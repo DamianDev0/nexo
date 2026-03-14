@@ -33,6 +33,11 @@ out/
 build
 dist
 
+# Compiled files (prevent tsc output leaking into src/)
+*.js.map
+*.d.ts.map
+*.tsbuildinfo
+
 # IDEs and editors
 /.idea
 .project
