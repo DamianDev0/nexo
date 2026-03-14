@@ -42,4 +42,8 @@ export class TenantsRepository {
     const count = await this.repo.count({ where: { slug } })
     return count > 0
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.repo.delete({ id })
+  }
 }

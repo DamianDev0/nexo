@@ -1,0 +1,64 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+# Prevent concurrent deploys — if a new push comes in, cancel the previous deploy
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false # never cancel an in-flight deploy — let it finish
+
+jobs:
+  deploy:
+    name: Deploy API + Run Tenant Migrations
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+      DATABASE_USER: ${{ secrets.DATABASE_USER }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+      NODE_ENV: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ── Pre-deploy: dry-run migration to catch errors before touching prod ──
+      - name: Migration dry-run
+        run: pnpm --filter api migrate:dry
+
+      # ── Build ────────────────────────────────────────────────────────────────
+      - name: Build API
+        run: pnpm --filter api build
+
+      # ── Run tenant migrations BEFORE switching traffic ───────────────────────
+      # Migrations run on the old version of the app while the new version
+      # is being deployed. Migrations must always be backwards-compatible.
+      - name: Run tenant migrations
+        run: pnpm --filter api migrate
+        # If migrations fail, the deploy is aborted — traffic stays on old version
+
+      # ── Deploy to Railway ────────────────────────────────────────────────────
+      # Replace this step with your actual deploy command (Railway, Fly.io, etc.)
+      - name: Deploy to Railway
+        run: |
+          echo "Deploy step — configure with your Railway / Fly.io / Docker command"
+          # Example for Railway:
+          # railway up --service api
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

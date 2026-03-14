@@ -8,4 +8,5 @@ export const appConfig = registerAs('app', () => ({
   swaggerPath: 'api/docs',
   apiName: 'NexoCRM API',
   apiVersion: '1.0',
+  cookieSecret: process.env.COOKIE_SECRET ?? 'nexocrm-dev-secret',
 }))

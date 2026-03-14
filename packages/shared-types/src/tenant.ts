@@ -14,6 +14,7 @@ export type AuthenticatedUser = {
   email: string
   role: UserRole
   tenantId: string
+  schemaName: string
 }
 
 export type TenantConfig = {

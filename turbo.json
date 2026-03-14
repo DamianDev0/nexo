@@ -11,10 +11,17 @@
     "DATABASE_PASSWORD",
     "DATABASE_NAME",
     "REDIS_HOST",
-    "REDIS_PORT"
+    "REDIS_PORT",
+    "COOKIE_SECRET",
+    "JWT_PRIVATE_KEY",
+    "JWT_PUBLIC_KEY",
+    "JWT_ACCESS_EXPIRES",
+    "JWT_REFRESH_EXPIRES",
+    "JWT_REFRESH_EXPIRES_MS"
   ],
   "tasks": {
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },

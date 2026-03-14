@@ -1,9 +1,5 @@
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -15,9 +11,9 @@ import { TenantResponseDto } from '../dto/tenant-response.dto'
 
 @Injectable()
 export class TenantsService {
-  private readonly logger = new Logger(TenantsService.name)
-
   constructor(
+    @InjectPinoLogger(TenantsService.name)
+    private readonly logger: PinoLogger,
     private readonly tenantsRepo: TenantsRepository,
     private readonly provisioning: TenantProvisioningService,
     @InjectRepository(Plan)
@@ -25,12 +21,10 @@ export class TenantsService {
   ) {}
 
   async create(dto: CreateTenantDto): Promise<TenantResponseDto> {
-    // Check slug uniqueness
     if (await this.tenantsRepo.slugExists(dto.slug)) {
       throw new ConflictException(`Subdomain "${dto.slug}" is already taken`)
     }
 
-    // Resolve plan
     const planName = dto.planName ?? 'free'
     const plan = await this.planRepo.findOne({ where: { name: planName } })
     if (!plan) {
@@ -39,7 +33,6 @@ export class TenantsService {
 
     const schemaName = `tenant_${dto.slug.replaceAll('-', '_')}`
 
-    // Create the tenant record
     const tenant = await this.tenantsRepo.create({
       slug: dto.slug,
       name: dto.name,
@@ -47,12 +40,10 @@ export class TenantsService {
       planId: plan.id,
     })
 
-    // Provision the isolated schema
     await this.provisioning.createTenantSchema(schemaName)
 
-    this.logger.log(`Tenant created: ${dto.slug} (${schemaName})`)
+    this.logger.info({ slug: dto.slug, schemaName }, 'Tenant created')
 
-    // Re-fetch with plan relation
     const fullTenant = await this.tenantsRepo.findById(tenant.id)
     return TenantResponseDto.fromEntity(fullTenant!)
   }
@@ -68,5 +59,18 @@ export class TenantsService {
       throw new NotFoundException(`Tenant "${slug}" not found`)
     }
     return TenantResponseDto.fromEntity(tenant)
+  }
+
+  /**
+   * Hard-deletes a tenant record and drops its schema.
+   * Used as rollback during failed onboarding — not exposed via API.
+   */
+  async delete(tenantId: string): Promise<void> {
+    const tenant = await this.tenantsRepo.findById(tenantId)
+    if (!tenant) return
+
+    await this.provisioning.dropTenantSchema(tenant.schemaName)
+    await this.tenantsRepo.deleteById(tenantId)
+    this.logger.warn({ slug: tenant.slug }, 'Tenant deleted (onboarding rollback)')
   }
 }
