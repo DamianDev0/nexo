@@ -57,8 +57,9 @@ export class ResendService {
     })
 
     if (error) {
-      this.logger.error({ to: options.to, subject: options.subject, error }, 'Email send failed')
-      throw new InternalServerErrorException('Failed to send email')
+      const reason = `${error.name}: ${error.message}`
+      this.logger.error({ to: options.to, subject: options.subject, reason }, 'Email send failed')
+      throw new InternalServerErrorException(`Failed to send email — ${reason}`)
     }
 
     this.logger.info({ to: options.to, subject: options.subject, id: data?.id }, 'Email sent')
