@@ -37,6 +37,7 @@ const mockUser: UserRow = {
 
 const mockTenantCtx: TenantContext = {
   tenantId: 'tenant-1',
+  slug: 'acme',
   schemaName: SCHEMA,
   plan: 'free',
   config: {},

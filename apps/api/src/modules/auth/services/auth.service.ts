@@ -63,6 +63,7 @@ export class AuthService {
 
     const tenantCtx: TenantContext = {
       tenantId: tenant.id,
+      slug: dto.slug,
       schemaName: tenant.schemaName,
       plan: tenant.plan,
       config: {},
@@ -173,6 +174,7 @@ export class AuthService {
 
     const tenantCtx: TenantContext = {
       tenantId: tenant.id,
+      slug: tenant.slug,
       schemaName: tenant.schemaName,
       plan: tenant.plan.name,
       config: tenant.config ?? {},

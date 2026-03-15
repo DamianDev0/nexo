@@ -17,6 +17,7 @@ import { TenantMiddleware } from '@/shared/tenant/tenant.middleware'
 import { TenantsModule } from '@/modules/tenants/tenants.module'
 import { AuthModule } from '@/modules/auth/auth.module'
 import { UsersModule } from '@/modules/users/users.module'
+import { SettingsModule } from '@/modules/settings/settings.module'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { RolesGuard } from '@/modules/auth/guards/roles.guard'
 
@@ -35,6 +36,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     TenantsModule,
     AuthModule,
     UsersModule,
+    SettingsModule,
   ],
   providers: [
     // Global guards — order matters: Throttler → JWT → Roles

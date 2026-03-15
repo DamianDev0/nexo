@@ -187,6 +187,27 @@ export class AuditLogService {
     })
   }
 
+  // ─── Settings events ──────────────────────────────────────────────────────
+
+  async settingsUpdated(
+    tenantId: string,
+    userId: string | undefined,
+    schemaName: string,
+    meta?: AuditMeta,
+    description = 'Tenant settings updated',
+  ): Promise<void> {
+    await this.write({
+      schemaName,
+      action: AuditAction.SettingsUpdated,
+      entityType: AuditEntityType.System,
+      entityId: tenantId,
+      userId,
+      severity: 'info',
+      description,
+      ...meta,
+    })
+  }
+
   // ─── Tenant events ────────────────────────────────────────────────────────
 
   async tenantCreated(tenant: TenantRef, schemaName: string, meta?: AuditMeta): Promise<void> {

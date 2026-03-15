@@ -6,6 +6,7 @@ import type { AuthService } from '../services/auth.service'
 
 const mockTenantCtx: TenantContext = {
   tenantId: 'tenant-1',
+  slug: 'acme',
   schemaName: 'tenant_acme',
   plan: 'free',
   config: {},

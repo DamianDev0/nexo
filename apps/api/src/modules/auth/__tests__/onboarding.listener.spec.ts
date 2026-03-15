@@ -45,7 +45,7 @@ describe('OnboardingListener', () => {
   })
 
   it('uses localhost:3001 as fallback frontend URL', async () => {
-    config.get.mockImplementation((_key: string, defaultValue?: string) => defaultValue)
+    config.get.mockImplementation((_key: unknown, defaultValue?: unknown) => defaultValue)
     resend.sendWelcomeEmail.mockResolvedValue(undefined)
 
     await listener.handleTenantOnboarded(mockEvent)

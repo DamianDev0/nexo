@@ -3,6 +3,7 @@ import type { UserRole } from './enums'
 // ─── TENANT CONTEXT (attached to every request by middleware) ─────────
 export type TenantContext = {
   tenantId: string
+  slug: string
   schemaName: string
   plan: string
   config: Record<string, unknown>

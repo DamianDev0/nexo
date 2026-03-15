@@ -68,6 +68,7 @@ export class TenantMiddleware implements NestMiddleware {
 
       tenantContext = {
         tenantId: tenant.id,
+        slug: tenant.slug,
         schemaName: tenant.schemaName,
         plan: tenant.plan.name,
         config: tenant.config,
