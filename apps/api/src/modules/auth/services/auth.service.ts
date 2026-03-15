@@ -109,6 +109,7 @@ export class AuthService {
         dto.ownerFullName,
         dto.businessName,
         tenantCtx.schemaName,
+        tenantCtx.tenantId,
       ),
     )
 

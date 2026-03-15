@@ -18,6 +18,7 @@ import { TenantsModule } from '@/modules/tenants/tenants.module'
 import { AuthModule } from '@/modules/auth/auth.module'
 import { UsersModule } from '@/modules/users/users.module'
 import { SettingsModule } from '@/modules/settings/settings.module'
+import { ContactsModule } from '@/modules/contacts/contacts.module'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { RolesGuard } from '@/modules/auth/guards/roles.guard'
 
@@ -37,6 +38,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     AuthModule,
     UsersModule,
     SettingsModule,
+    ContactsModule,
   ],
   providers: [
     // Global guards — order matters: Throttler → JWT → Roles

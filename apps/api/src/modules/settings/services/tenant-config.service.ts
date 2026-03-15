@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CacheService } from '@/shared/cache/cache.service'
@@ -14,10 +14,14 @@ import type {
   CustomFieldsConfig,
   FieldPermissionsConfig,
 } from '../interfaces/custom-field.interface'
+import { DEFAULT_ACTIVITY_TYPES } from '@repo/shared-types'
+import type { ActivityTypeDef } from '@repo/shared-types'
+import { deepMerge } from '@/shared/utils/deep-merge'
 
 const THEME_TTL = 600
 const NOMENCLATURE_TTL = 600
 const SIDEBAR_TTL = 300
+const ACTIVITY_TYPES_TTL = 600
 const HISTORY_LIMIT = 30
 
 interface TenantFullConfig {
@@ -26,6 +30,7 @@ interface TenantFullConfig {
   sidebarConfig?: SidebarConfig
   customFields?: CustomFieldsConfig
   fieldPermissions?: FieldPermissionsConfig
+  activityTypes?: ActivityTypeDef[]
   [key: string]: unknown
 }
 
@@ -131,7 +136,7 @@ export class TenantConfigService {
     if (cached) return cached
 
     const config = await this.getRawConfig(tenantId)
-    const sidebar = (config.sidebarConfig ?? DEFAULT_SIDEBAR_CONFIG) as SidebarConfig
+    const sidebar = config.sidebarConfig ?? DEFAULT_SIDEBAR_CONFIG
     await this.cache.set(this.sidebarKey(tenantId), sidebar, SIDEBAR_TTL)
     return sidebar
   }
@@ -141,6 +146,13 @@ export class TenantConfigService {
     updated: SidebarConfig,
     slug: string,
   ): Promise<SidebarConfig> {
+    const disabledRequired = updated.modules.filter((m) => m.required && !m.enabled)
+    if (disabledRequired.length > 0) {
+      throw new BadRequestException(
+        `Required modules cannot be disabled: ${disabledRequired.map((m) => m.key).join(', ')}`,
+      )
+    }
+
     await this.saveConfigSection(tenantId, 'sidebarConfig', updated)
     await this.invalidateAll(tenantId, slug)
     return updated
@@ -150,7 +162,7 @@ export class TenantConfigService {
 
   async getCustomFields(tenantId: string): Promise<CustomFieldsConfig> {
     const config = await this.getRawConfig(tenantId)
-    return (config.customFields ?? { contacts: [], companies: [], deals: [] }) as CustomFieldsConfig
+    return config.customFields ?? { contacts: [], companies: [], deals: [] }
   }
 
   async updateCustomFields(
@@ -163,11 +175,38 @@ export class TenantConfigService {
     return updated
   }
 
+  // ─── Activity types ───────────────────────────────────────────────────────
+
+  async getActivityTypes(tenantId: string): Promise<ActivityTypeDef[]> {
+    const cached = await this.cache.get<ActivityTypeDef[]>(this.activityTypesKey(tenantId))
+    if (cached) return cached
+
+    const config = await this.getRawConfig(tenantId)
+    const stored = config.activityTypes
+    const types: ActivityTypeDef[] =
+      Array.isArray(stored) && stored.length > 0 ? [...stored] : DEFAULT_ACTIVITY_TYPES
+    await this.cache.set(this.activityTypesKey(tenantId), types, ACTIVITY_TYPES_TTL)
+    return types
+  }
+
+  async updateActivityTypes(
+    tenantId: string,
+    types: ActivityTypeDef[],
+    slug: string,
+  ): Promise<ActivityTypeDef[]> {
+    await this.saveConfigSection(tenantId, 'activityTypes', types)
+    await Promise.all([
+      this.cache.del(this.activityTypesKey(tenantId)),
+      this.cache.del(`tenant:slug:${slug}`),
+    ])
+    return types
+  }
+
   async getFieldPermissions(tenantId: string): Promise<FieldPermissionsConfig> {
     const config = await this.getRawConfig(tenantId)
     const raw = config.fieldPermissions
     if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      return raw as FieldPermissionsConfig
+      return raw
     }
     return { contacts: {}, companies: {}, deals: {} }
   }
@@ -237,23 +276,9 @@ export class TenantConfigService {
   private sidebarKey(tenantId: string): string {
     return `tenant:sidebar:${tenantId}`
   }
-}
-
-function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
-  const result = { ...target }
-  for (const key of Object.keys(source) as (keyof T)[]) {
-    const sv = source[key]
-    const tv = result[key]
-    if (sv && typeof sv === 'object' && !Array.isArray(sv) && tv && typeof tv === 'object') {
-      result[key] = deepMerge(
-        tv as Record<string, unknown>,
-        sv as Record<string, unknown>,
-      ) as T[keyof T]
-    } else if (sv !== undefined) {
-      result[key] = sv as T[keyof T]
-    }
+  private activityTypesKey(tenantId: string): string {
+    return `tenant:activity-types:${tenantId}`
   }
-  return result
 }
 
 function deepMergeTheme(target: TenantTheme, patch: Partial<TenantTheme>): TenantTheme {

@@ -9,6 +9,7 @@ import { INDUSTRY_PRESETS } from '../constants/industry-presets'
 import type { TenantConfig } from '../interfaces/settings.interface'
 import type { UpdateSettingsDto } from '../dto/update-settings.dto'
 import { SettingsResponseDto } from '../dto/settings-response.dto'
+import { deepMerge } from '@/shared/utils/deep-merge'
 
 const FISCAL_FIELDS = new Set(['nit', 'taxRegime'])
 
@@ -119,21 +120,4 @@ export class SettingsService {
     if (!tenant) throw new NotFoundException('Tenant not found')
     return tenant
   }
-}
-
-function deepMerge<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
-  const result = { ...target }
-  for (const key of Object.keys(source) as (keyof T)[]) {
-    const sv = source[key]
-    const tv = result[key]
-    if (sv && typeof sv === 'object' && !Array.isArray(sv) && tv && typeof tv === 'object') {
-      result[key] = deepMerge(
-        tv as Record<string, unknown>,
-        sv as Record<string, unknown>,
-      ) as T[keyof T]
-    } else if (sv !== undefined) {
-      result[key] = sv as T[keyof T]
-    }
-  }
-  return result
 }

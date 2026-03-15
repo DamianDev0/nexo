@@ -7,6 +7,7 @@ import { Public } from '@/shared/decorators/public.decorator'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { TenantConfigService } from '../services/tenant-config.service'
 import { BORDER_RADIUS_MAP, FONT_FAMILY_MAP } from '../constants/default-theme'
+import type { BrandingPublic } from '@repo/shared-types'
 
 @ApiTags('Tenant Public')
 @Controller('tenant')
@@ -25,9 +26,7 @@ export class TenantPublicController {
   @ApiParam({ name: 'slug', description: 'Tenant slug' })
   @ApiOperation({ summary: 'Get tenant CSS variables (public, cached 5 min)' })
   async getThemeCss(@Param('slug') slug: string, @Res() res: Response): Promise<void> {
-    const tenant = await this.tenantRepo.findOne({ where: { slug, isActive: true } })
-    if (!tenant) throw new NotFoundException('Tenant not found')
-
+    const tenant = await this.findTenantBySlug(slug)
     const theme = await this.configService.getTheme(tenant.id)
     const { colors, typography, branding } = theme
 
@@ -56,10 +55,8 @@ export class TenantPublicController {
   @Public()
   @ApiParam({ name: 'slug', description: 'Tenant slug' })
   @ApiOperation({ summary: 'Get tenant branding info (public)' })
-  async getBranding(@Param('slug') slug: string) {
-    const tenant = await this.tenantRepo.findOne({ where: { slug, isActive: true } })
-    if (!tenant) throw new NotFoundException('Tenant not found')
-
+  async getBranding(@Param('slug') slug: string): Promise<BrandingPublic> {
+    const tenant = await this.findTenantBySlug(slug)
     const theme = await this.configService.getTheme(tenant.id)
     return {
       companyName: theme.branding.companyName,
@@ -70,5 +67,11 @@ export class TenantPublicController {
       darkModeDefault: theme.darkModeDefault,
       primaryColor: theme.colors.primary,
     }
+  }
+
+  private async findTenantBySlug(slug: string): Promise<Tenant> {
+    const tenant = await this.tenantRepo.findOne({ where: { slug, isActive: true } })
+    if (!tenant) throw new NotFoundException('Tenant not found')
+    return tenant
   }
 }

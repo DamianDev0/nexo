@@ -4,6 +4,7 @@ import { UserRole } from '@repo/shared-types'
 import { ROLES_KEY } from '@/shared/decorators/roles.decorator'
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
+  [UserRole.SUPER_ADMIN]: 6,
   [UserRole.OWNER]: 5,
   [UserRole.ADMIN]: 4,
   [UserRole.MANAGER]: 3,

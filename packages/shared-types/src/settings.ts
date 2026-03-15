@@ -143,3 +143,91 @@ export type FieldPermission = {
 }
 
 export type FieldPermissionsConfig = Record<CustomFieldEntity, Record<string, FieldPermission>>
+
+// ─── PIPELINE ─────────────────────────────────────────────────────────────────
+
+export type PipelineStage = {
+  id: string
+  pipelineId: string
+  name: string
+  color: string
+  probability: number // 0–100
+  position: number
+}
+
+export type Pipeline = {
+  id: string
+  name: string
+  isDefault: boolean
+  stages: PipelineStage[]
+}
+
+// ─── ACTIVITY TYPES ───────────────────────────────────────────────────────────
+
+export type ActivityTypeDef = {
+  key: string
+  label: string
+  icon: string
+  color: string
+  trackDuration: boolean
+  isSystem: boolean // system types cannot be deleted
+}
+
+export const DEFAULT_ACTIVITY_TYPES: ActivityTypeDef[] = [
+  {
+    key: 'call',
+    label: 'Call',
+    icon: 'phone',
+    color: '#22C55E',
+    trackDuration: true,
+    isSystem: true,
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    icon: 'mail',
+    color: '#3B82F6',
+    trackDuration: false,
+    isSystem: true,
+  },
+  {
+    key: 'meeting',
+    label: 'Meeting',
+    icon: 'calendar',
+    color: '#8B5CF6',
+    trackDuration: true,
+    isSystem: true,
+  },
+  {
+    key: 'task',
+    label: 'Task',
+    icon: 'check-square',
+    color: '#F59E0B',
+    trackDuration: false,
+    isSystem: true,
+  },
+  {
+    key: 'note',
+    label: 'Note',
+    icon: 'file-text',
+    color: '#6B7280',
+    trackDuration: false,
+    isSystem: true,
+  },
+  {
+    key: 'whatsapp',
+    label: 'WhatsApp',
+    icon: 'message-circle',
+    color: '#25D366',
+    trackDuration: false,
+    isSystem: true,
+  },
+]
+
+// ─── EMAIL BRANDING ───────────────────────────────────────────────────────────
+
+export type EmailBrandingContext = {
+  companyName: string
+  primaryColor: string
+  logoUrl: string | null
+}

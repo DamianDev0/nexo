@@ -18,6 +18,8 @@ import { UpdateCustomFieldsDto, UpdateFieldPermissionsDto } from '../dto/custom-
 import type {
   CustomFieldEntity,
   CustomFieldsConfig,
+  FieldDef,
+  FieldPermission,
   FieldPermissionsConfig,
 } from '../interfaces/custom-field.interface'
 
@@ -47,7 +49,10 @@ export class CustomFieldsController {
   @Auth(UserRole.ADMIN)
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
   @ApiOperation({ summary: 'Get custom fields for a specific entity' })
-  async getEntityFields(@Param('entity') entity: string, @TenantCtx() ctx: TenantContext) {
+  async getEntityFields(
+    @Param('entity') entity: string,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<FieldDef[]> {
     assertValidEntity(entity)
     const config = await this.configService.getCustomFields(ctx.tenantId)
     return config[entity]
@@ -74,10 +79,13 @@ export class CustomFieldsController {
   @Auth(UserRole.ADMIN)
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
   @ApiOperation({ summary: 'Get field permissions for a specific entity' })
-  async getFieldPermissions(@Param('entity') entity: string, @TenantCtx() ctx: TenantContext) {
+  async getFieldPermissions(
+    @Param('entity') entity: string,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<Record<string, FieldPermission>> {
     assertValidEntity(entity)
     const config = await this.configService.getFieldPermissions(ctx.tenantId)
-    return config[entity] ?? {}
+    return config[entity]
   }
 
   @Patch('permissions/:entity')
@@ -92,10 +100,7 @@ export class CustomFieldsController {
   ): Promise<FieldPermissionsConfig> {
     assertValidEntity(entity)
     const current = await this.configService.getFieldPermissions(ctx.tenantId)
-    const updated: FieldPermissionsConfig = {
-      ...(current as FieldPermissionsConfig),
-      [entity]: dto.permissions,
-    }
+    const updated: FieldPermissionsConfig = { ...current, [entity]: dto.permissions }
     return this.configService.updateFieldPermissions(ctx.tenantId, updated, ctx.slug)
   }
 }

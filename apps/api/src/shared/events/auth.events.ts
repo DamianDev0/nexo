@@ -8,5 +8,6 @@ export class TenantOnboardedEvent {
     public readonly ownerName: string,
     public readonly tenantName: string,
     public readonly schemaName: string,
+    public readonly tenantId: string,
   ) {}
 }

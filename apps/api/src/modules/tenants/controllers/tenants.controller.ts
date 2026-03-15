@@ -12,14 +12,14 @@ export class TenantsController {
   constructor(private readonly tenantsService: TenantsService) {}
 
   @Post()
-  @Auth(UserRole.OWNER)
+  @Auth(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Register a new tenant (internal — prefer POST /auth/onboard)' })
   create(@Body() dto: CreateTenantDto): Promise<TenantResponseDto> {
     return this.tenantsService.create(dto)
   }
 
   @Get()
-  @Auth(UserRole.ADMIN)
+  @Auth(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'List all active tenants' })
   findAll(): Promise<TenantResponseDto[]> {
     return this.tenantsService.findAll()

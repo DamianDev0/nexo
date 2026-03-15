@@ -6,7 +6,13 @@ import { OnboardingListener } from '../listeners/onboarding.listener'
 import { ResendService } from '@/shared/integrations/resend/resend.service'
 import { TenantOnboardedEvent } from '@/shared/events/auth.events'
 
-const mockEvent = new TenantOnboardedEvent('owner@acme.com', 'John Doe', 'Acme Corp', 'tenant_acme')
+const mockEvent = new TenantOnboardedEvent(
+  'owner@acme.com',
+  'John Doe',
+  'Acme Corp',
+  'tenant_acme',
+  'tenant-uuid-1',
+)
 
 describe('OnboardingListener', () => {
   let listener: OnboardingListener

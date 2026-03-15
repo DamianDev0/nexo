@@ -1,9 +1,12 @@
 import { Global, Module } from '@nestjs/common'
+import { SettingsModule } from '@/modules/settings/settings.module'
 import { ResendService } from './resend.service'
+import { TenantEmailService } from './tenant-email.service'
 
 @Global()
 @Module({
-  providers: [ResendService],
-  exports: [ResendService],
+  imports: [SettingsModule],
+  providers: [ResendService, TenantEmailService],
+  exports: [ResendService, TenantEmailService],
 })
 export class ResendModule {}

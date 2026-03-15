@@ -4,7 +4,7 @@ import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import type { TenantContext } from '@repo/shared-types'
 import { PasswordService } from '@/shared/security/password.service'
 import { AuditLogService } from '@/shared/audit-log/audit-log.service'
-import { ResendService } from '@/shared/integrations/resend/resend.service'
+import { TenantEmailService } from '@/shared/integrations/resend/tenant-email.service'
 import { AuthRepository } from '../repositories/auth.repository'
 import { PasswordResetRepository } from '../repositories/password-reset.repository'
 import { SessionRepository } from '../repositories/session.repository'
@@ -25,7 +25,7 @@ export class PasswordResetService {
     private readonly password: PasswordService,
     private readonly token: TokenService,
     private readonly audit: AuditLogService,
-    private readonly resend: ResendService,
+    private readonly tenantEmail: TenantEmailService,
     private readonly config: ConfigService,
   ) {}
 
@@ -45,11 +45,15 @@ export class PasswordResetService {
       tokenHash: this.token.hashToken(rawToken),
       expiresAt,
     })
-    await this.resend.sendPasswordResetEmail(email, {
-      resetUrl: this.buildResetUrl(rawToken),
-      userEmail: email,
-      expiresInMinutes: RESET_TTL_MINUTES,
-    })
+    await this.tenantEmail.sendPasswordResetEmail(
+      email,
+      {
+        resetUrl: this.buildResetUrl(rawToken),
+        userEmail: email,
+        expiresInMinutes: RESET_TTL_MINUTES,
+      },
+      tenantCtx.tenantId,
+    )
     await this.audit.authPasswordResetRequested(email, schemaName, meta)
 
     this.logger.info({ email, schemaName }, 'Password reset email sent')

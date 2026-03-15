@@ -9,7 +9,7 @@ import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import type { TenantContext } from '@repo/shared-types'
 import { AuditLogService } from '@/shared/audit-log/audit-log.service'
 import { PasswordService } from '@/shared/security/password.service'
-import { ResendService } from '@/shared/integrations/resend/resend.service'
+import { TenantEmailService } from '@/shared/integrations/resend/tenant-email.service'
 import { AuthRepository } from '@/modules/auth/repositories/auth.repository'
 import { TokenService } from '@/modules/auth/services/token.service'
 import { InvitationRepository } from '../repositories/invitation.repository'
@@ -29,7 +29,7 @@ export class UsersService {
     private readonly password: PasswordService,
     private readonly token: TokenService,
     private readonly audit: AuditLogService,
-    private readonly resend: ResendService,
+    private readonly tenantEmail: TenantEmailService,
     private readonly config: ConfigService,
   ) {}
 
@@ -66,13 +66,17 @@ export class UsersService {
     const frontendUrl = this.config.get<string>('app.frontendUrl', 'http://localhost:3001')
     const inviteUrl = `${frontendUrl}/invite/accept?token=${rawToken}`
 
-    await this.resend.sendInviteEmail(dto.email, {
-      inviteUrl,
-      tenantName: schemaName,
-      inviterName: inviterEmail,
-      role: dto.role,
-      expiresInHours: INVITE_TTL_HOURS,
-    })
+    await this.tenantEmail.sendInviteEmail(
+      dto.email,
+      {
+        inviteUrl,
+        tenantName: schemaName,
+        inviterName: inviterEmail,
+        role: dto.role,
+        expiresInHours: INVITE_TTL_HOURS,
+      },
+      tenantCtx.tenantId,
+    )
 
     this.logger.info({ email: dto.email, role: dto.role, schemaName }, 'Invitation sent')
     await this.audit.authInviteSent(dto.email, dto.role, invitedById, schemaName, meta)

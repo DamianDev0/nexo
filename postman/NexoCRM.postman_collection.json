@@ -1,0 +1,857 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "NexoCRM API",
+    "description": "Complete API collection for NexoCRM.\n\n**Base URL:** `http://localhost:8080/api/v1`\n\n**Auth:** Tokens are set as httpOnly cookies on login/onboard. Postman handles cookies automatically.\n\n**Tenant:** Send `x-tenant-slug` header on every authenticated request.\n\n**RBAC roles (lowest → highest):** `viewer → sales_rep → manager → admin → owner`\n\n**Setup:**\n1. Set collection variables: `NEXOURL`, `tenantSlug`, `email`\n2. Run `POST /auth/onboard` to create tenant + owner\n3. Run `POST /auth/login` — cookies are set automatically\n4. All subsequent requests use those cookies + `x-tenant-slug` header",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "NEXOURL", "value": "http://localhost:8080/api/v1", "type": "string" },
+    { "key": "tenantSlug", "value": "acme", "type": "string" },
+    { "key": "email", "value": "owner@acme.com", "type": "string" },
+    { "key": "contact_id", "value": "", "type": "string" },
+    { "key": "pipeline_id", "value": "", "type": "string" },
+    { "key": "history_id", "value": "", "type": "string" },
+    { "key": "activity_key", "value": "demo", "type": "string" },
+    { "key": "entity", "value": "contacts", "type": "string" },
+    { "key": "invite_token", "value": "", "type": "string" },
+    { "key": "reset_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints. Public endpoints need no cookies.",
+      "item": [
+        {
+          "name": "Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/onboard",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "onboard"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"businessName\": \"Acme Corp\",\n  \"slug\": \"acme\",\n  \"planName\": \"free\",\n  \"ownerEmail\": \"owner@acme.com\",\n  \"ownerPassword\": \"SecureP@ss123\",\n  \"ownerFullName\": \"John Owner\"\n}"
+            },
+            "description": "**Public — no auth required.**\n\nCreates the business tenant, provisions its isolated PostgreSQL schema, and registers the first user as OWNER.\n\nTokens are returned as httpOnly cookies. The response body contains user + tenant info."
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/login",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"SecureP@ss123\"\n}"
+            },
+            "description": "**Public — no auth required.**\n\nAuthenticates with email + password. Sets `access_token` and `refresh_token` as httpOnly cookies."
+          }
+        },
+        {
+          "name": "Refresh tokens",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/refresh",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Rotates the token pair using the `refresh_token` cookie. Includes reuse detection — if the token was already consumed, all sessions are revoked."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/logout",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "**Requires auth.**\n\nRevokes the current refresh token and clears all auth cookies. Returns 204."
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/me",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "**Requires auth.**\n\nReturns the user decoded from the JWT cookie: id, email, role, tenantId, schemaName."
+          }
+        },
+        {
+          "name": "Forgot-Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/forgot-password",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "forgot-password"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"email\": \"{{email}}\"\n}"
+            },
+            "description": "**Public — no auth required.**\n\nAlways returns 204 regardless of whether the email exists (prevents user enumeration). Token expires in 30 minutes."
+          }
+        },
+        {
+          "name": "Reset-Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/reset-password",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "reset-password"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"token\": \"{{reset_token}}\",\n  \"newPassword\": \"NewSecureP@ss123\"\n}"
+            },
+            "description": "**Public — no auth required.**\n\nConsumes the reset token (single-use) and sets the new password. Revokes all active sessions."
+          }
+        },
+        {
+          "name": "Google OAuth — initiate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{NEXOURL}}/auth/google?slug={{tenantSlug}}",
+              "host": ["{{NEXOURL}}"],
+              "path": ["auth", "google"],
+              "query": [{ "key": "slug", "value": "{{tenantSlug}}" }]
+            },
+            "description": "**Public — no auth required.**\n\nRedirects to Google OAuth. Pass `?slug=your-tenant-slug` so the backend knows which tenant to authenticate against.\n\n> Open in browser — Postman cannot follow OAuth redirects."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Tenants",
+      "description": "Tenant management. Most operations require ADMIN or OWNER role.",
+      "item": [
+        {
+          "name": "List all tenants",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/tenants",
+              "host": ["{{NEXOURL}}"],
+              "path": ["tenants"]
+            },
+            "description": "**Requires ADMIN.**\n\nReturns all active tenants."
+          }
+        },
+        {
+          "name": "Get tenant by slug",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/tenants/{{tenantSlug}}",
+              "host": ["{{NEXOURL}}"],
+              "path": ["tenants", "{{tenantSlug}}"]
+            },
+            "description": "**Requires VIEWER.**\n\nReturns the tenant info by slug."
+          }
+        },
+        {
+          "name": "Get tenant branding (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{NEXOURL}}/tenant/{{tenantSlug}}/branding",
+              "host": ["{{NEXOURL}}"],
+              "path": ["tenant", "{{tenantSlug}}", "branding"]
+            },
+            "description": "**Public — no auth required.**\n\nReturns branding config: logo, favicon, company name, primary color, dark mode preference. Used by the frontend login page before auth."
+          }
+        },
+        {
+          "name": "Get tenant theme CSS (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{NEXOURL}}/tenant/{{tenantSlug}}/theme.css",
+              "host": ["{{NEXOURL}}"],
+              "path": ["tenant", "{{tenantSlug}}", "theme.css"]
+            },
+            "description": "**Public — no auth required. Cached 5 min.**\n\nReturns a CSS file with `:root` variables for colors, fonts, border radius, density, and icon pack."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Users",
+      "description": "Team member management via invitation flow.",
+      "item": [
+        {
+          "name": "Invite team member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{NEXOURL}}/users/invite",
+              "host": ["{{NEXOURL}}"],
+              "path": ["users", "invite"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"email\": \"sales@acme.com\",\n  \"fullName\": \"Sales Rep\",\n  \"role\": \"sales_rep\"\n}"
+            },
+            "description": "**Requires MANAGER or above.**\n\nSends an invitation email. Token expires in 72 hours.\n\nValid roles: `viewer` | `sales_rep` | `manager` | `admin`"
+          }
+        },
+        {
+          "name": "Accept invitation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{NEXOURL}}/users/invite/accept",
+              "host": ["{{NEXOURL}}"],
+              "path": ["users", "invite", "accept"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"token\": \"{{invite_token}}\",\n  \"fullName\": \"Sales Rep\",\n  \"password\": \"SecureP@ss123\"\n}"
+            },
+            "description": "**Public — no auth required.**\n\nValidates the invite token, creates the account, and returns an authenticated session (sets auth cookies). Token is consumed (single-use)."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Contacts",
+      "description": "Full contact management with Colombian fields, full-text search, custom fields and timeline.",
+      "item": [
+        {
+          "name": "List contacts",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/contacts?page=1&limit=25",
+              "host": ["{{NEXOURL}}"],
+              "path": ["contacts"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "25" },
+                {
+                  "key": "q",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Full-text search (name, email, phone, document)"
+                },
+                {
+                  "key": "status",
+                  "value": "new",
+                  "disabled": true,
+                  "description": "new | in_contact | qualified | client | inactive | lost"
+                },
+                {
+                  "key": "source",
+                  "value": "manual",
+                  "disabled": true,
+                  "description": "manual | whatsapp | web_form | referral | import"
+                },
+                {
+                  "key": "tags[]",
+                  "value": "vip",
+                  "disabled": true,
+                  "description": "Contact must have ALL specified tags"
+                },
+                { "key": "companyId", "value": "", "disabled": true },
+                { "key": "assignedToId", "value": "", "disabled": true }
+              ]
+            },
+            "description": "**Requires VIEWER.**\n\nPaginated list with optional filters. All filters are AND-combined. `tags` uses `@>` — contact must have ALL specified tags."
+          }
+        },
+        {
+          "name": "Get contact",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/contacts/{{contact_id}}",
+              "host": ["{{NEXOURL}}"],
+              "path": ["contacts", "{{contact_id}}"]
+            },
+            "description": "**Requires VIEWER.**\n\nReturns full contact including `customFields` (excluded from list for performance)."
+          }
+        },
+        {
+          "name": "Create contact",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{NEXOURL}}/contacts",
+              "host": ["{{NEXOURL}}"],
+              "path": ["contacts"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"firstName\": \"Carlos\",\n  \"lastName\": \"Martínez\",\n  \"email\": \"carlos@empresa.com\",\n  \"phone\": \"3001234567\",\n  \"whatsapp\": \"3001234567\",\n  \"documentType\": \"cc\",\n  \"documentNumber\": \"1234567890\",\n  \"city\": \"Bogotá\",\n  \"department\": \"Cundinamarca\",\n  \"municipioCode\": \"11001\",\n  \"status\": \"new\",\n  \"source\": \"manual\",\n  \"leadScore\": 50,\n  \"tags\": [\"vip\", \"hot-lead\"],\n  \"customFields\": {\n    \"industry\": \"technology\"\n  }\n}"
+            },
+            "description": "**Requires SALES_REP.**\n\nDocument types: `cc` | `nit` | `ce` | `pp` | `ti`\n\nStatuses: `new` | `in_contact` | `qualified` | `client` | `inactive` | `lost`\n\nSources: `manual` | `whatsapp` | `web_form` | `referral` | `import`\n\n`municipioCode`: 5-digit DANE code (e.g. `11001` = Bogotá D.C.)"
+          }
+        },
+        {
+          "name": "Update contact",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{NEXOURL}}/contacts/{{contact_id}}",
+              "host": ["{{NEXOURL}}"],
+              "path": ["contacts", "{{contact_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"status\": \"qualified\",\n  \"leadScore\": 80,\n  \"tags\": [\"vip\", \"qualified\"],\n  \"customFields\": {\n    \"industry\": \"fintech\"\n  }\n}"
+            },
+            "description": "**Requires SALES_REP.**\n\nAll fields are optional. Only provided fields are updated — patch semantics."
+          }
+        },
+        {
+          "name": "Delete contact (soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/contacts/{{contact_id}}",
+              "host": ["{{NEXOURL}}"],
+              "path": ["contacts", "{{contact_id}}"]
+            },
+            "description": "**Requires MANAGER.**\n\nSoft-deletes: sets `is_active = false`. Returns 204."
+          }
+        },
+        {
+          "name": "Get contact timeline",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+            "url": {
+              "raw": "{{NEXOURL}}/contacts/{{contact_id}}/timeline",
+              "host": ["{{NEXOURL}}"],
+              "path": ["contacts", "{{contact_id}}", "timeline"]
+            },
+            "description": "**Requires VIEWER.**\n\nReturns the contact's complete history: activities (last 50) and active deals. Fetched in parallel."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Settings",
+      "description": "All tenant configuration. Most write operations require ADMIN.",
+      "item": [
+        {
+          "name": "General",
+          "item": [
+            {
+              "name": "Get general settings",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/general",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "general"]
+                },
+                "description": "**Requires VIEWER.**\n\nReturns full tenant settings: business info, i18n preferences, billing data, industry config, and current plan."
+              }
+            },
+            {
+              "name": "Update general settings",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/general",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "general"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"businessName\": \"Acme Corp\",\n  \"business\": {\n    \"phone\": \"6012345678\",\n    \"email\": \"info@acme.com\",\n    \"website\": \"https://acme.com\",\n    \"nit\": \"900123456\",\n    \"taxRegime\": \"responsible_iva\"\n  },\n  \"i18n\": {\n    \"language\": \"es\",\n    \"timezone\": \"America/Bogota\",\n    \"currency\": \"COP\",\n    \"dateFormat\": \"DD/MM/YYYY\",\n    \"numberFormat\": \"colombian\"\n  },\n  \"billing\": {\n    \"legalName\": \"Acme Corp S.A.S.\",\n    \"municipalityCode\": \"11001\",\n    \"fiscalResponsibilities\": [\"O-13\", \"O-15\"]\n  },\n  \"industry\": {\n    \"sector\": \"technology\"\n  }\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nAll sections are optional — deep-merged with existing config.\n\nTax regimes: `responsible_iva` | `not_responsible` | `large_taxpayer` | `simple_regime`"
+              }
+            }
+          ]
+        },
+
+        {
+          "name": "Theme",
+          "item": [
+            {
+              "name": "Get theme",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/theme",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "theme"]
+                },
+                "description": "**Requires VIEWER.**\n\nReturns the full theme config: colors, typography, branding, icon pack, dark mode."
+              }
+            },
+            {
+              "name": "Update theme",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/theme",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "theme"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"colors\": {\n    \"primary\": \"#6366F1\",\n    \"primaryForeground\": \"#FFFFFF\",\n    \"secondary\": \"#F1F5F9\",\n    \"accent\": \"#E0E7FF\",\n    \"sidebar\": \"#1E1B4B\",\n    \"sidebarForeground\": \"#FFFFFF\"\n  },\n  \"typography\": {\n    \"fontFamily\": \"inter\",\n    \"borderRadius\": \"md\",\n    \"density\": \"comfortable\"\n  },\n  \"branding\": {\n    \"companyName\": \"Acme Corp\",\n    \"logoUrl\": null,\n    \"faviconUrl\": null,\n    \"loginBgUrl\": null,\n    \"loginTagline\": \"Grow your business\"\n  },\n  \"iconPack\": \"outline\",\n  \"darkModeDefault\": \"system\"\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nDeep-merges — only send the sections you want to change.\n\nFont families: `inter` | `roboto` | `poppins` | `nunito` | `system`\n\nBorder radius: `none` | `sm` | `md` | `lg` | `full`\n\nDensity: `compact` | `comfortable` | `spacious`\n\nIcon packs: `outline` | `filled` | `duotone` | `rounded`\n\nDark mode: `light` | `dark` | `system`"
+              }
+            },
+            {
+              "name": "Get theme history",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/theme/history?limit=5",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "theme", "history"],
+                  "query": [{ "key": "limit", "value": "5", "description": "Max 10" }]
+                },
+                "description": "**Requires ADMIN.**\n\nReturns the last N theme changes with previous config snapshots (max 10, stored up to 30)."
+              }
+            },
+            {
+              "name": "Restore theme from history",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/theme/restore/{{history_id}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "theme", "restore", "{{history_id}}"]
+                },
+                "description": "**Requires ADMIN.**\n\nRolls back the theme to the state captured in the history record. Current state is saved to history before rolling back."
+              }
+            }
+          ]
+        },
+
+        {
+          "name": "Nomenclature",
+          "item": [
+            {
+              "name": "Get nomenclature",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/nomenclature",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "nomenclature"]
+                },
+                "description": "**Requires VIEWER.**\n\nReturns custom labels for core entities: contact, company, deal, activity."
+              }
+            },
+            {
+              "name": "Update nomenclature",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/nomenclature",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "nomenclature"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"contact\":  { \"singular\": \"Cliente\",    \"plural\": \"Clientes\"    },\n  \"company\":  { \"singular\": \"Empresa\",    \"plural\": \"Empresas\"    },\n  \"deal\":     { \"singular\": \"Negocio\",    \"plural\": \"Negocios\"    },\n  \"activity\": { \"singular\": \"Actividad\",  \"plural\": \"Actividades\" }\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nDeep-merges with existing labels. You can update just one entity."
+              }
+            }
+          ]
+        },
+
+        {
+          "name": "Navigation",
+          "item": [
+            {
+              "name": "Get sidebar config",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/navigation",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "navigation"]
+                },
+                "description": "**Requires VIEWER.**\n\nReturns the ordered list of sidebar modules with enabled/disabled state."
+              }
+            },
+            {
+              "name": "Update sidebar config",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/navigation",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "navigation"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"modules\": [\n    { \"key\": \"dashboard\",  \"label\": \"Dashboard\",     \"icon\": \"home\",        \"enabled\": true,  \"order\": 1, \"customIconUrl\": null, \"required\": true  },\n    { \"key\": \"contacts\",   \"label\": \"Clientes\",      \"icon\": \"users\",       \"enabled\": true,  \"order\": 2, \"customIconUrl\": null, \"required\": false },\n    { \"key\": \"companies\",  \"label\": \"Empresas\",      \"icon\": \"building\",    \"enabled\": true,  \"order\": 3, \"customIconUrl\": null, \"required\": false },\n    { \"key\": \"deals\",      \"label\": \"Negocios\",      \"icon\": \"trending-up\", \"enabled\": true,  \"order\": 4, \"customIconUrl\": null, \"required\": false },\n    { \"key\": \"activities\", \"label\": \"Actividades\",   \"icon\": \"calendar\",    \"enabled\": true,  \"order\": 5, \"customIconUrl\": null, \"required\": false },\n    { \"key\": \"invoices\",   \"label\": \"Facturas\",      \"icon\": \"file-text\",   \"enabled\": true,  \"order\": 6, \"customIconUrl\": null, \"required\": false },\n    { \"key\": \"products\",   \"label\": \"Productos\",     \"icon\": \"package\",     \"enabled\": false, \"order\": 7, \"customIconUrl\": null, \"required\": false },\n    { \"key\": \"reports\",    \"label\": \"Reportes\",      \"icon\": \"bar-chart\",   \"enabled\": true,  \"order\": 8, \"customIconUrl\": null, \"required\": false },\n    { \"key\": \"settings\",   \"label\": \"Configuración\", \"icon\": \"settings\",    \"enabled\": true,  \"order\": 9, \"customIconUrl\": null, \"required\": true  }\n  ]\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nFull replacement — send the complete ordered list. Modules with `required: true` (`dashboard`, `settings`) cannot be disabled — the server rejects with 400."
+              }
+            }
+          ]
+        },
+
+        {
+          "name": "Custom Fields",
+          "item": [
+            {
+              "name": "Get all custom fields",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields"]
+                },
+                "description": "**Requires ADMIN.**\n\nReturns custom field definitions for all entities: `{ contacts: [], companies: [], deals: [] }`"
+              }
+            },
+            {
+              "name": "Get custom fields for entity",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields/{{entity}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields", "{{entity}}"]
+                },
+                "description": "**Requires ADMIN.**\n\nEntity: `contacts` | `companies` | `deals`"
+              }
+            },
+            {
+              "name": "Replace custom fields for entity",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields/{{entity}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields", "{{entity}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"fields\": [\n    {\n      \"key\": \"industry\",\n      \"label\": \"Industry\",\n      \"type\": \"select\",\n      \"required\": false,\n      \"unique\": false,\n      \"order\": 1,\n      \"options\": [\n        { \"value\": \"technology\", \"label\": \"Technology\", \"color\": \"#3B82F6\" },\n        { \"value\": \"retail\",     \"label\": \"Retail\",     \"color\": \"#22C55E\" },\n        { \"value\": \"finance\",    \"label\": \"Finance\",    \"color\": \"#F59E0B\" }\n      ]\n    },\n    {\n      \"key\": \"linkedin_url\",\n      \"label\": \"LinkedIn URL\",\n      \"type\": \"url\",\n      \"required\": false,\n      \"unique\": false,\n      \"order\": 2\n    }\n  ]\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nFull replacement for the entity. Field types: `text` | `textarea` | `number` | `currency` | `date` | `datetime` | `select` | `multiselect` | `boolean` | `url` | `phone` | `email` | `file` | `relation`"
+              }
+            },
+            {
+              "name": "Get field permissions for entity",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields/permissions/{{entity}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields", "permissions", "{{entity}}"]
+                },
+                "description": "**Requires ADMIN.**\n\nReturns visibility and editability permissions per field key for the entity."
+              }
+            },
+            {
+              "name": "Update field permissions for entity",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields/permissions/{{entity}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields", "permissions", "{{entity}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"permissions\": {\n    \"email\":        { \"visibility\": \"all\",          \"editable\": \"manager_plus\" },\n    \"phone\":        { \"visibility\": \"all\",          \"editable\": \"all\"          },\n    \"linkedin_url\": { \"visibility\": \"manager_plus\", \"editable\": \"sales_rep\"    }\n  }\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nPermission levels: `all` | `manager_plus` | `admin_plus` | `owner_only` | `none`"
+              }
+            }
+          ]
+        },
+
+        {
+          "name": "Pipelines",
+          "item": [
+            {
+              "name": "List all pipelines",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/pipelines",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "pipelines"]
+                },
+                "description": "**Requires VIEWER. Cached 5 min.**\n\nReturns all pipelines with their stages ordered by position."
+              }
+            },
+            {
+              "name": "Get pipeline",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/pipelines/{{pipeline_id}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "pipelines", "{{pipeline_id}}"]
+                },
+                "description": "**Requires VIEWER. Cached 5 min.**"
+              }
+            },
+            {
+              "name": "Create pipeline",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/pipelines",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "pipelines"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"name\": \"Sales Pipeline\",\n  \"isDefault\": true,\n  \"stages\": [\n    { \"name\": \"Prospecting\",   \"color\": \"#6B7280\", \"probability\": 10,  \"position\": 0 },\n    { \"name\": \"Qualification\", \"color\": \"#3B82F6\", \"probability\": 25,  \"position\": 1 },\n    { \"name\": \"Proposal\",      \"color\": \"#8B5CF6\", \"probability\": 50,  \"position\": 2 },\n    { \"name\": \"Negotiation\",   \"color\": \"#F59E0B\", \"probability\": 75,  \"position\": 3 },\n    { \"name\": \"Closed Won\",    \"color\": \"#22C55E\", \"probability\": 100, \"position\": 4 },\n    { \"name\": \"Closed Lost\",   \"color\": \"#EF4444\", \"probability\": 0,   \"position\": 5 }\n  ]\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nIf `isDefault: true`, the current default pipeline is unset automatically. At least one stage is required."
+              }
+            },
+            {
+              "name": "Update pipeline",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/pipelines/{{pipeline_id}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "pipelines", "{{pipeline_id}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"name\": \"Enterprise Pipeline\",\n  \"isDefault\": false\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nOnly `name` and `isDefault` can be updated here. To change stages use `PATCH /settings/pipelines/:id/stages`."
+              }
+            },
+            {
+              "name": "Delete pipeline",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/pipelines/{{pipeline_id}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "pipelines", "{{pipeline_id}}"]
+                },
+                "description": "**Requires ADMIN.**\n\nReturns 400 if the pipeline is the default or if it is the only pipeline. Returns 204 on success."
+              }
+            },
+            {
+              "name": "Replace pipeline stages",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/pipelines/{{pipeline_id}}/stages",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "pipelines", "{{pipeline_id}}", "stages"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"stages\": [\n    { \"name\": \"Lead In\",         \"color\": \"#6B7280\", \"probability\": 5,   \"position\": 0 },\n    { \"name\": \"Demo Scheduled\",  \"color\": \"#3B82F6\", \"probability\": 30,  \"position\": 1 },\n    { \"name\": \"Proposal Sent\",   \"color\": \"#8B5CF6\", \"probability\": 60,  \"position\": 2 },\n    { \"name\": \"Contract Signed\", \"color\": \"#22C55E\", \"probability\": 100, \"position\": 3 }\n  ]\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nFull replacement — all existing stages are deleted and replaced with this list."
+              }
+            }
+          ]
+        },
+
+        {
+          "name": "Activity Types",
+          "item": [
+            {
+              "name": "List activity types",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/activity-types",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "activity-types"]
+                },
+                "description": "**Requires VIEWER. Cached 10 min.**\n\nReturns system types (Call, Email, Meeting, Task, Note, WhatsApp) plus tenant-defined custom types."
+              }
+            },
+            {
+              "name": "Create activity type",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/activity-types",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "activity-types"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"key\": \"demo\",\n  \"label\": \"Product Demo\",\n  \"icon\": \"monitor\",\n  \"color\": \"#6366F1\",\n  \"trackDuration\": true,\n  \"isSystem\": false\n}"
+                },
+                "description": "**Requires ADMIN.**\n\n`key` must be unique. `isSystem` is always forced to `false` for custom types."
+              }
+            },
+            {
+              "name": "Update activity type",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/activity-types/{{activity_key}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "activity-types", "{{activity_key}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"key\": \"demo\",\n  \"label\": \"Product Demo v2\",\n  \"icon\": \"monitor\",\n  \"color\": \"#818CF8\",\n  \"trackDuration\": true,\n  \"isSystem\": false\n}"
+                },
+                "description": "**Requires ADMIN.**\n\nFull replacement of the activity type. System types can have their label/icon/color updated."
+              }
+            },
+            {
+              "name": "Delete activity type",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/activity-types/{{activity_key}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "activity-types", "{{activity_key}}"]
+                },
+                "description": "**Requires ADMIN.**\n\nReturns 400 if trying to delete a system type. Returns the updated list on success."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
