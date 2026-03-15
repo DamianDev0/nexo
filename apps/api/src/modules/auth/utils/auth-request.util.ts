@@ -34,6 +34,12 @@ export function setAuthCookies(
   })
 }
 
+/** Extract a cookie value from an incoming request by name */
+export function extractCookie(req: Request, name: string): string | undefined {
+  const cookies = req.cookies as Record<string, string> | undefined
+  return cookies?.[name]
+}
+
 /** Clear both auth cookies */
 export function clearAuthCookies(res: Response): void {
   res.clearCookie(ACCESS_COOKIE)

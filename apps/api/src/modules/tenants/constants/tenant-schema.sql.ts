@@ -299,6 +299,31 @@ export function getTenantSchemaSQL(schema: string): string {
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
 
+    -- Password reset tokens
+    CREATE TABLE "${schema}".password_reset_tokens (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES "${schema}".users(id) ON DELETE CASCADE,
+      token_hash VARCHAR(64) NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      used_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(token_hash)
+    );
+
+    -- Invitations (team member onboarding via invite link)
+    CREATE TABLE "${schema}".invitations (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      email VARCHAR(255) NOT NULL,
+      role VARCHAR(30) NOT NULL DEFAULT 'sales_rep',
+      token_hash VARCHAR(64) NOT NULL,
+      invited_by UUID REFERENCES "${schema}".users(id),
+      expires_at TIMESTAMPTZ NOT NULL,
+      accepted_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(token_hash),
+      UNIQUE(email)
+    );
+
     -- Refresh tokens (JWT rotation with reuse detection)
     CREATE TABLE "${schema}".refresh_tokens (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -312,14 +337,24 @@ export function getTenantSchemaSQL(schema: string): string {
       UNIQUE(token_hash)
     );
 
-    -- Audit log (immutable)
+    -- Schema migration tracking (applied at startup by TenantMigrationService)
+    CREATE TABLE "${schema}".schema_migrations (
+      id VARCHAR(100) PRIMARY KEY,
+      applied_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    -- Audit log (immutable — no UPDATE or DELETE allowed via API)
     CREATE TABLE "${schema}".audit_log (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       action VARCHAR(100) NOT NULL,
-      entity_type VARCHAR(30) NOT NULL,
+      entity_type VARCHAR(50) NOT NULL,
       entity_id UUID,
       user_id UUID REFERENCES "${schema}".users(id),
       ip_address VARCHAR(45),
+      user_agent TEXT,
+      severity VARCHAR(10) NOT NULL DEFAULT 'info',
+      description TEXT,
+      metadata JSONB DEFAULT '{}',
       old_value JSONB,
       new_value JSONB,
       created_at TIMESTAMPTZ DEFAULT NOW()
@@ -376,5 +411,8 @@ export function getTenantIndicesSQL(schema: string): string {
 
     -- WhatsApp messages by conversation
     CREATE INDEX idx_${schema}_wa_messages_conv ON "${schema}".whatsapp_messages (conversation_id, created_at DESC);
+
+    -- Audit log time-range queries (cursor pagination on GET /audit-log)
+    CREATE INDEX idx_${schema}_audit_created_at ON "${schema}".audit_log (created_at DESC);
   `
 }

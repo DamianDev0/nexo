@@ -9,4 +9,10 @@ export const appConfig = registerAs('app', () => ({
   apiName: 'NexoCRM API',
   apiVersion: '1.0',
   cookieSecret: process.env.COOKIE_SECRET ?? 'nexocrm-dev-secret',
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  googleCallbackUrl:
+    process.env.GOOGLE_CALLBACK_URL ?? 'http://localhost:8080/api/v1/auth/google/callback',
+  resendApiKey: process.env.RESEND_API_KEY,
+  emailFrom: process.env.EMAIL_FROM ?? 'NexoCRM <noreply@nexocrm.app>',
 }))

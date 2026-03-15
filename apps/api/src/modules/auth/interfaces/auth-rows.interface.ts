@@ -1,4 +1,4 @@
-import type { UserRole } from '@repo/shared-types'
+import type { UserRole, TenantContext } from '@repo/shared-types'
 
 // ─── DATABASE ROW SHAPES (API-internal, never sent to client) ────────
 
@@ -49,3 +49,5 @@ export type AuthResult = {
 export type OnboardingResult = AuthResult & {
   tenant: { id: string; slug: string; name: string; schemaName: string; plan: string }
 }
+
+export type GoogleAuthResult = AuthResult & { tenantCtx: TenantContext }

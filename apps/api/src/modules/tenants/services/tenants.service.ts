@@ -45,7 +45,8 @@ export class TenantsService {
     this.logger.info({ slug: dto.slug, schemaName }, 'Tenant created')
 
     const fullTenant = await this.tenantsRepo.findById(tenant.id)
-    return TenantResponseDto.fromEntity(fullTenant!)
+    if (!fullTenant) throw new NotFoundException(`Tenant "${dto.slug}" not found after creation`)
+    return TenantResponseDto.fromEntity(fullTenant)
   }
 
   async findAll(): Promise<TenantResponseDto[]> {

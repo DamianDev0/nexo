@@ -9,14 +9,7 @@ import type {
   RequestMeta,
   AuthResult,
 } from '../interfaces/auth-rows.interface'
-
-interface StoreRefreshTokenData {
-  userId: string
-  tokenHash: string
-  expiresAt: Date
-  ip: string | null
-  userAgent: string | null
-}
+import type { StoreRefreshTokenData } from '../interfaces/session-rows.interface'
 
 @Injectable()
 export class SessionRepository {
@@ -32,14 +25,12 @@ export class SessionRepository {
 
   async findByTokenHash(schemaName: string, hash: string): Promise<RefreshTokenRow | undefined> {
     return this.tenantDb.query<RefreshTokenRow | undefined>(schemaName, async (qr) => {
-      const rows = (await qr.query(
+      const raw: unknown = await qr.query(
         `SELECT id, user_id, token_hash, expires_at, revoked_at
-         FROM "${schemaName}".refresh_tokens
-         WHERE token_hash = $1
-         LIMIT 1`,
+         FROM "${schemaName}".refresh_tokens WHERE token_hash = $1 LIMIT 1`,
         [hash],
-      )) as RefreshTokenRow[]
-      return rows[0]
+      )
+      return (raw as RefreshTokenRow[])[0]
     })
   }
 
@@ -69,8 +60,7 @@ export class SessionRepository {
     await this.tenantDb.query<void>(schemaName, async (qr) => {
       await qr.query(
         `UPDATE "${schemaName}".refresh_tokens
-         SET revoked_at = NOW()
-         WHERE user_id = $1 AND revoked_at IS NULL`,
+         SET revoked_at = NOW() WHERE user_id = $1 AND revoked_at IS NULL`,
         [userId],
       )
     })
@@ -116,8 +106,7 @@ export class SessionRepository {
   private async store(schemaName: string, data: StoreRefreshTokenData): Promise<void> {
     await this.tenantDb.query<void>(schemaName, async (qr) => {
       await qr.query(
-        `INSERT INTO "${schemaName}".refresh_tokens
-           (user_id, token_hash, expires_at, ip_address, user_agent)
+        `INSERT INTO "${schemaName}".refresh_tokens (user_id, token_hash, expires_at, ip_address, user_agent)
          VALUES ($1, $2, $3, $4, $5)`,
         [data.userId, data.tokenHash, data.expiresAt, data.ip, data.userAgent],
       )

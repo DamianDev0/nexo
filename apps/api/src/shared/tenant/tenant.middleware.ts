@@ -1,4 +1,5 @@
 import { Injectable, NestMiddleware, NotFoundException, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import type { Request, Response, NextFunction } from 'express'
@@ -12,19 +13,24 @@ const TENANT_CACHE_TTL = 300 // 5 minutes
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
   private readonly logger = new Logger(TenantMiddleware.name)
+  private readonly isProduction: boolean
 
   constructor(
     @InjectRepository(Tenant)
     private readonly tenantRepo: Repository<Tenant>,
     private readonly cache: CacheService,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    this.isProduction = config.get<string>('app.nodeEnv') === 'production'
+  }
 
   async use(req: Request, _res: Response, next: NextFunction) {
     const host = req.headers.host ?? ''
     const hostname = host.split(':')[0] ?? '' // Strip port
     const parts = hostname.split('.')
 
-    // Resolve subdomain from Host header, or fall back to x-tenant-slug header (local dev)
+    // Resolve subdomain from Host header
+    // Fall back to x-tenant-slug header only in non-production (dev/test convenience)
     let subdomain: string | undefined
 
     const isDirectAccess = parts.length < 2 || hostname === 'localhost' || hostname === '127.0.0.1'
@@ -36,7 +42,7 @@ export class TenantMiddleware implements NestMiddleware {
       }
     }
 
-    if (!subdomain) {
+    if (!subdomain && !this.isProduction) {
       const headerSlug = req.headers['x-tenant-slug']
       if (typeof headerSlug === 'string' && headerSlug) {
         subdomain = headerSlug
@@ -71,7 +77,7 @@ export class TenantMiddleware implements NestMiddleware {
       this.logger.debug(`Tenant resolved: ${subdomain} → ${tenant.schemaName}`)
     }
 
-    ;(req as any).tenantContext = tenantContext
+    req.tenantContext = tenantContext
     next()
   }
 }
