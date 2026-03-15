@@ -36,12 +36,6 @@ import { extractMeta, setAuthCookies, clearAuthCookies } from '../utils/auth-req
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // ─── Onboard (create tenant + owner — public, main domain only) ─────────
-  //
-  // Single entry point for new customers. After this call the frontend
-  // should redirect to `https://{tenant.slug}.nexocrm.com`.
-  // Tokens are delivered via httpOnly cookies — NOT returned in the body.
-
   @Public()
   @Post('onboard')
   @HttpCode(HttpStatus.CREATED)

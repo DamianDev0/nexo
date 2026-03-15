@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NestMiddleware,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common'
+import { Injectable, NestMiddleware, NotFoundException, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import type { Request, Response, NextFunction } from 'express'
@@ -29,14 +24,26 @@ export class TenantMiddleware implements NestMiddleware {
     const hostname = host.split(':')[0] ?? '' // Strip port
     const parts = hostname.split('.')
 
-    // Skip tenant resolution for platform-level routes or direct IP/localhost access
-    if (parts.length < 2 || hostname === 'localhost' || hostname === '127.0.0.1') {
-      return next()
+    // Resolve subdomain from Host header, or fall back to x-tenant-slug header (local dev)
+    let subdomain: string | undefined
+
+    const isDirectAccess = parts.length < 2 || hostname === 'localhost' || hostname === '127.0.0.1'
+
+    if (!isDirectAccess) {
+      const candidate = parts[0]
+      if (candidate && candidate !== 'www' && candidate !== 'api') {
+        subdomain = candidate
+      }
     }
 
-    const subdomain = parts[0]
+    if (!subdomain) {
+      const headerSlug = req.headers['x-tenant-slug']
+      if (typeof headerSlug === 'string' && headerSlug) {
+        subdomain = headerSlug
+      }
+    }
 
-    if (!subdomain || subdomain === 'www' || subdomain === 'api') {
+    if (!subdomain) {
       return next()
     }
 
