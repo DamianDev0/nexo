@@ -7,7 +7,20 @@ import { TenantThemeHistory } from '../entities/tenant-theme-history.entity'
 import { DEFAULT_THEME } from '../constants/default-theme'
 import { DEFAULT_NOMENCLATURE } from '../constants/default-nomenclature'
 import { DEFAULT_SIDEBAR_CONFIG } from '../constants/default-sidebar'
-import type { TenantTheme } from '../interfaces/tenant-theme.interface'
+import type {
+  TenantTheme,
+  TenantThemeColors,
+  TenantThemeTypography,
+  TenantThemeBranding,
+} from '../interfaces/tenant-theme.interface'
+
+type ThemePatch = {
+  colors?: Partial<TenantThemeColors>
+  typography?: Partial<TenantThemeTypography>
+  branding?: Partial<TenantThemeBranding>
+  iconPack?: TenantTheme['iconPack']
+  darkModeDefault?: TenantTheme['darkModeDefault']
+}
 import type { TenantNomenclature } from '../interfaces/nomenclature.interface'
 import type { SidebarConfig } from '../interfaces/sidebar-config.interface'
 import type {
@@ -61,7 +74,7 @@ export class TenantConfigService {
 
   async updateTheme(
     tenantId: string,
-    patch: Partial<TenantTheme>,
+    patch: ThemePatch,
     changedBy: string,
     slug: string,
   ): Promise<TenantTheme> {
@@ -281,7 +294,7 @@ export class TenantConfigService {
   }
 }
 
-function deepMergeTheme(target: TenantTheme, patch: Partial<TenantTheme>): TenantTheme {
+function deepMergeTheme(target: TenantTheme, patch: ThemePatch): TenantTheme {
   return {
     colors: { ...target.colors, ...patch.colors },
     typography: { ...target.typography, ...patch.typography },

@@ -15,7 +15,8 @@
     { "key": "activity_key", "value": "demo", "type": "string" },
     { "key": "entity", "value": "contacts", "type": "string" },
     { "key": "invite_token", "value": "", "type": "string" },
-    { "key": "reset_token", "value": "", "type": "string" }
+    { "key": "reset_token", "value": "", "type": "string" },
+    { "key": "field_key", "value": "industry", "type": "string" }
   ],
   "item": [
     {
@@ -437,6 +438,63 @@
         },
 
         {
+          "name": "Branding uploads",
+          "item": [
+            {
+              "name": "Upload logo",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/branding/logo",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "branding", "logo"]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [{ "key": "file", "type": "file", "src": "" }]
+                },
+                "description": "**Requires ADMIN.**\n\nAccepted: `jpg`, `png`, `webp`, `svg`. Max 2 MB.\n\nUploads to S3 under `{tenantSlug}/branding/`. URL is saved to `theme.branding.logoUrl` automatically. Previous file is deleted from S3."
+              }
+            },
+            {
+              "name": "Upload favicon",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/branding/favicon",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "branding", "favicon"]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [{ "key": "file", "type": "file", "src": "" }]
+                },
+                "description": "**Requires ADMIN.**\n\nAccepted: `png`, `ico`. Max 512 KB.\n\nSaved to `theme.branding.faviconUrl`."
+              }
+            },
+            {
+              "name": "Upload login background",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/branding/login-bg",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "branding", "login-bg"]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [{ "key": "file", "type": "file", "src": "" }]
+                },
+                "description": "**Requires ADMIN.**\n\nAccepted: `jpg`, `png`, `webp`. Max 5 MB.\n\nSaved to `theme.branding.loginBgUrl`."
+              }
+            }
+          ]
+        },
+
+        {
           "name": "Theme",
           "item": [
             {
@@ -613,7 +671,62 @@
               }
             },
             {
-              "name": "Replace custom fields for entity",
+              "name": "Create custom field",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields/{{entity}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields", "{{entity}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"key\": \"industry\",\n  \"label\": \"Industry\",\n  \"type\": \"select\",\n  \"required\": false,\n  \"unique\": false,\n  \"order\": 1,\n  \"options\": [\n    { \"value\": \"technology\", \"label\": \"Technology\", \"color\": \"#3B82F6\" },\n    { \"value\": \"retail\",     \"label\": \"Retail\",     \"color\": \"#22C55E\" },\n    { \"value\": \"finance\",    \"label\": \"Finance\",    \"color\": \"#F59E0B\" }\n  ]\n}"
+                },
+                "description": "**Requires ADMIN.** Returns `201`.\n\nAdds a single field to the entity. `key` must be unique within the entity — returns `400` if it already exists.\n\n`order` is optional — defaults to last position.\n\nField types: `text` | `textarea` | `number` | `currency` | `date` | `datetime` | `select` | `multiselect` | `boolean` | `url` | `phone` | `email` | `file` | `relation` | `formula` | `geolocation`"
+              }
+            },
+            {
+              "name": "Update custom field",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }
+                ],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields/{{entity}}/{{field_key}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields", "{{entity}}", "{{field_key}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "options": { "raw": { "language": "json" } },
+                  "raw": "{\n  \"label\": \"Industry Sector\",\n  \"required\": true,\n  \"options\": [\n    { \"value\": \"technology\", \"label\": \"Technology\", \"color\": \"#3B82F6\" },\n    { \"value\": \"retail\",     \"label\": \"Retail\",     \"color\": \"#22C55E\" },\n    { \"value\": \"finance\",    \"label\": \"Finance\",    \"color\": \"#F59E0B\" },\n    { \"value\": \"healthcare\", \"label\": \"Healthcare\", \"color\": \"#EC4899\" }\n  ]\n}"
+                },
+                "description": "**Requires ADMIN.** Returns `200`.\n\nPartial update of a single field identified by `{{field_key}}`. Only the fields sent are updated — the rest remain unchanged. The `key` itself cannot be changed.\n\nReturns `404` if the field key does not exist on the entity."
+              }
+            },
+            {
+              "name": "Delete custom field",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "x-tenant-slug", "value": "{{tenantSlug}}", "type": "text" }],
+                "url": {
+                  "raw": "{{NEXOURL}}/settings/custom-fields/{{entity}}/{{field_key}}",
+                  "host": ["{{NEXOURL}}"],
+                  "path": ["settings", "custom-fields", "{{entity}}", "{{field_key}}"]
+                },
+                "description": "**Requires ADMIN.** Returns `204 No Content`.\n\nRemoves the field permanently from the entity. Returns `404` if the key does not exist."
+              }
+            },
+            {
+              "name": "Replace custom fields for entity (bulk)",
               "request": {
                 "method": "PATCH",
                 "header": [
@@ -630,7 +743,7 @@
                   "options": { "raw": { "language": "json" } },
                   "raw": "{\n  \"fields\": [\n    {\n      \"key\": \"industry\",\n      \"label\": \"Industry\",\n      \"type\": \"select\",\n      \"required\": false,\n      \"unique\": false,\n      \"order\": 1,\n      \"options\": [\n        { \"value\": \"technology\", \"label\": \"Technology\", \"color\": \"#3B82F6\" },\n        { \"value\": \"retail\",     \"label\": \"Retail\",     \"color\": \"#22C55E\" },\n        { \"value\": \"finance\",    \"label\": \"Finance\",    \"color\": \"#F59E0B\" }\n      ]\n    },\n    {\n      \"key\": \"linkedin_url\",\n      \"label\": \"LinkedIn URL\",\n      \"type\": \"url\",\n      \"required\": false,\n      \"unique\": false,\n      \"order\": 2\n    }\n  ]\n}"
                 },
-                "description": "**Requires ADMIN.**\n\nFull replacement for the entity. Field types: `text` | `textarea` | `number` | `currency` | `date` | `datetime` | `select` | `multiselect` | `boolean` | `url` | `phone` | `email` | `file` | `relation`"
+                "description": "**Requires ADMIN.**\n\nFull replacement — overwrites all fields for the entity with the provided list. Use the individual `POST` / `PATCH` / `DELETE` endpoints for single-field operations."
               }
             },
             {

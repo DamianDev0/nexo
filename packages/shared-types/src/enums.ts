@@ -89,6 +89,31 @@ export enum CompanySize {
   LARGE = 'large', // > 200
 }
 
+// CIIU Rev 4 — main sector letters (Colombia DIAN classification)
+export enum CIIUSector {
+  A = 'A', // Agropecuario, silvicultura y pesca
+  B = 'B', // Minería y canteras
+  C = 'C', // Industria manufacturera
+  D = 'D', // Suministro de electricidad, gas y vapor
+  E = 'E', // Distribución de agua y saneamiento
+  F = 'F', // Construcción
+  G = 'G', // Comercio al por mayor y al por menor
+  H = 'H', // Transporte y almacenamiento
+  I = 'I', // Alojamiento y servicios de comida
+  J = 'J', // Información y comunicaciones
+  K = 'K', // Actividades financieras y de seguros
+  L = 'L', // Actividades inmobiliarias
+  M = 'M', // Actividades profesionales, científicas y técnicas
+  N = 'N', // Actividades de servicios administrativos y de apoyo
+  O = 'O', // Administración pública y defensa
+  P = 'P', // Educación
+  Q = 'Q', // Actividades de atención de la salud humana
+  R = 'R', // Actividades artísticas y de entretenimiento
+  S = 'S', // Otras actividades de servicios
+  T = 'T', // Actividades de los hogares como empleadores
+  U = 'U', // Actividades de organizaciones extraterritoriales
+}
+
 // ─── DEAL ────────────────────────────────────────────────────────────
 export enum DealStatus {
   OPEN = 'open',

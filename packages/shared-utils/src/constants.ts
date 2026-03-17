@@ -51,6 +51,7 @@ export const TAX_REGIME_LABELS: Record<TaxRegime, string> = {
 }
 
 export const USER_ROLE_LABELS: Record<UserRole, string> = {
+  [UserRole.SUPER_ADMIN]: 'Super administrador',
   [UserRole.OWNER]: 'Propietario',
   [UserRole.ADMIN]: 'Administrador',
   [UserRole.MANAGER]: 'Gerente',

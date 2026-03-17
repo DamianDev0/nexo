@@ -21,6 +21,19 @@ export type Action = 'create' | 'read' | 'update' | 'delete' | 'export'
 type PermissionMap = Record<Resource, Action[]>
 
 const ROLE_PERMISSIONS: Record<UserRole, PermissionMap> = {
+  [UserRole.SUPER_ADMIN]: {
+    contacts: ['create', 'read', 'update', 'delete', 'export'],
+    companies: ['create', 'read', 'update', 'delete', 'export'],
+    deals: ['create', 'read', 'update', 'delete', 'export'],
+    invoices: ['create', 'read', 'update', 'delete', 'export'],
+    products: ['create', 'read', 'update', 'delete', 'export'],
+    reports: ['read', 'export'],
+    settings: ['read', 'update'],
+    users: ['create', 'read', 'update', 'delete'],
+    billing: ['read', 'update'],
+    whatsapp: ['create', 'read', 'update', 'delete'],
+    workflows: ['create', 'read', 'update', 'delete'],
+  },
   [UserRole.OWNER]: {
     contacts: ['create', 'read', 'update', 'delete', 'export'],
     companies: ['create', 'read', 'update', 'delete', 'export'],

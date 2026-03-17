@@ -58,4 +58,40 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       );
     `,
   },
+  {
+    // Adds email, tags, assigned_to_id to companies (not in original schema)
+    // + GIN indices for full-text search and tag filtering
+    id: '0005_companies_email_tags_assigned_to',
+    up: (schema) => `
+      ALTER TABLE "${schema}".companies
+        ADD COLUMN IF NOT EXISTS email          VARCHAR(255),
+        ADD COLUMN IF NOT EXISTS tags           TEXT[]  DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS assigned_to_id UUID    REFERENCES "${schema}".users(id);
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_companies_fts"
+        ON "${schema}".companies
+        USING GIN (
+          to_tsvector('spanish',
+            coalesce(name, '') || ' ' ||
+            coalesce(nit,  '')
+          )
+        )
+        WHERE is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_companies_tags"
+        ON "${schema}".companies USING GIN (tags);
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_companies_status"
+        ON "${schema}".companies (assigned_to_id, is_active);
+    `,
+  },
+  {
+    // Enforce NIT uniqueness per tenant (only active companies with non-null NIT)
+    id: '0006_companies_nit_unique',
+    up: (schema) => `
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_companies_nit"
+        ON "${schema}".companies (nit)
+        WHERE nit IS NOT NULL AND is_active = true;
+    `,
+  },
 ]

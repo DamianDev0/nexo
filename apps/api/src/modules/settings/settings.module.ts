@@ -11,6 +11,7 @@ import { CustomFieldsController } from './controllers/custom-fields.controller'
 import { TenantPublicController } from './controllers/tenant-public.controller'
 import { PipelineController } from './controllers/pipeline.controller'
 import { ActivityTypesController } from './controllers/activity-types.controller'
+import { BrandingController } from './controllers/branding.controller'
 import { SettingsService } from './services/settings.service'
 import { TenantConfigService } from './services/tenant-config.service'
 import { PipelineSettingsService } from './services/pipeline-settings.service'
@@ -27,6 +28,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     TenantPublicController,
     PipelineController,
     ActivityTypesController,
+    BrandingController,
   ],
   providers: [SettingsService, TenantConfigService, PipelineSettingsService, ModuleEnabledGuard],
   exports: [SettingsService, TenantConfigService, PipelineSettingsService, ModuleEnabledGuard],

@@ -31,16 +31,23 @@ export function getTenantSchemaSQL(schema: string): string {
       sector_ciiu VARCHAR(10),
       website VARCHAR(500),
       phone VARCHAR(20),
+      email VARCHAR(255),
       address TEXT,
       city VARCHAR(100),
       department VARCHAR(100),
       municipio_code VARCHAR(5),
+      tags TEXT[] DEFAULT '{}',
+      assigned_to_id UUID REFERENCES "${schema}".users(id),
       custom_fields JSONB DEFAULT '{}',
       is_active BOOLEAN DEFAULT true,
       created_by UUID REFERENCES "${schema}".users(id),
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    -- NIT must be unique per tenant (partial: only non-null active companies)
+    CREATE UNIQUE INDEX uq_companies_nit ON "${schema}".companies (nit)
+      WHERE nit IS NOT NULL AND is_active = true;
 
     -- Contacts
     CREATE TABLE "${schema}".contacts (
@@ -367,6 +374,23 @@ export function getTenantSchemaSQL(schema: string): string {
  */
 export function getTenantIndicesSQL(schema: string): string {
   return `
+    -- Full-text search on companies (name + NIT)
+    CREATE INDEX idx_${schema}_companies_fts ON "${schema}".companies
+      USING GIN (
+        to_tsvector('spanish',
+          coalesce(name, '') || ' ' ||
+          coalesce(nit,  '')
+        )
+      )
+      WHERE is_active = true;
+
+    -- Tags on companies
+    CREATE INDEX idx_${schema}_companies_tags ON "${schema}".companies
+      USING GIN (tags);
+
+    -- Companies assigned_to + is_active
+    CREATE INDEX idx_${schema}_companies_status ON "${schema}".companies (assigned_to_id, is_active);
+
     -- Full-text search on contacts (Spanish)
     CREATE INDEX idx_${schema}_contacts_fts ON "${schema}".contacts
       USING GIN (

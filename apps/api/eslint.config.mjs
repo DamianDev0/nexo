@@ -14,12 +14,15 @@ export default [
     files: [
       '**/modules/**/*.service.ts',
       '**/modules/**/*.controller.ts',
+      '**/modules/**/*.dto.ts',
       '**/shared/database/**/*.ts',
+      '**/shared/integrations/**/*.ts',
     ],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
     },
   },
   {

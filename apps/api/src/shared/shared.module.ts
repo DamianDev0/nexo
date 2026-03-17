@@ -10,6 +10,7 @@ import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { Plan } from '@/modules/tenants/entities/plan.entity'
 import { AuditLogModule } from './audit-log/audit-log.module'
 import { ResendModule } from './integrations/resend/resend.module'
+import { S3Module } from './integrations/aws/s3.module'
 import { CacheService } from './cache/cache.service'
 import { TenantDbService } from './database/tenant-db.service'
 import { TenantMigrationService } from './database/tenant-migration.service'
@@ -31,6 +32,7 @@ import { EventBusService } from './events/event-bus.service'
     TypeOrmModule.forFeature([Tenant, Plan]),
     AuditLogModule,
     ResendModule,
+    S3Module,
   ],
   providers: [
     CacheService,

@@ -70,6 +70,32 @@ export class FieldDefDto implements FieldDef {
   relationEntity?: CustomFieldEntity
 }
 
+export class PatchFieldDefDto {
+  @ApiPropertyOptional() @IsOptional() @IsString() label?: string
+  @ApiPropertyOptional({ enum: FIELD_TYPES })
+  @IsOptional()
+  @IsIn(FIELD_TYPES)
+  type?: CustomFieldType
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() required?: boolean
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() unique?: boolean
+  @ApiPropertyOptional() @IsOptional() @IsInt() @Min(1) order?: number
+  @ApiPropertyOptional() @IsOptional() defaultValue?: unknown
+  @ApiPropertyOptional() @IsOptional() @IsString() placeholder?: string
+  @ApiPropertyOptional({ type: [SelectOptionDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SelectOptionDto)
+  options?: SelectOptionDto[]
+  @ApiPropertyOptional() @IsOptional() min?: number
+  @ApiPropertyOptional() @IsOptional() max?: number
+  @ApiPropertyOptional() @IsOptional() @IsString() formula?: string
+  @ApiPropertyOptional({ enum: ENTITIES })
+  @IsOptional()
+  @IsIn(ENTITIES)
+  relationEntity?: CustomFieldEntity
+}
+
 export class UpdateCustomFieldsDto {
   @ApiProperty({ type: [FieldDefDto] })
   @IsArray()
