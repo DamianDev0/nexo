@@ -144,23 +144,8 @@ export type FieldPermission = {
 
 export type FieldPermissionsConfig = Record<CustomFieldEntity, Record<string, FieldPermission>>
 
-// ─── PIPELINE ─────────────────────────────────────────────────────────────────
-
-export type PipelineStage = {
-  id: string
-  pipelineId: string
-  name: string
-  color: string
-  probability: number // 0–100
-  position: number
-}
-
-export type Pipeline = {
-  id: string
-  name: string
-  isDefault: boolean
-  stages: PipelineStage[]
-}
+// ─── PIPELINE (see pipelines.ts for full types) ──────────────────────────────
+// Pipeline and PipelineStage are exported from pipelines.ts
 
 // ─── ACTIVITY TYPES ───────────────────────────────────────────────────────────
 

@@ -1,16 +1,29 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { DealStatus } from '@repo/shared-types'
-import type { DealDetail, DealListItem, PaginatedDeals } from '@repo/shared-types'
+import type {
+  DealDetail,
+  DealItem,
+  DealListItem,
+  ForecastEntry,
+  PaginatedDeals,
+} from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type {
   CreateDealDto,
+  CreateDealItemDto,
   DealQueryDto,
   LoseDealDto,
   MoveDealDto,
   UpdateDealDto,
+  UpdateDealItemDto,
 } from './dto/deal.dto'
-import type { DealDetailRow, DealListRow } from './interfaces/deal-row.interfaces'
+import type {
+  DealDetailRow,
+  DealItemRow,
+  DealListRow,
+  ForecastRow,
+} from './interfaces/deal-row.interfaces'
 import {
   DEAL_DETAIL_COLUMNS,
   DEAL_DETAIL_FROM,
@@ -91,7 +104,22 @@ export class DealsService {
         ],
       )
 
-      return this.fetchDealOrFail(qr, insertRows[0].id)
+      const dealId = insertRows[0].id
+
+      // Record initial stage assignment in history
+      if (dto.stageId) {
+        await this.recordStageChange(
+          qr,
+          dealId,
+          null,
+          dto.stageId,
+          null,
+          DealStatus.OPEN,
+          createdById,
+        )
+      }
+
+      return this.fetchDealOrFail(qr, dealId)
     })
   }
 
@@ -116,7 +144,6 @@ export class DealsService {
       }
 
       if (sets.length === 1) {
-        // nothing to update beyond updated_at — return current state
         return this.fetchDealOrFail(qr, dealId)
       }
 
@@ -145,9 +172,14 @@ export class DealsService {
 
   // ─── Move to stage ────────────────────────────────────────────────────────
 
-  async moveStage(schemaName: string, dealId: string, dto: MoveDealDto): Promise<DealDetail> {
+  async moveStage(
+    schemaName: string,
+    dealId: string,
+    dto: MoveDealDto,
+    userId?: string,
+  ): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
-      await this.assertDealExists(qr, dealId)
+      const deal = await this.fetchDealRowOrFail(qr, dealId)
       await this.assertStageInPipeline(qr, dto.stageId, dto.pipelineId)
 
       await qr.query(
@@ -157,15 +189,26 @@ export class DealsService {
         [dto.stageId, dto.pipelineId, dealId],
       )
 
+      await this.recordStageChange(
+        qr,
+        dealId,
+        deal.stage_id,
+        dto.stageId,
+        deal.status,
+        deal.status,
+        userId ?? null,
+      )
+
       return this.fetchDealOrFail(qr, dealId)
     })
   }
 
   // ─── Mark won ─────────────────────────────────────────────────────────────
 
-  async markWon(schemaName: string, dealId: string): Promise<DealDetail> {
+  async markWon(schemaName: string, dealId: string, userId?: string): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
-      await this.assertDealExists(qr, dealId)
+      const deal = await this.fetchDealRowOrFail(qr, dealId)
+      this.assertDealIsOpen(deal.status)
 
       await qr.query(
         `UPDATE deals
@@ -174,21 +217,47 @@ export class DealsService {
         [DealStatus.WON, dealId],
       )
 
+      await this.recordStageChange(
+        qr,
+        dealId,
+        deal.stage_id,
+        deal.stage_id,
+        deal.status,
+        DealStatus.WON,
+        userId ?? null,
+      )
+
       return this.fetchDealOrFail(qr, dealId)
     })
   }
 
   // ─── Mark lost ────────────────────────────────────────────────────────────
 
-  async markLost(schemaName: string, dealId: string, dto: LoseDealDto): Promise<DealDetail> {
+  async markLost(
+    schemaName: string,
+    dealId: string,
+    dto: LoseDealDto,
+    userId?: string,
+  ): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
-      await this.assertDealExists(qr, dealId)
+      const deal = await this.fetchDealRowOrFail(qr, dealId)
+      this.assertDealIsOpen(deal.status)
 
       await qr.query(
         `UPDATE deals
          SET status = $1, loss_reason = $2, updated_at = NOW()
          WHERE id = $3 AND is_active = true`,
-        [DealStatus.LOST, dto.lossReason ?? null, dealId],
+        [DealStatus.LOST, dto.lossReason, dealId],
+      )
+
+      await this.recordStageChange(
+        qr,
+        dealId,
+        deal.stage_id,
+        deal.stage_id,
+        deal.status,
+        DealStatus.LOST,
+        userId ?? null,
       )
 
       return this.fetchDealOrFail(qr, dealId)
@@ -197,9 +266,12 @@ export class DealsService {
 
   // ─── Reopen ───────────────────────────────────────────────────────────────
 
-  async reopen(schemaName: string, dealId: string): Promise<DealDetail> {
+  async reopen(schemaName: string, dealId: string, userId?: string): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
-      await this.assertDealExists(qr, dealId)
+      const deal = await this.fetchDealRowOrFail(qr, dealId)
+      if (deal.status === DealStatus.OPEN) {
+        throw new BadRequestException('Deal is already open')
+      }
 
       await qr.query(
         `UPDATE deals
@@ -208,7 +280,157 @@ export class DealsService {
         [DealStatus.OPEN, dealId],
       )
 
+      await this.recordStageChange(
+        qr,
+        dealId,
+        deal.stage_id,
+        deal.stage_id,
+        deal.status,
+        DealStatus.OPEN,
+        userId ?? null,
+      )
+
       return this.fetchDealOrFail(qr, dealId)
+    })
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  Deal Items
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async addItem(schemaName: string, dealId: string, dto: CreateDealItemDto): Promise<DealItem> {
+    return this.db.query(schemaName, async (qr): Promise<DealItem> => {
+      await this.assertDealExists(qr, dealId)
+
+      const position = await this.getNextItemPosition(qr, dealId)
+
+      const rows: DealItemRow[] = await qr.query(
+        `INSERT INTO deal_items (deal_id, product_id, description, quantity, unit_price_cents, discount_percent, iva_rate, position)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING *`,
+        [
+          dealId,
+          dto.productId ?? null,
+          dto.description,
+          dto.quantity ?? 1,
+          dto.unitPriceCents,
+          dto.discountPercent ?? 0,
+          dto.ivaRate ?? 19,
+          position,
+        ],
+      )
+
+      const row = rows[0]
+      if (!row) throw new BadRequestException('Failed to create deal item')
+
+      await this.recalcDealValue(qr, dealId)
+      return this.mapItem(row)
+    })
+  }
+
+  async updateItem(
+    schemaName: string,
+    dealId: string,
+    itemId: string,
+    dto: UpdateDealItemDto,
+  ): Promise<DealItem> {
+    return this.db.query(schemaName, async (qr): Promise<DealItem> => {
+      await this.assertItemExists(qr, itemId, dealId)
+
+      const sets: string[] = []
+      const params: unknown[] = []
+
+      if (dto.description !== undefined) {
+        params.push(dto.description)
+        sets.push(`description = $${params.length}`)
+      }
+      if (dto.productId !== undefined) {
+        params.push(dto.productId)
+        sets.push(`product_id = $${params.length}`)
+      }
+      if (dto.quantity !== undefined) {
+        params.push(dto.quantity)
+        sets.push(`quantity = $${params.length}`)
+      }
+      if (dto.unitPriceCents !== undefined) {
+        params.push(dto.unitPriceCents)
+        sets.push(`unit_price_cents = $${params.length}`)
+      }
+      if (dto.discountPercent !== undefined) {
+        params.push(dto.discountPercent)
+        sets.push(`discount_percent = $${params.length}`)
+      }
+      if (dto.ivaRate !== undefined) {
+        params.push(dto.ivaRate)
+        sets.push(`iva_rate = $${params.length}`)
+      }
+
+      if (sets.length === 0) {
+        return this.fetchItemOrFail(qr, itemId)
+      }
+
+      params.push(itemId)
+      await qr.query(
+        `UPDATE deal_items SET ${sets.join(', ')} WHERE id = $${params.length}`,
+        params,
+      )
+
+      await this.recalcDealValue(qr, dealId)
+      return this.fetchItemOrFail(qr, itemId)
+    })
+  }
+
+  async removeItem(schemaName: string, dealId: string, itemId: string): Promise<void> {
+    return this.db.query(schemaName, async (qr): Promise<void> => {
+      await this.assertItemExists(qr, itemId, dealId)
+      await qr.query(`DELETE FROM deal_items WHERE id = $1 AND deal_id = $2`, [itemId, dealId])
+      await this.recalcDealValue(qr, dealId)
+    })
+  }
+
+  async getItems(schemaName: string, dealId: string): Promise<DealItem[]> {
+    return this.db.query(schemaName, async (qr): Promise<DealItem[]> => {
+      await this.assertDealExists(qr, dealId)
+      const rows: DealItemRow[] = await qr.query(
+        `SELECT * FROM deal_items WHERE deal_id = $1 ORDER BY position ASC`,
+        [dealId],
+      )
+      return rows.map((r) => this.mapItem(r))
+    })
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  Forecast
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async getForecast(schemaName: string, months = 6): Promise<ForecastEntry[]> {
+    return this.db.query(schemaName, async (qr): Promise<ForecastEntry[]> => {
+      const rows: ForecastRow[] = await qr.query(
+        `SELECT
+           TO_CHAR(d.expected_close_date, 'YYYY-MM') AS month,
+           SUM(d.value_cents)::text                  AS total_value_cents,
+           SUM(d.value_cents * COALESCE(ps.probability, 0) / 100)::text AS weighted_value_cents,
+           COUNT(*)::text                            AS deal_count
+         FROM deals d
+         LEFT JOIN pipeline_stages ps ON ps.id = d.stage_id
+         WHERE d.is_active = true
+           AND d.status = 'open'
+           AND d.expected_close_date IS NOT NULL
+           AND d.expected_close_date >= DATE_TRUNC('month', CURRENT_DATE)
+           AND d.expected_close_date < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' * $1
+         GROUP BY TO_CHAR(d.expected_close_date, 'YYYY-MM')
+         ORDER BY month ASC`,
+        [months],
+      )
+
+      return rows.map(
+        (r): ForecastEntry => ({
+          month: r.month,
+          totalValueCents: Number(r.total_value_cents),
+          weightedValueCents: Number(r.weighted_value_cents),
+          dealCount: Number(r.deal_count),
+        }),
+      )
     })
   }
 
@@ -222,7 +444,27 @@ export class DealsService {
 
     const row = rows[0]
     if (!row) throw new NotFoundException(`Deal ${dealId} not found`)
-    return this.mapDetail(row)
+
+    const itemRows: DealItemRow[] = await qr.query(
+      `SELECT * FROM deal_items WHERE deal_id = $1 ORDER BY position ASC`,
+      [dealId],
+    )
+
+    return { ...this.mapDetail(row), items: itemRows.map((r) => this.mapItem(r)) }
+  }
+
+  private async fetchDealRowOrFail(
+    qr: QueryRunner,
+    dealId: string,
+  ): Promise<{ id: string; stage_id: string | null; status: string }> {
+    const rows: [{ id: string; stage_id: string | null; status: string }?] = await qr.query(
+      `SELECT id, stage_id, status FROM deals WHERE id = $1 AND is_active = true`,
+      [dealId],
+    )
+
+    const row = rows[0]
+    if (!row) throw new NotFoundException(`Deal ${dealId} not found`)
+    return row
   }
 
   private async assertDealExists(qr: QueryRunner, dealId: string): Promise<void> {
@@ -233,6 +475,12 @@ export class DealsService {
 
     if (rows.length === 0) {
       throw new NotFoundException(`Deal ${dealId} not found`)
+    }
+  }
+
+  private assertDealIsOpen(status: string): void {
+    if (status !== DealStatus.OPEN) {
+      throw new BadRequestException(`Deal must be open to change status. Current status: ${status}`)
     }
   }
 
@@ -249,6 +497,63 @@ export class DealsService {
     if (rows.length === 0) {
       throw new BadRequestException(`Stage ${stageId} does not belong to pipeline ${pipelineId}`)
     }
+  }
+
+  private async assertItemExists(qr: QueryRunner, itemId: string, dealId: string): Promise<void> {
+    const rows: [{ id: string }?] = await qr.query(
+      `SELECT id FROM deal_items WHERE id = $1 AND deal_id = $2`,
+      [itemId, dealId],
+    )
+
+    if (rows.length === 0) {
+      throw new NotFoundException(`Item ${itemId} not found in deal ${dealId}`)
+    }
+  }
+
+  private async fetchItemOrFail(qr: QueryRunner, itemId: string): Promise<DealItem> {
+    const rows: DealItemRow[] = await qr.query(`SELECT * FROM deal_items WHERE id = $1`, [itemId])
+
+    const row = rows[0]
+    if (!row) throw new NotFoundException(`Item ${itemId} not found`)
+    return this.mapItem(row)
+  }
+
+  private async getNextItemPosition(qr: QueryRunner, dealId: string): Promise<number> {
+    const rows: [{ max_pos: number | null }] = await qr.query(
+      `SELECT MAX(position) AS max_pos FROM deal_items WHERE deal_id = $1`,
+      [dealId],
+    )
+    return (rows[0].max_pos ?? -1) + 1
+  }
+
+  /** Recalculate deal.value_cents from the sum of its items subtotals */
+  private async recalcDealValue(qr: QueryRunner, dealId: string): Promise<void> {
+    await qr.query(
+      `UPDATE deals SET
+         value_cents = COALESCE((
+           SELECT SUM(quantity * unit_price_cents * (100 - discount_percent) / 100)
+           FROM deal_items WHERE deal_id = $1
+         ), 0),
+         updated_at = NOW()
+       WHERE id = $1`,
+      [dealId],
+    )
+  }
+
+  private async recordStageChange(
+    qr: QueryRunner,
+    dealId: string,
+    fromStageId: string | null,
+    toStageId: string | null,
+    fromStatus: string | null,
+    toStatus: string,
+    changedBy: string | null,
+  ): Promise<void> {
+    await qr.query(
+      `INSERT INTO deal_stage_history (deal_id, from_stage_id, to_stage_id, from_status, to_status, changed_by)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [dealId, fromStageId, toStageId, fromStatus, toStatus, changedBy],
+    )
   }
 
   private buildWhereClause(query: DealQueryDto): { where: string; params: unknown[] } {
@@ -317,7 +622,7 @@ export class DealsService {
     }
   }
 
-  private mapDetail(r: DealDetailRow): DealDetail {
+  private mapDetail(r: DealDetailRow): Omit<DealDetail, 'items'> {
     return {
       ...this.mapListItem(r),
       customFields: r.custom_fields ?? {},
@@ -352,6 +657,24 @@ export class DealsService {
             name: r.pipeline_name ?? '',
           }
         : null,
+    }
+  }
+
+  private mapItem(r: DealItemRow): DealItem {
+    const unitPrice = Number(r.unit_price_cents)
+    const subtotal = (r.quantity * unitPrice * (100 - r.discount_percent)) / 100
+    return {
+      id: r.id,
+      dealId: r.deal_id,
+      productId: r.product_id,
+      description: r.description,
+      quantity: r.quantity,
+      unitPriceCents: unitPrice,
+      discountPercent: r.discount_percent,
+      ivaRate: r.iva_rate,
+      position: r.position,
+      subtotalCents: Math.round(subtotal),
+      createdAt: r.created_at,
     }
   }
 }

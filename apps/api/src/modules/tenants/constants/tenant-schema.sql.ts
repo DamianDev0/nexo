@@ -115,6 +115,32 @@ export function getTenantSchemaSQL(schema: string): string {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
 
+    -- Deal items (products/services linked to a deal — basis for invoice generation)
+    CREATE TABLE "${schema}".deal_items (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      deal_id UUID NOT NULL REFERENCES "${schema}".deals(id) ON DELETE CASCADE,
+      product_id UUID REFERENCES "${schema}".products(id),
+      description VARCHAR(500) NOT NULL,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      unit_price_cents BIGINT NOT NULL DEFAULT 0,
+      discount_percent INTEGER DEFAULT 0,
+      iva_rate INTEGER DEFAULT 19,
+      position INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    -- Deal stage history (tracks every stage transition for metrics)
+    CREATE TABLE "${schema}".deal_stage_history (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      deal_id UUID NOT NULL REFERENCES "${schema}".deals(id) ON DELETE CASCADE,
+      from_stage_id UUID REFERENCES "${schema}".pipeline_stages(id),
+      to_stage_id UUID REFERENCES "${schema}".pipeline_stages(id),
+      from_status VARCHAR(30),
+      to_status VARCHAR(30),
+      changed_by UUID REFERENCES "${schema}".users(id),
+      changed_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     -- Products
     CREATE TABLE "${schema}".products (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -421,6 +447,12 @@ export function getTenantIndicesSQL(schema: string): string {
     -- Deals by stage
     CREATE INDEX idx_${schema}_deals_stage ON "${schema}".deals (stage_id)
       WHERE is_active = true;
+
+    -- Deal items by deal
+    CREATE INDEX idx_${schema}_deal_items_deal ON "${schema}".deal_items (deal_id, position);
+
+    -- Deal stage history by deal (timeline queries)
+    CREATE INDEX idx_${schema}_deal_stage_history ON "${schema}".deal_stage_history (deal_id, changed_at DESC);
 
     -- Notifications unread
     CREATE INDEX idx_${schema}_notifications_unread ON "${schema}".notifications (user_id, is_read)

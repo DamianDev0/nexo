@@ -61,6 +61,36 @@ export type DealPipelineSummary = {
   name: string
 }
 
+// ─── Deal items (products/services on a deal) ────────────────────────────────
+
+export type DealItem = {
+  id: string
+  dealId: string
+  productId: string | null
+  description: string
+  quantity: number
+  unitPriceCents: number
+  discountPercent: number
+  ivaRate: number
+  position: number
+  /** Calculated: quantity * unitPriceCents * (1 - discountPercent/100) */
+  subtotalCents: number
+  createdAt: string
+}
+
+// ─── Deal stage history ───────────────────────────────────────────────────────
+
+export type DealStageHistoryEntry = {
+  id: string
+  dealId: string
+  fromStageId: string | null
+  toStageId: string | null
+  fromStatus: string | null
+  toStatus: string | null
+  changedBy: string | null
+  changedAt: string
+}
+
 // ─── Full detail (deal + joined relations) ────────────────────────────────────
 
 export type DealDetail = Deal & {
@@ -68,4 +98,14 @@ export type DealDetail = Deal & {
   company: DealCompanySummary | null
   stage: DealStageSummary | null
   pipeline: DealPipelineSummary | null
+  items: DealItem[]
+}
+
+// ─── Forecast ─────────────────────────────────────────────────────────────────
+
+export type ForecastEntry = {
+  month: string // "2026-04"
+  totalValueCents: number
+  weightedValueCents: number
+  dealCount: number
 }

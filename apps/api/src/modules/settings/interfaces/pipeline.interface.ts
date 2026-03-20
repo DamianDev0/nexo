@@ -11,3 +11,8 @@ export interface StageRow {
   probability: number
   position: number
 }
+
+export interface KanbanStageRow extends StageRow {
+  deal_count: string // COUNT → string from pg
+  total_value_cents: string // SUM → string from pg
+}

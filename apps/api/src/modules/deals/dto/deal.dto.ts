@@ -122,11 +122,51 @@ export class MoveDealDto {
   pipelineId: string
 }
 
+// ─── Deal items ──────────────────────────────────────────────────────────────
+
+export class CreateDealItemDto {
+  @IsOptional()
+  @IsUUID()
+  productId?: string
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(500)
+  description: string
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  quantity?: number
+
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
+  unitPriceCents: number
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  @Type(() => Number)
+  discountPercent?: number
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  @Type(() => Number)
+  ivaRate?: number
+}
+
+export class UpdateDealItemDto extends PartialType(CreateDealItemDto) {}
+
 // ─── Mark lost ────────────────────────────────────────────────────────────────
 
 export class LoseDealDto {
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(300)
-  lossReason?: string
+  lossReason: string
 }

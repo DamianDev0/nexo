@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
-import type { TenantContext, Pipeline } from '@repo/shared-types'
+import type { TenantContext, Pipeline, KanbanBoard } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { PipelineSettingsService } from '../services/pipeline-settings.service'
@@ -88,5 +88,16 @@ export class PipelineController {
     @TenantCtx() ctx: TenantContext,
   ): Promise<Pipeline> {
     return this.service.reorderStages(ctx.schemaName, id, dto)
+  }
+
+  @Get(':id/kanban')
+  @Auth(UserRole.VIEWER)
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiOperation({ summary: 'Kanban board: stages with deal counts and value totals' })
+  getKanbanBoard(
+    @Param('id', ParseUUIDPipe) id: string,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<KanbanBoard> {
+    return this.service.getKanbanBoard(ctx.schemaName, id)
   }
 }

@@ -34,3 +34,34 @@ export interface DealDetailRow extends DealListRow {
   company_name: string | null
   company_nit: string | null
 }
+
+export interface DealItemRow {
+  id: string
+  deal_id: string
+  product_id: string | null
+  description: string
+  quantity: number
+  unit_price_cents: string // BIGINT → string
+  discount_percent: number
+  iva_rate: number
+  position: number
+  created_at: string
+}
+
+export interface StageHistoryRow {
+  id: string
+  deal_id: string
+  from_stage_id: string | null
+  to_stage_id: string | null
+  from_status: string | null
+  to_status: string | null
+  changed_by: string | null
+  changed_at: string
+}
+
+export interface ForecastRow {
+  month: string
+  total_value_cents: string
+  weighted_value_cents: string
+  deal_count: string
+}

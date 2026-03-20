@@ -94,4 +94,42 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         WHERE nit IS NOT NULL AND is_active = true;
     `,
   },
+  {
+    id: '0007_deal_items',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".deal_items (
+        id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        deal_id          UUID NOT NULL REFERENCES "${schema}".deals(id) ON DELETE CASCADE,
+        product_id       UUID REFERENCES "${schema}".products(id),
+        description      VARCHAR(500) NOT NULL,
+        quantity         INTEGER NOT NULL DEFAULT 1,
+        unit_price_cents BIGINT NOT NULL DEFAULT 0,
+        discount_percent INTEGER DEFAULT 0,
+        iva_rate         INTEGER DEFAULT 19,
+        position         INTEGER NOT NULL DEFAULT 0,
+        created_at       TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_deal_items_deal"
+        ON "${schema}".deal_items (deal_id, position);
+    `,
+  },
+  {
+    id: '0008_deal_stage_history',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".deal_stage_history (
+        id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        deal_id       UUID NOT NULL REFERENCES "${schema}".deals(id) ON DELETE CASCADE,
+        from_stage_id UUID REFERENCES "${schema}".pipeline_stages(id),
+        to_stage_id   UUID REFERENCES "${schema}".pipeline_stages(id),
+        from_status   VARCHAR(30),
+        to_status     VARCHAR(30),
+        changed_by    UUID REFERENCES "${schema}".users(id),
+        changed_at    TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_deal_stage_history"
+        ON "${schema}".deal_stage_history (deal_id, changed_at DESC);
+    `,
+  },
 ]

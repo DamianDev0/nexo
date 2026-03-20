@@ -2,9 +2,9 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import type { QueryRunner } from 'typeorm'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { CacheService } from '@/shared/cache/cache.service'
-import type { Pipeline, PipelineStage } from '@repo/shared-types'
+import type { Pipeline, PipelineStage, KanbanBoard, KanbanStageSummary } from '@repo/shared-types'
 import type { CreatePipelineDto, UpdatePipelineDto, ReorderStagesDto } from '../dto/pipeline.dto'
-import type { PipelineRow, StageRow } from '../interfaces/pipeline.interface'
+import type { PipelineRow, StageRow, KanbanStageRow } from '../interfaces/pipeline.interface'
 
 const PIPELINE_TTL = 300 // 5 minutes — pipelines change rarely (admin-only mutations)
 
@@ -190,6 +190,44 @@ export class PipelineSettingsService {
 
     await this.invalidateCache(schemaName, pipelineId)
     return result
+  }
+
+  // ─── Kanban board ───────────────────────────────────────────────────────
+
+  async getKanbanBoard(schemaName: string, pipelineId: string): Promise<KanbanBoard> {
+    return this.db.query(schemaName, async (qr): Promise<KanbanBoard> => {
+      const pipeline = await this.fetchPipelineOrFail(qr, pipelineId)
+
+      const rows: KanbanStageRow[] = await qr.query(
+        `SELECT
+           ps.id, ps.pipeline_id, ps.name, ps.color, ps.probability, ps.position,
+           COUNT(d.id)::text                         AS deal_count,
+           COALESCE(SUM(d.value_cents), 0)::text     AS total_value_cents
+         FROM pipeline_stages ps
+         LEFT JOIN deals d
+           ON d.stage_id = ps.id AND d.is_active = true AND d.status = 'open'
+         WHERE ps.pipeline_id = $1
+         GROUP BY ps.id
+         ORDER BY ps.position ASC`,
+        [pipelineId],
+      )
+
+      return {
+        pipeline: { id: pipeline.id, name: pipeline.name },
+        stages: rows.map(
+          (r): KanbanStageSummary => ({
+            id: r.id,
+            pipelineId: r.pipeline_id,
+            name: r.name,
+            color: r.color,
+            probability: r.probability,
+            position: r.position,
+            dealCount: Number(r.deal_count),
+            totalValueCents: Number(r.total_value_cents),
+          }),
+        ),
+      }
+    })
   }
 
   // ─── Private — DB helpers ─────────────────────────────────────────────────
