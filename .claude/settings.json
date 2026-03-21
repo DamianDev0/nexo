@@ -8,7 +8,13 @@
       "Bash(rm -rf src/features/auth/services src/features/auth/hooks src/features/auth/types src/features/auth/index.ts)",
       "Bash(mkdir -p src/core/config src/core/helpers src/core/interfaces src/core/services)",
       "WebFetch(domain:skills.sh)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(pnpm --filter web check-types)",
+      "Bash(ls -la /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\\\\\(app\\\\\\)/)",
+      "Bash(ls -la /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\\\\\(auth\\\\\\)/)"
+    ],
+    "additionalDirectories": [
+      "/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/components/data-table/components"
     ]
   }
 }

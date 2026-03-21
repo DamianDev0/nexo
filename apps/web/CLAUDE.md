@@ -184,6 +184,14 @@ interface ContactCardProps {
 - No unused variables or imports.
 - No `void` operator warnings — use proper async handling.
 - Cognitive complexity must stay under 15 per function.
+- Use native semantic HTML elements instead of ARIA roles (S6819): `<ul>`/`<ol>`/`<menu>` instead of `role="list"`, `<nav>` instead of `role="navigation"`, etc.
+
+## Tailwind — no arbitrary values
+
+- NEVER use arbitrary values like `w-[70px]` or `rounded-[4px]` when a Tailwind utility exists.
+- Use canonical classes: `w-17.5` not `w-[70px]`, `rounded-sm` not `rounded-[4px]`, `text-[13px]` → `text-sm`, etc.
+- If no utility exists, add a custom token in `tailwind.config` or `globals.css` instead of using arbitrary values.
+- Common replacements: `rounded-[4px]` → `rounded-sm`, `rounded-[6px]` → `rounded-md`, `size-[16px]` → `size-4`.
 
 ## API calls
 
