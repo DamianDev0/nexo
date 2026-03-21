@@ -23,6 +23,8 @@ import { CompaniesModule } from '@/modules/companies/companies.module'
 import { DealsModule } from '@/modules/deals/deals.module'
 import { ActivitiesModule } from '@/modules/activities/activities.module'
 import { ProductsModule } from '@/modules/products/products.module'
+import { NotificationsModule } from '@/modules/notifications/notifications.module'
+import { DashboardModule } from '@/modules/dashboard/dashboard.module'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { RolesGuard } from '@/modules/auth/guards/roles.guard'
 
@@ -47,6 +49,8 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     DealsModule,
     ActivitiesModule,
     ProductsModule,
+    NotificationsModule,
+    DashboardModule,
   ],
   providers: [
     // Global guards — order matters: Throttler → JWT → Roles

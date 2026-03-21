@@ -196,4 +196,11 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".inventory_movements (product_id, created_at DESC);
     `,
   },
+  {
+    id: '0011_notification_preferences_muted_types',
+    up: (schema) => `
+      ALTER TABLE "${schema}".notification_preferences
+        ADD COLUMN IF NOT EXISTS muted_types TEXT[] DEFAULT '{}';
+    `,
+  },
 ]

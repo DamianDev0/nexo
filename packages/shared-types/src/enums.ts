@@ -71,14 +71,20 @@ export enum ActivityType {
 
 // ─── NOTIFICATION ────────────────────────────────────────────────────
 export enum NotificationType {
-  INVOICE_APPROVED_DIAN = 'invoice_approved_dian',
-  INVOICE_REJECTED_DIAN = 'invoice_rejected_dian',
-  PAYMENT_RECEIVED = 'payment_received',
-  PAYMENT_FAILED = 'payment_failed',
-  DEAL_ASSIGNED = 'deal_assigned',
-  DEAL_STAGE_CHANGED = 'deal_stage_changed',
-  TASK_DUE = 'task_due',
-  WHATSAPP_NEW_MESSAGE = 'whatsapp_new_message',
+  DEAL_ASSIGNED = 'deal.assigned',
+  DEAL_WON = 'deal.won',
+  DEAL_LOST = 'deal.lost',
+  DEAL_STAGE_CHANGED = 'deal.stage_changed',
+  ACTIVITY_REMINDER = 'activity.reminder',
+  ACTIVITY_ASSIGNED = 'activity.assigned',
+  INVOICE_APPROVED = 'invoice.approved',
+  INVOICE_REJECTED = 'invoice.rejected',
+  PAYMENT_RECEIVED = 'payment.received',
+  PAYMENT_FAILED = 'payment.failed',
+  STOCK_LOW = 'stock.low',
+  IMPORT_COMPLETED = 'import.completed',
+  WHATSAPP_NEW_MESSAGE = 'whatsapp.new_message',
+  SYSTEM = 'system',
 }
 
 // ─── COMPANY ─────────────────────────────────────────────────────────

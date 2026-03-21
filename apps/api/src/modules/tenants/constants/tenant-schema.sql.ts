@@ -330,6 +330,7 @@ export function getTenantSchemaSQL(schema: string): string {
       in_app BOOLEAN DEFAULT true,
       email BOOLEAN DEFAULT true,
       push BOOLEAN DEFAULT false,
+      muted_types TEXT[] DEFAULT '{}',
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
