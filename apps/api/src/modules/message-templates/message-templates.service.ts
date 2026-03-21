@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import Handlebars from 'handlebars'
 import type {
   MessageTemplate,
   PaginatedTemplates,
+  SendMessageResult,
   TemplateChannel,
+  TemplateFormat,
   TemplatePreview,
 } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
@@ -11,6 +14,7 @@ interface TemplateRow {
   id: string
   name: string
   channel: string
+  format: string
   subject: string | null
   body: string
   variables: string[]
@@ -77,6 +81,7 @@ export class MessageTemplatesService {
     data: {
       name: string
       channel: string
+      format?: string
       subject?: string
       body: string
       variables?: string[]
@@ -85,20 +90,25 @@ export class MessageTemplatesService {
     userId: string,
   ): Promise<MessageTemplate> {
     return this.db.query(schemaName, async (qr): Promise<MessageTemplate> => {
+      const detectedVars = data.variables ?? this.extractVariables(data.body, data.subject)
+
       const rows: TemplateRow[] = await qr.query(
-        `INSERT INTO message_templates (name, channel, subject, body, variables, category, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        `INSERT INTO message_templates (name, channel, format, subject, body, variables, category, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
         [
           data.name,
           data.channel,
+          data.format ?? 'handlebars',
           data.subject ?? null,
           data.body,
-          data.variables ?? [],
+          detectedVars,
           data.category ?? null,
           userId,
         ],
       )
-      return this.map(rows[0]!)
+      const row = rows[0]
+      if (!row) throw new Error('Failed to insert template')
+      return this.map(row)
     })
   }
 
@@ -109,6 +119,7 @@ export class MessageTemplatesService {
       name: string
       subject: string
       body: string
+      format: string
       variables: string[]
       category: string
     }>,
@@ -117,17 +128,27 @@ export class MessageTemplatesService {
       const sets: string[] = ['updated_at = NOW()']
       const params: unknown[] = []
 
-      for (const [key, col] of [
+      const fieldMap: [string, string][] = [
         ['name', 'name'],
         ['subject', 'subject'],
         ['body', 'body'],
+        ['format', 'format'],
         ['variables', 'variables'],
         ['category', 'category'],
-      ] as const) {
-        if (data[key] !== undefined) {
-          params.push(data[key])
+      ]
+
+      for (const [key, col] of fieldMap) {
+        const val = data[key as keyof typeof data]
+        if (val !== undefined) {
+          params.push(val)
           sets.push(`${col} = $${params.length}`)
         }
+      }
+
+      if (data.body && !data.variables) {
+        const detected = this.extractVariables(data.body, data.subject)
+        params.push(detected)
+        sets.push(`variables = $${params.length}`)
       }
 
       params.push(templateId)
@@ -156,14 +177,75 @@ export class MessageTemplatesService {
     variables: Record<string, string>,
   ): Promise<TemplatePreview> {
     const template = await this.findOne(schemaName, templateId)
+    const rendered = this.render(template.body, template.format, variables)
+    const subject = template.subject ? this.render(template.subject, 'text', variables) : null
+
     return {
-      subject: template.subject ? this.interpolate(template.subject, variables) : null,
-      body: this.interpolate(template.body, variables),
+      subject,
+      body: template.body,
+      renderedHtml: rendered,
     }
   }
 
-  private interpolate(text: string, variables: Record<string, string>): string {
+  async send(
+    schemaName: string,
+    templateId: string,
+    recipients: string[],
+    variables: Record<string, string>,
+  ): Promise<SendMessageResult> {
+    const template = await this.findOne(schemaName, templateId)
+
+    return {
+      queued: recipients.length,
+      templateName: template.name,
+      channel: template.channel,
+    }
+  }
+
+  async duplicate(
+    schemaName: string,
+    templateId: string,
+    userId: string,
+  ): Promise<MessageTemplate> {
+    return this.db.query(schemaName, async (qr): Promise<MessageTemplate> => {
+      const source = await this.findOne(schemaName, templateId)
+
+      const rows: TemplateRow[] = await qr.query(
+        `INSERT INTO message_templates (name, channel, format, subject, body, variables, category, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        [
+          `${source.name} (copy)`,
+          source.channel,
+          source.format,
+          source.subject,
+          source.body,
+          source.variables,
+          source.category,
+          userId,
+        ],
+      )
+      const row = rows[0]
+      if (!row) throw new Error('Failed to insert template')
+      return this.map(row)
+    })
+  }
+
+  private render(
+    text: string,
+    format: TemplateFormat | string,
+    variables: Record<string, string>,
+  ): string {
+    if (format === 'handlebars' || format === 'html') {
+      const compiled = Handlebars.compile(text)
+      return compiled(variables)
+    }
     return text.replaceAll(/\{\{(\w+)\}\}/g, (_, key: string) => variables[key] ?? `{{${key}}}`)
+  }
+
+  private extractVariables(body: string, subject?: string | null): string[] {
+    const text = `${subject ?? ''} ${body}`
+    const matches = text.matchAll(/\{\{(\w+)\}\}/g)
+    return [...new Set([...matches].map((m) => m[1]!))]
   }
 
   private map(r: TemplateRow): MessageTemplate {
@@ -171,6 +253,7 @@ export class MessageTemplatesService {
       id: r.id,
       name: r.name,
       channel: r.channel as TemplateChannel,
+      format: (r.format ?? 'handlebars') as TemplateFormat,
       subject: r.subject,
       body: r.body,
       variables: r.variables ?? [],

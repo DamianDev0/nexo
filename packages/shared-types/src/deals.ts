@@ -1,10 +1,11 @@
-import type { DealStatus } from './enums'
+import type { DealPriority, DealStatus, DealType } from './enums'
 
 export type Deal = {
   id: string
   title: string
   valueCents: number
   expectedCloseDate: string | null
+  closeDateActual: string | null
   stageId: string | null
   stageName: string | null
   pipelineId: string | null
@@ -14,6 +15,14 @@ export type Deal = {
   assignedToId: string | null
   lossReason: string | null
   status: DealStatus
+  description: string | null
+  nextStep: string | null
+  dealType: DealType
+  priority: DealPriority
+  probabilityOverride: number | null
+  competitors: string[]
+  currency: string
+  leadSource: string | null
   customFields: Record<string, unknown>
   isActive: boolean
   createdById: string | null
@@ -21,7 +30,7 @@ export type Deal = {
   updatedAt: string
 }
 
-export type DealListItem = Omit<Deal, 'customFields'>
+export type DealListItem = Omit<Deal, 'customFields' | 'description'>
 
 export type PaginatedDeals = {
   data: DealListItem[]

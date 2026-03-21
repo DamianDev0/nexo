@@ -27,7 +27,7 @@ export class NotificationsListener {
       entityId: event.entityId,
     })
 
-    if (notification.id) {
+    if (notification) {
       this.gateway.emitToUser(event.userId, 'notification:new', notification)
 
       const unreadCount = await this.notificationsService.getUnreadCount(

@@ -1,9 +1,11 @@
 export type TemplateChannel = 'email' | 'sms' | 'whatsapp'
+export type TemplateFormat = 'html' | 'text' | 'handlebars'
 
 export type MessageTemplate = {
   id: string
   name: string
   channel: TemplateChannel
+  format: TemplateFormat
   subject: string | null
   body: string
   variables: string[]
@@ -24,4 +26,18 @@ export type PaginatedTemplates = {
 export type TemplatePreview = {
   subject: string | null
   body: string
+  renderedHtml: string | null
+}
+
+export type SendMessageRequest = {
+  templateId: string
+  recipients: string[]
+  variables: Record<string, string>
+  scheduleAt?: string
+}
+
+export type SendMessageResult = {
+  queued: number
+  templateName: string
+  channel: TemplateChannel
 }

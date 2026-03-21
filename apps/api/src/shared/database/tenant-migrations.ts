@@ -257,4 +257,63 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ADD COLUMN IF NOT EXISTS mentioned_user_ids UUID[] DEFAULT '{}';
     `,
   },
+  {
+    id: '0014_contacts_crm_fields',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS job_title         VARCHAR(200),
+        ADD COLUMN IF NOT EXISTS linkedin_url      VARCHAR(500),
+        ADD COLUMN IF NOT EXISTS birthday          DATE,
+        ADD COLUMN IF NOT EXISTS address           TEXT,
+        ADD COLUMN IF NOT EXISTS country           VARCHAR(3) DEFAULT 'CO',
+        ADD COLUMN IF NOT EXISTS lifecycle_stage   VARCHAR(30) DEFAULT 'subscriber',
+        ADD COLUMN IF NOT EXISTS data_consent      BOOLEAN DEFAULT false,
+        ADD COLUMN IF NOT EXISTS consent_date      TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS consent_source    VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS opt_out_email     BOOLEAN DEFAULT false,
+        ADD COLUMN IF NOT EXISTS opt_out_sms       BOOLEAN DEFAULT false,
+        ADD COLUMN IF NOT EXISTS opt_out_whatsapp  BOOLEAN DEFAULT false,
+        ADD COLUMN IF NOT EXISTS last_contacted_at TIMESTAMPTZ;
+    `,
+  },
+  {
+    id: '0015_companies_crm_fields',
+    up: (schema) => `
+      ALTER TABLE "${schema}".companies
+        ADD COLUMN IF NOT EXISTS employee_count            INTEGER,
+        ADD COLUMN IF NOT EXISTS annual_revenue_cents      BIGINT,
+        ADD COLUMN IF NOT EXISTS description               TEXT,
+        ADD COLUMN IF NOT EXISTS account_type              VARCHAR(30) DEFAULT 'prospect',
+        ADD COLUMN IF NOT EXISTS person_type               VARCHAR(20) DEFAULT 'juridica',
+        ADD COLUMN IF NOT EXISTS parent_company_id         UUID REFERENCES "${schema}".companies(id),
+        ADD COLUMN IF NOT EXISTS legal_rep_name            VARCHAR(300),
+        ADD COLUMN IF NOT EXISTS legal_rep_document_type   VARCHAR(10),
+        ADD COLUMN IF NOT EXISTS legal_rep_document_number VARCHAR(20),
+        ADD COLUMN IF NOT EXISTS camara_comercio_number    VARCHAR(50),
+        ADD COLUMN IF NOT EXISTS country                   VARCHAR(3) DEFAULT 'CO',
+        ADD COLUMN IF NOT EXISTS rating                    VARCHAR(10);
+    `,
+  },
+  {
+    id: '0016_deals_crm_fields',
+    up: (schema) => `
+      ALTER TABLE "${schema}".deals
+        ADD COLUMN IF NOT EXISTS description          TEXT,
+        ADD COLUMN IF NOT EXISTS next_step            TEXT,
+        ADD COLUMN IF NOT EXISTS deal_type            VARCHAR(30) DEFAULT 'new_business',
+        ADD COLUMN IF NOT EXISTS priority             VARCHAR(10) DEFAULT 'medium',
+        ADD COLUMN IF NOT EXISTS probability_override INTEGER,
+        ADD COLUMN IF NOT EXISTS competitors          TEXT[] DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS currency             VARCHAR(3) DEFAULT 'COP',
+        ADD COLUMN IF NOT EXISTS close_date_actual    DATE,
+        ADD COLUMN IF NOT EXISTS lead_source          VARCHAR(50);
+    `,
+  },
+  {
+    id: '0017_message_templates_format',
+    up: (schema) => `
+      ALTER TABLE "${schema}".message_templates
+        ADD COLUMN IF NOT EXISTS format VARCHAR(20) DEFAULT 'handlebars';
+    `,
+  },
 ]

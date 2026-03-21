@@ -63,8 +63,10 @@ function buildQrMock() {
 }
 
 function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
+  const executor = (_schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)
   return {
-    query: jest.fn((_schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
+    query: jest.fn(executor),
+    transactional: jest.fn(executor),
   }
 }
 
@@ -289,9 +291,7 @@ describe('ProductsService', () => {
     })
 
     it('checks stock for sale movements and throws if insufficient', async () => {
-      qr.query
-        .mockResolvedValueOnce([{ id: PRODUCT_ID }]) // assertProductExists
-        .mockResolvedValueOnce([makeProductRow({ stock: 5 })]) // fetchProductOrFail (for stock check)
+      qr.query.mockResolvedValueOnce([{ stock: 5 }]) // SELECT FOR UPDATE
 
       await expect(
         service.adjustInventory(
@@ -308,8 +308,7 @@ describe('ProductsService', () => {
 
     it('allows sale when stock is sufficient', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: PRODUCT_ID }]) // assertProductExists
-        .mockResolvedValueOnce([makeProductRow({ stock: 50 })]) // fetchProductOrFail (stock check)
+        .mockResolvedValueOnce([{ stock: 50 }]) // SELECT FOR UPDATE
         .mockResolvedValueOnce([makeMovementRow({ movement_type: 'sale', quantity: 5 })]) // INSERT
         .mockResolvedValueOnce([]) // UPDATE stock
 

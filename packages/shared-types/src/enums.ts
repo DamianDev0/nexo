@@ -1,20 +1,32 @@
-// ─── DOCUMENT TYPES (Colombian ID documents) ────────────────────────
 export enum DocumentType {
-  CC = 'cc', // Cédula de Ciudadanía
-  NIT = 'nit', // Número de Identificación Tributaria
-  CE = 'ce', // Cédula de Extranjería
-  PP = 'pp', // Pasaporte
-  TI = 'ti', // Tarjeta de Identidad (minors)
+  CC = 'cc',
+  NIT = 'nit',
+  CE = 'ce',
+  PP = 'pp',
+  TI = 'ti',
+  PEP = 'pep',
+  PPT = 'ppt',
 }
 
-// ─── CONTACT ─────────────────────────────────────────────────────────
 export enum ContactStatus {
   NEW = 'new',
   IN_CONTACT = 'in_contact',
   QUALIFIED = 'qualified',
+  UNQUALIFIED = 'unqualified',
+  NURTURING = 'nurturing',
   CLIENT = 'client',
   INACTIVE = 'inactive',
   LOST = 'lost',
+}
+
+export enum LifecycleStage {
+  SUBSCRIBER = 'subscriber',
+  LEAD = 'lead',
+  MQL = 'mql',
+  SQL = 'sql',
+  OPPORTUNITY = 'opportunity',
+  CUSTOMER = 'customer',
+  EVANGELIST = 'evangelist',
 }
 
 export enum ContactSource {
@@ -23,9 +35,16 @@ export enum ContactSource {
   WEB_FORM = 'web_form',
   REFERRAL = 'referral',
   IMPORT = 'import',
+  EMAIL_CAMPAIGN = 'email_campaign',
+  SOCIAL_MEDIA = 'social_media',
+  PAID_AD = 'paid_ad',
+  ORGANIC_SEARCH = 'organic_search',
+  EVENT = 'event',
+  COLD_CALL = 'cold_call',
+  PARTNER = 'partner',
+  CHAT = 'chat',
 }
 
-// ─── INVOICE ─────────────────────────────────────────────────────────
 export enum InvoiceStatus {
   DRAFT = 'draft',
   PENDING_DIAN = 'pending_dian',
@@ -33,33 +52,29 @@ export enum InvoiceStatus {
   REJECTED = 'rejected',
   PAID = 'paid',
   VOIDED = 'voided',
+  OVERDUE = 'overdue',
 }
 
-// ─── TAX ─────────────────────────────────────────────────────────────
 export enum TaxRegime {
   RESPONSIBLE_VAT = 'responsible_vat',
   NOT_RESPONSIBLE = 'not_responsible',
   LARGE_CONTRIBUTOR = 'large_contributor',
   SIMPLE_REGIME = 'simple_regime',
+  AUTORRETENEDOR = 'autorretenedor',
 }
 
-// ─── USER ROLES (RBAC) ──────────────────────────────────────────────
-// super_admin  → platform operator (can manage all tenants)
-// owner        → tenant business owner (highest role within a tenant)
-// admin        → tenant administrator
-// manager      → team manager
-// sales_rep    → sales representative
-// viewer       → read-only
 export enum UserRole {
   SUPER_ADMIN = 'super_admin',
   OWNER = 'owner',
   ADMIN = 'admin',
   MANAGER = 'manager',
   SALES_REP = 'sales_rep',
+  MARKETING = 'marketing',
+  BILLING = 'billing',
+  SUPPORT = 'support',
   VIEWER = 'viewer',
 }
 
-// ─── ACTIVITY ────────────────────────────────────────────────────────
 export enum ActivityType {
   CALL = 'call',
   MEETING = 'meeting',
@@ -67,9 +82,13 @@ export enum ActivityType {
   TASK = 'task',
   NOTE = 'note',
   WHATSAPP = 'whatsapp',
+  SMS = 'sms',
+  DEMO = 'demo',
+  PROPOSAL = 'proposal',
+  SITE_VISIT = 'site_visit',
+  LINKEDIN_MESSAGE = 'linkedin_message',
 }
 
-// ─── NOTIFICATION ────────────────────────────────────────────────────
 export enum NotificationType {
   DEAL_ASSIGNED = 'deal.assigned',
   DEAL_WON = 'deal.won',
@@ -84,58 +103,93 @@ export enum NotificationType {
   STOCK_LOW = 'stock.low',
   IMPORT_COMPLETED = 'import.completed',
   WHATSAPP_NEW_MESSAGE = 'whatsapp.new_message',
+  MENTION = 'mention',
   SYSTEM = 'system',
 }
 
-// ─── COMPANY ─────────────────────────────────────────────────────────
 export enum CompanySize {
-  MICRO = 'micro', // < 10 employees
-  SMALL = 'small', // 10–50
-  MEDIUM = 'medium', // 51–200
-  LARGE = 'large', // > 200
+  MICRO = 'micro',
+  SMALL = 'small',
+  MEDIUM = 'medium',
+  LARGE = 'large',
 }
 
-// CIIU Rev 4 — main sector letters (Colombia DIAN classification)
+export enum AccountType {
+  PROSPECT = 'prospect',
+  CUSTOMER = 'customer',
+  PARTNER = 'partner',
+  VENDOR = 'vendor',
+  COMPETITOR = 'competitor',
+}
+
+export enum PersonType {
+  NATURAL = 'natural',
+  JURIDICA = 'juridica',
+}
+
 export enum CIIUSector {
-  A = 'A', // Agropecuario, silvicultura y pesca
-  B = 'B', // Minería y canteras
-  C = 'C', // Industria manufacturera
-  D = 'D', // Suministro de electricidad, gas y vapor
-  E = 'E', // Distribución de agua y saneamiento
-  F = 'F', // Construcción
-  G = 'G', // Comercio al por mayor y al por menor
-  H = 'H', // Transporte y almacenamiento
-  I = 'I', // Alojamiento y servicios de comida
-  J = 'J', // Información y comunicaciones
-  K = 'K', // Actividades financieras y de seguros
-  L = 'L', // Actividades inmobiliarias
-  M = 'M', // Actividades profesionales, científicas y técnicas
-  N = 'N', // Actividades de servicios administrativos y de apoyo
-  O = 'O', // Administración pública y defensa
-  P = 'P', // Educación
-  Q = 'Q', // Actividades de atención de la salud humana
-  R = 'R', // Actividades artísticas y de entretenimiento
-  S = 'S', // Otras actividades de servicios
-  T = 'T', // Actividades de los hogares como empleadores
-  U = 'U', // Actividades de organizaciones extraterritoriales
+  A = 'A',
+  B = 'B',
+  C = 'C',
+  D = 'D',
+  E = 'E',
+  F = 'F',
+  G = 'G',
+  H = 'H',
+  I = 'I',
+  J = 'J',
+  K = 'K',
+  L = 'L',
+  M = 'M',
+  N = 'N',
+  O = 'O',
+  P = 'P',
+  Q = 'Q',
+  R = 'R',
+  S = 'S',
+  T = 'T',
+  U = 'U',
 }
 
-// ─── DEAL ────────────────────────────────────────────────────────────
 export enum DealStatus {
   OPEN = 'open',
   WON = 'won',
   LOST = 'lost',
+  ON_HOLD = 'on_hold',
 }
 
-// ─── PAYMENT ─────────────────────────────────────────────────────────
+export enum DealType {
+  NEW_BUSINESS = 'new_business',
+  EXISTING_CUSTOMER = 'existing_customer',
+  RENEWAL = 'renewal',
+  UPSELL = 'upsell',
+}
+
+export enum DealPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent',
+}
+
+export enum AccountRating {
+  HOT = 'hot',
+  WARM = 'warm',
+  COLD = 'cold',
+}
+
 export enum PaymentMethod {
   CASH = 'cash',
   BANK_TRANSFER = 'bank_transfer',
   CREDIT_CARD = 'credit_card',
   DEBIT_CARD = 'debit_card',
-  PSE = 'pse', // Colombian bank payment system
+  PSE = 'pse',
   NEQUI = 'nequi',
   DAVIPLATA = 'daviplata',
+  EFECTY = 'efecty',
+  BOLD = 'bold',
+  WOMPI_LINK = 'wompi_link',
+  CHEQUE = 'cheque',
 }
 
 export enum PaymentStatus {
@@ -143,4 +197,5 @@ export enum PaymentStatus {
   APPROVED = 'approved',
   REJECTED = 'rejected',
   VOIDED = 'voided',
+  REFUNDED = 'refunded',
 }

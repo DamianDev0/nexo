@@ -216,3 +216,13 @@ export type EmailBrandingContext = {
   primaryColor: string
   logoUrl: string | null
 }
+
+export type TenantEmailConfig = {
+  fromName: string | null
+  fromEmail: string | null
+  replyToEmail: string | null
+  customDomain: string | null
+  signature: string | null
+  provider: 'resend' | 'sendgrid' | null
+  sendgridApiKey: string | null
+}

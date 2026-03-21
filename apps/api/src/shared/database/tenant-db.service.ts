@@ -1,22 +1,28 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { DataSource, QueryRunner } from 'typeorm'
+
+const SCHEMA_NAME_REGEX = /^[a-z][a-z0-9_]{2,62}$/
 
 @Injectable()
 export class TenantDbService {
   constructor(private readonly dataSource: DataSource) {}
 
+  private validateSchemaName(schemaName: string): void {
+    if (!SCHEMA_NAME_REGEX.test(schemaName)) {
+      throw new BadRequestException('Invalid schema name')
+    }
+  }
+
   /**
    * Executes a callback within the context of a tenant's schema.
    * Sets search_path to the tenant schema before executing and resets after.
    */
-  async query<T>(
-    schemaName: string,
-    fn: (queryRunner: QueryRunner) => Promise<T>,
-  ): Promise<T> {
+  async query<T>(schemaName: string, fn: (queryRunner: QueryRunner) => Promise<T>): Promise<T> {
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
 
     try {
+      this.validateSchemaName(schemaName)
       await queryRunner.query(`SET search_path TO "${schemaName}", public`)
       return await fn(queryRunner)
     } finally {
@@ -25,13 +31,11 @@ export class TenantDbService {
     }
   }
 
-  /**
-   * Executes raw SQL within a tenant's schema inside a transaction.
-   */
   async transactional<T>(
     schemaName: string,
     fn: (queryRunner: QueryRunner) => Promise<T>,
   ): Promise<T> {
+    this.validateSchemaName(schemaName)
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.startTransaction()

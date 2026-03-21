@@ -17,6 +17,7 @@ import type {
   AuthenticatedUser,
   MessageTemplate,
   PaginatedTemplates,
+  SendMessageResult,
   TemplatePreview,
   TenantContext,
 } from '@repo/shared-types'
@@ -99,12 +100,34 @@ export class MessageTemplatesController {
 
   @Post(':id/preview')
   @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Preview a template with variable substitution' })
+  @ApiOperation({ summary: 'Preview a template with Handlebars rendering' })
   preview(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() variables: Record<string, string>,
     @TenantCtx() ctx: TenantContext,
   ): Promise<TemplatePreview> {
     return this.service.preview(ctx.schemaName, id, variables)
+  }
+
+  @Post(':id/send')
+  @Auth(UserRole.SALES_REP)
+  @ApiOperation({ summary: 'Send a template to recipients (queued for delivery)' })
+  send(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: { recipients: string[]; variables: Record<string, string> },
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<SendMessageResult> {
+    return this.service.send(ctx.schemaName, id, dto.recipients, dto.variables)
+  }
+
+  @Post(':id/duplicate')
+  @Auth(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Duplicate a template' })
+  duplicate(
+    @Param('id', ParseUUIDPipe) id: string,
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<MessageTemplate> {
+    return this.service.duplicate(ctx.schemaName, id, user.id)
   }
 }

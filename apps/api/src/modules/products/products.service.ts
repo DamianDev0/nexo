@@ -218,23 +218,25 @@ export class ProductsService {
     dto: InventoryAdjustmentDto,
     userId: string,
   ): Promise<InventoryMovement> {
-    return this.db.query(schemaName, async (qr): Promise<InventoryMovement> => {
-      await this.assertProductExists(qr, productId)
-
-      // Determine stock delta based on movement type
+    return this.db.transactional(schemaName, async (qr): Promise<InventoryMovement> => {
       const delta = this.getStockDelta(dto.movementType, dto.quantity)
 
-      // Check stock doesn't go negative for outbound movements
       if (delta < 0) {
-        const product = await this.fetchProductOrFail(qr, productId)
-        if (product.stock + delta < 0) {
+        const lockRows: [{ stock: number }?] = await qr.query(
+          `SELECT stock FROM products WHERE id = $1 AND is_active = true FOR UPDATE`,
+          [productId],
+        )
+        const locked = lockRows[0]
+        if (!locked) throw new NotFoundException(`Product ${productId} not found`)
+        if (locked.stock + delta < 0) {
           throw new BadRequestException(
-            `Insufficient stock. Current: ${product.stock}, requested: ${Math.abs(delta)}`,
+            `Insufficient stock. Current: ${locked.stock}, requested: ${Math.abs(delta)}`,
           )
         }
+      } else {
+        await this.assertProductExists(qr, productId)
       }
 
-      // Insert movement record
       const movementRows: MovementRow[] = await qr.query(
         `INSERT INTO inventory_movements (product_id, quantity, movement_type, reference_type, reference_id, notes, created_by)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -323,7 +325,7 @@ export class ProductsService {
       productImportMapper,
     )
 
-    return this.db.query(schemaName, async (qr): Promise<ImportResult> => {
+    return this.db.transactional(schemaName, async (qr): Promise<ImportResult> => {
       let imported = 0
       let updated = 0
       let skipped = 0

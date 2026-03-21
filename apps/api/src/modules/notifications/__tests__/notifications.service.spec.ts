@@ -152,7 +152,7 @@ describe('NotificationsService', () => {
       })
 
       expect(qr.query).toHaveBeenCalledTimes(1)
-      expect(result.id).toBeUndefined()
+      expect(result).toBeNull()
     })
   })
 

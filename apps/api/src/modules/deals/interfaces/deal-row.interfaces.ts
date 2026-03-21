@@ -7,6 +7,7 @@ export interface DealListRow {
   title: string
   value_cents: string
   expected_close_date: string | null
+  close_date_actual: string | null
   stage_id: string | null
   stage_name: string | null
   stage_color: string | null
@@ -19,6 +20,13 @@ export interface DealListRow {
   assigned_to_id: string | null
   loss_reason: string | null
   status: string
+  next_step: string | null
+  deal_type: string
+  priority: string
+  probability_override: number | null
+  competitors: string[]
+  currency: string
+  lead_source: string | null
   is_active: boolean
   created_by: string | null
   created_at: string

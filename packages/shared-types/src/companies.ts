@@ -1,19 +1,15 @@
-import type { TaxRegime, CompanySize, CIIUSector } from './enums'
-
-// ─── COMPANY ──────────────────────────────────────────────────────────────────
+import type { AccountType, CIIUSector, CompanySize, PersonType, TaxRegime } from './enums'
 
 export type Company = {
   id: string
   name: string
-  /** Raw 9-digit NIT without check digit */
   nit: string | null
-  /** Dígito de verificación DIAN */
   nitDv: string | null
-  /** Display format: "900.123.456-7" — derived from nit + nitDv */
   nitFormatted: string | null
   taxRegime: TaxRegime | null
   companySize: CompanySize | null
   sectorCiiu: CIIUSector | null
+  description: string | null
   website: string | null
   phone: string | null
   email: string | null
@@ -21,6 +17,17 @@ export type Company = {
   city: string | null
   department: string | null
   municipioCode: string | null
+  country: string
+  employeeCount: number | null
+  annualRevenueCents: number | null
+  accountType: AccountType
+  personType: PersonType
+  parentCompanyId: string | null
+  legalRepName: string | null
+  legalRepDocumentType: string | null
+  legalRepDocumentNumber: string | null
+  camaraComercioNumber: string | null
+  rating: string | null
   tags: string[]
   assignedToId: string | null
   customFields: Record<string, unknown>
@@ -30,7 +37,7 @@ export type Company = {
   updatedAt: string
 }
 
-export type CompanyListItem = Omit<Company, 'customFields'>
+export type CompanyListItem = Omit<Company, 'customFields' | 'description'>
 
 export type PaginatedCompanies = {
   data: CompanyListItem[]
@@ -39,17 +46,12 @@ export type PaginatedCompanies = {
   limit: number
 }
 
-// ─── SUMMARY ──────────────────────────────────────────────────────────────────
-
 export type CompanyStats = {
   contactCount: number
   activeDealCount: number
-  /** Sum of value_cents for open deals */
   totalDealsValueCents: number
   invoiceCount: number
-  /** Sum of total_cents for approved/paid invoices */
   totalBilledCents: number
-  /** Sum of total_cents for invoices not yet paid */
   pendingDebtCents: number
 }
 

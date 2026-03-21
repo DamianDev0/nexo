@@ -120,13 +120,12 @@ export class NotificationsService {
       entityType?: string
       entityId?: string
     },
-  ): Promise<Notification> {
-    return this.db.query(schemaName, async (qr): Promise<Notification> => {
+  ): Promise<Notification | null> {
+    return this.db.query(schemaName, async (qr): Promise<Notification | null> => {
       const prefs = await this.getOrCreatePreferences(qr, userId)
 
-      if (!prefs.in_app) return this.mapNotification({} as NotificationRow)
-      if ((prefs.muted_types ?? []).includes(payload.type))
-        return this.mapNotification({} as NotificationRow)
+      if (!prefs.in_app) return null
+      if ((prefs.muted_types ?? []).includes(payload.type)) return null
 
       const rows: NotificationRow[] = await qr.query(
         `INSERT INTO notifications (user_id, notification_type, title, body, entity_type, entity_id)

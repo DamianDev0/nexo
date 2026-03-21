@@ -1,6 +1,4 @@
-import type { DocumentType, ContactStatus, ContactSource } from './enums'
-
-// ─── CONTACT ──────────────────────────────────────────────────────────────────
+import type { ContactSource, ContactStatus, DocumentType, LifecycleStage } from './enums'
 
 export type Contact = {
   id: string
@@ -11,12 +9,25 @@ export type Contact = {
   whatsapp: string | null
   documentType: DocumentType | null
   documentNumber: string | null
+  jobTitle: string | null
+  linkedinUrl: string | null
+  birthday: string | null
+  address: string | null
   city: string | null
   department: string | null
-  municipioCode: string | null // DANE 5-digit code
+  municipioCode: string | null
+  country: string
   status: ContactStatus
+  lifecycleStage: LifecycleStage
   source: ContactSource | null
   leadScore: number
+  dataConsent: boolean
+  consentDate: string | null
+  consentSource: string | null
+  optOutEmail: boolean
+  optOutSms: boolean
+  optOutWhatsapp: boolean
+  lastContactedAt: string | null
   tags: string[]
   companyId: string | null
   assignedToId: string | null

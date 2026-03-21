@@ -299,7 +299,7 @@ export class DealsService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   async addItem(schemaName: string, dealId: string, dto: CreateDealItemDto): Promise<DealItem> {
-    return this.db.query(schemaName, async (qr): Promise<DealItem> => {
+    return this.db.transactional(schemaName, async (qr): Promise<DealItem> => {
       await this.assertDealExists(qr, dealId)
 
       const position = await this.getNextItemPosition(qr, dealId)
@@ -334,7 +334,7 @@ export class DealsService {
     itemId: string,
     dto: UpdateDealItemDto,
   ): Promise<DealItem> {
-    return this.db.query(schemaName, async (qr): Promise<DealItem> => {
+    return this.db.transactional(schemaName, async (qr): Promise<DealItem> => {
       await this.assertItemExists(qr, itemId, dealId)
 
       const sets: string[] = []
@@ -381,7 +381,7 @@ export class DealsService {
   }
 
   async removeItem(schemaName: string, dealId: string, itemId: string): Promise<void> {
-    return this.db.query(schemaName, async (qr): Promise<void> => {
+    return this.db.transactional(schemaName, async (qr): Promise<void> => {
       await this.assertItemExists(qr, itemId, dealId)
       await qr.query(`DELETE FROM deal_items WHERE id = $1 AND deal_id = $2`, [itemId, dealId])
       await this.recalcDealValue(qr, dealId)
@@ -606,6 +606,7 @@ export class DealsService {
       title: r.title,
       valueCents: Number(r.value_cents),
       expectedCloseDate: r.expected_close_date,
+      closeDateActual: r.close_date_actual ?? null,
       stageId: r.stage_id,
       stageName: r.stage_name,
       pipelineId: r.pipeline_id,
@@ -615,6 +616,13 @@ export class DealsService {
       assignedToId: r.assigned_to_id,
       lossReason: r.loss_reason,
       status: r.status as DealStatus,
+      nextStep: r.next_step ?? null,
+      dealType: (r.deal_type ?? 'new_business') as DealListItem['dealType'],
+      priority: (r.priority ?? 'medium') as DealListItem['priority'],
+      probabilityOverride: r.probability_override ?? null,
+      competitors: r.competitors ?? [],
+      currency: r.currency ?? 'COP',
+      leadSource: r.lead_source ?? null,
       isActive: r.is_active,
       createdById: r.created_by,
       createdAt: r.created_at,
