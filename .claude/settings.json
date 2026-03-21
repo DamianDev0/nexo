@@ -4,7 +4,11 @@
       "Bash(curl -s http://localhost:8080/api/v1/auth/me -H \"Authorization: Bearer test\")",
       "Bash(node -e \":*)",
       "Bash(chmod +x scripts/e2e-full-flow.sh)",
-      "Bash(bash scripts/e2e-full-flow.sh)"
+      "Bash(bash scripts/e2e-full-flow.sh)",
+      "Bash(rm -rf src/features/auth/services src/features/auth/hooks src/features/auth/types src/features/auth/index.ts)",
+      "Bash(mkdir -p src/core/config src/core/helpers src/core/interfaces src/core/services)",
+      "WebFetch(domain:skills.sh)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

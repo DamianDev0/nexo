@@ -1,8 +1,6 @@
 import type { UserRole } from './enums'
 
-// ─── JWT PAYLOAD (embedded in the access token) ──────────────────────
 export interface JwtPayload {
-  /** User ID (subject) */
   sub: string
   email: string
   role: UserRole
@@ -12,7 +10,6 @@ export interface JwtPayload {
   exp?: number
 }
 
-// ─── AUTH USER (returned in every auth response) ─────────────────────
 export type AuthUser = {
   id: string
   email: string
@@ -21,13 +18,34 @@ export type AuthUser = {
   avatarUrl: string | null
 }
 
-// ─── PUBLIC AUTH RESPONSE SHAPES (API contract shared with frontend) ─
-export type AuthTokensResponse = {
-  accessToken: string
+export type MeResponse = {
+  id: string
+  email: string
+  role: UserRole
+  tenantId: string
+  schemaName: string
+}
+
+export type LoginRequest = {
+  email: string
+  password: string
+}
+
+export type OnboardingRequest = {
+  businessName: string
+  slug: string
+  ownerEmail: string
+  ownerPassword: string
+  ownerFullName: string
+  planName?: string
+}
+
+export type LoginResponse = {
   user: AuthUser
 }
 
-export type OnboardingResponse = AuthTokensResponse & {
+export type OnboardingResponse = {
+  user: AuthUser
   tenant: {
     id: string
     slug: string
