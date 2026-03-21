@@ -72,13 +72,15 @@ export class TenantMiddleware implements NestMiddleware {
         schemaName: tenant.schemaName,
         plan: tenant.plan.name,
         config: tenant.config,
+        productName: tenant.productName ?? 'NexoCRM',
+        customDomain: tenant.customDomain ?? null,
       }
 
       await this.cache.set(cacheKey, tenantContext, TENANT_CACHE_TTL)
       this.logger.debug(`Tenant resolved: ${subdomain} → ${tenant.schemaName}`)
     }
 
-    req.tenantContext = tenantContext
+    req.tenantContext = tenantContext ?? undefined
     next()
   }
 }

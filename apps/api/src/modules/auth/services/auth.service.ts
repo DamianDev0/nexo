@@ -67,6 +67,8 @@ export class AuthService {
       schemaName: tenant.schemaName,
       plan: tenant.plan,
       config: {},
+      productName: 'NexoCRM',
+      customDomain: null,
     }
 
     let authResult: AuthResult
@@ -179,6 +181,8 @@ export class AuthService {
       schemaName: tenant.schemaName,
       plan: tenant.plan.name,
       config: tenant.config ?? {},
+      productName: tenant.productName ?? 'NexoCRM',
+      customDomain: tenant.customDomain ?? null,
     }
 
     const user = await this.authRepo.findOrCreateGoogleUser(

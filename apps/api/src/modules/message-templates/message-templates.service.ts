@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { InjectQueue } from '@nestjs/bullmq'
+import type { Queue } from 'bullmq'
 import Handlebars from 'handlebars'
 import type {
   MessageTemplate,
@@ -9,6 +11,8 @@ import type {
   TemplatePreview,
 } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { QUEUE_NAMES } from '@/shared/queue/queue-names'
+import type { MessageJobData } from './message-queue.processor'
 
 interface TemplateRow {
   id: string
@@ -27,7 +31,10 @@ interface TemplateRow {
 
 @Injectable()
 export class MessageTemplatesService {
-  constructor(private readonly db: TenantDbService) {}
+  constructor(
+    private readonly db: TenantDbService,
+    @InjectQueue(QUEUE_NAMES.MESSAGES) private readonly messageQueue: Queue<MessageJobData>,
+  ) {}
 
   async findAll(
     schemaName: string,
@@ -192,8 +199,29 @@ export class MessageTemplatesService {
     templateId: string,
     recipients: string[],
     variables: Record<string, string>,
+    tenantId?: string,
   ): Promise<SendMessageResult> {
     const template = await this.findOne(schemaName, templateId)
+    const renderedBody = this.render(template.body, template.format, variables)
+    const renderedSubject = template.subject
+      ? this.render(template.subject, 'text', variables)
+      : null
+
+    const jobs = recipients.map((recipient) => ({
+      name: `send-${template.channel}`,
+      data: {
+        schemaName,
+        tenantId: tenantId ?? '',
+        templateId,
+        channel: template.channel,
+        recipient,
+        subject: renderedSubject,
+        renderedBody,
+        variables,
+      } satisfies MessageJobData,
+    }))
+
+    await this.messageQueue.addBulk(jobs)
 
     return {
       queued: recipients.length,

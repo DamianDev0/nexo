@@ -18,6 +18,8 @@ const mockCtx: TenantContext = {
   slug: 'acme',
   plan: 'free',
   config: {},
+  productName: 'NexoCRM',
+  customDomain: null,
 }
 const mockUser: AuthenticatedUser = {
   id: 'user-1',

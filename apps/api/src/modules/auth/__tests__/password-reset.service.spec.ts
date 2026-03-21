@@ -34,6 +34,8 @@ const mockTenantCtx: TenantContext = {
   schemaName: SCHEMA,
   plan: 'free',
   config: {},
+  productName: 'NexoCRM',
+  customDomain: null,
 }
 
 const mockMeta: RequestMeta = { ip: '127.0.0.1', userAgent: 'jest' }

@@ -1,274 +1,245 @@
-# NexoCRM — Sprint Status
-# BMad Enterprise Track | Agente: SM Bob (bmad-sm)
-# Generado: Marzo 2026
-# Comando: bmad-sprint-planning
-
 project:
   name: NexoCRM
   track: enterprise
-  mvp_target: 2026-05-09  # 8 semanas desde inicio
-  beta_target: 2026-05-30 # 10 semanas con buffer
+  mvp_target: 2026-05-09
+  beta_target: 2026-05-30
   velocity_sp_per_week: 15
 
 sprints:
-
-  # ═══════════════════════════════════════════════════════════════
-  # SPRINT 1 — Semanas 1-2: Fundación + Auth
-  # ═══════════════════════════════════════════════════════════════
   - id: S01
-    name: "Fundación Multitenant + Auth"
-    goal: "Un tenant puede registrarse, autenticarse y sus datos están aislados de otros tenants"
-    weeks: "1-2"
+    name: 'Fundación Multitenant + Auth'
+    weeks: '1-2'
+    status: completed
+    stories:
+      - {
+          id: E-01-S01,
+          title: 'Multitenancy: schema-per-tenant + TenantMiddleware',
+          status: completed,
+          points: 5,
+          epic: E-01,
+        }
+      - {
+          id: E-01-S02,
+          title: 'Migration runner para todos los tenants',
+          status: completed,
+          points: 2,
+          epic: E-01,
+        }
+      - {
+          id: E-02-S01,
+          title: 'Login email/password + JWT RS256 + refresh tokens',
+          status: completed,
+          points: 5,
+          epic: E-02,
+        }
+      - {
+          id: E-02-S02,
+          title: 'Login social Google OAuth 2.0',
+          status: completed,
+          points: 3,
+          epic: E-02,
+        }
+    total_points: 15
+    completed_points: 15
+
+  - id: S02
+    name: 'RBAC + Onboarding + Contactos base'
+    weeks: '3-4'
+    status: completed
+    stories:
+      - {
+          id: E-02-S03,
+          title: 'RBAC + roles + invitación de usuarios',
+          status: completed,
+          points: 5,
+          epic: E-02,
+        }
+      - {
+          id: E-03-S01,
+          title: 'Wizard de onboarding + Settings completo',
+          status: completed,
+          points: 8,
+          epic: E-03,
+        }
+      - {
+          id: E-04-S01,
+          title: 'CRUD de contactos con campos colombianos',
+          status: completed,
+          points: 8,
+          epic: E-04,
+        }
+    total_points: 21
+    completed_points: 21
+
+  - id: S03
+    name: 'CRM Core + Pipeline Kanban'
+    weeks: '5-6'
+    status: completed
+    stories:
+      - {
+          id: E-04-S02,
+          title: 'Búsqueda full-text de contactos (tsvector)',
+          status: completed,
+          points: 3,
+          epic: E-04,
+        }
+      - {
+          id: E-04-S03,
+          title: 'Timeline unificado de contacto',
+          status: completed,
+          points: 5,
+          epic: E-04,
+        }
+      - {
+          id: E-05-S01,
+          title: 'CRUD de empresas con NIT colombiano',
+          status: completed,
+          points: 5,
+          epic: E-05,
+        }
+      - {
+          id: E-06-S01,
+          title: 'Pipeline kanban + stages + forecast + stage history',
+          status: completed,
+          points: 8,
+          epic: E-06,
+        }
+    total_points: 21
+    completed_points: 21
+
+  - id: S04
+    name: 'Deals completo + Actividades + Catálogo + Dashboard'
+    weeks: '7-8'
+    status: completed
+    stories:
+      - {
+          id: E-06-S02,
+          title: 'Deal items + forecast + state validation',
+          status: completed,
+          points: 5,
+          epic: E-06,
+        }
+      - {
+          id: E-07-S01,
+          title: 'Actividades CRUD + calendario + complete/cancel/reopen',
+          status: completed,
+          points: 5,
+          epic: E-07,
+        }
+      - {
+          id: E-11-S01,
+          title: 'Catálogo productos + inventario + import/export CSV',
+          status: completed,
+          points: 5,
+          epic: E-11,
+        }
+      - {
+          id: E-12-S01,
+          title: 'Notificaciones in-app + WebSocket + preferences',
+          status: completed,
+          points: 5,
+          epic: E-12,
+        }
+      - {
+          id: E-13-S01,
+          title: 'Dashboard KPIs + pipeline summary + revenue trend',
+          status: completed,
+          points: 5,
+          epic: E-13,
+        }
+    total_points: 25
+    completed_points: 25
+    note: 'Also implemented: Tags CRUD, Saved Filters, Message Templates, Timeline, Bulk Actions'
+
+  - id: S05
+    name: 'Facturación DIAN + Pagos Wompi'
+    weeks: '9-10'
     status: not_started
     stories:
-      - id: E-01-S01
-        title: "Multitenancy: schema-per-tenant + TenantMiddleware"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-01
-      - id: E-01-S02
-        title: "Migration runner para todos los tenants"
-        status: not_started
-        points: 2
-        assignee: dev
-        epic: E-01
-      - id: E-02-S01
-        title: "Login email/password + JWT RS256 + refresh tokens"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-02
-      - id: E-02-S02
-        title: "Login social Google OAuth 2.0"
-        status: not_started
-        points: 3
-        assignee: dev
-        epic: E-02
+      - {
+          id: E-08-S01,
+          title: 'Configuración de resolución DIAN',
+          status: not_started,
+          points: 3,
+          epic: E-08,
+        }
+      - {
+          id: E-08-S02,
+          title: 'Emitir factura electrónica vía MATIAS/Factus',
+          status: not_started,
+          points: 13,
+          epic: E-08,
+        }
+      - {
+          id: E-08-S03,
+          title: 'Nota crédito (anulación)',
+          status: not_started,
+          points: 5,
+          epic: E-08,
+        }
+      - { id: E-09-S01, title: 'Link de pago Wompi', status: not_started, points: 5, epic: E-09 }
+    total_points: 26
+    completed_points: 0
+
+  - id: S06
+    name: 'Pagos completo + WhatsApp'
+    weeks: '11-12'
+    status: not_started
+    stories:
+      - {
+          id: E-09-S02,
+          title: 'Webhook Wompi + conciliación',
+          status: not_started,
+          points: 5,
+          epic: E-09,
+        }
+      - { id: E-09-S03, title: 'Dashboard de cartera', status: not_started, points: 5, epic: E-09 }
+      - {
+          id: E-10-S01,
+          title: 'WhatsApp básico (factura + link pago)',
+          status: not_started,
+          points: 5,
+          epic: E-10,
+        }
     total_points: 15
     completed_points: 0
 
-  # ═══════════════════════════════════════════════════════════════
-  # SPRINT 2 — Semanas 3-4: Auth completo + Onboarding + CRM base
-  # ═══════════════════════════════════════════════════════════════
-  - id: S02
-    name: "RBAC + Onboarding + Contactos base"
-    goal: "Un usuario nuevo completa el onboarding y puede crear sus primeros contactos"
-    weeks: "3-4"
-    status: not_started
-    stories:
-      - id: E-02-S03
-        title: "RBAC + roles + invitación de usuarios"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-02
-      - id: E-03-S01
-        title: "Wizard de onboarding 4 pasos"
-        status: not_started
-        points: 8
-        assignee: dev
-        epic: E-03
-      - id: E-04-S01
-        title: "CRUD de contactos con campos colombianos"
-        status: not_started
-        points: 8  # Parcial — continúa en S03
-        assignee: dev
-        epic: E-04
-    total_points: 21
-    completed_points: 0
-    note: "Sprint ligeramente sobre velocidad — ajustar si es necesario mover E-04-S01 al S03"
-
-  # ═══════════════════════════════════════════════════════════════
-  # SPRINT 3 — Semanas 5-6: CRM completo + Pipeline
-  # ═══════════════════════════════════════════════════════════════
-  - id: S03
-    name: "CRM Core + Pipeline Kanban"
-    goal: "El vendedor puede gestionar contactos, empresas y mover deals en el pipeline"
-    weeks: "5-6"
-    status: not_started
-    stories:
-      - id: E-04-S02
-        title: "Búsqueda full-text de contactos (tsvector)"
-        status: not_started
-        points: 3
-        assignee: dev
-        epic: E-04
-      - id: E-04-S03
-        title: "Timeline de contacto con WebSocket"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-04
-      - id: E-05-S01
-        title: "CRUD de empresas con NIT colombiano"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-05
-      - id: E-06-S01
-        title: "Pipeline kanban con drag & drop"
-        status: not_started
-        points: 8
-        assignee: dev
-        epic: E-06
-    total_points: 21
-    completed_points: 0
-    note: "Sprint pesado — si hay deuda técnica del S02, mover E-06-S01 al S04"
-
-  # ═══════════════════════════════════════════════════════════════
-  # SPRINT 4 — Semanas 7-8: Deals + Actividades + Productos
-  # ═══════════════════════════════════════════════════════════════
-  - id: S04
-    name: "Deals completo + Actividades + Catálogo"
-    goal: "El flujo completo CRM: contacto → deal → actividades → catálogo de productos"
-    weeks: "7-8"
-    status: not_started
-    stories:
-      - id: E-06-S02
-        title: "Deal: creación, detalle y conversión a factura"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-06
-      - id: E-07-S01
-        title: "Actividades y recordatorios + calendario"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-07
-      - id: E-11-S01
-        title: "Catálogo básico de productos y servicios"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-11
-      - id: E-13-S01
-        title: "Dashboard principal con métricas"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-13
-    total_points: 20
-    completed_points: 0
-
-  # ═══════════════════════════════════════════════════════════════
-  # SPRINT 5 — Semanas 9-10: DIAN + Pagos (el más crítico)
-  # ═══════════════════════════════════════════════════════════════
-  - id: S05
-    name: "Facturación DIAN + Pagos Wompi"
-    goal: "Una factura se emite, la DIAN la aprueba y el cliente paga por Nequi o PSE"
-    weeks: "9-10"
-    status: not_started
-    stories:
-      - id: E-08-S01
-        title: "Configuración de resolución DIAN en Settings"
-        status: not_started
-        points: 3
-        assignee: dev
-        epic: E-08
-      - id: E-08-S02
-        title: "Emitir factura electrónica vía MATIAS API"
-        status: not_started
-        points: 13
-        assignee: dev
-        epic: E-08
-        note: "REGISTRARSE EN MATIAS SANDBOX DESDE SEMANA 1 — no esperar a este sprint"
-      - id: E-08-S03
-        title: "Nota crédito (anulación de factura)"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-08
-      - id: E-09-S01
-        title: "Generación de link de pago Wompi"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-09
-    total_points: 26
-    completed_points: 0
-    note: "Sprint más largo por E-08-S02 (13 SP). Si es necesario, dividir en 3 semanas."
-
-  # ═══════════════════════════════════════════════════════════════
-  # SPRINT 6 — Semanas 11-12: Pagos completo + WhatsApp + Notificaciones
-  # ═══════════════════════════════════════════════════════════════
-  - id: S06
-    name: "Pagos completo + WhatsApp básico + Notificaciones"
-    goal: "El cobro de cartera funciona end-to-end: factura → WhatsApp → pago recibido → notificación"
-    weeks: "11-12"
-    status: not_started
-    stories:
-      - id: E-09-S02
-        title: "Webhook Wompi + conciliación automática de pagos"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-09
-      - id: E-09-S03
-        title: "Dashboard de cartera (por cobrar / vencidas / pagadas)"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-09
-      - id: E-10-S01
-        title: "Envío de factura y link de pago por WhatsApp"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-10
-      - id: E-12-S01
-        title: "Notificaciones in-app en tiempo real (WebSocket)"
-        status: not_started
-        points: 5
-        assignee: dev
-        epic: E-12
-    total_points: 20
-    completed_points: 0
-
-# ═══════════════════════════════════════════════════════════════
-# RESUMEN DEL MVP
-# ═══════════════════════════════════════════════════════════════
 summary:
   total_sprints: 6
   total_weeks: 12
   total_stories: 25
   total_points: 123
-  velocity_assumed: 15-20  # SP por semana
-  estimated_duration_weeks: 8-10
-  
-  epics_covered:
-    - E-01: Fundación Multitenant         # ✅ Incluida
-    - E-02: Autenticación y Autorización   # ✅ Incluida
-    - E-03: Onboarding Wizard              # ✅ Incluida
-    - E-04: Gestión de Contactos           # ✅ Incluida
-    - E-05: Gestión de Empresas            # ✅ Incluida
-    - E-06: Pipeline de Ventas             # ✅ Incluida
-    - E-07: Actividades                    # ✅ Incluida
-    - E-08: Facturación DIAN               # ✅ Incluida — CRÍTICA
-    - E-09: Pagos Wompi                    # ✅ Incluida — CRÍTICA
-    - E-10: WhatsApp Básico                # ✅ Incluida
-    - E-11: Catálogo de Productos          # ✅ Incluida (básico)
-    - E-12: Notificaciones                 # ✅ Incluida
-    - E-13: Dashboard                      # ✅ Incluida
+  sprints_completed: 4
+  points_completed: 82
+  points_remaining: 41
+  progress_percent: 67
 
-  critical_path:
-    - "Registrarse en MATIAS sandbox SEMANA 1 (no esperar al Sprint 5)"
-    - "Registrarse en Wompi SEMANA 1"
-    - "Configurar 360dialog para WhatsApp SEMANA 1"
-    - "E-01 (multitenancy) debe completarse antes de cualquier otra épica"
-    - "E-02 (auth) debe completarse antes de E-04, E-05, E-06"
-    - "E-08 (DIAN) y E-09 (Wompi) son las más complejas y las más críticas"
+  modules_implemented:
+    - auth (JWT RS256 + Google OAuth + RBAC 9 roles)
+    - tenants (schema-per-tenant + migrations + middleware)
+    - settings (theme + branding + nomenclature + sidebar + custom fields + pipelines + activity types)
+    - contacts (CRUD + FTS + lifecycle + habeas data + opt-outs)
+    - companies (CRUD + NIT DIAN + legal rep + account types)
+    - deals (CRUD + items + kanban + forecast + stage history + state validation)
+    - activities (CRUD + calendar + complete/cancel/reopen + @mentions)
+    - products (CRUD + inventory + import/export CSV + duplicate + bulk price)
+    - notifications (REST + WebSocket + preferences + event listener)
+    - dashboard (KPIs + pipeline summary + revenue + top reps + today activities)
+    - tags (global CRUD with colors per entity type)
+    - message-templates (email/SMS/WhatsApp + Handlebars + BullMQ queue + preview)
+    - saved-filters (per user per entity JSONB views)
+    - timeline (unified feed for contacts/deals/companies)
+    - bulk-actions (assign/tag/untag/delete for contacts/companies/deals)
 
-  risks:
-    - risk: "MATIAS API aprobación en producción puede tardar 2-4 semanas"
-      mitigation: "Iniciar proceso en semana 1, desarrollar con sandbox"
-    - risk: "Integración DIAN más compleja de lo estimado"
-      mitigation: "13 SP para E-08-S02 ya tiene buffer. Si aún así excede, dividir en 2 sprints."
-    - risk: "Velocidad real del dev es menor a 15 SP/semana"
-      mitigation: "Con 10 semanas (buffer incluido), hay 2 semanas de holgura"
+  test_framework: jest
+  tests_total: 296
+  tests_passing: 280
+  tests_pre_existing_failures: 16
 
-# Próximos pasos después del MVP:
-# 1. Retrospectiva del Sprint 6 (bmad-retrospective)
-# 2. Iniciar E-14 (Import CSV), E-15 (Campos custom), E-16 (WhatsApp bidireccional)
-# 3. Lanzar beta cerrado con 10-20 pymes en Medellín
+  shared_types_files: 20
+  migrations: 17
+
+  remaining_epics:
+    - 'E-08: Facturación DIAN (requires MATIAS/Factus API integration)'
+    - 'E-09: Pagos Wompi (requires Wompi API integration)'
+    - 'E-10: WhatsApp (requires 360dialog/Meta API integration)'

@@ -7,6 +7,8 @@ import {
 import type { QueryRunner } from 'typeorm'
 import { validateNIT, formatNIT } from '@repo/shared-utils'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
 import type {
   Company,
   CompanyListItem,
@@ -28,7 +30,10 @@ import {
 
 @Injectable()
 export class CompaniesService {
-  constructor(private readonly db: TenantDbService) {}
+  constructor(
+    private readonly db: TenantDbService,
+    private readonly audit: AuditLogService,
+  ) {}
 
   // ─── List ─────────────────────────────────────────────────────────────────
 
@@ -104,7 +109,16 @@ export class CompaniesService {
         ],
       )
 
-      return this.mapRow(rows)
+      const result = this.mapRow(rows)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.CompanyCreated,
+        AuditEntityType.Company,
+        result.id,
+        createdById,
+        `Company ${dto.name} created`,
+      )
+      return result
     })
   }
 
@@ -145,7 +159,16 @@ export class CompaniesService {
         params,
       )
 
-      return this.mapRow(rows)
+      const result = this.mapRow(rows)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.CompanyUpdated,
+        AuditEntityType.Company,
+        companyId,
+        undefined,
+        `Company ${companyId} updated`,
+      )
+      return result
     })
   }
 
@@ -157,6 +180,14 @@ export class CompaniesService {
       await qr.query(`UPDATE companies SET is_active = false, updated_at = NOW() WHERE id = $1`, [
         companyId,
       ])
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.CompanyDeleted,
+        AuditEntityType.Company,
+        companyId,
+        undefined,
+        `Company ${companyId} deleted`,
+      )
     })
   }
 
@@ -397,6 +428,7 @@ export class CompaniesService {
       taxRegime: r.tax_regime as Company['taxRegime'],
       companySize: r.company_size as Company['companySize'],
       sectorCiiu: r.sector_ciiu as Company['sectorCiiu'],
+      description: r.description ?? null,
       website: r.website,
       phone: r.phone,
       email: r.email,
@@ -404,6 +436,17 @@ export class CompaniesService {
       city: r.city,
       department: r.department,
       municipioCode: r.municipio_code,
+      country: r.country ?? 'CO',
+      employeeCount: r.employee_count ?? null,
+      annualRevenueCents: r.annual_revenue_cents ? Number(r.annual_revenue_cents) : null,
+      accountType: (r.account_type ?? 'prospect') as Company['accountType'],
+      personType: (r.person_type ?? 'juridica') as Company['personType'],
+      parentCompanyId: r.parent_company_id ?? null,
+      legalRepName: r.legal_rep_name ?? null,
+      legalRepDocumentType: r.legal_rep_document_type ?? null,
+      legalRepDocumentNumber: r.legal_rep_document_number ?? null,
+      camaraComercioNumber: r.camara_comercio_number ?? null,
+      rating: r.rating ?? null,
       tags: r.tags ?? [],
       assignedToId: r.assigned_to_id,
       customFields: r.custom_fields ?? {},

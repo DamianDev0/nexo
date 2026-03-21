@@ -8,6 +8,7 @@ export interface CompanyRow {
   tax_regime: string | null
   company_size: string | null
   sector_ciiu: string | null
+  description: string | null
   website: string | null
   phone: string | null
   email: string | null
@@ -15,6 +16,17 @@ export interface CompanyRow {
   city: string | null
   department: string | null
   municipio_code: string | null
+  country: string | null
+  employee_count: number | null
+  annual_revenue_cents: string | null
+  account_type: string | null
+  person_type: string | null
+  parent_company_id: string | null
+  legal_rep_name: string | null
+  legal_rep_document_type: string | null
+  legal_rep_document_number: string | null
+  camara_comercio_number: string | null
+  rating: string | null
   tags: string[]
   assigned_to_id: string | null
   custom_fields?: Record<string, unknown>

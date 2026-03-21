@@ -13,6 +13,8 @@ export class AuditLogEntryDto {
   @ApiProperty({ enum: ['info', 'warning', 'critical'] }) severity: AuditSeverity
   @ApiPropertyOptional() description: string | null
   @ApiPropertyOptional() metadata: Record<string, unknown> | null
+  @ApiPropertyOptional() oldValue: Record<string, unknown> | null
+  @ApiPropertyOptional() newValue: Record<string, unknown> | null
   @ApiProperty() createdAt: string
 
   static from(row: AuditLogRow): AuditLogEntryDto {
@@ -27,6 +29,8 @@ export class AuditLogEntryDto {
     dto.severity = row.severity
     dto.description = row.description
     dto.metadata = row.metadata
+    dto.oldValue = row.old_value ?? null
+    dto.newValue = row.new_value ?? null
     dto.createdAt =
       row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at)
     return dto

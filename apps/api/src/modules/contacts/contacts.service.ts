@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
 import type {
   Contact,
   ContactListItem,
@@ -44,12 +46,25 @@ interface ContactRow {
   whatsapp: string | null
   document_type: string | null
   document_number: string | null
+  job_title: string | null
+  linkedin_url: string | null
+  birthday: string | null
+  address: string | null
   city: string | null
   department: string | null
   municipio_code: string | null
+  country: string | null
   status: string
+  lifecycle_stage: string | null
   source: string | null
   lead_score: number
+  data_consent: boolean | null
+  consent_date: string | null
+  consent_source: string | null
+  opt_out_email: boolean | null
+  opt_out_sms: boolean | null
+  opt_out_whatsapp: boolean | null
+  last_contacted_at: string | null
   tags: string[]
   company_id: string | null
   assigned_to_id: string | null
@@ -103,7 +118,10 @@ const CONTACT_LIST_COLUMNS = `
 
 @Injectable()
 export class ContactsService {
-  constructor(private readonly db: TenantDbService) {}
+  constructor(
+    private readonly db: TenantDbService,
+    private readonly audit: AuditLogService,
+  ) {}
 
   // ─── List ─────────────────────────────────────────────────────────────────
 
@@ -178,7 +196,16 @@ export class ContactsService {
       )
       const row = rows[0]
       if (!row) throw new Error('Contact insert returned no row')
-      return this.mapContact(row)
+      const result = this.mapContact(row)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ContactCreated,
+        AuditEntityType.Contact,
+        result.id,
+        createdById,
+        `Contact ${dto.firstName} created`,
+      )
+      return result
     })
   }
 
@@ -208,7 +235,16 @@ export class ContactsService {
          RETURNING ${CONTACT_COLUMNS}`,
         values,
       )
-      return this.mapContact(rows[0]!)
+      const result = this.mapContact(rows[0]!)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ContactUpdated,
+        AuditEntityType.Contact,
+        contactId,
+        undefined,
+        `Contact ${contactId} updated`,
+      )
+      return result
     })
   }
 
@@ -220,6 +256,14 @@ export class ContactsService {
       await qr.query(`UPDATE contacts SET is_active = false, updated_at = NOW() WHERE id = $1`, [
         contactId,
       ])
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ContactDeleted,
+        AuditEntityType.Contact,
+        contactId,
+        undefined,
+        `Contact ${contactId} deleted`,
+      )
     })
   }
 
@@ -331,12 +375,25 @@ export class ContactsService {
       whatsapp: r.whatsapp,
       documentType: r.document_type as ContactListItem['documentType'],
       documentNumber: r.document_number,
+      jobTitle: r.job_title ?? null,
+      linkedinUrl: r.linkedin_url ?? null,
+      birthday: r.birthday ?? null,
+      address: r.address ?? null,
       city: r.city,
       department: r.department,
       municipioCode: r.municipio_code,
+      country: r.country ?? 'CO',
       status: r.status as ContactListItem['status'],
+      lifecycleStage: (r.lifecycle_stage ?? 'subscriber') as ContactListItem['lifecycleStage'],
       source: r.source as ContactListItem['source'],
       leadScore: r.lead_score,
+      dataConsent: r.data_consent ?? false,
+      consentDate: r.consent_date ?? null,
+      consentSource: r.consent_source ?? null,
+      optOutEmail: r.opt_out_email ?? false,
+      optOutSms: r.opt_out_sms ?? false,
+      optOutWhatsapp: r.opt_out_whatsapp ?? false,
+      lastContactedAt: r.last_contacted_at ?? null,
       tags: r.tags,
       companyId: r.company_id,
       assignedToId: r.assigned_to_id,

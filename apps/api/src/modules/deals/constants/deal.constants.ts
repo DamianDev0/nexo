@@ -19,7 +19,7 @@ export const UPDATABLE_FIELDS: Array<[keyof UpdateDealDto, string]> = [
 
 /** Columns for list view — no custom_fields, no contact/company detail */
 export const DEAL_LIST_COLUMNS = `
-  d.id, d.title, d.value_cents, d.expected_close_date,
+  d.id, d.title, d.value_cents, d.expected_close_date, d.close_date_actual,
   d.stage_id,
   ps.name  AS stage_name,
   ps.color AS stage_color,
@@ -28,8 +28,9 @@ export const DEAL_LIST_COLUMNS = `
   d.pipeline_id,
   p.name AS pipeline_name,
   d.contact_id, d.company_id, d.assigned_to_id,
-  d.loss_reason, d.status, d.is_active,
-  d.created_by, d.created_at, d.updated_at
+  d.loss_reason, d.status, d.next_step, d.deal_type, d.priority,
+  d.probability_override, d.competitors, d.currency, d.lead_source,
+  d.is_active, d.created_by, d.created_at, d.updated_at
 `
 
 /** Columns for detail view — includes custom_fields + joined contact/company */
@@ -51,6 +52,9 @@ export const DEAL_DETAIL_COLUMNS = `
   co.name AS company_name,
   co.nit  AS company_nit,
   d.assigned_to_id, d.loss_reason, d.status,
+  d.description, d.next_step, d.deal_type, d.priority,
+  d.probability_override, d.competitors, d.currency, d.lead_source,
+  d.close_date_actual,
   d.custom_fields, d.is_active, d.created_by, d.created_at, d.updated_at
 `
 

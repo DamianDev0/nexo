@@ -41,6 +41,8 @@ const mockTenantCtx: TenantContext = {
   schemaName: SCHEMA,
   plan: 'free',
   config: {},
+  productName: 'NexoCRM',
+  customDomain: null,
 }
 
 const mockAuthResult = {
@@ -395,6 +397,8 @@ describe('AuthService', () => {
       isActive: true,
       plan: { name: 'free' },
       config: {},
+      productName: 'NexoCRM',
+      customDomain: null,
     }
 
     it('finds or creates a Google user and issues session', async () => {

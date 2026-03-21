@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { DealStatus } from '@repo/shared-types'
+import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
 import type {
   DealDetail,
   DealItem,
@@ -36,7 +38,10 @@ import {
 
 @Injectable()
 export class DealsService {
-  constructor(private readonly db: TenantDbService) {}
+  constructor(
+    private readonly db: TenantDbService,
+    private readonly audit: AuditLogService,
+  ) {}
 
   // ─── List ─────────────────────────────────────────────────────────────────
 
@@ -119,7 +124,16 @@ export class DealsService {
         )
       }
 
-      return this.fetchDealOrFail(qr, dealId)
+      const result = await this.fetchDealOrFail(qr, dealId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.DealCreated,
+        AuditEntityType.Deal,
+        result.id,
+        createdById,
+        `Deal "${dto.title}" created`,
+      )
+      return result
     })
   }
 
@@ -155,7 +169,16 @@ export class DealsService {
         params,
       )
 
-      return this.fetchDealOrFail(qr, dealId)
+      const result = await this.fetchDealOrFail(qr, dealId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.DealUpdated,
+        AuditEntityType.Deal,
+        dealId,
+        undefined,
+        `Deal ${dealId} updated`,
+      )
+      return result
     })
   }
 
@@ -167,6 +190,14 @@ export class DealsService {
       await qr.query(`UPDATE deals SET is_active = false, updated_at = NOW() WHERE id = $1`, [
         dealId,
       ])
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.DealDeleted,
+        AuditEntityType.Deal,
+        dealId,
+        undefined,
+        `Deal ${dealId} deleted`,
+      )
     })
   }
 
@@ -199,7 +230,17 @@ export class DealsService {
         userId ?? null,
       )
 
-      return this.fetchDealOrFail(qr, dealId)
+      const result = await this.fetchDealOrFail(qr, dealId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.DealStageChanged,
+        AuditEntityType.Deal,
+        dealId,
+        userId,
+        `Deal ${dealId} moved to stage ${dto.stageId}`,
+        { oldValue: { stageId: deal.stage_id }, newValue: { stageId: dto.stageId } },
+      )
+      return result
     })
   }
 
@@ -227,7 +268,16 @@ export class DealsService {
         userId ?? null,
       )
 
-      return this.fetchDealOrFail(qr, dealId)
+      const result = await this.fetchDealOrFail(qr, dealId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.DealWon,
+        AuditEntityType.Deal,
+        dealId,
+        userId,
+        `Deal ${dealId} marked as won`,
+      )
+      return result
     })
   }
 
@@ -260,7 +310,17 @@ export class DealsService {
         userId ?? null,
       )
 
-      return this.fetchDealOrFail(qr, dealId)
+      const result = await this.fetchDealOrFail(qr, dealId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.DealLost,
+        AuditEntityType.Deal,
+        dealId,
+        userId,
+        `Deal ${dealId} marked as lost`,
+        { newValue: { lossReason: dto.lossReason } },
+      )
+      return result
     })
   }
 
@@ -633,6 +693,7 @@ export class DealsService {
   private mapDetail(r: DealDetailRow): Omit<DealDetail, 'items'> {
     return {
       ...this.mapListItem(r),
+      description: r.description ?? null,
       customFields: r.custom_fields ?? {},
       contact: r.contact_id
         ? {

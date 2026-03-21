@@ -316,4 +316,53 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ADD COLUMN IF NOT EXISTS format VARCHAR(20) DEFAULT 'handlebars';
     `,
   },
+  {
+    id: '0018_pg_trgm_extension',
+    up: () => `CREATE EXTENSION IF NOT EXISTS pg_trgm;`,
+  },
+  {
+    id: '0019_webhooks_and_api_keys',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".webhooks (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        url VARCHAR(2000) NOT NULL,
+        events TEXT[] NOT NULL DEFAULT '{}',
+        secret VARCHAR(255) NOT NULL,
+        is_active BOOLEAN DEFAULT true,
+        last_triggered_at TIMESTAMPTZ,
+        last_status_code INTEGER,
+        fail_count INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS "${schema}".webhook_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        webhook_id UUID NOT NULL REFERENCES "${schema}".webhooks(id) ON DELETE CASCADE,
+        event VARCHAR(50) NOT NULL,
+        payload JSONB NOT NULL,
+        status_code INTEGER,
+        response_time INTEGER,
+        success BOOLEAN DEFAULT false,
+        error TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_webhook_logs_webhook"
+        ON "${schema}".webhook_logs (webhook_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS "${schema}".api_keys (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(200) NOT NULL,
+        key_hash VARCHAR(255) NOT NULL,
+        key_prefix VARCHAR(10) NOT NULL,
+        scopes TEXT[] DEFAULT '{}',
+        last_used_at TIMESTAMPTZ,
+        expires_at TIMESTAMPTZ,
+        is_active BOOLEAN DEFAULT true,
+        created_by UUID REFERENCES "${schema}".users(id),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `,
+  },
 ]

@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
+import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
 import type {
   Activity,
   ActivityListItem,
@@ -31,7 +33,10 @@ import {
 
 @Injectable()
 export class ActivitiesService {
-  constructor(private readonly db: TenantDbService) {}
+  constructor(
+    private readonly db: TenantDbService,
+    private readonly audit: AuditLogService,
+  ) {}
 
   // ─── List ─────────────────────────────────────────────────────────────────
 
@@ -110,7 +115,16 @@ export class ActivitiesService {
         ],
       )
 
-      return this.fetchActivityOrFail(qr, insertRows[0].id)
+      const result = await this.fetchActivityOrFail(qr, insertRows[0].id)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ActivityCreated,
+        AuditEntityType.Activity,
+        result.id,
+        createdById,
+        `Activity "${dto.activityType}" created`,
+      )
+      return result
     })
   }
 
@@ -144,7 +158,16 @@ export class ActivitiesService {
         params,
       )
 
-      return this.fetchActivityOrFail(qr, activityId)
+      const result = await this.fetchActivityOrFail(qr, activityId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ActivityUpdated,
+        AuditEntityType.Activity,
+        activityId,
+        undefined,
+        `Activity ${activityId} updated`,
+      )
+      return result
     })
   }
 
@@ -156,6 +179,14 @@ export class ActivitiesService {
       await qr.query(`UPDATE activities SET is_active = false, updated_at = NOW() WHERE id = $1`, [
         activityId,
       ])
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ActivityDeleted,
+        AuditEntityType.Activity,
+        activityId,
+        undefined,
+        `Activity ${activityId} deleted`,
+      )
     })
   }
 
@@ -172,7 +203,16 @@ export class ActivitiesService {
         [activityId],
       )
 
-      return this.fetchActivityOrFail(qr, activityId)
+      const result = await this.fetchActivityOrFail(qr, activityId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ActivityCompleted,
+        AuditEntityType.Activity,
+        activityId,
+        undefined,
+        `Activity ${activityId} completed`,
+      )
+      return result
     })
   }
 

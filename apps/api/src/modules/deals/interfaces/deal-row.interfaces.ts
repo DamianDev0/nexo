@@ -34,6 +34,7 @@ export interface DealListRow {
 }
 
 export interface DealDetailRow extends DealListRow {
+  description: string | null
   custom_fields: Record<string, unknown>
   contact_first_name: string | null
   contact_last_name: string | null

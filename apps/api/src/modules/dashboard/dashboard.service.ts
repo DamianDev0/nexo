@@ -208,14 +208,14 @@ export class DashboardService {
         `
         SELECT
           u.id AS user_id,
-          COALESCE(u.first_name || ' ' || u.last_name, u.email) AS user_name,
+          COALESCE(u.full_name, u.email) AS user_name,
           COUNT(d.id)::text AS won_deals_count,
           COALESCE(SUM(d.value_cents), 0)::text AS total_value_cents
         FROM deals d
         JOIN users u ON u.id = d.assigned_to_id
         WHERE d.status = 'won'
           AND d.updated_at >= DATE_TRUNC('month', CURRENT_DATE)
-        GROUP BY u.id, u.first_name, u.last_name, u.email
+        GROUP BY u.id, u.full_name, u.email
         ORDER BY total_value_cents DESC
         LIMIT $1
       `,

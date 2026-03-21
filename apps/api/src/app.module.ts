@@ -30,6 +30,8 @@ import { MessageTemplatesModule } from '@/modules/message-templates/message-temp
 import { SavedFiltersModule } from '@/modules/saved-filters/saved-filters.module'
 import { TimelineModule } from '@/modules/timeline/timeline.module'
 import { BulkActionsModule } from '@/modules/bulk-actions/bulk-actions.module'
+import { WebhooksModule } from '@/modules/webhooks/webhooks.module'
+import { ApiKeysModule } from '@/modules/api-keys/api-keys.module'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { RolesGuard } from '@/modules/auth/guards/roles.guard'
 
@@ -61,6 +63,8 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     SavedFiltersModule,
     TimelineModule,
     BulkActionsModule,
+    WebhooksModule,
+    ApiKeysModule,
   ],
   providers: [
     // Global guards — order matters: Throttler → JWT → Roles

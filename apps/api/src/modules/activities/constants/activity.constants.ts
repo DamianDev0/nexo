@@ -25,7 +25,7 @@ export const ACTIVITY_LIST_COLUMNS = `
   COALESCE(c.first_name || ' ' || c.last_name, c.first_name) AS contact_name,
   co.name AS company_name,
   d.title AS deal_title,
-  COALESCE(u.first_name || ' ' || u.last_name, u.email) AS assigned_to_name
+  COALESCE(u.full_name, u.email) AS assigned_to_name
 `
 
 export const ACTIVITY_LIST_FROM = `

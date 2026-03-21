@@ -13,6 +13,8 @@ const mockCtx: TenantContext = {
   schemaName: 'tenant_acme',
   plan: 'free',
   config: {},
+  productName: 'NexoCRM',
+  customDomain: null,
 }
 
 function makeSidebarConfig(overrides: Partial<SidebarConfig> = {}): SidebarConfig {

@@ -7,6 +7,8 @@ export type TenantContext = {
   schemaName: string
   plan: string
   config: Record<string, unknown>
+  productName: string
+  customDomain: string | null
 }
 
 // ─── AUTHENTICATED CONTEXT (after JWT validation) ────────────────────

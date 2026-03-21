@@ -223,6 +223,39 @@ export class AuditLogService {
     })
   }
 
+  async entityEvent(
+    schemaName: string,
+    action: AuditAction,
+    entityType: AuditEntityType,
+    entityId: string,
+    userId: string | undefined,
+    description: string,
+    meta?: AuditMeta & { oldValue?: Record<string, unknown>; newValue?: Record<string, unknown> },
+  ): Promise<void> {
+    await this.write({
+      schemaName,
+      action,
+      entityType,
+      entityId,
+      userId,
+      severity: this.getSeverity(action),
+      description,
+      metadata: meta?.metadata,
+      oldValue: meta?.oldValue,
+      newValue: meta?.newValue,
+      ip: meta?.ip,
+      userAgent: meta?.userAgent,
+    })
+  }
+
+  private getSeverity(action: AuditAction): 'info' | 'warning' | 'critical' {
+    if (action.includes('Deleted') || action.includes('Voided') || action.includes('Revoked'))
+      return 'warning'
+    if (action.includes('Failed') || action.includes('Rejected') || action.includes('Disabled'))
+      return 'critical'
+    return 'info'
+  }
+
   // ─── Private write ────────────────────────────────────────────────────────
 
   private async write(event: AuditEvent): Promise<void> {

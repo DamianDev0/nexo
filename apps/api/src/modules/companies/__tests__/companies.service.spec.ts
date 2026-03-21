@@ -1,3 +1,4 @@
+import { AuditLogService } from '@/shared/audit-log/audit-log.service'
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { CompaniesService } from '../companies.service'
@@ -102,7 +103,11 @@ describe('CompaniesService', () => {
     db = buildDbMock(qr)
 
     const module = await Test.createTestingModule({
-      providers: [CompaniesService, { provide: TenantDbService, useValue: db }],
+      providers: [
+        CompaniesService,
+        { provide: TenantDbService, useValue: db },
+        { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
+      ],
     }).compile()
 
     service = module.get(CompaniesService)

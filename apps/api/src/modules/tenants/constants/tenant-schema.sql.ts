@@ -149,21 +149,6 @@ export function getTenantSchemaSQL(schema: string): string {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
 
-    CREATE TABLE "${schema}".deal_items (
-    CREATE TABLE "${schema}".deal_items (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      deal_id UUID NOT NULL REFERENCES "${schema}".deals(id) ON DELETE CASCADE,
-      product_id UUID REFERENCES "${schema}".products(id),
-      description VARCHAR(500) NOT NULL,
-      quantity INTEGER NOT NULL DEFAULT 1,
-      unit_price_cents BIGINT NOT NULL DEFAULT 0,
-      discount_percent INTEGER DEFAULT 0,
-      iva_rate INTEGER DEFAULT 19,
-      position INTEGER NOT NULL DEFAULT 0,
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    );
-
-    -- Deal stage history (tracks every stage transition for metrics)
     CREATE TABLE "${schema}".deal_stage_history (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       deal_id UUID NOT NULL REFERENCES "${schema}".deals(id) ON DELETE CASCADE,
@@ -174,8 +159,6 @@ export function getTenantSchemaSQL(schema: string): string {
       changed_by UUID REFERENCES "${schema}".users(id),
       changed_at TIMESTAMPTZ DEFAULT NOW()
     );
-
-    -- Products
     CREATE TABLE "${schema}".products (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(300) NOT NULL,
@@ -202,7 +185,19 @@ export function getTenantSchemaSQL(schema: string): string {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
 
-    -- Inventory movements
+    CREATE TABLE "${schema}".deal_items (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      deal_id UUID NOT NULL REFERENCES "${schema}".deals(id) ON DELETE CASCADE,
+      product_id UUID REFERENCES "${schema}".products(id),
+      description VARCHAR(500) NOT NULL,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      unit_price_cents BIGINT NOT NULL DEFAULT 0,
+      discount_percent INTEGER DEFAULT 0,
+      iva_rate INTEGER DEFAULT 19,
+      position INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     CREATE TABLE "${schema}".inventory_movements (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       product_id UUID NOT NULL REFERENCES "${schema}".products(id),
@@ -328,6 +323,44 @@ export function getTenantSchemaSQL(schema: string): string {
       created_by UUID REFERENCES "${schema}".users(id),
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE "${schema}".webhooks (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      url VARCHAR(2000) NOT NULL,
+      events TEXT[] NOT NULL DEFAULT '{}',
+      secret VARCHAR(255) NOT NULL,
+      is_active BOOLEAN DEFAULT true,
+      last_triggered_at TIMESTAMPTZ,
+      last_status_code INTEGER,
+      fail_count INTEGER DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE "${schema}".webhook_logs (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      webhook_id UUID NOT NULL REFERENCES "${schema}".webhooks(id) ON DELETE CASCADE,
+      event VARCHAR(50) NOT NULL,
+      payload JSONB NOT NULL,
+      status_code INTEGER,
+      response_time INTEGER,
+      success BOOLEAN DEFAULT false,
+      error TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE "${schema}".api_keys (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name VARCHAR(200) NOT NULL,
+      key_hash VARCHAR(255) NOT NULL,
+      key_prefix VARCHAR(10) NOT NULL,
+      scopes TEXT[] DEFAULT '{}',
+      last_used_at TIMESTAMPTZ,
+      expires_at TIMESTAMPTZ,
+      is_active BOOLEAN DEFAULT true,
+      created_by UUID REFERENCES "${schema}".users(id),
+      created_at TIMESTAMPTZ DEFAULT NOW()
     );
 
     -- WhatsApp conversations

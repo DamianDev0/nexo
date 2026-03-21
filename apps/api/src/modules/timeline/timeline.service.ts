@@ -63,7 +63,7 @@ export class TimelineService {
           a.description,
           'activity' AS entity_type, a.id AS entity_id,
           a.created_by AS user_id,
-          COALESCE(u.first_name || ' ' || u.last_name, u.email) AS user_name,
+          COALESCE(u.full_name, u.email) AS user_name,
           '{}'::jsonb AS metadata,
           a.created_at
         FROM activities a
@@ -78,12 +78,12 @@ export class TimelineService {
           NULL AS description,
           'deal' AS entity_type, d.id AS entity_id,
           d.created_by AS user_id,
-          COALESCE(u.first_name || ' ' || u.last_name, u.email) AS user_name,
+          COALESCE(u.full_name, u.email) AS user_name,
           jsonb_build_object('valueCents', d.value_cents, 'status', d.status) AS metadata,
           d.created_at
         FROM deals d
         LEFT JOIN users u ON u.id = d.created_by
-        WHERE d.${filterCol} = $1 AND d.is_active = true
+        WHERE ${filterCol === 'deal_id' ? 'd.id' : `d.${filterCol}`} = $1 AND d.is_active = true
 
         UNION ALL
 

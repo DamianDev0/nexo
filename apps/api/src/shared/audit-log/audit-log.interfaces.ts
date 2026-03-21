@@ -85,6 +85,12 @@ export enum AuditAction {
   ProductUpdated = 'product.updated',
   ProductDeleted = 'product.deleted',
 
+  // Activities
+  ActivityCreated = 'activity.created',
+  ActivityUpdated = 'activity.updated',
+  ActivityDeleted = 'activity.deleted',
+  ActivityCompleted = 'activity.completed',
+
   // Invoices
   InvoiceCreated = 'invoice.created',
   InvoiceUpdated = 'invoice.updated',
@@ -130,6 +136,7 @@ export enum AuditAction {
 export interface AuditMeta {
   ip?: string
   userAgent?: string
+  metadata?: Record<string, unknown>
 }
 
 // ─── Event payload ────────────────────────────────────────────────────────────

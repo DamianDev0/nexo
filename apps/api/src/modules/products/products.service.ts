@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
+import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
 import type {
   AnalyzeResult,
   DuplicateStrategy,
@@ -64,6 +66,7 @@ export class ProductsService {
     private readonly db: TenantDbService,
     private readonly csvExport: CsvExportService,
     private readonly importService: ImportService,
+    private readonly audit: AuditLogService,
   ) {}
 
   // ─── List ─────────────────────────────────────────────────────────────────
@@ -161,7 +164,16 @@ export class ProductsService {
         ],
       )
 
-      return this.fetchProductOrFail(qr, insertRows[0].id)
+      const result = await this.fetchProductOrFail(qr, insertRows[0].id)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ProductCreated,
+        AuditEntityType.Product,
+        result.id,
+        createdById,
+        `Product "${dto.name}" created`,
+      )
+      return result
     })
   }
 
@@ -195,7 +207,16 @@ export class ProductsService {
         params,
       )
 
-      return this.fetchProductOrFail(qr, productId)
+      const result = await this.fetchProductOrFail(qr, productId)
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ProductUpdated,
+        AuditEntityType.Product,
+        productId,
+        undefined,
+        `Product ${productId} updated`,
+      )
+      return result
     })
   }
 
@@ -207,6 +228,14 @@ export class ProductsService {
       await qr.query(`UPDATE products SET is_active = false, updated_at = NOW() WHERE id = $1`, [
         productId,
       ])
+      void this.audit.entityEvent(
+        schemaName,
+        AuditAction.ProductDeleted,
+        AuditEntityType.Product,
+        productId,
+        undefined,
+        `Product ${productId} deleted`,
+      )
     })
   }
 

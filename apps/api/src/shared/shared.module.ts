@@ -19,6 +19,8 @@ import { EventBusService } from './events/event-bus.service'
 import { CsvExportService } from './csv/csv-export.service'
 import { CsvParseService } from './csv/csv-parse.service'
 import { ImportsModule } from './imports/imports.module'
+import { QueueModule } from './queue/queue.module'
+import { DuplicateDetectionService } from './utils/duplicate-detection.service'
 
 @Global()
 @Module({
@@ -37,6 +39,7 @@ import { ImportsModule } from './imports/imports.module'
     ResendModule,
     S3Module,
     ImportsModule,
+    QueueModule,
   ],
   providers: [
     CacheService,
@@ -46,6 +49,7 @@ import { ImportsModule } from './imports/imports.module'
     EventBusService,
     CsvExportService,
     CsvParseService,
+    DuplicateDetectionService,
   ],
   exports: [
     CacheService,
@@ -55,6 +59,7 @@ import { ImportsModule } from './imports/imports.module'
     EventBusService,
     CsvExportService,
     CsvParseService,
+    DuplicateDetectionService,
   ],
 })
 export class SharedModule {}
