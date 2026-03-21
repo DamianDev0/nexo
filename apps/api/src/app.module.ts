@@ -25,6 +25,11 @@ import { ActivitiesModule } from '@/modules/activities/activities.module'
 import { ProductsModule } from '@/modules/products/products.module'
 import { NotificationsModule } from '@/modules/notifications/notifications.module'
 import { DashboardModule } from '@/modules/dashboard/dashboard.module'
+import { TagsModule } from '@/modules/tags/tags.module'
+import { MessageTemplatesModule } from '@/modules/message-templates/message-templates.module'
+import { SavedFiltersModule } from '@/modules/saved-filters/saved-filters.module'
+import { TimelineModule } from '@/modules/timeline/timeline.module'
+import { BulkActionsModule } from '@/modules/bulk-actions/bulk-actions.module'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { RolesGuard } from '@/modules/auth/guards/roles.guard'
 
@@ -51,6 +56,11 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     ProductsModule,
     NotificationsModule,
     DashboardModule,
+    TagsModule,
+    MessageTemplatesModule,
+    SavedFiltersModule,
+    TimelineModule,
+    BulkActionsModule,
   ],
   providers: [
     // Global guards — order matters: Throttler → JWT → Roles

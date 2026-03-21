@@ -203,4 +203,58 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ADD COLUMN IF NOT EXISTS muted_types TEXT[] DEFAULT '{}';
     `,
   },
+  {
+    id: '0012_tags_saved_filters_message_templates',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".tags (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(100) NOT NULL,
+        color VARCHAR(7) DEFAULT '#6B7280',
+        entity_type VARCHAR(30) NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS "${schema}".saved_filters (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES "${schema}".users(id),
+        entity_type VARCHAR(30) NOT NULL,
+        name VARCHAR(200) NOT NULL,
+        filters JSONB NOT NULL DEFAULT '{}',
+        is_default BOOLEAN DEFAULT false,
+        position INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS "${schema}".message_templates (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(200) NOT NULL,
+        channel VARCHAR(20) NOT NULL DEFAULT 'email',
+        subject VARCHAR(500),
+        body TEXT NOT NULL,
+        variables TEXT[] DEFAULT '{}',
+        category VARCHAR(100),
+        is_active BOOLEAN DEFAULT true,
+        created_by UUID REFERENCES "${schema}".users(id),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_tags_entity"
+        ON "${schema}".tags (entity_type, name);
+      CREATE UNIQUE INDEX IF NOT EXISTS "idx_${schema}_tags_unique"
+        ON "${schema}".tags (entity_type, LOWER(name));
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_saved_filters_user"
+        ON "${schema}".saved_filters (user_id, entity_type);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_message_templates_channel"
+        ON "${schema}".message_templates (channel) WHERE is_active = true;
+    `,
+  },
+  {
+    id: '0013_activities_mentioned_users',
+    up: (schema) => `
+      ALTER TABLE "${schema}".activities
+        ADD COLUMN IF NOT EXISTS mentioned_user_ids UUID[] DEFAULT '{}';
+    `,
+  },
 ]

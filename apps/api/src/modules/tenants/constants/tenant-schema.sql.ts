@@ -257,6 +257,41 @@ export function getTenantSchemaSQL(schema: string): string {
       assigned_to_id UUID REFERENCES "${schema}".users(id),
       created_by UUID REFERENCES "${schema}".users(id),
       created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      mentioned_user_ids UUID[] DEFAULT '{}'
+    );
+
+    CREATE TABLE "${schema}".tags (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name VARCHAR(100) NOT NULL,
+      color VARCHAR(7) DEFAULT '#6B7280',
+      entity_type VARCHAR(30) NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE "${schema}".saved_filters (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES "${schema}".users(id),
+      entity_type VARCHAR(30) NOT NULL,
+      name VARCHAR(200) NOT NULL,
+      filters JSONB NOT NULL DEFAULT '{}',
+      is_default BOOLEAN DEFAULT false,
+      position INTEGER DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE "${schema}".message_templates (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name VARCHAR(200) NOT NULL,
+      channel VARCHAR(20) NOT NULL DEFAULT 'email',
+      subject VARCHAR(500),
+      body TEXT NOT NULL,
+      variables TEXT[] DEFAULT '{}',
+      category VARCHAR(100),
+      is_active BOOLEAN DEFAULT true,
+      created_by UUID REFERENCES "${schema}".users(id),
+      created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
 
@@ -492,6 +527,14 @@ export function getTenantIndicesSQL(schema: string): string {
       WHERE is_active = true;
     CREATE INDEX idx_${schema}_activities_calendar ON "${schema}".activities (due_date, assigned_to_id)
       WHERE is_active = true AND status = 'pending';
+
+    CREATE INDEX idx_${schema}_tags_entity ON "${schema}".tags (entity_type, name);
+    CREATE UNIQUE INDEX idx_${schema}_tags_unique ON "${schema}".tags (entity_type, LOWER(name));
+
+    CREATE INDEX idx_${schema}_saved_filters_user ON "${schema}".saved_filters (user_id, entity_type);
+
+    CREATE INDEX idx_${schema}_message_templates_channel ON "${schema}".message_templates (channel)
+      WHERE is_active = true;
 
     -- Notifications unread
     CREATE INDEX idx_${schema}_notifications_unread ON "${schema}".notifications (user_id, is_read)
