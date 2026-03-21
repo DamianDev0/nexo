@@ -11,12 +11,19 @@ import type {
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-const mockCtx: TenantContext = { tenantId: 'tenant-1', schemaName: 'tenant_acme', slug: 'acme' }
+const mockCtx: TenantContext = {
+  tenantId: 'tenant-1',
+  schemaName: 'tenant_acme',
+  slug: 'acme',
+  plan: 'free',
+  config: {},
+}
 const mockUser: AuthenticatedUser = {
   id: 'user-1',
   email: 'a@b.co',
   role: 'sales_rep' as AuthenticatedUser['role'],
   tenantId: 'tenant-1',
+  schemaName: 'tenant_acme',
 }
 
 const mockActivity: ActivityListItem = {

@@ -16,6 +16,9 @@ import { TenantDbService } from './database/tenant-db.service'
 import { TenantMigrationService } from './database/tenant-migration.service'
 import { PasswordService } from './security/password.service'
 import { EventBusService } from './events/event-bus.service'
+import { CsvExportService } from './csv/csv-export.service'
+import { CsvParseService } from './csv/csv-parse.service'
+import { ImportsModule } from './imports/imports.module'
 
 @Global()
 @Module({
@@ -33,6 +36,7 @@ import { EventBusService } from './events/event-bus.service'
     AuditLogModule,
     ResendModule,
     S3Module,
+    ImportsModule,
   ],
   providers: [
     CacheService,
@@ -40,7 +44,17 @@ import { EventBusService } from './events/event-bus.service'
     TenantMigrationService,
     PasswordService,
     EventBusService,
+    CsvExportService,
+    CsvParseService,
   ],
-  exports: [CacheService, TenantDbService, TypeOrmModule, PasswordService, EventBusService],
+  exports: [
+    CacheService,
+    TenantDbService,
+    TypeOrmModule,
+    PasswordService,
+    EventBusService,
+    CsvExportService,
+    CsvParseService,
+  ],
 })
 export class SharedModule {}

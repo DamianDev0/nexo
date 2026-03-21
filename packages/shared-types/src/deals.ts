@@ -1,7 +1,5 @@
 import type { DealStatus } from './enums'
 
-// ─── Core Deal types ──────────────────────────────────────────────────────────
-
 export type Deal = {
   id: string
   title: string
@@ -32,8 +30,6 @@ export type PaginatedDeals = {
   limit: number
 }
 
-// ─── Summary types used in related-entity responses ───────────────────────────
-
 export type DealContactSummary = {
   id: string
   firstName: string
@@ -61,8 +57,6 @@ export type DealPipelineSummary = {
   name: string
 }
 
-// ─── Deal items (products/services on a deal) ────────────────────────────────
-
 export type DealItem = {
   id: string
   dealId: string
@@ -73,12 +67,9 @@ export type DealItem = {
   discountPercent: number
   ivaRate: number
   position: number
-  /** Calculated: quantity * unitPriceCents * (1 - discountPercent/100) */
   subtotalCents: number
   createdAt: string
 }
-
-// ─── Deal stage history ───────────────────────────────────────────────────────
 
 export type DealStageHistoryEntry = {
   id: string
@@ -91,8 +82,6 @@ export type DealStageHistoryEntry = {
   changedAt: string
 }
 
-// ─── Full detail (deal + joined relations) ────────────────────────────────────
-
 export type DealDetail = Deal & {
   contact: DealContactSummary | null
   company: DealCompanySummary | null
@@ -101,10 +90,8 @@ export type DealDetail = Deal & {
   items: DealItem[]
 }
 
-// ─── Forecast ─────────────────────────────────────────────────────────────────
-
 export type ForecastEntry = {
-  month: string // "2026-04"
+  month: string
   totalValueCents: number
   weightedValueCents: number
   dealCount: number

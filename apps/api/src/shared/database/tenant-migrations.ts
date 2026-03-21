@@ -158,4 +158,42 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         WHERE is_active = true AND status = 'pending';
     `,
   },
+  {
+    id: '0010_products_enhance',
+    up: (schema) => `
+      ALTER TABLE "${schema}".products
+        ADD COLUMN IF NOT EXISTS barcode       VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS category      VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS brand         VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS currency      VARCHAR(3) DEFAULT 'COP',
+        ADD COLUMN IF NOT EXISTS weight_grams  INTEGER,
+        ADD COLUMN IF NOT EXISTS tags          TEXT[]  DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS images        TEXT[]  DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS custom_fields JSONB   DEFAULT '{}',
+        ADD COLUMN IF NOT EXISTS created_by    UUID    REFERENCES "${schema}".users(id);
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_products_sku"
+        ON "${schema}".products (sku)
+        WHERE sku IS NOT NULL AND is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_products_barcode"
+        ON "${schema}".products (barcode)
+        WHERE barcode IS NOT NULL AND is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_products_category"
+        ON "${schema}".products (category)
+        WHERE is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_products_fts"
+        ON "${schema}".products
+        USING GIN (to_tsvector('spanish', coalesce(name,'') || ' ' || coalesce(sku,'') || ' ' || coalesce(description,'')))
+        WHERE is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_products_tags"
+        ON "${schema}".products USING GIN (tags);
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_inventory_product"
+        ON "${schema}".inventory_movements (product_id, created_at DESC);
+    `,
+  },
 ]

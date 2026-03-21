@@ -146,15 +146,24 @@ export function getTenantSchemaSQL(schema: string): string {
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(300) NOT NULL,
       sku VARCHAR(100),
+      barcode VARCHAR(100),
       description TEXT,
+      category VARCHAR(100),
+      brand VARCHAR(100),
       price_cents BIGINT NOT NULL DEFAULT 0,
       cost_cents BIGINT DEFAULT 0,
       iva_rate INTEGER DEFAULT 19,
       product_type VARCHAR(20) DEFAULT 'product',
       unit_of_measure VARCHAR(30) DEFAULT 'unit',
+      currency VARCHAR(3) DEFAULT 'COP',
       stock INTEGER DEFAULT 0,
       min_stock INTEGER DEFAULT 0,
+      weight_grams INTEGER,
+      tags TEXT[] DEFAULT '{}',
+      images TEXT[] DEFAULT '{}',
+      custom_fields JSONB DEFAULT '{}',
       is_active BOOLEAN DEFAULT true,
+      created_by UUID REFERENCES "${schema}".users(id),
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
@@ -457,6 +466,21 @@ export function getTenantIndicesSQL(schema: string): string {
 
     -- Deal stage history by deal (timeline queries)
     CREATE INDEX idx_${schema}_deal_stage_history ON "${schema}".deal_stage_history (deal_id, changed_at DESC);
+
+    -- Products
+    CREATE INDEX idx_${schema}_products_sku ON "${schema}".products (sku)
+      WHERE sku IS NOT NULL AND is_active = true;
+    CREATE INDEX idx_${schema}_products_barcode ON "${schema}".products (barcode)
+      WHERE barcode IS NOT NULL AND is_active = true;
+    CREATE INDEX idx_${schema}_products_category ON "${schema}".products (category)
+      WHERE is_active = true;
+    CREATE INDEX idx_${schema}_products_fts ON "${schema}".products
+      USING GIN (to_tsvector('spanish', coalesce(name,'') || ' ' || coalesce(sku,'') || ' ' || coalesce(description,'')))
+      WHERE is_active = true;
+    CREATE INDEX idx_${schema}_products_tags ON "${schema}".products USING GIN (tags);
+
+    -- Inventory movements
+    CREATE INDEX idx_${schema}_inventory_product ON "${schema}".inventory_movements (product_id, created_at DESC);
 
     -- Activities
     CREATE INDEX idx_${schema}_activities_assigned ON "${schema}".activities (assigned_to_id, due_date)

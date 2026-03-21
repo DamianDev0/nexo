@@ -1,8 +1,4 @@
-// ─── Activity status ─────────────────────────────────────────────────────────
-
 export type ActivityStatus = 'pending' | 'completed' | 'cancelled'
-
-// ─── Core Activity type ──────────────────────────────────────────────────────
 
 export type Activity = {
   id: string
@@ -24,8 +20,6 @@ export type Activity = {
   updatedAt: string
 }
 
-// ─── List item (joined names for display) ────────────────────────────────────
-
 export type ActivityListItem = Activity & {
   contactName: string | null
   companyName: string | null
@@ -39,8 +33,6 @@ export type PaginatedActivities = {
   page: number
   limit: number
 }
-
-// ─── Calendar view ───────────────────────────────────────────────────────────
 
 export type CalendarActivity = {
   id: string

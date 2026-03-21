@@ -4,17 +4,6 @@ import { DataSource } from 'typeorm'
 import { TENANT_MIGRATIONS } from './tenant-migrations'
 import type { SchemaRow, MigrationRow } from './tenant-migration.interfaces'
 
-/**
- * Runs schema migrations for every tenant at application startup.
- *
- * Strategy:
- *   1. List all tenant schemas from public.tenants.
- *   2. For each schema, ensure schema_migrations table exists.
- *   3. Find which migration IDs have NOT been applied yet.
- *   4. Apply them in order and record each in schema_migrations.
- *
- * Migrations must be idempotent — use IF NOT EXISTS / IF EXISTS guards.
- */
 @Injectable()
 export class TenantMigrationService implements OnApplicationBootstrap {
   constructor(
