@@ -1,13 +1,15 @@
-import { Controller, Get, Query } from '@nestjs/common'
+import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type {
   AuthenticatedUser,
   DashboardData,
+  DashboardLayout,
   DashboardMetrics,
   OverdueInvoice,
   PipelineSummary,
   RevenueByMonth,
+  UserDashboardConfig,
   TenantContext,
   TodayActivity,
   TopSalesRep,
@@ -16,11 +18,15 @@ import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { DashboardService } from './dashboard.service'
+import { DashboardConfigService } from './dashboard-config.service'
 
 @ApiTags('Dashboard')
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) {}
+  constructor(
+    private readonly dashboardService: DashboardService,
+    private readonly dashboardConfigService: DashboardConfigService,
+  ) {}
 
   @Get()
   @Auth(UserRole.VIEWER)
@@ -101,5 +107,63 @@ export class DashboardController {
     @Query('months') months?: string,
   ): Promise<RevenueByMonth[]> {
     return this.dashboardService.getRevenueByMonth(ctx.schemaName, months ? Number(months) : 6)
+  }
+
+  @Get('config')
+  @Auth(UserRole.VIEWER)
+  @ApiOperation({ summary: 'Get dashboard layout config for the current user' })
+  getConfig(
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserDashboardConfig> {
+    return this.dashboardConfigService.getConfig(ctx.schemaName, user.id)
+  }
+
+  @Patch('config')
+  @Auth(UserRole.VIEWER)
+  @ApiOperation({ summary: 'Update full dashboard layout (widgets, columns, refresh interval)' })
+  updateConfig(
+    @Body() layout: DashboardLayout,
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserDashboardConfig> {
+    return this.dashboardConfigService.updateLayout(ctx.schemaName, user.id, layout)
+  }
+
+  @Patch('config/toggle-widget')
+  @Auth(UserRole.VIEWER)
+  @ApiOperation({ summary: 'Toggle a widget visible/hidden' })
+  toggleWidget(
+    @Body() dto: { widgetId: string; visible: boolean },
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserDashboardConfig> {
+    return this.dashboardConfigService.toggleWidget(
+      ctx.schemaName,
+      user.id,
+      dto.widgetId,
+      dto.visible,
+    )
+  }
+
+  @Patch('config/reorder')
+  @Auth(UserRole.VIEWER)
+  @ApiOperation({ summary: 'Reorder widgets by passing array of widget IDs in desired order' })
+  reorderWidgets(
+    @Body() dto: { widgetIds: string[] },
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserDashboardConfig> {
+    return this.dashboardConfigService.reorderWidgets(ctx.schemaName, user.id, dto.widgetIds)
+  }
+
+  @Post('config/reset')
+  @Auth(UserRole.VIEWER)
+  @ApiOperation({ summary: 'Reset dashboard to default layout' })
+  resetConfig(
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserDashboardConfig> {
+    return this.dashboardConfigService.resetToDefault(ctx.schemaName, user.id)
   }
 }

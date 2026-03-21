@@ -493,6 +493,14 @@ export function getTenantSchemaSQL(schema: string): string {
       applied_at TIMESTAMPTZ DEFAULT NOW()
     );
 
+    CREATE TABLE "${schema}".user_dashboard_configs (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES "${schema}".users(id) UNIQUE,
+      layout JSONB NOT NULL DEFAULT '{"widgets":[],"columns":3,"refreshIntervalSeconds":300}',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     -- Audit log (immutable — no UPDATE or DELETE allowed via API)
     CREATE TABLE "${schema}".audit_log (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

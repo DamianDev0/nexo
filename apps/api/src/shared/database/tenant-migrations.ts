@@ -365,4 +365,16 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       );
     `,
   },
+  {
+    id: '0020_user_dashboard_config',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".user_dashboard_configs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES "${schema}".users(id) UNIQUE,
+        layout JSONB NOT NULL DEFAULT '{"widgets":[],"columns":3,"refreshIntervalSeconds":300}',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `,
+  },
 ]
