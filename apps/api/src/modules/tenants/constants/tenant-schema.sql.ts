@@ -238,6 +238,10 @@ export function getTenantSchemaSQL(schema: string): string {
       description TEXT,
       due_date TIMESTAMPTZ,
       completed_at TIMESTAMPTZ,
+      status VARCHAR(20) DEFAULT 'pending',
+      duration_minutes INTEGER,
+      reminder_at TIMESTAMPTZ,
+      is_active BOOLEAN DEFAULT true,
       contact_id UUID REFERENCES "${schema}".contacts(id),
       company_id UUID REFERENCES "${schema}".companies(id),
       deal_id UUID REFERENCES "${schema}".deals(id),
@@ -453,6 +457,16 @@ export function getTenantIndicesSQL(schema: string): string {
 
     -- Deal stage history by deal (timeline queries)
     CREATE INDEX idx_${schema}_deal_stage_history ON "${schema}".deal_stage_history (deal_id, changed_at DESC);
+
+    -- Activities
+    CREATE INDEX idx_${schema}_activities_assigned ON "${schema}".activities (assigned_to_id, due_date)
+      WHERE is_active = true;
+    CREATE INDEX idx_${schema}_activities_contact ON "${schema}".activities (contact_id)
+      WHERE is_active = true;
+    CREATE INDEX idx_${schema}_activities_deal ON "${schema}".activities (deal_id)
+      WHERE is_active = true;
+    CREATE INDEX idx_${schema}_activities_calendar ON "${schema}".activities (due_date, assigned_to_id)
+      WHERE is_active = true AND status = 'pending';
 
     -- Notifications unread
     CREATE INDEX idx_${schema}_notifications_unread ON "${schema}".notifications (user_id, is_read)

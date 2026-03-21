@@ -132,4 +132,30 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".deal_stage_history (deal_id, changed_at DESC);
     `,
   },
+  {
+    id: '0009_activities_enhance',
+    up: (schema) => `
+      ALTER TABLE "${schema}".activities
+        ADD COLUMN IF NOT EXISTS status          VARCHAR(20) DEFAULT 'pending',
+        ADD COLUMN IF NOT EXISTS duration_minutes INTEGER,
+        ADD COLUMN IF NOT EXISTS reminder_at      TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS is_active        BOOLEAN DEFAULT true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_activities_assigned"
+        ON "${schema}".activities (assigned_to_id, due_date)
+        WHERE is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_activities_contact"
+        ON "${schema}".activities (contact_id)
+        WHERE is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_activities_deal"
+        ON "${schema}".activities (deal_id)
+        WHERE is_active = true;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_activities_calendar"
+        ON "${schema}".activities (due_date, assigned_to_id)
+        WHERE is_active = true AND status = 'pending';
+    `,
+  },
 ]
