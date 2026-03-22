@@ -1,72 +1,55 @@
-'use client'
-
-import { useState, useCallback } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Plus, X } from 'lucide-react'
-import { sileo } from 'sileo'
+import { INVITE_ROLE_OPTIONS, USER_ROLE_LABELS } from '@repo/shared-utils'
 
 import { Input } from '@/components/atoms/input'
-import settingsService from '@/core/services/settings.service'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/molecules/select'
 import { WizardStep } from './WizardStep'
 
 interface InviteRow {
-  email: string
-  role: string
+  readonly email: string
+  readonly role: string
 }
 
-const ROLES = ['admin', 'manager', 'sales_rep', 'viewer'] as const
-
 interface StepTeamProps {
+  readonly invites: ReadonlyArray<InviteRow>
+  readonly isPending: boolean
+  readonly onAdd: () => void
+  readonly onRemove: (index: number) => void
+  readonly onUpdate: (index: number, field: 'email' | 'role', value: string) => void
   readonly onNext: () => void
   readonly onBack: () => void
 }
 
-export function StepTeam({ onNext, onBack }: StepTeamProps) {
-  const [invites, setInvites] = useState<InviteRow[]>([{ email: '', role: 'sales_rep' }])
-
-  const { mutate: sendInvites, isPending } = useMutation({
-    mutationFn: async () => {
-      const validInvites = invites.filter((inv) => inv.email.trim().length > 0)
-      await Promise.all(
-        validInvites.map((inv) => settingsService.inviteUser({ email: inv.email, role: inv.role })),
-      )
-    },
-    onSuccess: () => {
-      const count = invites.filter((inv) => inv.email.trim().length > 0).length
-      if (count > 0) {
-        sileo.success({ title: `${count} invitation(s) sent` })
-      }
-      onNext()
-    },
-    onError: (err) => sileo.error({ title: 'Failed to send invites', description: err.message }),
-  })
-
-  const handleAdd = useCallback(() => {
-    setInvites((prev) => [...prev, { email: '', role: 'sales_rep' }])
-  }, [])
-
-  const handleRemove = useCallback((index: number) => {
-    setInvites((prev) => prev.filter((_, i) => i !== index))
-  }, [])
-
-  const handleUpdate = useCallback((index: number, field: keyof InviteRow, value: string) => {
-    setInvites((prev) => prev.map((inv, i) => (i === index ? { ...inv, [field]: value } : inv)))
-  }, [])
-
-  const handleSave = useCallback(() => sendInvites(), [sendInvites])
+export function StepTeam({
+  invites,
+  isPending,
+  onAdd,
+  onRemove,
+  onUpdate,
+  onNext,
+  onBack,
+}: StepTeamProps) {
+  const { t } = useTranslation()
+  const s = 'onboarding.steps.team'
 
   return (
     <WizardStep
-      badge="Step 5 of 6"
-      title="Invite your team to Nexo"
-      description="Add colleagues by email. They'll receive a link to join with the role you assign."
+      badge={t(`${s}.badge`)}
+      title={t(`${s}.title`)}
+      description={t(`${s}.subtitle`)}
       onBack={onBack}
-      onNext={handleSave}
-      nextLabel="Finish setup"
+      onNext={onNext}
+      nextLabel={t(`${s}.finishSetup`)}
       isPending={isPending}
-      footerNote="You can invite more people later"
+      footerNote={t(`${s}.canInviteLater`)}
     >
-      {/* Invite rows */}
       <div className="flex flex-col gap-2">
         {invites.map((inv, i) => (
           <div key={`invite-${i}`} className="flex items-center gap-2">
@@ -75,22 +58,24 @@ export function StepTeam({ onNext, onBack }: StepTeamProps) {
               type="email"
               placeholder="colleague@company.com"
               value={inv.email}
-              onChange={(e) => handleUpdate(i, 'email', e.target.value)}
+              onChange={(e) => onUpdate(i, 'email', e.target.value)}
             />
-            <select
-              className="h-9 rounded-md border border-border bg-background px-2 text-xs font-semibold capitalize"
-              value={inv.role}
-              onChange={(e) => handleUpdate(i, 'role', e.target.value)}
-            >
-              {ROLES.map((role) => (
-                <option key={role} value={role}>
-                  {role.replace('_', ' ')}
-                </option>
-              ))}
-            </select>
+            <Select value={inv.role} onValueChange={(v) => onUpdate(i, 'role', v)}>
+              <SelectTrigger className="h-9 w-36 text-xs font-semibold">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {INVITE_ROLE_OPTIONS.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {USER_ROLE_LABELS[role]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {invites.length > 1 && (
               <button
-                onClick={() => handleRemove(i)}
+                type="button"
+                onClick={() => onRemove(i)}
                 className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-destructive/50 hover:text-destructive"
               >
                 <X className="size-3.5" />
@@ -101,20 +86,21 @@ export function StepTeam({ onNext, onBack }: StepTeamProps) {
       </div>
 
       <button
-        onClick={handleAdd}
+        type="button"
+        onClick={onAdd}
         className="mt-2 flex w-full items-center gap-2 rounded-lg border border-dashed border-border p-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
       >
         <Plus className="size-3.5" />
-        Add another member
+        {t(`${s}.addMember`)}
       </button>
 
-      {/* Roles reference */}
-      <div className="mt-6 rounded-lg border border-border overflow-hidden">
+      {/* Roles table */}
+      <div className="mt-6 overflow-hidden rounded-lg border border-border">
         <div className="grid grid-cols-5 gap-0 bg-muted px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <span>Role</span>
-          <span>View</span>
-          <span>Create</span>
-          <span>Edit</span>
+          <span>Rol</span>
+          <span>Ver</span>
+          <span>Crear</span>
+          <span>Editar</span>
           <span>Config</span>
         </div>
         {[
@@ -128,9 +114,9 @@ export function StepTeam({ onNext, onBack }: StepTeamProps) {
             className="grid grid-cols-5 gap-0 border-t border-border px-3 py-2 text-xs"
           >
             <span className="font-semibold">{row.role}</span>
-            {row.perms.map((allowed, i) => (
+            {row.perms.map((allowed, idx) => (
               <span
-                key={`${row.role}-${i}`}
+                key={`${row.role}-${idx}`}
                 className={allowed ? 'text-emerald-500' : 'text-destructive'}
               >
                 {allowed ? '✓' : '✗'}

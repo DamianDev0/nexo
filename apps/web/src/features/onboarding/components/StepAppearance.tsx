@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { BRAND_COLOR_OPTIONS, THEME_MODE_OPTIONS } from '@repo/shared-utils'
 
 import { Input } from '@/components/atoms/input'
@@ -33,18 +34,21 @@ export function StepAppearance({
   onNext,
   onBack,
 }: StepAppearanceProps) {
+  const { t } = useTranslation()
+  const s = 'onboarding.steps.appearance'
+
   return (
     <WizardStep
-      badge="Step 4 of 6"
-      title="Give your CRM an identity"
-      description="Choose brand colors and customize the name. Your team will see this every time they use Nexo."
+      badge={t(`${s}.badge`)}
+      title={t(`${s}.title`)}
+      description={t(`${s}.subtitle`)}
       onBack={onBack}
       onNext={onNext}
       isPending={isPending}
-      footerNote="Optional — you can do this later"
+      footerNote={t(`${s}.optionalNote`)}
     >
       <div className="mb-6">
-        <Label className="text-xs text-muted-foreground">Primary color</Label>
+        <Label className="text-xs text-muted-foreground">{t(`${s}.primaryColor`)}</Label>
         <ColorPicker
           className="mt-2"
           colors={BRAND_COLOR_OPTIONS}
@@ -54,7 +58,7 @@ export function StepAppearance({
       </div>
 
       <div className="mb-6">
-        <Label className="text-xs text-muted-foreground">Color mode</Label>
+        <Label className="text-xs text-muted-foreground">{t(`${s}.colorMode`)}</Label>
         <div className="mt-2 grid grid-cols-3 gap-3">
           {THEME_MODE_OPTIONS.map((mode) => (
             <button
@@ -76,7 +80,7 @@ export function StepAppearance({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label className="text-xs text-muted-foreground">CRM name</Label>
+          <Label className="text-xs text-muted-foreground">{t(`${s}.crmName`)}</Label>
           <Input
             className="mt-1.5 h-9 border-border text-sm"
             placeholder="Nexo Acme Corp"
@@ -85,7 +89,7 @@ export function StepAppearance({
           />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Login tagline</Label>
+          <Label className="text-xs text-muted-foreground">{t(`${s}.loginTagline`)}</Label>
           <Input
             className="mt-1.5 h-9 border-border text-sm"
             placeholder="Build. Grow. Scale."

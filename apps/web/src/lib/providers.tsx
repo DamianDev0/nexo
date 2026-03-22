@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider, useTheme } from 'next-themes'
 import { Toaster } from 'sileo'
 import { createQueryClient } from './query-client'
+import './i18n/config'
 
 const LIGHT_TOAST_OPTIONS = {
   fill: '#FFFFFF',
