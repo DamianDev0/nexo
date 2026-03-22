@@ -329,6 +329,9 @@ importers:
       recharts:
         specifier: 2.15.4
         version: 2.15.4(react-dom@19.2.0)(react@19.2.0)
+      sileo:
+        specifier: ^0.1.5
+        version: 0.1.5(react-dom@19.2.0)(react@19.2.0)
       socket.io-client:
         specifier: ^4.8.3
         version: 4.8.3
@@ -14985,6 +14988,22 @@ packages:
         integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==,
       }
     engines: { node: '>=14' }
+
+  /sileo@0.1.5(react-dom@19.2.0)(react@19.2.0):
+    resolution:
+      {
+        integrity: sha512-Fc/3VNFWgQlZttkyvAdnPlzWrLTaii6FIas7nMivlx3uGuKpuNNRZGtSgNRFqTHFn70ZxEjKYxsBIO0nQlDGAg==,
+      }
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+    dependencies:
+      motion: 12.38.0(react-dom@19.2.0)(react@19.2.0)
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+    transitivePeerDependencies:
+      - '@emotion/is-prop-valid'
+    dev: false
 
   /slash@3.0.0:
     resolution:

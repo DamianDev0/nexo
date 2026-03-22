@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 import { QUERY_KEYS } from '@/constants/query-keys.constants'
 import { ROUTES } from '@/constants/routes.constants'
 import authService from '@/core/services/auth.service'
@@ -17,7 +17,7 @@ export function useLogin() {
       router.push(ROUTES.app.dashboard)
     },
     onError: (error) => {
-      toast.error(error.message)
+      sileo.error({ title: 'Login failed', description: error.message })
     },
   })
 }

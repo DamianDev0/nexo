@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
 
@@ -10,14 +11,7 @@ import { Button } from '@/components/atoms/button'
 import { Input } from '@/components/atoms/input'
 import { Checkbox } from '@/components/atoms/checkbox'
 import { Label } from '@/components/atoms/label'
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/components/organisms/form'
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/organisms/form'
 
 import { useLogin } from '../hooks/useLogin'
 import { loginSchema, type LoginFormValues } from '../schemas/login.schema'
@@ -57,9 +51,11 @@ export function LoginForm() {
           <FormField
             control={form.control}
             name="email"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium text-muted-foreground">Email</FormLabel>
+                <FormLabel className="text-xs font-medium text-muted-foreground data-[error=true]:text-muted-foreground">
+                  Email
+                </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
@@ -72,7 +68,19 @@ export function LoginForm() {
                     />
                   </div>
                 </FormControl>
-                <FormMessage />
+                <AnimatePresence>
+                  {fieldState.error?.message && (
+                    <motion.p
+                      className="text-xs text-destructive/80"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                    >
+                      {fieldState.error.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </FormItem>
             )}
           />
@@ -80,9 +88,9 @@ export function LoginForm() {
           <FormField
             control={form.control}
             name="password"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium text-muted-foreground">
+                <FormLabel className="text-xs font-medium text-muted-foreground data-[error=true]:text-muted-foreground">
                   Password
                 </FormLabel>
                 <FormControl>
@@ -105,7 +113,19 @@ export function LoginForm() {
                     </button>
                   </div>
                 </FormControl>
-                <FormMessage />
+                <AnimatePresence>
+                  {fieldState.error?.message && (
+                    <motion.p
+                      className="text-xs text-destructive/80"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                    >
+                      {fieldState.error.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </FormItem>
             )}
           />

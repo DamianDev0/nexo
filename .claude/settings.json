@@ -17,7 +17,8 @@
       "Bash(ls -la \"/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\(auth\\)/login/\")",
       "Bash(ls -la \"/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\(auth\\)/onboarding/\")",
       "Bash(pnpm --filter web lint)",
-      "Bash(pnpm --filter web build)"
+      "Bash(pnpm --filter web build)",
+      "Bash(grep -r *.css /Users/damiangarcia/Desktop/nexo-crm-monorepo/node_modules/sileo/package.json)"
     ],
     "additionalDirectories": [
       "/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/components/data-table/components"
