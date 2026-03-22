@@ -18,7 +18,21 @@
       "Bash(ls -la \"/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\(auth\\)/onboarding/\")",
       "Bash(pnpm --filter web lint)",
       "Bash(pnpm --filter web build)",
-      "Bash(grep -r *.css /Users/damiangarcia/Desktop/nexo-crm-monorepo/node_modules/sileo/package.json)"
+      "Bash(grep -r *.css /Users/damiangarcia/Desktop/nexo-crm-monorepo/node_modules/sileo/package.json)",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/colombia-departments.geojson\" -o /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/public/colombia-departments.geojson)",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/marcboquet/colombia-json/master/colombia-departments.json\" -o /tmp/co-test.json)",
+      "Bash(curl -sL \"https://gist.githubusercontent.com/john-googol/43f05d4935e4b5c1e953/raw/4d8867bb3320fe2afcc0f01b50acc07da1847ded/colombia.geo.json\" -o /tmp/co-test2.json)",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/arunisrael/topojson/master/countries/colombia/colombia-departments.json\" -o /tmp/co-test3.json)",
+      "Bash(curl -sL -o /tmp/co-gadm.json \"https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_COL_1.json\")",
+      "Bash(curl -sL -o /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/public/colombia-departments.geojson \"https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_COL_1.json\")",
+      "Bash(cat '/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\(auth\\)/layout.tsx')",
+      "Bash(cat '/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\(auth\\)/login/page.tsx')",
+      "Bash(cat '/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\(auth\\)/onboarding/page.tsx')",
+      "Bash(wc -l /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/auth/hooks/*.ts)",
+      "Bash(wc -l /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/auth/components/*.tsx)",
+      "Bash(grep -n \"React.FC\\\\|React\\\\.createElement\" /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/auth/components/*.tsx)",
+      "Bash(pnpm --filter api check-types)",
+      "Bash(npx tsc:*)"
     ],
     "additionalDirectories": [
       "/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/components/data-table/components"

@@ -32,6 +32,7 @@ import { PasswordResetService } from '../services/password-reset.service'
 import type { UserRow } from '../interfaces/auth-rows.interface'
 import type { GoogleProfile } from '../interfaces/google-profile.interface'
 import { OnboardingDto } from '../dto/onboarding.dto'
+import { ResolveTenantDto } from '../dto/resolve-tenant.dto'
 import { LoginSessionDto, OnboardingSessionDto } from '../dto/auth-session.dto'
 import { ForgotPasswordDto, ResetPasswordDto } from '../dto/password-reset.dto'
 import { REFRESH_COOKIE } from '../constants/auth-cookies.constants'
@@ -73,6 +74,21 @@ export class AuthController {
     const result = await this.authService.onboard(dto, extractMeta(req))
     setAuthCookies(res, result.accessToken, result.refreshToken, req)
     return { user: result.user, tenant: result.tenant }
+  }
+
+  // ─── Resolve tenant by email ─────────────────────────────────────────────
+
+  @Public()
+  @Post('resolve-tenant')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Resolve which tenant a user belongs to by their email',
+    description:
+      'Used by the login form to auto-resolve the tenant before authenticating. ' +
+      'Returns the tenant slug so the frontend can set the x-tenant-slug header.',
+  })
+  async resolveTenant(@Body() dto: ResolveTenantDto): Promise<{ slug: string }> {
+    return this.authService.resolveTenantByEmail(dto.email)
   }
 
   // ─── Login ───────────────────────────────────────────────────────────────

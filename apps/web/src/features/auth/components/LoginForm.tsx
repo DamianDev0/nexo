@@ -1,172 +1,124 @@
-'use client'
-
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
-import { motion, AnimatePresence } from 'motion/react'
-import { useState, useCallback } from 'react'
+import { Controller, type Control } from 'react-hook-form'
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 
 import { Button } from '@/components/atoms/button'
 import { Input } from '@/components/atoms/input'
 import { Checkbox } from '@/components/atoms/checkbox'
 import { Label } from '@/components/atoms/label'
-import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/organisms/form'
 
-import { useLogin } from '../hooks/useLogin'
-import { loginSchema, type LoginFormValues } from '../schemas/login.schema'
+import type { LoginFormValues } from '../schemas/login.schema'
+import { FieldError } from './FieldError'
+import { AuthFooter } from './AuthFooter'
 
-export function LoginForm() {
-  const { mutate: login, isPending } = useLogin()
-  const [showPassword, setShowPassword] = useState(false)
+interface LoginFormProps {
+  readonly control: Control<LoginFormValues>
+  readonly onSubmit: () => void
+  readonly isPending: boolean
+  readonly showPassword: boolean
+  readonly onTogglePassword: () => void
+}
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
-    mode: 'onBlur',
-  })
-
-  const handleSubmit = useCallback(
-    (values: LoginFormValues) => {
-      login(values)
-    },
-    [login],
-  )
-
-  const handleTogglePassword = useCallback(() => {
-    setShowPassword((prev) => !prev)
-  }, [])
-
+export function LoginForm({
+  control,
+  onSubmit,
+  isPending,
+  showPassword,
+  onTogglePassword,
+}: LoginFormProps) {
   return (
-    <div className="flex w-full flex-col gap-8 rounded-2xl border border-border/30 bg-surface-glass px-12 py-10 shadow-lg backdrop-blur-xl">
-      {/* Header — no toggle here, it's in the parent */}
+    <div className="flex w-full max-w-md flex-col gap-6">
       <div>
         <span className="text-sm font-medium text-muted-foreground">Welcome back</span>
-        <h2 className="mt-2 text-4xl font-bold tracking-tight text-foreground">Log in</h2>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">Log in</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Don&apos;t have an account?{' '}
+          <Link
+            href="/onboarding"
+            className="font-medium text-foreground underline underline-offset-2"
+          >
+            Sign up free
+          </Link>
+        </p>
       </div>
 
-      {/* Form */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-6">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <FormLabel className="text-xs font-medium text-muted-foreground data-[error=true]:text-muted-foreground">
-                  Email
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
-                    <Input
-                      type="email"
-                      placeholder="your@email.com"
-                      autoComplete="email"
-                      className="h-10 rounded-lg border-border bg-surface-input pl-11 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-0"
-                      {...field}
-                    />
-                  </div>
-                </FormControl>
-                <AnimatePresence>
-                  {fieldState.error?.message && (
-                    <motion.p
-                      className="text-xs text-destructive/80"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
-                    >
-                      {fieldState.error.message}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <FormLabel className="text-xs font-medium text-muted-foreground data-[error=true]:text-muted-foreground">
-                  Password
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Enter your password"
-                      autoComplete="current-password"
-                      className="h-10 rounded-lg border-border bg-surface-input pl-11 pr-11 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-0"
-                      {...field}
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                      onClick={handleTogglePassword}
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                    </button>
-                  </div>
-                </FormControl>
-                <AnimatePresence>
-                  {fieldState.error?.message && (
-                    <motion.p
-                      className="text-xs text-destructive/80"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
-                    >
-                      {fieldState.error.message}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </FormItem>
-            )}
-          />
-
-          {/* Remember me + Forgot */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Checkbox
-                id="remember"
-                className="border-foreground/40 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground"
+      <form onSubmit={onSubmit} className="flex flex-col gap-5">
+        <Controller
+          control={control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <div>
+              <Label className="text-xs text-muted-foreground">Email</Label>
+              <Input
+                type="email"
+                placeholder="your@email.com"
+                autoComplete="email"
+                className="mt-1.5 h-10 border-border bg-surface-input text-sm"
+                {...field}
+                value={field.value ?? ''}
               />
-              <Label htmlFor="remember" className="cursor-pointer text-sm text-muted-foreground">
-                Remember me
-              </Label>
+              <FieldError message={fieldState.error?.message} />
             </div>
-            <Link
-              href="/forgot-password"
-              className="text-sm text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
-            >
-              Forgot password?
-            </Link>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="password"
+          render={({ field, fieldState }) => (
+            <div>
+              <Label className="text-xs text-muted-foreground">Password</Label>
+              <div className="relative mt-1.5">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  className="h-10 border-border bg-surface-input pr-10 text-sm"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={onTogglePassword}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+              <FieldError message={fieldState.error?.message} />
+            </div>
+          )}
+        />
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Checkbox
+              id="remember"
+              className="border-foreground/40 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground"
+            />
+            <Label htmlFor="remember" className="cursor-pointer text-sm text-muted-foreground">
+              Remember me
+            </Label>
           </div>
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="h-11 w-full rounded-lg text-sm font-bold"
+          <Link
+            href="/forgot-password"
+            className="text-sm text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
           >
-            {isPending ? 'Logging in...' : 'Log in to Nexo'}
-          </Button>
-        </form>
-      </Form>
+            Forgot password?
+          </Link>
+        </div>
 
-      {/* Sign up link */}
-      <p className="text-center text-sm text-muted-foreground">
-        No account?{' '}
-        <Link href="/onboarding" className="font-bold text-foreground underline underline-offset-2">
-          Sign up free
-        </Link>
-      </p>
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="mt-2 h-11 w-full rounded-lg text-sm font-bold"
+        >
+          {isPending ? 'Logging in...' : 'Log in to Nexo'}
+        </Button>
+      </form>
+
+      <AuthFooter />
     </div>
   )
 }

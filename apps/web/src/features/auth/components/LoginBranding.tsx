@@ -1,3 +1,5 @@
+'use client'
+
 import { OrbNetwork } from './OrbNetwork'
 
 export function LoginBranding() {
@@ -8,15 +10,15 @@ export function LoginBranding() {
         <OrbNetwork />
       </div>
 
-      {/* Tagline */}
+      {/* Tagline — login specific */}
       <div className="flex flex-col gap-2 text-center">
         <h2 className="text-3xl font-light text-foreground">
-          Your pipeline, <em className="italic text-foreground/35">always on.</em>
+          Welcome back, <em className="italic text-foreground/35">let&apos;s close deals.</em>
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          The CRM built for teams that move fast.
+          Your team is waiting.
           <br />
-          Close deals, not tabs.
+          Pick up where you left off.
         </p>
       </div>
     </div>

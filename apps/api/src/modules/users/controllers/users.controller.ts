@@ -61,7 +61,7 @@ export class UsersController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginSessionDto> {
     const meta = extractMeta(req)
-    const user = await this.usersService.acceptInvite(dto, tenantCtx.schemaName, meta)
+    const user = await this.usersService.acceptInvite(dto, tenantCtx, meta)
     const result = await this.authService.login(user, tenantCtx, meta)
     setAuthCookies(res, result.accessToken, result.refreshToken, req)
     return { user: result.user }

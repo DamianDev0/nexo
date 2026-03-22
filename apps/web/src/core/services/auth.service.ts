@@ -9,6 +9,15 @@ import type {
 } from '@repo/shared-types'
 
 const authService = {
+  async resolveTenant(email: string): Promise<{ slug: string }> {
+    try {
+      const response = await apiUrl.post('/auth/resolve-tenant', { email })
+      return response.data.data ?? response.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
   async login(data: LoginRequest): Promise<LoginResponse> {
     try {
       const response = await apiUrl.post('/auth/login', data)

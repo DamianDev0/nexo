@@ -47,6 +47,13 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-surface-glass: var(--surface-glass);
   --color-surface-input: var(--surface-input);
+  --color-map-accent: var(--map-accent);
+  --color-map-stroke: var(--map-stroke);
+  --color-map-fill: var(--map-fill);
+  --color-map-label: var(--map-label);
+  --color-map-node: var(--map-node);
+  --color-map-grid: var(--map-grid);
+  --color-map-line: var(--map-line);
 }
 
 /* ─── Light mode ─────────────────────────────────────────── */
@@ -85,6 +92,13 @@
   --sidebar-ring: #a3a3a3;
   --surface-glass: rgba(255, 255, 255, 0.2);
   --surface-input: rgba(255, 255, 255, 0.45);
+  --map-accent: #c85c10;
+  --map-stroke: rgba(200, 92, 16, 0.18);
+  --map-fill: rgba(200, 92, 16, 0.03);
+  --map-label: #8a6040;
+  --map-node: #fff4e8;
+  --map-grid: #c07010;
+  --map-line: rgba(200, 92, 16, 0.08);
 }
 
 /* ─── Dark mode ──────────────────────────────────────────── */
@@ -123,6 +137,13 @@
   --sidebar-ring: #555555;
   --surface-glass: rgba(255, 255, 255, 0.06);
   --surface-input: rgba(255, 255, 255, 0.1);
+  --map-accent: #e98520;
+  --map-stroke: rgba(233, 133, 32, 0.22);
+  --map-fill: rgba(233, 133, 32, 0.03);
+  --map-label: #c09060;
+  --map-node: #2a1a0a;
+  --map-grid: #e98520;
+  --map-line: rgba(233, 133, 32, 0.12);
 }
 
 @layer base {

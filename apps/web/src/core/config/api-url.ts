@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useAuthStore } from '@/store/auth.store'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1'
 
@@ -9,6 +10,15 @@ const apiUrl = axios.create({
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
+})
+
+// Inject x-tenant-slug header on every request (dev convenience, prod uses subdomain)
+apiUrl.interceptors.request.use((config) => {
+  const slug = useAuthStore.getState().tenantSlug
+  if (slug) {
+    config.headers['x-tenant-slug'] = slug
+  }
+  return config
 })
 
 apiUrl.interceptors.response.use(

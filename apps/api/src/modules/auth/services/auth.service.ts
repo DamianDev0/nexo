@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import type { TenantContext } from '@repo/shared-types'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
+import { UserTenantMapService } from '@/modules/tenants/services/user-tenant-map.service'
 import { CacheService } from '@/shared/cache/cache.service'
 import { AuditLogService } from '@/shared/audit-log/audit-log.service'
 import { PasswordService } from '@/shared/security/password.service'
@@ -50,7 +51,25 @@ export class AuthService {
     private readonly eventBus: EventBusService,
     @InjectRepository(Tenant)
     private readonly tenantRepo: Repository<Tenant>,
+    private readonly userTenantMap: UserTenantMapService,
   ) {}
+
+  // ─── Resolve tenant from email ──────────────────────────────────────────────
+
+  async resolveTenantByEmail(email: string): Promise<{ slug: string }> {
+    const tenant = await this.userTenantMap.findTenantByEmail(email)
+
+    if (!tenant) {
+      throw new NotFoundException('Unable to find workspace for this email')
+    }
+
+    return { slug: tenant.slug }
+  }
+
+  /** Delegates to UserTenantMapService — kept as a convenience for internal callers */
+  async registerUserTenantMapping(email: string, tenantId: string): Promise<void> {
+    await this.userTenantMap.register(email, tenantId)
+  }
 
   // ─── Onboarding ───────────────────────────────────────────────────────────
 
@@ -85,6 +104,7 @@ export class AuthService {
         dto.ownerFullName,
       )
       authResult = await this.session.issue(owner, tenantCtx, meta)
+      await this.registerUserTenantMapping(dto.ownerEmail, tenant.id)
     } catch (error) {
       this.logger.error(
         { slug: tenant.slug },
@@ -195,6 +215,7 @@ export class AuthService {
 
     this.logger.info({ slug: tenant.slug, email: profile.email }, 'Google OAuth login')
 
+    await this.registerUserTenantMapping(profile.email, tenant.id)
     const authResult = await this.session.issue(user, tenantCtx, meta)
     await this.audit.authLoginGoogle({ id: user.id, email: user.email }, tenantCtx.schemaName, meta)
     return { ...authResult, tenantCtx }

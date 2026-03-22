@@ -30,6 +30,18 @@ export function OrbNetwork() {
 
   return (
     <div className="relative flex size-full items-center justify-center">
+      {/* Faint grid — same pattern as map */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, ${isDark ? '#c9b97a' : '#a09070'} 0.5px, transparent 0.5px),
+            linear-gradient(to bottom, ${isDark ? '#c9b97a' : '#a09070'} 0.5px, transparent 0.5px)
+          `,
+          backgroundSize: '70px 70px',
+        }}
+      />
+
       {/* SVG layer */}
       <svg viewBox="0 0 100 100" className="absolute inset-0 z-0 size-full overflow-visible">
         {/* Dashed lines */}

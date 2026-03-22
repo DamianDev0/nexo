@@ -12,6 +12,7 @@ import { PasswordService } from '@/shared/security/password.service'
 import { TenantEmailService } from '@/shared/integrations/resend/tenant-email.service'
 import { AuthRepository } from '@/modules/auth/repositories/auth.repository'
 import { TokenService } from '@/modules/auth/services/token.service'
+import { UserTenantMapService } from '@/modules/tenants/services/user-tenant-map.service'
 import { InvitationRepository } from '../repositories/invitation.repository'
 import type { InviteUserDto, InviteUserResponseDto } from '../dto/invite-user.dto'
 import type { AcceptInviteDto } from '../dto/accept-invite.dto'
@@ -31,6 +32,7 @@ export class UsersService {
     private readonly audit: AuditLogService,
     private readonly tenantEmail: TenantEmailService,
     private readonly config: ConfigService,
+    private readonly userTenantMap: UserTenantMapService,
   ) {}
 
   // ─── Send invitation ───────────────────────────────────────────────────────
@@ -88,9 +90,10 @@ export class UsersService {
 
   async acceptInvite(
     dto: AcceptInviteDto,
-    schemaName: string,
+    tenantCtx: TenantContext,
     meta?: RequestMeta,
   ): Promise<UserRow> {
+    const { schemaName } = tenantCtx
     const invitation = await this.invitationRepo.findByTokenHash(
       schemaName,
       this.token.hashToken(dto.token),
@@ -132,6 +135,8 @@ export class UsersService {
       schemaName,
       meta,
     )
+
+    await this.userTenantMap.register(invitation.email, tenantCtx.tenantId)
 
     return user
   }
