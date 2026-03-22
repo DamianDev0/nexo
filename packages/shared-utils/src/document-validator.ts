@@ -4,18 +4,26 @@ import { validateNIT } from './nit-validator'
 
 // ─── COLOMBIAN DOCUMENT VALIDATION ──────────────────────────────────
 
-const DOCUMENT_RULES: Record<DocumentType, { pattern: RegExp; minLength: number; maxLength: number }> = {
+const DOCUMENT_RULES: Record<
+  DocumentType,
+  { pattern: RegExp; minLength: number; maxLength: number }
+> = {
   [DocumentType.CC]: { pattern: /^\d+$/, minLength: 6, maxLength: 10 },
   [DocumentType.NIT]: { pattern: /^\d+$/, minLength: 9, maxLength: 10 },
   [DocumentType.CE]: { pattern: /^[a-zA-Z0-9]+$/, minLength: 4, maxLength: 12 },
   [DocumentType.PP]: { pattern: /^[a-zA-Z0-9]+$/, minLength: 4, maxLength: 20 },
   [DocumentType.TI]: { pattern: /^\d+$/, minLength: 8, maxLength: 10 },
+  [DocumentType.PEP]: { pattern: /^\d+$/, minLength: 6, maxLength: 15 },
+  [DocumentType.PPT]: { pattern: /^[a-zA-Z0-9]+$/, minLength: 6, maxLength: 15 },
 }
 
 /**
  * Validate a Colombian document number based on its type.
  */
-export function validateDocumentNumber(type: DocumentType, number: string): { isValid: boolean; error?: string } {
+export function validateDocumentNumber(
+  type: DocumentType,
+  number: string,
+): { isValid: boolean; error?: string } {
   const cleaned = number.replace(/[.\-\s]/g, '')
   const rule = DOCUMENT_RULES[type]
 
@@ -74,4 +82,6 @@ export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   [DocumentType.CE]: 'Cédula de Extranjería',
   [DocumentType.PP]: 'Pasaporte',
   [DocumentType.TI]: 'Tarjeta de Identidad',
+  [DocumentType.PEP]: 'Permiso Especial de Permanencia',
+  [DocumentType.PPT]: 'Permiso de Protección Temporal',
 }

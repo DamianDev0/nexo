@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Skeleton } from '@/components/atoms/skeleton'
 import { ROUTES } from '@/constants/routes.constants'
@@ -10,16 +10,25 @@ interface AuthGuardProps {
   readonly children: React.ReactNode
 }
 
-/** Protects routes — redirects to login if not authenticated */
+/** Protects app routes — redirects to login or onboarding setup */
 export function AuthGuard({ children }: AuthGuardProps) {
   const { data, isLoading, isError } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    if (!isLoading && (isError || !data)) {
+    if (isLoading) return
+
+    if (isError || !data) {
       router.replace(ROUTES.auth.login)
+      return
     }
-  }, [isLoading, isError, data, router])
+
+    const isOnSetupPage = pathname.startsWith('/onboarding/setup')
+    if (!data.onboardingCompleted && !isOnSetupPage) {
+      router.replace('/onboarding/setup')
+    }
+  }, [isLoading, isError, data, router, pathname])
 
   if (isLoading) {
     return (

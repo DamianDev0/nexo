@@ -44,7 +44,8 @@
       "Bash(do ls:*)",
       "Bash(echo \"OK: $f\")",
       "Bash(echo \"MISSING: $f\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(/tmp/inventory_summary.txt:*)"
     ],
     "additionalDirectories": [
       "/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/components/data-table/components"

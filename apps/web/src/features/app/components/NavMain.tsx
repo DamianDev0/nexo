@@ -10,7 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar'
+} from '@/components/organisms/sidebar'
 
 interface NavMainProps {
   readonly items: ReadonlyArray<{

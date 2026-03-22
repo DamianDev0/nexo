@@ -231,8 +231,15 @@ export class AuthController {
 
   @Get('me')
   @Auth()
-  @ApiOperation({ summary: 'Get the currently authenticated user (decoded from JWT cookie)' })
-  me(@CurrentUser() user: AuthenticatedUser): AuthenticatedUser {
-    return user
+  @ApiOperation({
+    summary: 'Get current user + onboarding status',
+    description: 'Returns the JWT-decoded user plus tenant onboarding completion flag.',
+  })
+  async me(
+    @CurrentUser() user: AuthenticatedUser,
+    @TenantCtx() tenantCtx: TenantContext,
+  ): Promise<AuthenticatedUser & { onboardingCompleted: boolean }> {
+    const tenant = await this.authService.getTenantOnboardingStatus(tenantCtx.tenantId)
+    return { ...user, onboardingCompleted: tenant }
   }
 }

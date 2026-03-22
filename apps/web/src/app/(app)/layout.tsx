@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { Separator } from '@/components/ui/separator'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/organisms/sidebar'
+import { Separator } from '@/components/atoms/separator'
 import { ThemeToggle } from '@/components/atoms/theme-toggle'
 import { AuthGuard } from '@/features/app/components/AuthGuard'
 import { AppSidebar } from '@/features/app/components/AppSidebar'

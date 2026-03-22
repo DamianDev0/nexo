@@ -24,6 +24,7 @@ export type MeResponse = {
   role: UserRole
   tenantId: string
   schemaName: string
+  onboardingCompleted: boolean
 }
 
 export type LoginRequest = {

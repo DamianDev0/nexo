@@ -10,6 +10,7 @@ import { cn } from '@/utils'
 import { Button } from '@/components/atoms/button'
 import { Input } from '@/components/atoms/input'
 import { Separator } from '@/components/atoms/separator'
+import { Skeleton } from '@/components/atoms/skeleton'
 import {
   Sheet,
   SheetContent,
@@ -17,7 +18,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/organisms/sheet'
-import { Skeleton } from '@/components/atoms/skeleton'
 import {
   Tooltip,
   TooltipContent,
@@ -233,7 +233,7 @@ function Sidebar({
           // Adjust the padding for floating and inset variants.
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
-            : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',
+            : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon)',
           className,
         )}
         {...props}

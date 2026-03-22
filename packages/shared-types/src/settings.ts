@@ -209,6 +209,77 @@ export const DEFAULT_ACTIVITY_TYPES: ActivityTypeDef[] = [
   },
 ]
 
+// ─── ONBOARDING ──────────────────────────────────────────────────────────────
+
+export type OnboardingStatus = {
+  step: number
+  completed: boolean
+}
+
+// ─── GENERAL SETTINGS (GET /settings/general response) ───────────────────────
+
+export type GeneralSettings = {
+  id: string
+  name: string
+  slug: string
+  plan: string
+  business: {
+    nit?: string
+    taxRegime?: string
+    phone?: string
+    email?: string
+    website?: string
+    address?: { street?: string; city?: string; department?: string; zipCode?: string }
+  }
+  i18n: {
+    language?: string
+    timezone?: string
+    currency?: string
+    dateFormat?: string
+    numberFormat?: string
+  }
+  billing: Record<string, unknown>
+  industry: {
+    sector?: string
+    nomenclature?: Record<string, string>
+    iconPack?: string
+  }
+}
+
+// ─── PIPELINE CREATE REQUEST ─────────────────────────────────────────────────
+
+export type CreatePipelineRequest = {
+  name: string
+  isDefault?: boolean
+  stages: Array<{ name: string; color: string; probability: number }>
+}
+
+// ─── NOMENCLATURE CONFIG ─────────────────────────────────────────────────────
+
+export type NomenclatureConfig = {
+  contact?: EntityTerm
+  company?: EntityTerm
+  deal?: EntityTerm
+  activity?: EntityTerm
+}
+
+// ─── THEME CONFIG (patch) ────────────────────────────────────────────────────
+
+export type ThemeConfig = Partial<TenantTheme>
+
+// ─── USER INVITE ─────────────────────────────────────────────────────────────
+
+export type InviteUserRequest = {
+  email: string
+  role: string
+}
+
+export type InviteUserResponse = {
+  inviteToken: string
+  email: string
+  expiresAt: string
+}
+
 // ─── EMAIL BRANDING ───────────────────────────────────────────────────────────
 
 export type EmailBrandingContext = {

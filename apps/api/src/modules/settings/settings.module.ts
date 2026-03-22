@@ -12,6 +12,7 @@ import { TenantPublicController } from './controllers/tenant-public.controller'
 import { PipelineController } from './controllers/pipeline.controller'
 import { ActivityTypesController } from './controllers/activity-types.controller'
 import { BrandingController } from './controllers/branding.controller'
+import { OnboardingSettingsController } from './controllers/onboarding-settings.controller'
 import { SettingsService } from './services/settings.service'
 import { TenantConfigService } from './services/tenant-config.service'
 import { PipelineSettingsService } from './services/pipeline-settings.service'
@@ -29,6 +30,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     PipelineController,
     ActivityTypesController,
     BrandingController,
+    OnboardingSettingsController,
   ],
   providers: [SettingsService, TenantConfigService, PipelineSettingsService, ModuleEnabledGuard],
   exports: [SettingsService, TenantConfigService, PipelineSettingsService, ModuleEnabledGuard],

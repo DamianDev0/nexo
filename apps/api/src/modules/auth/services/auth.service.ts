@@ -66,6 +66,15 @@ export class AuthService {
     return { slug: tenant.slug }
   }
 
+  /** Check if tenant has completed onboarding */
+  async getTenantOnboardingStatus(tenantId: string): Promise<boolean> {
+    const tenant = await this.tenantRepo.findOne({ where: { id: tenantId } })
+    if (!tenant) return false
+    const config = (tenant.config ?? {}) as Record<string, unknown>
+    const onboarding = config.onboarding as { completed?: boolean } | undefined
+    return onboarding?.completed ?? false
+  }
+
   /** Delegates to UserTenantMapService — kept as a convenience for internal callers */
   async registerUserTenantMapping(email: string, tenantId: string): Promise<void> {
     await this.userTenantMap.register(email, tenantId)
@@ -113,6 +122,11 @@ export class AuthService {
       await this.tenantsService.delete(tenant.id)
       throw error
     }
+
+    // Set initial onboarding state
+    await this.tenantRepo.update(tenant.id, {
+      config: { ...tenantCtx.config, onboarding: { step: 1, completed: false } },
+    } as Parameters<typeof this.tenantRepo.update>[1])
 
     this.logger.info({ slug: tenant.slug, email: dto.ownerEmail }, 'Onboarding complete')
 

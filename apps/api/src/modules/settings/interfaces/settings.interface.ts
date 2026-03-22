@@ -47,9 +47,15 @@ export interface SettingsIndustry {
   pipelinePreset?: PipelineStagePreset[]
 }
 
+export interface OnboardingConfig {
+  step: number
+  completed: boolean
+}
+
 export interface TenantConfig {
   business?: SettingsBusiness
   i18n?: SettingsI18n
   billing?: SettingsBilling
   industry?: SettingsIndustry
+  onboarding?: OnboardingConfig
 }

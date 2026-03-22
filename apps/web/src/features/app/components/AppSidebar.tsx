@@ -18,7 +18,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from '@/components/ui/sidebar'
+} from '@/components/organisms/sidebar'
 import { ROUTES } from '@/constants/routes.constants'
 import { useAuthStore } from '@/store/auth.store'
 

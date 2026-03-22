@@ -21,6 +21,8 @@ export const CONTACT_STATUS_LABELS: Record<ContactStatus, string> = {
   [ContactStatus.NEW]: 'Nuevo',
   [ContactStatus.IN_CONTACT]: 'En contacto',
   [ContactStatus.QUALIFIED]: 'Calificado',
+  [ContactStatus.UNQUALIFIED]: 'No calificado',
+  [ContactStatus.NURTURING]: 'En nurturing',
   [ContactStatus.CLIENT]: 'Cliente',
   [ContactStatus.INACTIVE]: 'Inactivo',
   [ContactStatus.LOST]: 'Perdido',
@@ -32,6 +34,14 @@ export const CONTACT_SOURCE_LABELS: Record<ContactSource, string> = {
   [ContactSource.WEB_FORM]: 'Formulario web',
   [ContactSource.REFERRAL]: 'Referido',
   [ContactSource.IMPORT]: 'Importación',
+  [ContactSource.EMAIL_CAMPAIGN]: 'Campaña email',
+  [ContactSource.SOCIAL_MEDIA]: 'Redes sociales',
+  [ContactSource.PAID_AD]: 'Anuncio pagado',
+  [ContactSource.ORGANIC_SEARCH]: 'Búsqueda orgánica',
+  [ContactSource.EVENT]: 'Evento',
+  [ContactSource.COLD_CALL]: 'Llamada fría',
+  [ContactSource.PARTNER]: 'Partner',
+  [ContactSource.CHAT]: 'Chat',
 }
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
@@ -41,6 +51,7 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
   [InvoiceStatus.REJECTED]: 'Rechazada',
   [InvoiceStatus.PAID]: 'Pagada',
   [InvoiceStatus.VOIDED]: 'Anulada',
+  [InvoiceStatus.OVERDUE]: 'Vencida',
 }
 
 export const TAX_REGIME_LABELS: Record<TaxRegime, string> = {
@@ -48,6 +59,7 @@ export const TAX_REGIME_LABELS: Record<TaxRegime, string> = {
   [TaxRegime.NOT_RESPONSIBLE]: 'No responsable de IVA',
   [TaxRegime.LARGE_CONTRIBUTOR]: 'Gran contribuyente',
   [TaxRegime.SIMPLE_REGIME]: 'Régimen simple',
+  [TaxRegime.AUTORRETENEDOR]: 'Autorretenedor',
 }
 
 export const USER_ROLE_LABELS: Record<UserRole, string> = {
@@ -56,6 +68,9 @@ export const USER_ROLE_LABELS: Record<UserRole, string> = {
   [UserRole.ADMIN]: 'Administrador',
   [UserRole.MANAGER]: 'Gerente',
   [UserRole.SALES_REP]: 'Vendedor',
+  [UserRole.MARKETING]: 'Marketing',
+  [UserRole.BILLING]: 'Facturación',
+  [UserRole.SUPPORT]: 'Soporte',
   [UserRole.VIEWER]: 'Solo lectura',
 }
 
@@ -63,6 +78,7 @@ export const DEAL_STATUS_LABELS: Record<DealStatus, string> = {
   [DealStatus.OPEN]: 'Abierto',
   [DealStatus.WON]: 'Ganado',
   [DealStatus.LOST]: 'Perdido',
+  [DealStatus.ON_HOLD]: 'En espera',
 }
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
@@ -73,6 +89,10 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   [PaymentMethod.PSE]: 'PSE',
   [PaymentMethod.NEQUI]: 'Nequi',
   [PaymentMethod.DAVIPLATA]: 'Daviplata',
+  [PaymentMethod.EFECTY]: 'Efecty',
+  [PaymentMethod.BOLD]: 'Bold',
+  [PaymentMethod.WOMPI_LINK]: 'Wompi Link',
+  [PaymentMethod.CHEQUE]: 'Cheque',
 }
 
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
@@ -80,7 +100,91 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   [PaymentStatus.APPROVED]: 'Aprobado',
   [PaymentStatus.REJECTED]: 'Rechazado',
   [PaymentStatus.VOIDED]: 'Anulado',
+  [PaymentStatus.REFUNDED]: 'Reembolsado',
 }
+
+// ─── TIMEZONES (LATAM focused) ───────────────────────────────────────
+
+export const TIMEZONE_OPTIONS = [
+  { value: 'America/Bogota', label: 'Bogota (UTC-5)' },
+  { value: 'America/Mexico_City', label: 'Mexico City (UTC-6)' },
+  { value: 'America/Santiago', label: 'Santiago (UTC-4)' },
+  { value: 'America/Lima', label: 'Lima (UTC-5)' },
+  { value: 'America/Buenos_Aires', label: 'Buenos Aires (UTC-3)' },
+  { value: 'America/Sao_Paulo', label: 'São Paulo (UTC-3)' },
+  { value: 'America/New_York', label: 'New York (UTC-5)' },
+  { value: 'Europe/Madrid', label: 'Madrid (UTC+1)' },
+] as const
+
+// ─── CURRENCIES ─────────────────────────────────────────────────────
+
+export const CURRENCY_OPTIONS = [
+  { value: 'COP', label: 'COP — Colombian Peso' },
+  { value: 'USD', label: 'USD — US Dollar' },
+  { value: 'EUR', label: 'EUR — Euro' },
+  { value: 'MXN', label: 'MXN — Mexican Peso' },
+  { value: 'BRL', label: 'BRL — Brazilian Real' },
+  { value: 'ARS', label: 'ARS — Argentine Peso' },
+  { value: 'CLP', label: 'CLP — Chilean Peso' },
+  { value: 'PEN', label: 'PEN — Peruvian Sol' },
+] as const
+
+// ─── INDUSTRY SECTORS ───────────────────────────────────────────────
+
+export const SECTOR_OPTIONS = [
+  { id: 'technology', label: 'Technology', icon: '💻' },
+  { id: 'retail', label: 'Retail', icon: '🏪' },
+  { id: 'finance', label: 'Finance', icon: '💰' },
+  { id: 'health', label: 'Health', icon: '🏥' },
+  { id: 'education', label: 'Education', icon: '📚' },
+  { id: 'construction', label: 'Construction', icon: '🏗️' },
+  { id: 'logistics', label: 'Logistics', icon: '🚚' },
+  { id: 'services', label: 'Services', icon: '🔧' },
+  { id: 'other', label: 'Other', icon: '⚡' },
+] as const
+
+// ─── BRAND COLORS ───────────────────────────────────────────────────
+
+export const BRAND_COLOR_OPTIONS = [
+  '#4F46E5',
+  '#7C3AED',
+  '#DB2777',
+  '#DC2626',
+  '#EA580C',
+  '#D97706',
+  '#059669',
+  '#0891B2',
+  '#1D4ED8',
+  '#0F172A',
+] as const
+
+// ─── STAGE COLORS ───────────────────────────────────────────────────
+
+export const STAGE_COLOR_OPTIONS = [
+  '#6366F1',
+  '#8B5CF6',
+  '#EC4899',
+  '#F59E0B',
+  '#F97316',
+  '#EF4444',
+  '#059669',
+  '#0891B2',
+  '#3B82F6',
+  '#6B7280',
+] as const
+
+// ─── THEME MODES ────────────────────────────────────────────────────
+
+export const THEME_MODE_OPTIONS = ['light', 'dark', 'system'] as const
+
+// ─── INVITE ROLES ───────────────────────────────────────────────────
+
+export const INVITE_ROLE_OPTIONS = [
+  UserRole.ADMIN,
+  UserRole.MANAGER,
+  UserRole.SALES_REP,
+  UserRole.VIEWER,
+] as const
 
 // ─── DEFAULT PIPELINE STAGES (by industry sector) ───────────────────
 
