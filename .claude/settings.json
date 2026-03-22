@@ -32,7 +32,19 @@
       "Bash(wc -l /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/auth/components/*.tsx)",
       "Bash(grep -n \"React.FC\\\\|React\\\\.createElement\" /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/auth/components/*.tsx)",
       "Bash(pnpm --filter api check-types)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls -laR /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/app/\\\\\\(app\\\\\\)/)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:codepen.io)",
+      "Bash(npx shadcn@latest add sidebar-07 --yes)",
+      "Bash(npx shadcn@latest add sidebar-07 --yes --overwrite)",
+      "Bash(grep -l \"@/components/ui/\" /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/app/components/Nav*.tsx /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/app/components/Team*.tsx)",
+      "Bash(grep \"from \"\"@/components/ui/\" /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/features/app/components/*.tsx)",
+      "Bash(for f:*)",
+      "Bash(do ls:*)",
+      "Bash(echo \"OK: $f\")",
+      "Bash(echo \"MISSING: $f\")",
+      "Bash(done)"
     ],
     "additionalDirectories": [
       "/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/components/data-table/components"
