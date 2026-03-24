@@ -92,13 +92,13 @@
   --sidebar-ring: #a3a3a3;
   --surface-glass: rgba(255, 255, 255, 0.2);
   --surface-input: rgba(255, 255, 255, 0.45);
-  --map-accent: #c85c10;
-  --map-stroke: rgba(200, 92, 16, 0.18);
-  --map-fill: rgba(200, 92, 16, 0.03);
-  --map-label: #8a6040;
-  --map-node: #fff4e8;
-  --map-grid: #c07010;
-  --map-line: rgba(200, 92, 16, 0.08);
+  --map-accent: #b54e0a;
+  --map-stroke: rgba(180, 78, 10, 0.35);
+  --map-fill: rgba(180, 78, 10, 0.07);
+  --map-label: #6b4428;
+  --map-node: #fff0e0;
+  --map-grid: #a04808;
+  --map-line: rgba(180, 78, 10, 0.18);
 }
 
 /* ─── Dark mode ──────────────────────────────────────────── */

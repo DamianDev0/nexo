@@ -1,29 +1,18 @@
 import { useTranslation } from 'react-i18next'
-import { TIMEZONE_OPTIONS, CURRENCY_OPTIONS, SECTOR_OPTIONS } from '@repo/shared-utils'
+import { SECTOR_OPTIONS } from '@repo/shared-utils'
 
 import { Input } from '@/components/atoms/input'
 import { Label } from '@/components/atoms/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/molecules/select'
 import { cn } from '@/utils'
 import { WizardStep } from './WizardStep'
 
 interface StepCompanyProps {
   readonly phone: string
   readonly website: string
-  readonly timezone: string
-  readonly currency: string
   readonly sector: string
   readonly isPending: boolean
   readonly onPhoneChange: (v: string) => void
   readonly onWebsiteChange: (v: string) => void
-  readonly onTimezoneChange: (v: string) => void
-  readonly onCurrencyChange: (v: string) => void
   readonly onSectorChange: (v: string) => void
   readonly onNext: () => void
 }
@@ -31,14 +20,10 @@ interface StepCompanyProps {
 export function StepCompany({
   phone,
   website,
-  timezone,
-  currency,
   sector,
   isPending,
   onPhoneChange,
   onWebsiteChange,
-  onTimezoneChange,
-  onCurrencyChange,
   onSectorChange,
   onNext,
 }: StepCompanyProps) {
@@ -75,33 +60,19 @@ export function StepCompany({
         </div>
         <div>
           <Label className="text-xs text-muted-foreground">{t(`${s}.timezone`)}</Label>
-          <Select value={timezone} onValueChange={onTimezoneChange}>
-            <SelectTrigger className="mt-1.5 h-9 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {TIMEZONE_OPTIONS.map((tz) => (
-                <SelectItem key={tz.value} value={tz.value}>
-                  {tz.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            className="mt-1.5 h-9 border-border bg-muted text-sm text-muted-foreground"
+            value="America/Bogota (UTC-5)"
+            disabled
+          />
         </div>
         <div>
           <Label className="text-xs text-muted-foreground">{t(`${s}.currency`)}</Label>
-          <Select value={currency} onValueChange={onCurrencyChange}>
-            <SelectTrigger className="mt-1.5 h-9 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CURRENCY_OPTIONS.map((c) => (
-                <SelectItem key={c.value} value={c.value}>
-                  {c.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            className="mt-1.5 h-9 border-border bg-muted text-sm text-muted-foreground"
+            value="COP — Colombian Peso"
+            disabled
+          />
         </div>
       </div>
 

@@ -267,6 +267,16 @@ export type NomenclatureConfig = {
 
 export type ThemeConfig = Partial<TenantTheme>
 
+// ─── THEME HISTORY ──────────────────────────────────────────────────────────
+
+export type ThemeHistoryEntry = {
+  id: string
+  tenantId: string
+  changedBy: string
+  previousConfig: TenantTheme
+  createdAt: string
+}
+
 // ─── USER INVITE ─────────────────────────────────────────────────────────────
 
 export type InviteUserRequest = {

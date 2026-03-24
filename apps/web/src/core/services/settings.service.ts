@@ -7,6 +7,8 @@ import type {
   CreatePipelineRequest,
   NomenclatureConfig,
   ThemeConfig,
+  ThemeHistoryEntry,
+  SidebarConfig,
   InviteUserRequest,
   InviteUserResponse,
 } from '@repo/shared-types'
@@ -102,6 +104,15 @@ const settingsService = {
     }
   },
 
+  async getThemeHistory(limit = 5): Promise<ThemeHistoryEntry[]> {
+    try {
+      const res = await apiUrl.get(`/settings/theme/history?limit=${limit}`)
+      return res.data.data ?? res.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
   async uploadLogo(file: File): Promise<{ url: string }> {
     try {
       const formData = new FormData()
@@ -131,6 +142,24 @@ const settingsService = {
   async inviteUser(data: InviteUserRequest): Promise<InviteUserResponse> {
     try {
       const res = await apiUrl.post('/users/invite', data)
+      return res.data.data ?? res.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  async getNavigation(): Promise<SidebarConfig> {
+    try {
+      const res = await apiUrl.get('/settings/navigation')
+      return res.data.data ?? res.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  async updateNavigation(data: SidebarConfig): Promise<SidebarConfig> {
+    try {
+      const res = await apiUrl.patch('/settings/navigation', data)
       return res.data.data ?? res.data
     } catch (error) {
       throw handleApiError(error)

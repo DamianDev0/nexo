@@ -1,7 +1,9 @@
 'use client'
 
+import { motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { PANEL_GLOW_LIGHT, PANEL_GLOW_DARK } from '@/utils/effects'
+import { fade, slideRight, smoothEase } from '@/utils/animations'
 import { usePasswordToggle } from '@/hooks/usePasswordToggle'
 import { useMounted } from '@/hooks/useMounted'
 import { AuthLayout } from '../components/AuthLayout'
@@ -25,12 +27,24 @@ export function LoginView() {
         />
       )}
 
-      <div className="hidden flex-1 lg:flex">
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fade}
+        transition={smoothEase}
+        className="hidden flex-1 lg:flex"
+      >
         <LoginBranding />
-      </div>
+      </motion.div>
 
       <div className="relative z-3 flex w-full items-center justify-center overflow-y-auto px-6 py-20 lg:w-130 lg:shrink-0 lg:px-12 xl:w-140">
-        <div className="relative z-1 flex w-full flex-col items-center gap-8">
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={slideRight}
+          transition={smoothEase}
+          className="relative z-1 flex w-full flex-col items-center gap-8"
+        >
           <LoginForm
             control={control}
             onSubmit={handleSubmit}
@@ -44,7 +58,7 @@ export function LoginView() {
             </h2>
             <p className="text-xs leading-relaxed text-muted-foreground">Your team is waiting.</p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </AuthLayout>
   )

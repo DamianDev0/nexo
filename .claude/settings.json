@@ -47,7 +47,8 @@
       "Bash(done)",
       "Bash(/tmp/inventory_summary.txt:*)",
       "Bash(git status:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(grep -r \"settings/navigation\\\\|getSidebarConfig\\\\|/navigation\" /Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src --include=*.ts --include=*.tsx)"
     ],
     "additionalDirectories": [
       "/Users/damiangarcia/Desktop/nexo-crm-monorepo/apps/web/src/components/data-table/components"

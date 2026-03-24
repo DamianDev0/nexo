@@ -5,12 +5,14 @@ import { useOnboardingWizard } from '../hooks/useOnboardingWizard'
 import { useStepCompany } from '../hooks/useStepCompany'
 import { useStepPipeline } from '../hooks/useStepPipeline'
 import { useStepNomenclature } from '../hooks/useStepNomenclature'
+import { useStepNavigation } from '../hooks/useStepNavigation'
 import { useStepAppearance } from '../hooks/useStepAppearance'
 import { useStepTeam } from '../hooks/useStepTeam'
 import { WizardLayout } from '../components/WizardLayout'
 import { StepCompany } from '../components/StepCompany'
 import { StepPipeline } from '../components/StepPipeline'
 import { StepNomenclature } from '../components/StepNomenclature'
+import { StepNavigation } from '../components/StepNavigation'
 import { StepAppearance } from '../components/StepAppearance'
 import { StepTeam } from '../components/StepTeam'
 import { StepDone } from '../components/StepDone'
@@ -19,6 +21,7 @@ const STEPS = [
   { label: 'Your company', description: 'Basic info' },
   { label: 'Sales pipeline', description: 'Stages & probabilities' },
   { label: 'Nomenclature', description: 'Entity names', optional: true },
+  { label: 'Navigation', description: 'Sidebar modules', optional: true },
   { label: 'Appearance', description: 'Theme & colors', optional: true },
   { label: 'Invite team', description: 'Colleagues & roles', optional: true },
   { label: 'Done!', description: 'Go to dashboard' },
@@ -29,6 +32,7 @@ export function SetupWizardView() {
   const company = useStepCompany(wizard.nextStep)
   const pipeline = useStepPipeline(wizard.nextStep)
   const nomenclature = useStepNomenclature(wizard.nextStep)
+  const navigation = useStepNavigation(wizard.nextStep)
   const appearance = useStepAppearance(wizard.nextStep)
   const team = useStepTeam(wizard.nextStep)
 
@@ -46,14 +50,10 @@ export function SetupWizardView() {
         <StepCompany
           phone={company.phone}
           website={company.website}
-          timezone={company.timezone}
-          currency={company.currency}
           sector={company.sector}
           isPending={company.isPending}
           onPhoneChange={company.setPhone}
           onWebsiteChange={company.setWebsite}
-          onTimezoneChange={company.setTimezone}
-          onCurrencyChange={company.setCurrency}
           onSectorChange={company.setSector}
           onNext={company.handleSave}
         />
@@ -82,21 +82,47 @@ export function SetupWizardView() {
         />
       )}
       {wizard.currentStep === 4 && (
-        <StepAppearance
-          primaryColor={appearance.primaryColor}
-          darkMode={appearance.darkMode}
-          productName={appearance.productName}
-          tagline={appearance.tagline}
-          isPending={appearance.isPending}
-          onPrimaryColorChange={appearance.setPrimaryColor}
-          onDarkModeChange={appearance.setDarkMode}
-          onProductNameChange={appearance.setProductName}
-          onTaglineChange={appearance.setTagline}
-          onNext={appearance.handleSave}
+        <StepNavigation
+          modules={navigation.modules}
+          isPending={navigation.isPending}
+          onToggle={navigation.handleToggle}
+          onReorder={navigation.handleReorder}
+          onNext={navigation.handleSave}
           onBack={wizard.prevStep}
         />
       )}
       {wizard.currentStep === 5 && (
+        <StepAppearance
+          primaryColor={appearance.primaryColor}
+          colors={appearance.colors}
+          grainIntensity={appearance.grainIntensity}
+          darkMode={appearance.darkMode}
+          fontFamily={appearance.fontFamily}
+          borderRadius={appearance.borderRadius}
+          density={appearance.density}
+          productName={appearance.productName}
+          tagline={appearance.tagline}
+          logoPreview={appearance.logoPreview}
+          navModules={navigation.modules}
+          logoFileName={appearance.logoFileName}
+          isPending={appearance.isPending}
+          onPrimaryColorChange={appearance.handlePrimaryChange}
+          onColorOverride={appearance.handleColorOverride}
+          onGrainIntensityChange={appearance.setGrainIntensity}
+          onDarkModeChange={appearance.setDarkMode}
+          onFontFamilyChange={appearance.setFontFamily}
+          onBorderRadiusChange={appearance.setBorderRadius}
+          onDensityChange={appearance.setDensity}
+          onProductNameChange={appearance.setProductName}
+          onTaglineChange={appearance.setTagline}
+          onLogoUpload={appearance.handleLogoUpload}
+          onLogoRemove={appearance.handleLogoRemove}
+          onRestoreTheme={appearance.handleRestoreTheme}
+          onNext={appearance.handleSave}
+          onBack={wizard.prevStep}
+        />
+      )}
+      {wizard.currentStep === 6 && (
         <StepTeam
           invites={team.invites}
           isPending={team.isPending}
@@ -107,7 +133,7 @@ export function SetupWizardView() {
           onBack={wizard.prevStep}
         />
       )}
-      {wizard.currentStep === 6 && (
+      {wizard.currentStep === 7 && (
         <StepDone onGoToDashboard={wizard.completeOnboarding} onReviewConfig={handleReview} />
       )}
     </WizardLayout>

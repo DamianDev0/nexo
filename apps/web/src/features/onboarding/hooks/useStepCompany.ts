@@ -6,15 +6,13 @@ import settingsService from '@/core/services/settings.service'
 export function useStepCompany(onNext: () => void) {
   const [phone, setPhone] = useState('')
   const [website, setWebsite] = useState('')
-  const [timezone, setTimezone] = useState('America/Bogota')
-  const [currency, setCurrency] = useState('COP')
   const [sector, setSector] = useState('technology')
 
   const { mutate: save, isPending } = useMutation({
     mutationFn: () =>
       settingsService.updateGeneral({
         business: { phone, website },
-        i18n: { timezone, currency },
+        i18n: { timezone: 'America/Bogota', currency: 'COP' },
         industry: { sector },
       }),
     onSuccess: () => onNext(),
@@ -28,10 +26,6 @@ export function useStepCompany(onNext: () => void) {
     setPhone,
     website,
     setWebsite,
-    timezone,
-    setTimezone,
-    currency,
-    setCurrency,
     sector,
     setSector,
     handleSave,

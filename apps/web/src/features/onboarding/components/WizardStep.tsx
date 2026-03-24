@@ -1,11 +1,13 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/atoms/button'
+import { cn } from '@/utils'
 
 interface WizardStepProps {
   readonly badge: string
   readonly title: string
   readonly description: string
   readonly children: React.ReactNode
+  readonly aside?: React.ReactNode
   readonly onBack?: () => void
   readonly onNext: () => void
   readonly nextLabel?: string
@@ -18,6 +20,7 @@ export function WizardStep({
   title,
   description,
   children,
+  aside,
   onBack,
   onNext,
   nextLabel = 'Continue',
@@ -36,8 +39,14 @@ export function WizardStep({
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto px-8 py-6 lg:px-12">
-        <div className="max-w-2xl">{children}</div>
+      <div
+        className={cn(
+          'flex-1 overflow-y-auto px-8 py-6 lg:px-12',
+          aside ? 'flex flex-col gap-6 xl:flex-row xl:gap-8' : '',
+        )}
+      >
+        <div className={aside ? 'w-full xl:max-w-md' : 'max-w-2xl'}>{children}</div>
+        {aside && <div className="w-full xl:sticky xl:top-0 xl:flex-1">{aside}</div>}
       </div>
 
       {/* Footer */}

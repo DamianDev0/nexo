@@ -4,9 +4,9 @@ import { OrbNetwork } from './OrbNetwork'
 
 export function LoginBranding() {
   return (
-    <div className="relative z-3 flex h-full flex-col items-center justify-center gap-8 py-16 pl-40 pr-0">
+    <div className="relative z-3 flex h-full flex-col items-center justify-center gap-8 py-16 pl-32">
       {/* Orb */}
-      <div className="relative size-80 shrink-0 translate-x-20 lg:size-105 lg:translate-x-36">
+      <div className="relative size-80 shrink-0 lg:size-105">
         <OrbNetwork />
       </div>
 

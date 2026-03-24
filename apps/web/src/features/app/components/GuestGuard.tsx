@@ -16,7 +16,7 @@ export function GuestGuard({ children }: GuestGuardProps) {
 
   useEffect(() => {
     if (!isLoading && data) {
-      router.replace(ROUTES.app.dashboard)
+      router.replace(data.onboardingCompleted ? ROUTES.app.dashboard : '/onboarding/setup')
     }
   }, [isLoading, data, router])
 

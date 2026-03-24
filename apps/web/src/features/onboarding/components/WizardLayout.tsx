@@ -139,9 +139,9 @@ export function WizardLayout({
             <p className="mt-1 text-xs text-muted-foreground">
               Our team can guide you through the initial setup.
             </p>
-            <a href="#" className="mt-2 inline-block text-xs font-semibold text-primary">
+            <Link href="#" className="mt-2 inline-block text-xs font-semibold text-primary">
               Chat with support →
-            </a>
+            </Link>
           </div>
         </div>
       </aside>

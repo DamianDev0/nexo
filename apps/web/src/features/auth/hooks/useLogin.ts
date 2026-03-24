@@ -12,9 +12,10 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (data: LoginRequest) => authService.login(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me })
-      router.push(ROUTES.app.dashboard)
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me })
+      const me = queryClient.getQueryData<{ onboardingCompleted?: boolean }>(QUERY_KEYS.auth.me)
+      router.push(me?.onboardingCompleted === false ? '/onboarding/setup' : ROUTES.app.dashboard)
     },
     onError: (error) => {
       sileo.error({ title: 'Login failed', description: error.message })

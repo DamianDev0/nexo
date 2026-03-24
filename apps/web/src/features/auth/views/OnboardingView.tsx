@@ -1,7 +1,9 @@
 'use client'
 
+import { motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { PANEL_GLOW_LIGHT, PANEL_GLOW_DARK } from '@/utils/effects'
+import { fade, slideRight, smoothEase } from '@/utils/animations'
 import { usePasswordToggle } from '@/hooks/usePasswordToggle'
 import { useMounted } from '@/hooks/useMounted'
 import { AuthLayout } from '../components/AuthLayout'
@@ -25,19 +27,33 @@ export function OnboardingView() {
         />
       )}
 
-      <div className="hidden flex-1 border-r border-border/20 lg:flex">
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fade}
+        transition={smoothEase}
+        className="hidden flex-1 border-r border-border/20 lg:flex"
+      >
         <OnboardingBranding />
-      </div>
+      </motion.div>
 
       <div className="relative z-3 flex w-full items-center justify-center px-6 py-20 lg:w-130 lg:shrink-0 lg:px-12 xl:w-140">
-        <OnboardingForm
-          control={control}
-          onSubmit={handleSubmit}
-          isPending={isPending}
-          showPassword={showPassword}
-          onTogglePassword={togglePassword}
-          onBusinessNameChange={handleBusinessNameChange}
-        />
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={slideRight}
+          transition={smoothEase}
+          className="flex w-full max-w-md flex-col"
+        >
+          <OnboardingForm
+            control={control}
+            onSubmit={handleSubmit}
+            isPending={isPending}
+            showPassword={showPassword}
+            onTogglePassword={togglePassword}
+            onBusinessNameChange={handleBusinessNameChange}
+          />
+        </motion.div>
       </div>
     </AuthLayout>
   )
