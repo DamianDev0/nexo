@@ -3,11 +3,6 @@ import { AuthGuard } from '@nestjs/passport'
 import type { ExecutionContext } from '@nestjs/common'
 import type { Request } from 'express'
 
-/**
- * Used on GET /auth/google to initiate the OAuth flow.
- * Reads ?slug= from the query string and encodes it as a base64 JSON
- * state parameter so the tenant context survives the Google redirect.
- */
 @Injectable()
 export class GoogleAuthGuard extends AuthGuard('google') {
   override getAuthenticateOptions(context: ExecutionContext) {
@@ -23,9 +18,5 @@ export class GoogleAuthGuard extends AuthGuard('google') {
   }
 }
 
-/**
- * Used on GET /auth/google/callback — just handles the passport callback,
- * no custom options needed.
- */
 @Injectable()
 export class GoogleCallbackGuard extends AuthGuard('google') {}

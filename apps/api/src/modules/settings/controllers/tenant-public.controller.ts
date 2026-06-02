@@ -6,7 +6,7 @@ import type { Response } from 'express'
 import { Public } from '@/shared/decorators/public.decorator'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { TenantConfigService } from '../services/tenant-config.service'
-import { BORDER_RADIUS_MAP, FONT_FAMILY_MAP } from '../constants/default-theme'
+import { ThemeCssService } from '../services/theme-css.service'
 import type { BrandingPublic } from '@repo/shared-types'
 
 @ApiTags('Tenant Public')
@@ -14,6 +14,7 @@ import type { BrandingPublic } from '@repo/shared-types'
 export class TenantPublicController {
   constructor(
     private readonly configService: TenantConfigService,
+    private readonly themeCss: ThemeCssService,
     @InjectRepository(Tenant)
     private readonly tenantRepo: Repository<Tenant>,
   ) {}
@@ -28,27 +29,7 @@ export class TenantPublicController {
   async getThemeCss(@Param('slug') slug: string, @Res() res: Response): Promise<void> {
     const tenant = await this.findTenantBySlug(slug)
     const theme = await this.configService.getTheme(tenant.id)
-    const { colors, typography, branding } = theme
-
-    const fontValue = FONT_FAMILY_MAP[typography.fontFamily] ?? FONT_FAMILY_MAP.inter
-    const radiusValue = BORDER_RADIUS_MAP[typography.borderRadius] ?? BORDER_RADIUS_MAP.md
-
-    const css = `:root {
-  --color-primary: ${colors.primary};
-  --color-primary-foreground: ${colors.primaryForeground};
-  --color-secondary: ${colors.secondary};
-  --color-accent: ${colors.accent};
-  --color-sidebar: ${colors.sidebar};
-  --color-sidebar-foreground: ${colors.sidebarForeground};
-  --font-family: ${fontValue};
-  --border-radius: ${radiusValue};
-  --density: ${typography.density};
-  --icon-pack: ${theme.iconPack};
-  --dark-mode-default: ${theme.darkModeDefault};
-  --company-name: "${branding.companyName}";
-}
-`
-    res.type('text/css').send(css)
+    res.type('text/css').send(this.themeCss.build(theme))
   }
 
   @Get(':slug/branding')

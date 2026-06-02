@@ -32,7 +32,9 @@ import { TimelineModule } from '@/modules/timeline/timeline.module'
 import { BulkActionsModule } from '@/modules/bulk-actions/bulk-actions.module'
 import { WebhooksModule } from '@/modules/webhooks/webhooks.module'
 import { ApiKeysModule } from '@/modules/api-keys/api-keys.module'
+import { AuditLogModule } from '@/modules/audit-log/audit-log.module'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
+import { TenantMatchGuard } from '@/modules/auth/guards/tenant-match.guard'
 import { RolesGuard } from '@/modules/auth/guards/roles.guard'
 
 @Module({
@@ -47,6 +49,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
       useFactory: createLoggerOptions,
     }),
     SharedModule,
+    AuditLogModule,
     TenantsModule,
     AuthModule,
     UsersModule,
@@ -67,9 +70,10 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     ApiKeysModule,
   ],
   providers: [
-    // Global guards — order matters: Throttler → JWT → Roles
+    // Global guards — order matters: Throttler → JWT → TenantMatch → Roles
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: TenantMatchGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })

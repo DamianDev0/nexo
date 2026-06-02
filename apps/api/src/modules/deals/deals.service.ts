@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { DealStatus } from '@repo/shared-types'
-import { AuditLogService } from '@/shared/audit-log/audit-log.service'
-import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
+import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/modules/audit-log/audit-log.interfaces'
 import type {
   DealDetail,
   DealItem,

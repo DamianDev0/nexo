@@ -2,31 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { randomBytes, createHmac } from 'node:crypto'
 import type { Webhook, WebhookDeliveryResult, WebhookEvent, WebhookLog } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-
-interface WebhookRow {
-  id: string
-  url: string
-  events: string[]
-  secret: string
-  is_active: boolean
-  last_triggered_at: string | null
-  last_status_code: number | null
-  fail_count: number
-  created_at: string
-  updated_at: string
-}
-
-interface LogRow {
-  id: string
-  webhook_id: string
-  event: string
-  payload: Record<string, unknown>
-  status_code: number | null
-  response_time: number | null
-  success: boolean
-  error: string | null
-  created_at: string
-}
+import type { WebhookRow, LogRow } from './interfaces/webhook-row.interfaces'
 
 @Injectable()
 export class WebhooksService {

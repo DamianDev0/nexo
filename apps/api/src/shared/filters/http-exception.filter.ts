@@ -65,7 +65,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (typeof exceptionResponse !== 'object' || !('message' in exceptionResponse)) {
       return false
     }
-    return Array.isArray((exceptionResponse as { message: unknown }).message)
+    return Array.isArray(exceptionResponse.message)
   }
 
   private extractMessage(exceptionResponse: string | object, exception: HttpException): string {
@@ -95,15 +95,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
       504: 'GATEWAY_TIMEOUT',
     }
 
-    return codeMap[status] ?? (HttpStatus[status] ?? 'UNKNOWN_ERROR')
+    return codeMap[status] ?? HttpStatus[status] ?? 'UNKNOWN_ERROR'
   }
 
   private extractValidationErrors(exceptionResponse: object): ValidationErrorDetail[] {
     const messages = (exceptionResponse as { message: string[] }).message
 
     return messages.map((msg) => {
-      // class-validator messages typically start with the property name
-      // e.g. "slug must be longer than or equal to 3 characters"
       const spaceIndex = msg.indexOf(' ')
       const field = spaceIndex > 0 ? msg.substring(0, spaceIndex) : 'unknown'
 

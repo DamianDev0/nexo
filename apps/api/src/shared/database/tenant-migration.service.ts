@@ -1,4 +1,5 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import { DataSource } from 'typeorm'
 import { TENANT_MIGRATIONS } from './tenant-migrations'
@@ -10,9 +11,21 @@ export class TenantMigrationService implements OnApplicationBootstrap {
     @InjectPinoLogger(TenantMigrationService.name)
     private readonly logger: PinoLogger,
     private readonly dataSource: DataSource,
+    private readonly config: ConfigService,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    if (!this.config.get<boolean>('app.runMigrationsOnBoot')) {
+      this.logger.info(
+        'Skipping tenant migrations on boot (set RUN_MIGRATIONS_ON_BOOT=true to enable; prefer the migrate-all-tenants deploy job)',
+      )
+      return
+    }
+
+    await this.runAll()
+  }
+
+  async runAll(): Promise<void> {
     const schemas = await this.getAllTenantSchemas()
 
     if (schemas.length === 0) {

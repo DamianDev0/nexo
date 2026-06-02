@@ -33,7 +33,7 @@ export function createTypeOrmOptions(config: ConfigService): TypeOrmModuleOption
     password: db.password,
     database: db.database,
     autoLoadEntities: true,
-    synchronize: isDev,
+    synchronize: config.get<boolean>('app.dbSynchronize') ?? false,
     logging: isDev,
   }
 }

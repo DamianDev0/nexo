@@ -17,3 +17,9 @@ export interface ImportRowMapper {
   validateField(field: string, value: unknown): ImportFieldError | null
   uniqueKeyField: string | null
 }
+
+export interface StoredFile {
+  buffer: Buffer
+  fileName: string
+  expiresAt: number
+}

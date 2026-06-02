@@ -1,19 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import type { PaginatedTimeline, TimelineEntry, TimelineEventType } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-
-interface TimelineRow {
-  id: string
-  event_type: string
-  title: string
-  description: string | null
-  entity_type: string | null
-  entity_id: string | null
-  user_id: string | null
-  user_name: string | null
-  metadata: Record<string, unknown>
-  created_at: string
-}
+import type { TimelineRow } from './interfaces/timeline-row.interfaces'
 
 @Injectable()
 export class TimelineService {

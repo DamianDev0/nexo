@@ -8,7 +8,6 @@ import { createTypeOrmOptions } from '@/config/database.config'
 import { createThrottlerOptions } from '@/config/throttler.config'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { Plan } from '@/modules/tenants/entities/plan.entity'
-import { AuditLogModule } from './audit-log/audit-log.module'
 import { ResendModule } from './integrations/resend/resend.module'
 import { S3Module } from './integrations/aws/s3.module'
 import { CacheService } from './cache/cache.service'
@@ -20,7 +19,7 @@ import { CsvExportService } from './csv/csv-export.service'
 import { CsvParseService } from './csv/csv-parse.service'
 import { ImportsModule } from './imports/imports.module'
 import { QueueModule } from './queue/queue.module'
-import { DuplicateDetectionService } from './utils/duplicate-detection.service'
+import { DuplicateDetectionService } from './duplicate-detection/duplicate-detection.service'
 
 @Global()
 @Module({
@@ -35,7 +34,6 @@ import { DuplicateDetectionService } from './utils/duplicate-detection.service'
       useFactory: createTypeOrmOptions,
     }),
     TypeOrmModule.forFeature([Tenant, Plan]),
-    AuditLogModule,
     ResendModule,
     S3Module,
     ImportsModule,

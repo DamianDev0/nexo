@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { TenantConfigService } from '../services/tenant-config.service'
-import type { REQUIRED_MODULES } from '../interfaces/sidebar-config.interface'
 
 export const MODULE_KEY = 'requiredModule'
 

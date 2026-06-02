@@ -13,10 +13,6 @@ export class TenantDbService {
     }
   }
 
-  /**
-   * Executes a callback within the context of a tenant's schema.
-   * Sets search_path to the tenant schema before executing and resets after.
-   */
   async query<T>(schemaName: string, fn: (queryRunner: QueryRunner) => Promise<T>): Promise<T> {
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()

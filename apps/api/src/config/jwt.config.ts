@@ -4,7 +4,6 @@ export const jwtConfig = registerAs('jwt', () => {
   const privateKeyBase64 = process.env.JWT_PRIVATE_KEY ?? ''
   const publicKeyBase64 = process.env.JWT_PUBLIC_KEY ?? ''
 
-  // Keys are stored base64-encoded in env to avoid newline issues
   const privateKey = privateKeyBase64
     ? Buffer.from(privateKeyBase64, 'base64').toString('utf-8')
     : ''

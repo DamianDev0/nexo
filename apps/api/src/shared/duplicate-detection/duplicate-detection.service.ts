@@ -1,15 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import type { DuplicateCheckResult, DuplicateMatch } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-
-interface DuplicateRow {
-  id: string
-  name: string
-  match_field: string
-  match_value: string
-  similarity: number
-  created_at: string
-}
+import type { DuplicateRow } from './duplicate-detection.interfaces'
 
 @Injectable()
 export class DuplicateDetectionService {

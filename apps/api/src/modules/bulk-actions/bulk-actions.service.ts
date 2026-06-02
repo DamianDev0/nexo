@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import type { BulkActionResult } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-
-type EntityTable = 'contacts' | 'companies' | 'deals'
+import type { EntityTable } from './interfaces/bulk-actions.interface'
 
 const ALLOWED_TABLES = new Set<EntityTable>(['contacts', 'companies', 'deals'])
 

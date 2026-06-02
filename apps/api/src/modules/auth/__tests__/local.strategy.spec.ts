@@ -4,6 +4,8 @@ import type { TenantContext } from '@repo/shared-types'
 import { LocalStrategy } from '../strategies/local.strategy'
 import type { AuthService } from '../services/auth.service'
 
+type ValidateReq = Parameters<LocalStrategy['validate']>[0]
+
 const mockTenantCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
@@ -43,9 +45,9 @@ describe('LocalStrategy', () => {
       const strategy = buildStrategy()
       const req = buildReq(undefined)
 
-      await expect(strategy.validate(req as any, 'x@x.com', 'pass')).rejects.toThrow(
-        UnauthorizedException,
-      )
+      await expect(
+        strategy.validate(req as unknown as ValidateReq, 'x@x.com', 'pass'),
+      ).rejects.toThrow(UnauthorizedException)
     })
 
     it('delegates to AuthService.validateUser with correct args', async () => {
@@ -53,7 +55,11 @@ describe('LocalStrategy', () => {
       const strategy = buildStrategy(validateUser)
       const req = buildReq(mockTenantCtx, '10.0.0.1')
 
-      const result = await strategy.validate(req as any, 'owner@acme.com', 'secret')
+      const result = await strategy.validate(
+        req as unknown as ValidateReq,
+        'owner@acme.com',
+        'secret',
+      )
 
       expect(validateUser).toHaveBeenCalledWith(
         'owner@acme.com',
@@ -73,7 +79,7 @@ describe('LocalStrategy', () => {
         socket: { remoteAddress: '::ffff:192.168.1.1' },
       }
 
-      await strategy.validate(req as any, 'owner@acme.com', 'secret')
+      await strategy.validate(req as unknown as ValidateReq, 'owner@acme.com', 'secret')
 
       expect(validateUser).toHaveBeenCalledWith(
         'owner@acme.com',
@@ -88,9 +94,9 @@ describe('LocalStrategy', () => {
       const strategy = buildStrategy(validateUser)
       const req = buildReq(mockTenantCtx)
 
-      await expect(strategy.validate(req as any, 'bad@acme.com', 'wrong')).rejects.toThrow(
-        UnauthorizedException,
-      )
+      await expect(
+        strategy.validate(req as unknown as ValidateReq, 'bad@acme.com', 'wrong'),
+      ).rejects.toThrow(UnauthorizedException)
     })
   })
 })

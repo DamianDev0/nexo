@@ -2,7 +2,6 @@ import { BadRequestException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { NavigationController } from '../controllers/navigation.controller'
 import { TenantConfigService } from '../services/tenant-config.service'
-import { UserRole } from '@repo/shared-types'
 import type { TenantContext, SidebarConfig } from '@repo/shared-types'
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -209,10 +208,6 @@ describe('NavigationController', () => {
 
 describe('TenantConfigService sidebar required module guard', () => {
   it('validates required modules directly via service integration', async () => {
-    // This test imports the real service to verify the guard logic in isolation
-    const { TenantConfigService } = await import('../services/tenant-config.service')
-    const { InjectRepository } = await import('@nestjs/typeorm')
-
     const mockRepo = { findOne: jest.fn(), update: jest.fn() }
     const mockHistoryRepo = {
       find: jest.fn(),
@@ -223,24 +218,6 @@ describe('TenantConfigService sidebar required module guard', () => {
     }
     const mockCache = { get: jest.fn().mockResolvedValue(null), set: jest.fn(), del: jest.fn() }
 
-    const module = await Test.createTestingModule({
-      providers: [
-        TenantConfigService,
-        { provide: 'TenantRepository', useValue: mockRepo },
-        { provide: 'TenantThemeHistoryRepository', useValue: mockHistoryRepo },
-        { provide: 'CacheService', useValue: mockCache },
-      ],
-    })
-      .overrideProvider(TenantConfigService)
-      .useFactory({
-        factory: () => {
-          const svc = new (TenantConfigService as any)(mockRepo, mockHistoryRepo, mockCache)
-          return svc
-        },
-      })
-      .compile()
-
-    // Directly construct service and call the method to test the guard
     const svc = new (TenantConfigService as any)(mockRepo, mockHistoryRepo, mockCache)
 
     const invalidConfig: SidebarConfig = {

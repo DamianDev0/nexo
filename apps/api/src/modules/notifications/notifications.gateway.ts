@@ -16,6 +16,12 @@ interface JwtPayload {
   schemaName: string
 }
 
+interface SocketData {
+  userId: string
+  tenantId: string
+  schemaName: string
+}
+
 @WebSocketGateway({
   cors: { origin: '*' },
   transports: ['websocket', 'polling'],
@@ -44,9 +50,10 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
       const userId = payload.sub
       const tenantId = payload.tenantId
 
-      client.data.userId = userId
-      client.data.tenantId = tenantId
-      client.data.schemaName = payload.schemaName
+      const data = client.data as SocketData
+      data.userId = userId
+      data.tenantId = tenantId
+      data.schemaName = payload.schemaName
 
       await client.join(`user:${userId}`)
       await client.join(`tenant:${tenantId}`)
@@ -61,7 +68,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   }
 
   handleDisconnect(client: Socket): void {
-    const userId = client.data.userId as string | undefined
+    const { userId } = client.data as Partial<SocketData>
     if (userId) {
       this.logger.debug(`Client disconnected: user=${userId}`)
     }

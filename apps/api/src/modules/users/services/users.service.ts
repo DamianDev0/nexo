@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import type { TenantContext } from '@repo/shared-types'
-import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { PasswordService } from '@/shared/security/password.service'
 import { TenantEmailService } from '@/shared/integrations/resend/tenant-email.service'
 import { AuthRepository } from '@/modules/auth/repositories/auth.repository'

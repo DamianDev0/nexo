@@ -17,6 +17,7 @@ export default [
       '**/modules/**/*.dto.ts',
       '**/shared/database/**/*.ts',
       '**/shared/integrations/**/*.ts',
+      '**/shared/**/*.service.ts',
     ],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -32,6 +33,12 @@ export default [
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    files: ['**/seeds/**/*.ts'],
+    rules: {
+      'no-console': 'off',
     },
   },
 ]

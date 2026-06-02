@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { DealsController } from '../deals.controller'
 import { DealsService } from '../deals.service'
+import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { DealStatus } from '@repo/shared-types'
 import type {
   DealDetail,
@@ -91,6 +92,7 @@ describe('DealsController', () => {
             getForecast: jest.fn(),
           },
         },
+        { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
       ],
     }).compile()
 

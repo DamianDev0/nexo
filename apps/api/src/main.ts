@@ -11,6 +11,7 @@ import { AllExceptionsFilter } from './shared/filters/all-exceptions.filter'
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter'
 import { TypeOrmExceptionFilter } from './shared/filters/typeorm-exception.filter'
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor'
+import { buildCorsOrigin } from './shared/security/cors-origin'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -71,7 +72,7 @@ async function bootstrap() {
 
   // ── CORS ───────────────────────────────────────────────────────────────────
   app.enableCors({
-    origin: frontendUrl,
+    origin: buildCorsOrigin(frontendUrl),
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-tenant-slug'],
@@ -86,6 +87,8 @@ async function bootstrap() {
       .build()
     SwaggerModule.setup(swaggerPath, app, SwaggerModule.createDocument(app, swaggerConfig))
   }
+
+  app.enableShutdownHooks()
 
   await app.listen(port)
 

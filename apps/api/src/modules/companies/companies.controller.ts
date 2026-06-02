@@ -24,6 +24,7 @@ import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { CompaniesService } from './companies.service'
+import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import {
   AssignContactDto,
   CompanyQueryDto,
@@ -34,7 +35,10 @@ import {
 @ApiTags('Companies')
 @Controller('companies')
 export class CompaniesController {
-  constructor(private readonly companiesService: CompaniesService) {}
+  constructor(
+    private readonly companiesService: CompaniesService,
+    private readonly customFields: CustomFieldsValidator,
+  ) {}
 
   @Get()
   @Auth(UserRole.VIEWER)
@@ -49,11 +53,12 @@ export class CompaniesController {
   @Post()
   @Auth(UserRole.SALES_REP)
   @ApiOperation({ summary: 'Create a company' })
-  create(
+  async create(
     @Body() dto: CreateCompanyDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<Company> {
+    await this.customFields.validate(ctx.tenantId, 'companies', dto.customFields)
     return this.companiesService.create(ctx.schemaName, dto, user.id)
   }
 
@@ -72,11 +77,12 @@ export class CompaniesController {
   @Auth(UserRole.SALES_REP)
   @ApiParam({ name: 'id', description: 'Company UUID' })
   @ApiOperation({ summary: 'Update a company' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCompanyDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<Company> {
+    await this.customFields.validate(ctx.tenantId, 'companies', dto.customFields)
     return this.companiesService.update(ctx.schemaName, id, dto)
   }
 

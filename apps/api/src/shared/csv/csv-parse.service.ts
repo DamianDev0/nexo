@@ -7,16 +7,11 @@ export interface CsvParseResult<T> {
 
 @Injectable()
 export class CsvParseService {
-  /**
-   * Parse a CSV buffer into an array of objects.
-   * Expects the first row to be headers.
-   * Returns parsed data + per-row errors (does not throw on individual row failures).
-   */
   parse<T>(
     buffer: Buffer,
     mapRow: (row: Record<string, string>, index: number) => T | null,
   ): CsvParseResult<T> {
-    const content = buffer.toString('utf-8').replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+    const content = buffer.toString('utf-8').replaceAll('\r\n', '\n').replaceAll('\r', '\n')
     const lines = this.splitLines(content)
 
     if (lines.length < 2) {
@@ -36,40 +31,35 @@ export class CsvParseService {
       const line = lines[i]
       if (!line || line.trim() === '') continue
 
+      const rowNumber = i + 1
       try {
-        const values = this.parseLine(line)
-        const record: Record<string, string> = {}
-
-        for (let j = 0; j < headers.length; j++) {
-          const key = headers[j]
-          if (key) {
-            record[key] = values[j]?.trim() ?? ''
-          }
-        }
-
-        const mapped = mapRow(record, i + 1) // 1-based row number (header = row 1)
-        if (mapped !== null) {
-          data.push(mapped)
-        }
+        const record = this.buildRecord(headers, this.parseLine(line))
+        const mapped = mapRow(record, rowNumber)
+        if (mapped !== null) data.push(mapped)
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err)
-        errors.push({ row: i + 1, message })
+        errors.push({ row: rowNumber, message: err instanceof Error ? err.message : String(err) })
       }
     }
 
     return { data, errors }
   }
 
-  /** Split content into lines, respecting quoted fields that span multiple lines */
+  private buildRecord(headers: string[], values: string[]): Record<string, string> {
+    const record: Record<string, string> = {}
+    for (let j = 0; j < headers.length; j++) {
+      const key = headers[j]
+      if (key) record[key] = values[j]?.trim() ?? ''
+    }
+    return record
+  }
+
   private splitLines(content: string): string[] {
     const lines: string[] = []
     let current = ''
     let inQuotes = false
 
     for (const char of content) {
-      if (char === '"') {
-        inQuotes = !inQuotes
-      }
+      if (char === '"') inQuotes = !inQuotes
 
       if (char === '\n' && !inQuotes) {
         lines.push(current)
@@ -79,46 +69,52 @@ export class CsvParseService {
       }
     }
 
-    if (current.trim()) {
-      lines.push(current)
-    }
+    if (current.trim()) lines.push(current)
 
     return lines
   }
 
-  /** Parse a single CSV line into fields, handling RFC 4180 quoting */
   private parseLine(line: string): string[] {
     const fields: string[] = []
     let current = ''
     let inQuotes = false
+    let i = 0
 
-    for (let i = 0; i < line.length; i++) {
+    while (i < line.length) {
       const char = line[i]
 
       if (inQuotes) {
-        if (char === '"') {
-          if (line[i + 1] === '"') {
-            current += '"'
-            i++ // skip escaped quote
-          } else {
-            inQuotes = false
-          }
-        } else {
-          current += char
-        }
-      } else {
-        if (char === '"') {
-          inQuotes = true
-        } else if (char === ',') {
-          fields.push(current)
-          current = ''
-        } else {
-          current += char
-        }
+        const next = this.readQuotedChar(line, i, current)
+        current = next.current
+        i = next.index + 1
+        inQuotes = next.inQuotes
+        continue
       }
+
+      if (char === '"') {
+        inQuotes = true
+      } else if (char === ',') {
+        fields.push(current)
+        current = ''
+      } else {
+        current += char
+      }
+      i++
     }
 
     fields.push(current)
     return fields
+  }
+
+  private readQuotedChar(
+    line: string,
+    index: number,
+    current: string,
+  ): { current: string; index: number; inQuotes: boolean } {
+    const char = line[index]
+
+    if (char !== '"') return { current: current + char, index, inQuotes: true }
+    if (line[index + 1] === '"') return { current: current + '"', index: index + 1, inQuotes: true }
+    return { current, index, inQuotes: false }
   }
 }

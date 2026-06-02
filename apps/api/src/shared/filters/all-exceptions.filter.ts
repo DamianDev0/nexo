@@ -11,13 +11,6 @@ import { QueryFailedError } from 'typeorm'
 
 import type { ApiErrorResponse } from '../interfaces/api-response.interface'
 
-/**
- * Catch-all filter for any unhandled exception that slips past
- * HttpExceptionFilter and TypeOrmExceptionFilter.
- *
- * This ensures the client ALWAYS gets a standardized JSON response,
- * even for unexpected crashes.
- */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name)

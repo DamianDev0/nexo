@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { CompaniesController } from '../companies.controller'
 import { CompaniesService } from '../companies.service'
+import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { UserRole, TaxRegime, CompanySize, CIIUSector } from '@repo/shared-types'
 import type {
   TenantContext,
@@ -104,7 +105,10 @@ describe('CompaniesController', () => {
 
     const module = await Test.createTestingModule({
       controllers: [CompaniesController],
-      providers: [{ provide: CompaniesService, useValue: service }],
+      providers: [
+        { provide: CompaniesService, useValue: service },
+        { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
+      ],
     }).compile()
 
     controller = module.get(CompaniesController)

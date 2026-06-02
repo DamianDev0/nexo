@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { ContactsController } from '../contacts.controller'
 import { ContactsService } from '../contacts.service'
+import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { ContactStatus, ContactSource, UserRole } from '@repo/shared-types'
 import type {
   TenantContext,
@@ -86,7 +87,10 @@ describe('ContactsController', () => {
 
     const module = await Test.createTestingModule({
       controllers: [ContactsController],
-      providers: [{ provide: ContactsService, useValue: service }],
+      providers: [
+        { provide: ContactsService, useValue: service },
+        { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
+      ],
     }).compile()
 
     controller = module.get(ContactsController)

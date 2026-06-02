@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import { AuditLogService } from '@/shared/audit-log/audit-log.service'
-import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
+import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/modules/audit-log/audit-log.interfaces'
 import type {
   Contact,
   ContactListItem,
@@ -12,109 +12,12 @@ import type {
   ContactDeal,
 } from '@repo/shared-types'
 import type { CreateContactDto, UpdateContactDto, ContactQueryDto } from './dto/contact.dto'
-
-// ─── Field mapping: DTO key → SQL column name ─────────────────────────────────
-
-const UPDATABLE_FIELDS: Array<[keyof UpdateContactDto, string]> = [
-  ['firstName', 'first_name'],
-  ['lastName', 'last_name'],
-  ['email', 'email'],
-  ['phone', 'phone'],
-  ['whatsapp', 'whatsapp'],
-  ['documentType', 'document_type'],
-  ['documentNumber', 'document_number'],
-  ['city', 'city'],
-  ['department', 'department'],
-  ['municipioCode', 'municipio_code'],
-  ['status', 'status'],
-  ['source', 'source'],
-  ['leadScore', 'lead_score'],
-  ['tags', 'tags'],
-  ['companyId', 'company_id'],
-  ['assignedToId', 'assigned_to_id'],
-  ['customFields', 'custom_fields'],
-]
-
-// ─── DB row shapes ────────────────────────────────────────────────────────────
-
-interface ContactRow {
-  id: string
-  first_name: string
-  last_name: string | null
-  email: string | null
-  phone: string | null
-  whatsapp: string | null
-  document_type: string | null
-  document_number: string | null
-  job_title: string | null
-  linkedin_url: string | null
-  birthday: string | null
-  address: string | null
-  city: string | null
-  department: string | null
-  municipio_code: string | null
-  country: string | null
-  status: string
-  lifecycle_stage: string | null
-  source: string | null
-  lead_score: number
-  data_consent: boolean | null
-  consent_date: string | null
-  consent_source: string | null
-  opt_out_email: boolean | null
-  opt_out_sms: boolean | null
-  opt_out_whatsapp: boolean | null
-  last_contacted_at: string | null
-  tags: string[]
-  company_id: string | null
-  assigned_to_id: string | null
-  custom_fields?: Record<string, unknown>
-  is_active: boolean
-  created_by: string | null
-  created_at: string
-  updated_at: string
-}
-
-interface ActivityRow {
-  id: string
-  activity_type: string
-  title: string | null
-  description: string | null
-  due_date: string | null
-  completed_at: string | null
-  assigned_to_id: string | null
-  created_by: string | null
-  created_at: string
-}
-
-interface DealRow {
-  id: string
-  title: string
-  value_cents: number
-  status: string
-  stage_id: string | null
-  pipeline_id: string | null
-  expected_close_date: string | null
-  created_at: string
-}
-
-// SQL column list shared between findOne, create RETURNING and update RETURNING
-const CONTACT_COLUMNS = `
-  id, first_name, last_name, email, phone, whatsapp,
-  document_type, document_number, city, department, municipio_code,
-  status, source, lead_score, tags, company_id, assigned_to_id,
-  custom_fields, is_active, created_by, created_at, updated_at
-`
-
-// SQL column list for list view (excludes custom_fields for performance)
-const CONTACT_LIST_COLUMNS = `
-  id, first_name, last_name, email, phone, whatsapp,
-  document_type, document_number, city, department, municipio_code,
-  status, source, lead_score, tags, company_id, assigned_to_id,
-  is_active, created_by, created_at, updated_at
-`
-
-// ─── Service ──────────────────────────────────────────────────────────────────
+import type { ContactRow, ActivityRow, DealRow } from './interfaces/contact-row.interfaces'
+import {
+  UPDATABLE_FIELDS,
+  CONTACT_COLUMNS,
+  CONTACT_LIST_COLUMNS,
+} from './constants/contact.constants'
 
 @Injectable()
 export class ContactsService {

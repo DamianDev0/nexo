@@ -24,12 +24,16 @@ import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { ContactsService } from './contacts.service'
+import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { CreateContactDto, UpdateContactDto, ContactQueryDto } from './dto/contact.dto'
 
 @ApiTags('Contacts')
 @Controller('contacts')
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) {}
+  constructor(
+    private readonly contactsService: ContactsService,
+    private readonly customFields: CustomFieldsValidator,
+  ) {}
 
   @Get()
   @Auth(UserRole.VIEWER)
@@ -44,11 +48,12 @@ export class ContactsController {
   @Post()
   @Auth(UserRole.SALES_REP)
   @ApiOperation({ summary: 'Create a contact' })
-  create(
+  async create(
     @Body() dto: CreateContactDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<Contact> {
+    await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
     return this.contactsService.create(ctx.schemaName, dto, user.id)
   }
 
@@ -67,11 +72,12 @@ export class ContactsController {
   @Auth(UserRole.SALES_REP)
   @ApiParam({ name: 'id', description: 'Contact UUID' })
   @ApiOperation({ summary: 'Update a contact' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateContactDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<Contact> {
+    await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
     return this.contactsService.update(ctx.schemaName, id, dto)
   }
 

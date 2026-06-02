@@ -1,14 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import type { Tag, TagEntityType } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-
-interface TagRow {
-  id: string
-  name: string
-  color: string
-  entity_type: string
-  created_at: string
-}
+import type { TagRow } from './interfaces/tag-row.interfaces'
 
 @Injectable()
 export class TagsService {

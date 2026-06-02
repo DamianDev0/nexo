@@ -16,6 +16,10 @@ import { OnboardingSettingsController } from './controllers/onboarding-settings.
 import { SettingsService } from './services/settings.service'
 import { TenantConfigService } from './services/tenant-config.service'
 import { PipelineSettingsService } from './services/pipeline-settings.service'
+import { ThemeCssService } from './services/theme-css.service'
+import { ThemeExportService } from './services/theme-export.service'
+import { ThemeImportService } from './services/theme-import.service'
+import { CustomFieldsValidator } from './services/custom-fields-validator.service'
 import { ModuleEnabledGuard } from './guards/module-enabled.guard'
 
 @Module({
@@ -32,7 +36,22 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     BrandingController,
     OnboardingSettingsController,
   ],
-  providers: [SettingsService, TenantConfigService, PipelineSettingsService, ModuleEnabledGuard],
-  exports: [SettingsService, TenantConfigService, PipelineSettingsService, ModuleEnabledGuard],
+  providers: [
+    SettingsService,
+    TenantConfigService,
+    PipelineSettingsService,
+    ThemeCssService,
+    ThemeExportService,
+    ThemeImportService,
+    CustomFieldsValidator,
+    ModuleEnabledGuard,
+  ],
+  exports: [
+    SettingsService,
+    TenantConfigService,
+    PipelineSettingsService,
+    CustomFieldsValidator,
+    ModuleEnabledGuard,
+  ],
 })
 export class SettingsModule {}

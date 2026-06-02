@@ -28,7 +28,7 @@ export class TransformInterceptor implements NestInterceptor {
     const defaultMessage = this.getDefaultMessage(request.method, response.statusCode)
 
     return next.handle().pipe(
-      map((data) => {
+      map((data: unknown) => {
         const base = {
           statusCode: response.statusCode,
           timestamp: new Date().toISOString(),
@@ -55,9 +55,7 @@ export class TransformInterceptor implements NestInterceptor {
     if (!data || typeof data !== 'object') return false
     const obj = data as Record<string, unknown>
     return (
-      Array.isArray(obj.data) &&
-      obj.pagination !== undefined &&
-      typeof obj.pagination === 'object'
+      Array.isArray(obj.data) && obj.pagination !== undefined && typeof obj.pagination === 'object'
     )
   }
 

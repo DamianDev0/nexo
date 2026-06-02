@@ -7,20 +7,7 @@ import { TenantThemeHistory } from '../entities/tenant-theme-history.entity'
 import { DEFAULT_THEME } from '../constants/default-theme'
 import { DEFAULT_NOMENCLATURE } from '../constants/default-nomenclature'
 import { DEFAULT_SIDEBAR_CONFIG } from '../constants/default-sidebar'
-import type {
-  TenantTheme,
-  TenantThemeColors,
-  TenantThemeTypography,
-  TenantThemeBranding,
-} from '../interfaces/tenant-theme.interface'
-
-type ThemePatch = {
-  colors?: Partial<TenantThemeColors>
-  typography?: Partial<TenantThemeTypography>
-  branding?: Partial<TenantThemeBranding>
-  iconPack?: TenantTheme['iconPack']
-  darkModeDefault?: TenantTheme['darkModeDefault']
-}
+import type { TenantTheme } from '../interfaces/tenant-theme.interface'
 import type { TenantNomenclature } from '../interfaces/nomenclature.interface'
 import type { SidebarConfig } from '../interfaces/sidebar-config.interface'
 import type {
@@ -30,22 +17,13 @@ import type {
 import { DEFAULT_ACTIVITY_TYPES } from '@repo/shared-types'
 import type { ActivityTypeDef } from '@repo/shared-types'
 import { deepMerge } from '@/shared/utils/deep-merge'
+import type { ThemePatch, TenantFullConfig } from '../interfaces/tenant-config.interface'
 
 const THEME_TTL = 600
 const NOMENCLATURE_TTL = 600
 const SIDEBAR_TTL = 300
 const ACTIVITY_TYPES_TTL = 600
 const HISTORY_LIMIT = 30
-
-interface TenantFullConfig {
-  theme?: TenantTheme
-  nomenclature?: TenantNomenclature
-  sidebarConfig?: SidebarConfig
-  customFields?: CustomFieldsConfig
-  fieldPermissions?: FieldPermissionsConfig
-  activityTypes?: ActivityTypeDef[]
-  [key: string]: unknown
-}
 
 @Injectable()
 export class TenantConfigService {

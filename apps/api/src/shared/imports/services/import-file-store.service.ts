@@ -1,14 +1,9 @@
 import { Injectable, OnModuleDestroy, BadRequestException } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
+import type { StoredFile } from '../interfaces/import.interfaces'
 
 const FILE_TTL_MS = 10 * 60 * 1000
 const CLEANUP_INTERVAL_MS = 60 * 1000
-
-interface StoredFile {
-  buffer: Buffer
-  fileName: string
-  expiresAt: number
-}
 
 @Injectable()
 export class ImportFileStoreService implements OnModuleDestroy {

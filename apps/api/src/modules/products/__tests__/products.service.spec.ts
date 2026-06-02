@@ -4,7 +4,7 @@ import { ProductsService } from '../products.service'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { CsvExportService } from '@/shared/csv/csv-export.service'
 import { ImportService } from '@/shared/imports/services/import.service'
-import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import type { PaginatedProducts } from '@repo/shared-types'
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────

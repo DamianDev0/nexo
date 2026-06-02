@@ -11,8 +11,8 @@ import {
 /** Extract IP address and User-Agent from an incoming Express request */
 export function extractMeta(req: Request): RequestMeta {
   const ip = String(req.ip ?? req.socket?.remoteAddress ?? 'unknown').replace('::ffff:', '')
-  const rawAgent = req.headers['user-agent']
-  const userAgent = Array.isArray(rawAgent) ? (rawAgent[0] ?? 'unknown') : (rawAgent ?? 'unknown')
+  const header = req.headers['user-agent'] as string | string[] | undefined
+  const userAgent = Array.isArray(header) ? (header[0] ?? 'unknown') : (header ?? 'unknown')
   return { ip, userAgent }
 }
 

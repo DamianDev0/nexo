@@ -25,6 +25,7 @@ import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { DealsService } from './deals.service'
+import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import {
   CreateDealDto,
   CreateDealItemDto,
@@ -38,7 +39,10 @@ import {
 @ApiTags('Deals')
 @Controller('deals')
 export class DealsController {
-  constructor(private readonly dealsService: DealsService) {}
+  constructor(
+    private readonly dealsService: DealsService,
+    private readonly customFields: CustomFieldsValidator,
+  ) {}
 
   // ═══════════════════════════════════════════════════════════════════════════
   //  CRUD
@@ -54,11 +58,12 @@ export class DealsController {
   @Post()
   @Auth(UserRole.SALES_REP)
   @ApiOperation({ summary: 'Create a deal' })
-  create(
+  async create(
     @Body() dto: CreateDealDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<DealDetail> {
+    await this.customFields.validate(ctx.tenantId, 'deals', dto.customFields)
     return this.dealsService.create(ctx.schemaName, dto, user.id)
   }
 
@@ -84,11 +89,12 @@ export class DealsController {
   @Auth(UserRole.SALES_REP)
   @ApiParam({ name: 'id', description: 'Deal UUID' })
   @ApiOperation({ summary: 'Update a deal' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateDealDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<DealDetail> {
+    await this.customFields.validate(ctx.tenantId, 'deals', dto.customFields)
     return this.dealsService.update(ctx.schemaName, id, dto)
   }
 

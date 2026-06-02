@@ -1,14 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import type { DashboardLayout, DashboardWidget, UserDashboardConfig } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-
-interface ConfigRow {
-  id: string
-  user_id: string
-  layout: DashboardLayout
-  created_at: string
-  updated_at: string
-}
+import type { ConfigRow } from './interfaces/dashboard-config-row.interfaces'
 
 const DEFAULT_WIDGETS: DashboardWidget[] = [
   {

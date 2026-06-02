@@ -1,19 +1,9 @@
-import {
-  type ArgumentsHost,
-  Catch,
-  type ExceptionFilter,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common'
+import { type ArgumentsHost, Catch, type ExceptionFilter, HttpStatus, Logger } from '@nestjs/common'
 import type { Request, Response } from 'express'
 import { QueryFailedError } from 'typeorm'
 
 import type { ApiErrorResponse } from '../interfaces/api-response.interface'
 
-/**
- * Catches TypeORM QueryFailedError and maps PostgreSQL error codes
- * to appropriate HTTP responses with human-readable messages.
- */
 @Catch(QueryFailedError)
 export class TypeOrmExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(TypeOrmExceptionFilter.name)
@@ -92,11 +82,13 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
       },
     }
 
-    return map[code] ?? {
-      status: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'An unexpected database error occurred',
-      error: 'DATABASE_ERROR',
-    }
+    return (
+      map[code] ?? {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'An unexpected database error occurred',
+        error: 'DATABASE_ERROR',
+      }
+    )
   }
 
   /**
@@ -104,7 +96,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
    * e.g., "Key (email)=(test@test.com) already exists" → "email"
    */
   private extractField(detail: string): string {
-    const match = detail.match(/Key \((.+?)\)/)
+    const match = new RegExp(/Key \((.+?)\)/).exec(detail)
     return match?.[1] ?? 'unknown'
   }
 }

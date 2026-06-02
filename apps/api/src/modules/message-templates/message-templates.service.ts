@@ -13,21 +13,7 @@ import type {
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { QUEUE_NAMES } from '@/shared/queue/queue-names'
 import type { MessageJobData } from './message-queue.processor'
-
-interface TemplateRow {
-  id: string
-  name: string
-  channel: string
-  format: string
-  subject: string | null
-  body: string
-  variables: string[]
-  category: string | null
-  is_active: boolean
-  created_by: string | null
-  created_at: string
-  updated_at: string
-}
+import type { TemplateRow } from './interfaces/message-template-row.interfaces'
 
 @Injectable()
 export class MessageTemplatesService {

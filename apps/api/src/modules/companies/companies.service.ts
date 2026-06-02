@@ -7,8 +7,8 @@ import {
 import type { QueryRunner } from 'typeorm'
 import { validateNIT, formatNIT } from '@repo/shared-utils'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import { AuditLogService } from '@/shared/audit-log/audit-log.service'
-import { AuditAction, AuditEntityType } from '@/shared/audit-log/audit-log.interfaces'
+import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditAction, AuditEntityType } from '@/modules/audit-log/audit-log.interfaces'
 import type {
   Company,
   CompanyListItem,

@@ -1,4 +1,4 @@
-import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ActivitiesService } from '../activities.service'

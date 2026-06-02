@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "developing-genkit-js": {
+      "source": "genkit-ai/skills",
+      "sourceType": "github",
+      "skillPath": "skills/developing-genkit-js/SKILL.md",
+      "computedHash": "bedbb7516a325a4cd942b8ad6e92e2159bcd8a7c5ad047089cd3737644243ef9"
+    },
+    "nestjs-best-practices": {
+      "source": "kadajett/agent-nestjs-skills",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "1b6f82e889d19d305e38e35594de08eca0242321f353cafa4cf5e61dd3aa1a73"
+    },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "sourceType": "github",
+      "skillPath": "skills/turborepo/SKILL.md",
+      "computedHash": "b7c3165ae67a2892d6195a5b2cba15c8d96341f5c64ddd0d3ce4225c94a2ae83"
+    }
+  }
+}

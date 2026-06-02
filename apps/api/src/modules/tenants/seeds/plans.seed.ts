@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm'
+import type { DataSource } from 'typeorm'
 import { Plan } from '../entities/plan.entity'
 
 const PLANS = [

@@ -1,9 +1,9 @@
-import { AuditLogService } from '@/shared/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ContactsService } from '../contacts.service'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import type { Contact, PaginatedContacts } from '@repo/shared-types'
+import type { PaginatedContacts } from '@repo/shared-types'
 import { ContactStatus, ContactSource } from '@repo/shared-types'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -34,34 +34,6 @@ function makeContactRow(overrides: Record<string, unknown> = {}) {
     created_by: 'user-1',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
-    ...overrides,
-  }
-}
-
-function makeContact(overrides: Partial<Contact> = {}): Contact {
-  return {
-    id: 'c-1',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com',
-    phone: '3001234567',
-    whatsapp: null,
-    documentType: 'cc' as Contact['documentType'],
-    documentNumber: '123456789',
-    city: 'Bogotá',
-    department: 'Cundinamarca',
-    municipioCode: '11001',
-    status: ContactStatus.NEW,
-    source: ContactSource.MANUAL,
-    leadScore: 0,
-    tags: [],
-    companyId: null,
-    assignedToId: null,
-    customFields: {},
-    isActive: true,
-    createdById: 'user-1',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
     ...overrides,
   }
 }

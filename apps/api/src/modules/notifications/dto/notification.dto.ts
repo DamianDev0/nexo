@@ -1,16 +1,5 @@
-import { PartialType } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import {
-  IsArray,
-  IsBoolean,
-  IsIn,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator'
+import { IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
 
 export class NotificationQueryDto {
   @IsOptional()
