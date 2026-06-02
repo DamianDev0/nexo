@@ -554,8 +554,14 @@ export function getTenantIndicesSQL(schema: string): string {
         )
       );
 
-    -- JSONB custom_fields on contacts
+    -- JSONB custom_fields (GIN for fast filtering on tenant custom fields)
     CREATE INDEX idx_${schema}_contacts_custom ON "${schema}".contacts
+      USING GIN (custom_fields jsonb_path_ops);
+    CREATE INDEX idx_${schema}_companies_custom ON "${schema}".companies
+      USING GIN (custom_fields jsonb_path_ops);
+    CREATE INDEX idx_${schema}_deals_custom ON "${schema}".deals
+      USING GIN (custom_fields jsonb_path_ops);
+    CREATE INDEX idx_${schema}_products_custom ON "${schema}".products
       USING GIN (custom_fields jsonb_path_ops);
 
     -- Tags on contacts

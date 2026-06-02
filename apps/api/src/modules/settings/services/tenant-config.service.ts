@@ -224,10 +224,14 @@ export class TenantConfigService {
     section: string,
     value: unknown,
   ): Promise<void> {
-    const config = await this.getRawConfig(tenantId)
-    await this.tenantRepo.update(tenantId, {
-      config: { ...config, [section]: value },
-    } as Parameters<typeof this.tenantRepo.update>[1])
+    // Atomic per-section write — avoids the lost-update race of read-modify-write
+    // when two sections (theme, nomenclature, ...) are updated concurrently.
+    await this.tenantRepo.query(
+      `UPDATE public.tenants
+         SET config = jsonb_set(COALESCE(config, '{}'::jsonb), $2::text[], $3::jsonb, true)
+       WHERE id = $1`,
+      [tenantId, `{${section}}`, JSON.stringify(value)],
+    )
   }
 
   private async writeHistory(

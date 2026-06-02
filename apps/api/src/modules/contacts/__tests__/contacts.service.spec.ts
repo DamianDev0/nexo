@@ -199,7 +199,7 @@ describe('ContactsService', () => {
       await service.create(SCHEMA, { firstName: 'Jane' }, 'user-1')
 
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params).toContain({})
+      expect(params).toContainEqual({})
     })
 
     it('throws if INSERT returns no row', async () => {
@@ -345,7 +345,7 @@ describe('ContactsService', () => {
 
   describe('buildWhereClause filters', () => {
     beforeEach(() => {
-      qr.query.mockResolvedValue([{ count: '0' }]).mockResolvedValue([])
+      qr.query.mockReset().mockResolvedValueOnce([{ count: '0' }]).mockResolvedValueOnce([])
     })
 
     it('always includes is_active = true', async () => {
@@ -389,7 +389,7 @@ describe('ContactsService', () => {
       const sql: string = qr.query.mock.calls[0][0] as string
       expect(sql).toContain('@>')
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params).toContain(['vip', 'hot'])
+      expect(params).toContainEqual(['vip', 'hot'])
     })
   })
 })

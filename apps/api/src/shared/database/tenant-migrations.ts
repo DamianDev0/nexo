@@ -377,4 +377,15 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       );
     `,
   },
+  {
+    id: '0021_custom_fields_gin_indexes',
+    up: (schema) => `
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_companies_custom_fields"
+        ON "${schema}".companies USING GIN (custom_fields jsonb_path_ops);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_deals_custom_fields"
+        ON "${schema}".deals USING GIN (custom_fields jsonb_path_ops);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_products_custom_fields"
+        ON "${schema}".products USING GIN (custom_fields jsonb_path_ops);
+    `,
+  },
 ]

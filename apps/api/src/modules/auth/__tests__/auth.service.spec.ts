@@ -18,6 +18,7 @@ import { PasswordService } from '@/shared/security/password.service'
 import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { EventBusService } from '@/shared/events/event-bus.service'
 import { TenantsService } from '@/modules/tenants/services/tenants.service'
+import { UserTenantMapService } from '@/modules/tenants/services/user-tenant-map.service'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { AUTH_EVENTS, TenantOnboardedEvent } from '@/shared/events/auth.events'
 import type { UserRow, RequestMeta } from '../interfaces/auth-rows.interface'
@@ -97,7 +98,13 @@ function buildMocks() {
       userCreated: jest.fn(),
     },
     eventBus: { emit: jest.fn() },
-    tenantRepo: { findOne: jest.fn() },
+    tenantRepo: { findOne: jest.fn(), update: jest.fn() },
+    userTenantMap: {
+      findTenantByEmail: jest.fn(),
+      register: jest.fn(),
+      updateEmail: jest.fn(),
+      remove: jest.fn(),
+    },
     logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
   }
 }
@@ -121,6 +128,7 @@ describe('AuthService', () => {
         { provide: AuditLogService, useValue: mocks.audit },
         { provide: EventBusService, useValue: mocks.eventBus },
         { provide: getRepositoryToken(Tenant), useValue: mocks.tenantRepo },
+        { provide: UserTenantMapService, useValue: mocks.userTenantMap },
       ],
     }).compile()
 

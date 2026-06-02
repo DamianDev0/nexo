@@ -28,14 +28,11 @@ import type {
   OnboardingResult,
   GoogleAuthResult,
 } from '../interfaces/auth-rows.interface'
-
-const RATE_LIMIT_MAX_ATTEMPTS = 10
-const RATE_LIMIT_WINDOW_SECONDS = 900 // 15 minutes
-
-// Scoped per tenant+IP to avoid cross-tenant lockouts behind shared NAT
-function rateLimitCacheKey(schemaName: string, ip: string): string {
-  return `auth:fail:${schemaName}:${ip}`
-}
+import {
+  RATE_LIMIT_MAX_ATTEMPTS,
+  RATE_LIMIT_WINDOW_SECONDS,
+  rateLimitCacheKey,
+} from '../constants/rate-limit.constants'
 
 @Injectable()
 export class AuthService {
@@ -126,7 +123,7 @@ export class AuthService {
     // Set initial onboarding state
     await this.tenantRepo.update(tenant.id, {
       config: { ...tenantCtx.config, onboarding: { step: 1, completed: false } },
-    } as Parameters<typeof this.tenantRepo.update>[1])
+    })
 
     this.logger.info({ slug: tenant.slug, email: dto.ownerEmail }, 'Onboarding complete')
 

@@ -11,7 +11,7 @@ import { SessionRepository } from '../repositories/session.repository'
 import { TokenService } from '../services/token.service'
 import { PasswordService } from '@/shared/security/password.service'
 import { AuditLogService } from '@/modules/audit-log/audit-log.service'
-import { ResendService } from '@/shared/integrations/resend/resend.service'
+import { TenantEmailService } from '@/shared/integrations/resend/tenant-email.service'
 import type { UserRow, RequestMeta } from '../interfaces/auth-rows.interface'
 import type { PasswordResetRow } from '../interfaces/password-reset-rows.interface'
 import { UserRole } from '@repo/shared-types'
@@ -58,7 +58,7 @@ function buildMocks() {
     password: { hash: jest.fn() },
     token: { generateRefreshToken: jest.fn(), hashToken: jest.fn() },
     audit: { authPasswordResetRequested: jest.fn(), authPasswordChanged: jest.fn() },
-    resend: { sendPasswordResetEmail: jest.fn() },
+    email: { sendPasswordResetEmail: jest.fn() },
     config: { get: jest.fn() },
     logger: { info: jest.fn(), error: jest.fn() },
   }
@@ -81,7 +81,7 @@ describe('PasswordResetService', () => {
         { provide: PasswordService, useValue: mocks.password },
         { provide: TokenService, useValue: mocks.token },
         { provide: AuditLogService, useValue: mocks.audit },
-        { provide: ResendService, useValue: mocks.resend },
+        { provide: TenantEmailService, useValue: mocks.email },
         { provide: ConfigService, useValue: mocks.config },
       ],
     }).compile()
@@ -97,7 +97,7 @@ describe('PasswordResetService', () => {
       mocks.token.generateRefreshToken.mockReturnValue('rawtoken')
       mocks.token.hashToken.mockReturnValue('hashedtoken')
       mocks.resetRepo.create.mockResolvedValue(undefined)
-      mocks.resend.sendPasswordResetEmail.mockResolvedValue(undefined)
+      mocks.email.sendPasswordResetEmail.mockResolvedValue(undefined)
       mocks.audit.authPasswordResetRequested.mockResolvedValue(undefined)
       mocks.config.get.mockReturnValue('http://localhost:3001')
     })
@@ -109,9 +109,10 @@ describe('PasswordResetService', () => {
         SCHEMA,
         expect.objectContaining({ userId: 'user-1', tokenHash: 'hashedtoken' }),
       )
-      expect(mocks.resend.sendPasswordResetEmail).toHaveBeenCalledWith(
+      expect(mocks.email.sendPasswordResetEmail).toHaveBeenCalledWith(
         'owner@acme.com',
         expect.objectContaining({ resetUrl: expect.stringContaining('rawtoken') }),
+        'tenant-1',
       )
       expect(mocks.audit.authPasswordResetRequested).toHaveBeenCalledWith(
         'owner@acme.com',
@@ -125,14 +126,14 @@ describe('PasswordResetService', () => {
 
       await expect(service.forgotPassword('ghost@x.com', mockTenantCtx)).resolves.toBeUndefined()
       expect(mocks.resetRepo.create).not.toHaveBeenCalled()
-      expect(mocks.resend.sendPasswordResetEmail).not.toHaveBeenCalled()
+      expect(mocks.email.sendPasswordResetEmail).not.toHaveBeenCalled()
     })
 
     it('returns silently when user is inactive (anti-enumeration)', async () => {
       mocks.authRepo.findUserByEmail.mockResolvedValue({ ...mockUser, is_active: false })
 
       await expect(service.forgotPassword('owner@acme.com', mockTenantCtx)).resolves.toBeUndefined()
-      expect(mocks.resend.sendPasswordResetEmail).not.toHaveBeenCalled()
+      expect(mocks.email.sendPasswordResetEmail).not.toHaveBeenCalled()
     })
 
     it('builds reset URL with the configured frontend URL', async () => {
@@ -140,11 +141,12 @@ describe('PasswordResetService', () => {
 
       await service.forgotPassword('owner@acme.com', mockTenantCtx)
 
-      expect(mocks.resend.sendPasswordResetEmail).toHaveBeenCalledWith(
+      expect(mocks.email.sendPasswordResetEmail).toHaveBeenCalledWith(
         'owner@acme.com',
         expect.objectContaining({
           resetUrl: 'https://app.nexocrm.com/reset-password?token=rawtoken',
         }),
+        'tenant-1',
       )
     })
   })

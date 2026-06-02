@@ -27,7 +27,7 @@ export default [
     },
   },
   {
-    files: ['**/*.spec.ts', '**/__tests__/**/*.ts'],
+    files: ['**/*.spec.ts', '**/*.e2e-spec.ts', '**/__tests__/**/*.ts'],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
