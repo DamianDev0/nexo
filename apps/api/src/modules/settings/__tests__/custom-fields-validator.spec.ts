@@ -57,6 +57,14 @@ describe('validateCustomFields', () => {
     ).not.toThrow()
   })
 
+  it('enforces relation fields to be UUIDs', () => {
+    const defs = [def({ key: 'account', type: 'relation', relationEntity: 'companies' })]
+    expect(() => validateCustomFields({ account: 'not-a-uuid' }, defs)).toThrow(BadRequestException)
+    expect(() =>
+      validateCustomFields({ account: '550e8400-e29b-41d4-a716-446655440000' }, defs),
+    ).not.toThrow()
+  })
+
   it('rejects setting a computed formula field', () => {
     const defs = [def({ key: 'total', type: 'formula', formula: 'a+b' })]
     expect(() => validateCustomFields({ total: 5 }, defs)).toThrow(BadRequestException)

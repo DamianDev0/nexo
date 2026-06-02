@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import type { CustomFieldEntity, FieldDef } from '@repo/shared-types'
+import type { CustomFieldEntity, CustomFieldType, FieldDef } from '@repo/shared-types'
 import { TenantConfigService } from './tenant-config.service'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || value === ''
@@ -12,56 +13,82 @@ function optionValues(def: FieldDef): Set<string> {
   return new Set((def.options ?? []).map((o) => o.value))
 }
 
+type FieldValidator = (def: FieldDef, value: unknown) => string | null
+
+function validateNumber(def: FieldDef, value: unknown): string | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return `"${def.label}" must be a number`
+  if (def.min !== undefined && value < def.min) return `"${def.label}" must be ≥ ${def.min}`
+  if (def.max !== undefined && value > def.max) return `"${def.label}" must be ≤ ${def.max}`
+  return null
+}
+
+function validateText(def: FieldDef, value: unknown): string | null {
+  if (typeof value !== 'string') return `"${def.label}" must be text`
+  if (def.min !== undefined && value.length < def.min) return `"${def.label}" is too short`
+  if (def.max !== undefined && value.length > def.max) return `"${def.label}" is too long`
+  return null
+}
+
+function validateBoolean(def: FieldDef, value: unknown): string | null {
+  return typeof value === 'boolean' ? null : `"${def.label}" must be a boolean`
+}
+
+function validateSelect(def: FieldDef, value: unknown): string | null {
+  return optionValues(def).has(value as string) ? null : `"${def.label}" has an invalid option`
+}
+
+function validateMultiselect(def: FieldDef, value: unknown): string | null {
+  if (!Array.isArray(value)) return `"${def.label}" must be a list`
+  const allowed = optionValues(def)
+  return value.every((v) => allowed.has(v as string)) ? null : `"${def.label}" has an invalid option`
+}
+
+function validateEmail(def: FieldDef, value: unknown): string | null {
+  return typeof value === 'string' && EMAIL_PATTERN.test(value)
+    ? null
+    : `"${def.label}" must be a valid email`
+}
+
+function validateDate(def: FieldDef, value: unknown): string | null {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value))
+    ? null
+    : `"${def.label}" must be a valid date`
+}
+
+function validateRelation(def: FieldDef, value: unknown): string | null {
+  return typeof value === 'string' && UUID_PATTERN.test(value)
+    ? null
+    : `"${def.label}" must reference a valid ${def.relationEntity ?? 'record'} id`
+}
+
+function validateGeneric(def: FieldDef, value: unknown): string | null {
+  return typeof value === 'string' || typeof value === 'object'
+    ? null
+    : `"${def.label}" has an invalid value`
+}
+
+const VALIDATORS: Partial<Record<CustomFieldType, FieldValidator>> = {
+  number: validateNumber,
+  currency: validateNumber,
+  text: validateText,
+  textarea: validateText,
+  boolean: validateBoolean,
+  select: validateSelect,
+  multiselect: validateMultiselect,
+  email: validateEmail,
+  date: validateDate,
+  datetime: validateDate,
+  relation: validateRelation,
+}
+
 function validateField(def: FieldDef, value: unknown): string | null {
   if (isEmpty(value)) {
     return def.required ? `"${def.label}" is required` : null
   }
-
   if (def.type === 'formula') {
     return `"${def.label}" is computed and cannot be set`
   }
-
-  switch (def.type) {
-    case 'number':
-    case 'currency': {
-      if (typeof value !== 'number' || !Number.isFinite(value))
-        return `"${def.label}" must be a number`
-      if (def.min !== undefined && value < def.min) return `"${def.label}" must be ≥ ${def.min}`
-      if (def.max !== undefined && value > def.max) return `"${def.label}" must be ≤ ${def.max}`
-      return null
-    }
-    case 'boolean':
-      return typeof value === 'boolean' ? null : `"${def.label}" must be a boolean`
-    case 'select':
-      return optionValues(def).has(value as string) ? null : `"${def.label}" has an invalid option`
-    case 'multiselect': {
-      if (!Array.isArray(value)) return `"${def.label}" must be a list`
-      const allowed = optionValues(def)
-      return value.every((v) => allowed.has(v as string))
-        ? null
-        : `"${def.label}" has an invalid option`
-    }
-    case 'email':
-      return typeof value === 'string' && EMAIL_PATTERN.test(value)
-        ? null
-        : `"${def.label}" must be a valid email`
-    case 'date':
-    case 'datetime':
-      return typeof value === 'string' && !Number.isNaN(Date.parse(value))
-        ? null
-        : `"${def.label}" must be a valid date`
-    case 'text':
-    case 'textarea': {
-      if (typeof value !== 'string') return `"${def.label}" must be text`
-      if (def.min !== undefined && value.length < def.min) return `"${def.label}" is too short`
-      if (def.max !== undefined && value.length > def.max) return `"${def.label}" is too long`
-      return null
-    }
-    default:
-      return typeof value === 'string' || typeof value === 'object'
-        ? null
-        : `"${def.label}" has an invalid value`
-  }
+  return (VALIDATORS[def.type] ?? validateGeneric)(def, value)
 }
 
 export function validateCustomFields(values: Record<string, unknown>, defs: FieldDef[]): void {

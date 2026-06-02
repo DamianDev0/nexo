@@ -20,6 +20,7 @@ import { ThemeCssService } from './services/theme-css.service'
 import { ThemeExportService } from './services/theme-export.service'
 import { ThemeImportService } from './services/theme-import.service'
 import { CustomFieldsValidator } from './services/custom-fields-validator.service'
+import { CustomFieldsComputer } from './services/custom-fields-computer.service'
 import { ModuleEnabledGuard } from './guards/module-enabled.guard'
 
 @Module({
@@ -44,6 +45,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     ThemeExportService,
     ThemeImportService,
     CustomFieldsValidator,
+    CustomFieldsComputer,
     ModuleEnabledGuard,
   ],
   exports: [
@@ -51,6 +53,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     TenantConfigService,
     PipelineSettingsService,
     CustomFieldsValidator,
+    CustomFieldsComputer,
     ModuleEnabledGuard,
   ],
 })
