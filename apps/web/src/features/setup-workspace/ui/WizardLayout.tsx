@@ -29,7 +29,7 @@ interface StepItemProps {
   readonly onClick: () => void
 }
 
-function StepItem({ index, step, currentStep, onClick }: StepItemProps) {
+function StepItem({ index, step, currentStep, onClick }: Readonly<StepItemProps>) {
   const { t } = useTranslation()
   const stepNumber = index + 1
   const isDone = stepNumber < currentStep
@@ -72,7 +72,7 @@ interface WizardLayoutProps {
   readonly children: ReactNode
 }
 
-export function WizardLayout({ rail, children }: WizardLayoutProps) {
+export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
   const { t } = useTranslation()
   const stepOf = t('onboarding.stepOf', {
     current: rail.currentStep,

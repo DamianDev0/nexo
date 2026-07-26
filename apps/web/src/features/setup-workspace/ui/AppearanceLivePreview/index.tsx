@@ -21,7 +21,7 @@ interface AppearanceLivePreviewProps {
   readonly data: LivePreviewData
 }
 
-export function AppearanceLivePreview({ data }: AppearanceLivePreviewProps) {
+export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewProps>) {
   const isDark = data.darkMode === 'dark'
   const colors = isDark ? deriveDarkPalette(data.colors) : data.colors
 

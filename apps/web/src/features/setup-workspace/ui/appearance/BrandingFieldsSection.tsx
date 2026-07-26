@@ -15,7 +15,7 @@ export function BrandingFieldsSection({
   tagline,
   onProductNameChange,
   onTaglineChange,
-}: BrandingFieldsSectionProps) {
+}: Readonly<BrandingFieldsSectionProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.appearance'
 

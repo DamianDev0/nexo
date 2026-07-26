@@ -14,7 +14,7 @@ interface SortableModuleProps {
   readonly onToggle: (key: string) => void
 }
 
-export function SortableModule({ module, onToggle }: SortableModuleProps) {
+export function SortableModule({ module, onToggle }: Readonly<SortableModuleProps>) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: module.key,
   })

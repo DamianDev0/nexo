@@ -27,7 +27,7 @@ interface StepCompanyProps {
   readonly nav: WizardStepNav
 }
 
-export function StepCompany({ data, actions, nav }: StepCompanyProps) {
+export function StepCompany({ data, actions, nav }: Readonly<StepCompanyProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.company'
 

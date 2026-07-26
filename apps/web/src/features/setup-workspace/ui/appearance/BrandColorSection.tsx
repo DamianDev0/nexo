@@ -21,7 +21,7 @@ export function BrandColorSection({
   grainIntensity,
   onPrimaryColorChange,
   onGrainIntensityChange,
-}: BrandColorSectionProps) {
+}: Readonly<BrandColorSectionProps>) {
   const { t } = useTranslation()
   const colorName = COLOR_NAMES[primaryColor.toUpperCase()] ?? 'Custom'
 

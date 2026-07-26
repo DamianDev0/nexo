@@ -18,7 +18,7 @@ export function StaggerGroup({
   className,
   containerVariants = staggerContainer,
   as = 'div',
-}: StaggerGroupProps) {
+}: Readonly<StaggerGroupProps>) {
   const Component = motion.create(as)
 
   return (
@@ -39,7 +39,11 @@ interface StaggerItemProps {
   readonly variants?: Variants
 }
 
-export function StaggerItem({ children, className, variants = staggerChild }: StaggerItemProps) {
+export function StaggerItem({
+  children,
+  className,
+  variants = staggerChild,
+}: Readonly<StaggerItemProps>) {
   return (
     <motion.div variants={variants} transition={smoothEase} className={cn(className)}>
       {children}

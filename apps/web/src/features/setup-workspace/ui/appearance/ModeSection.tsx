@@ -11,7 +11,7 @@ interface ModeSectionProps {
   readonly onDarkModeChange: (v: ThemeMode) => void
 }
 
-export function ModeSection({ darkMode, onDarkModeChange }: ModeSectionProps) {
+export function ModeSection({ darkMode, onDarkModeChange }: Readonly<ModeSectionProps>) {
   const { t } = useTranslation()
 
   return (

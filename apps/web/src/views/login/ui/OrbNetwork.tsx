@@ -38,7 +38,6 @@ export function OrbNetwork() {
 
   return (
     <div className="relative flex size-full items-center justify-center">
-      {/* Faint grid — same pattern as map */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
@@ -50,9 +49,7 @@ export function OrbNetwork() {
         }}
       />
 
-      {/* SVG layer */}
       <svg viewBox="0 0 100 100" className="absolute inset-0 z-0 size-full overflow-visible">
-        {/* Dashed lines */}
         {NODES.map((n, i) => (
           <motion.path
             key={`line-${n.label}`}
@@ -67,7 +64,6 @@ export function OrbNetwork() {
           />
         ))}
 
-        {/* Node dots */}
         {NODES.map((n, i) => (
           <motion.circle
             key={`dot-${n.label}`}
@@ -88,7 +84,6 @@ export function OrbNetwork() {
           />
         ))}
 
-        {/* Labels */}
         {NODES.map((n, i) => (
           <motion.text
             key={`label-${n.label}`}
@@ -116,7 +111,6 @@ export function OrbNetwork() {
         </defs>
       </svg>
 
-      {/* Orb */}
       <motion.div
         className="absolute z-2 size-40 rounded-full lg:size-48"
         initial={{ scale: 0, opacity: 0 }}

@@ -6,7 +6,7 @@ interface DotsPatternProps {
   readonly className?: string
 }
 
-export function DotsPattern({ width = 8, height = 8, className }: DotsPatternProps) {
+export function DotsPattern({ width = 8, height = 8, className }: Readonly<DotsPatternProps>) {
   const id = `dots-${width}-${height}`
 
   return (

@@ -3,7 +3,6 @@ import boundaries from 'eslint-plugin-boundaries'
 import importPlugin from 'eslint-plugin-import'
 import unusedImports from 'eslint-plugin-unused-imports'
 
-/** @type {import("eslint").Linter.Config[]} */
 export default [
   {
     ignores: ['.next/**', 'next-env.d.ts', 'node_modules/**'],

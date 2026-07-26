@@ -25,7 +25,7 @@ export function OnboardingForm({
   showPassword,
   onTogglePassword,
   onBusinessNameChange,
-}: OnboardingFormProps) {
+}: Readonly<OnboardingFormProps>) {
   const { t } = useTranslation()
 
   return (

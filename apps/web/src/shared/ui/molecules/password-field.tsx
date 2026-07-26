@@ -26,7 +26,7 @@ export function PasswordField<T extends FieldValues>({
   autoComplete,
   showPassword,
   onToggle,
-}: PasswordFieldProps<T>) {
+}: Readonly<PasswordFieldProps<T>>) {
   const { t } = useTranslation()
 
   return (

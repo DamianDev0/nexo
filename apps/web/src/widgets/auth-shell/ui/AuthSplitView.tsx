@@ -26,7 +26,7 @@ export function AuthSplitView({
   brandingClassName,
   contentClassName,
   innerClassName,
-}: AuthSplitViewProps) {
+}: Readonly<AuthSplitViewProps>) {
   const mounted = useMounted()
   const { resolvedTheme } = useTheme()
   const isDark = mounted && resolvedTheme === 'dark'

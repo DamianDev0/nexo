@@ -25,7 +25,7 @@ export function ControlledField<T extends FieldValues>({
   autoComplete,
   onValueChange,
   hintFormat,
-}: ControlledFieldProps<T>) {
+}: Readonly<ControlledFieldProps<T>>) {
   return (
     <Controller
       control={control}

@@ -27,7 +27,7 @@ interface WizardStepProps {
   readonly children: ReactNode
 }
 
-export function WizardStep({ header, nav, aside, children }: WizardStepProps) {
+export function WizardStep({ header, nav, aside, children }: Readonly<WizardStepProps>) {
   const { t } = useTranslation()
 
   return (

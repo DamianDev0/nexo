@@ -33,7 +33,7 @@ interface StepTeamProps {
   readonly nav: WizardStepNav
 }
 
-export function StepTeam({ data, actions, nav }: StepTeamProps) {
+export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.team'
 

@@ -8,7 +8,7 @@ interface StepDoneProps {
   readonly onReviewConfig: () => void
 }
 
-export function StepDone({ onGoToDashboard, onReviewConfig }: StepDoneProps) {
+export function StepDone({ onGoToDashboard, onReviewConfig }: Readonly<StepDoneProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.done'
 

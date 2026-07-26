@@ -30,7 +30,7 @@ interface StepNomenclatureProps {
   readonly nav: WizardStepNav
 }
 
-export function StepNomenclature({ data, actions, nav }: StepNomenclatureProps) {
+export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatureProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.nomenclature'
 

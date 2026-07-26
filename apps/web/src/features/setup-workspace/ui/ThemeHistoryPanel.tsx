@@ -19,7 +19,7 @@ function formatDate(iso: string): string {
   })
 }
 
-function ColorDot({ color }: { readonly color: string }) {
+function ColorDot({ color }: Readonly<{ readonly color: string }>) {
   return (
     <div
       className="size-4 shrink-0 rounded-full border border-border"
@@ -31,10 +31,10 @@ function ColorDot({ color }: { readonly color: string }) {
 function HistoryCard({
   entry,
   onRestore,
-}: {
+}: Readonly<{
   readonly entry: ThemeHistoryEntry
   readonly onRestore: () => void
-}) {
+}>) {
   const { colors, typography, branding } = entry.previousConfig
 
   return (
@@ -68,7 +68,7 @@ function HistoryCard({
   )
 }
 
-export function ThemeHistoryPanel({ onRestore }: ThemeHistoryPanelProps) {
+export function ThemeHistoryPanel({ onRestore }: Readonly<ThemeHistoryPanelProps>) {
   const { data: history, isLoading } = useQuery({
     queryKey: ['settings', 'theme', 'history'],
     queryFn: () => settingsService.getThemeHistory(5),

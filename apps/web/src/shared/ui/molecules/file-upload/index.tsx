@@ -26,7 +26,7 @@ export function FileUpload({
   onUpload,
   onRemove,
   className,
-}: FileUploadProps) {
+}: Readonly<FileUploadProps>) {
   const {
     inputRef,
     isDragging,

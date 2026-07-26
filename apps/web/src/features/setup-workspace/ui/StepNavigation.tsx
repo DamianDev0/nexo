@@ -33,7 +33,7 @@ interface StepNavigationProps {
   readonly nav: WizardStepNav
 }
 
-export function StepNavigation({ data, actions, nav }: StepNavigationProps) {
+export function StepNavigation({ data, actions, nav }: Readonly<StepNavigationProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.navigation'
 

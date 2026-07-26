@@ -28,7 +28,7 @@ interface NavUserProps {
   }
 }
 
-export function NavUser({ user }: NavUserProps) {
+export function NavUser({ user }: Readonly<NavUserProps>) {
   const { isMobile } = useSidebar()
   const { mutate: logout } = useLogout()
 

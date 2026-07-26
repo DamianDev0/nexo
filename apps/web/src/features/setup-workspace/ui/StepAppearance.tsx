@@ -21,7 +21,7 @@ interface StepAppearanceProps {
   readonly nav: WizardStepNav
 }
 
-export function StepAppearance({ data, actions, nav }: StepAppearanceProps) {
+export function StepAppearance({ data, actions, nav }: Readonly<StepAppearanceProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.appearance'
 

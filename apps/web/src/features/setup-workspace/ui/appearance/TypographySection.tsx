@@ -30,7 +30,7 @@ interface TypographySectionProps {
   readonly actions: TypographyActions
 }
 
-export function TypographySection({ data, actions }: TypographySectionProps) {
+export function TypographySection({ data, actions }: Readonly<TypographySectionProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.appearance'
 

@@ -8,10 +8,10 @@ import type { ColorOption } from './types'
 export function PreviewColor({
   color,
   intensity,
-}: {
+}: Readonly<{
   readonly color: string
   readonly intensity: number
-}) {
+}>) {
   return (
     <div className="flex justify-center">
       <div className="relative size-10 overflow-hidden rounded-full border-3 border-white shadow-lg shadow-neutral-400/50 dark:border-white/80 dark:shadow-none">
@@ -30,11 +30,11 @@ export function ColorSwatches({
   colors,
   selectedColor,
   onSelect,
-}: {
+}: Readonly<{
   readonly colors: ReadonlyArray<ColorOption>
   readonly selectedColor: string
   readonly onSelect: (color: ColorOption) => void
-}) {
+}>) {
   return (
     <div className="flex flex-wrap justify-center gap-2">
       {colors.map((color) => (
@@ -60,10 +60,10 @@ export function ColorSwatches({
 export function GrainSlider({
   intensity,
   onChange,
-}: {
+}: Readonly<{
   readonly intensity: number
   readonly onChange: (v: number) => void
-}) {
+}>) {
   return (
     <div className="relative flex h-8 items-center">
       <svg className="h-5 w-full" viewBox="0 0 200 20">

@@ -29,7 +29,7 @@ export function ArcColorPicker({
   onGrainIntensityChange,
   colors = DEFAULT_COLORS,
   className,
-}: ArcColorPickerProps) {
+}: Readonly<ArcColorPickerProps>) {
   const {
     hue,
     opacity,

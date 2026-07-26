@@ -21,7 +21,7 @@ export function PreviewSidebar({
   productName,
   logoPreview,
   modules,
-}: PreviewSidebarProps) {
+}: Readonly<PreviewSidebarProps>) {
   return (
     <div
       className="flex w-40 shrink-0 flex-col border-r p-2.5"

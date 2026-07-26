@@ -9,7 +9,7 @@ interface OptionTileProps {
   readonly className?: string
 }
 
-export function OptionTile({ selected, onSelect, children, className }: OptionTileProps) {
+export function OptionTile({ selected, onSelect, children, className }: Readonly<OptionTileProps>) {
   return (
     <button
       type="button"

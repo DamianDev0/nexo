@@ -8,7 +8,7 @@ interface SidebarPreviewProps {
   readonly modules: ReadonlyArray<SidebarModule>
 }
 
-export function SidebarPreview({ modules }: SidebarPreviewProps) {
+export function SidebarPreview({ modules }: Readonly<SidebarPreviewProps>) {
   const enabledModules = modules.filter((m) => m.enabled)
 
   return (

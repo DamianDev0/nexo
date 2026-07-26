@@ -25,7 +25,7 @@ export function LoginForm({
   isPending,
   showPassword,
   onTogglePassword,
-}: LoginFormProps) {
+}: Readonly<LoginFormProps>) {
   const { t } = useTranslation()
 
   return (

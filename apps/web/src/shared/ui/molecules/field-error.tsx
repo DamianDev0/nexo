@@ -6,7 +6,7 @@ interface FieldErrorProps {
   readonly message?: string
 }
 
-export function FieldError({ message }: FieldErrorProps) {
+export function FieldError({ message }: Readonly<FieldErrorProps>) {
   return (
     <AnimatePresence>
       {message && (

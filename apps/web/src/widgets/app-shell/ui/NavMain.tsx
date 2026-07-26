@@ -18,7 +18,7 @@ interface NavMainProps {
   readonly items: ReadonlyArray<NavItem>
 }
 
-export function NavMain({ items }: NavMainProps) {
+export function NavMain({ items }: Readonly<NavMainProps>) {
   const { t } = useTranslation()
   const pathname = usePathname()
 

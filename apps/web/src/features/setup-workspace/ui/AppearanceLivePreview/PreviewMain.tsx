@@ -10,7 +10,7 @@ interface PreviewMainProps {
   readonly gap: string
 }
 
-export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
+export function PreviewMain({ colors, radius, gap }: Readonly<PreviewMainProps>) {
   return (
     <div
       className="flex flex-1 flex-col overflow-hidden p-3"

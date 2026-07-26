@@ -19,7 +19,7 @@ interface ThemeColorsSectionProps {
   readonly onColorOverride: (key: OverridableColorKey, v: string) => void
 }
 
-export function ThemeColorsSection({ colors, onColorOverride }: ThemeColorsSectionProps) {
+export function ThemeColorsSection({ colors, onColorOverride }: Readonly<ThemeColorsSectionProps>) {
   const { t } = useTranslation()
 
   return (

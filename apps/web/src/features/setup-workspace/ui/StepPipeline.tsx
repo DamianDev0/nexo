@@ -31,7 +31,7 @@ interface StepPipelineProps {
   readonly nav: WizardStepNav
 }
 
-export function StepPipeline({ data, actions, nav }: StepPipelineProps) {
+export function StepPipeline({ data, actions, nav }: Readonly<StepPipelineProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.pipeline'
 

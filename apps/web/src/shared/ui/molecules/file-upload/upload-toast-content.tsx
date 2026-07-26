@@ -6,7 +6,11 @@ interface UploadToastContentProps {
   readonly status: 'loading' | 'success'
 }
 
-export function UploadToastContent({ fileName, fileSize, status }: UploadToastContentProps) {
+export function UploadToastContent({
+  fileName,
+  fileSize,
+  status,
+}: Readonly<UploadToastContentProps>) {
   const isSuccess = status === 'success'
   const accentColor = isSuccess ? UPLOAD_ACCENT_SUCCESS : UPLOAD_ACCENT_ACTIVE
 
