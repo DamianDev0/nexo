@@ -1,10 +1,10 @@
-import { OrbNetwork } from './OrbNetwork'
+import { LoginOrb } from './LoginOrb'
 
 export function LoginBranding() {
   return (
-    <div className="relative z-3 flex h-full flex-col items-center justify-center gap-8 py-16 pl-32">
-      <div className="relative size-80 shrink-0 lg:size-105">
-        <OrbNetwork />
+    <div className="relative z-3 flex h-full flex-col items-center justify-center gap-10 py-16 pl-32">
+      <div className="translate-x-8 shrink-0">
+        <LoginOrb />
       </div>
       <div className="flex flex-col gap-2 text-center">
         <h2 className="text-3xl font-light text-foreground">

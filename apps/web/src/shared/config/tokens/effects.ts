@@ -15,22 +15,8 @@ export const NODE_DOT_STYLE = {
 } as const
 
 export const CONNECTOR_LINE_LIGHT = 'rgba(95,169,43,0.22)'
-export const CONNECTOR_LINE_DARK = 'rgba(165,233,111,0.18)'
-
 export const ORB_LABEL_LIGHT = 'rgba(30,33,21,0.45)'
-export const ORB_LABEL_DARK = 'rgba(242,244,240,0.45)'
-
 export const ORB_GRID_LIGHT = '#DFE4DB'
-export const ORB_GRID_DARK = '#2A2D27'
-
-export const ORB_LINK_STROKE = 'rgba(160,212,48,0.35)'
-
-export const NODE_GRADIENT_STOPS = [
-  { offset: '0%', color: '#F7FFE8' },
-  { offset: '55%', color: '#C6E97A' },
-  { offset: '100%', color: '#8FC430' },
-] as const
-
 export const ONBOARDING_GLOW_LIGHT =
   'radial-gradient(circle, rgba(111,203,58,0.10) 0%, transparent 70%)'
 export const ONBOARDING_GLOW_DARK =
