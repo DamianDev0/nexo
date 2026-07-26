@@ -49,7 +49,9 @@ Real shippable product today: **~25%**. The backend ran ahead of the frontend an
 - [x] Multi-agent audit + adversarial verification.
 - [x] Green test baseline confirmed.
 - [x] Security P0: Google OAuth OWNER bug, invite privilege escalation, webhooks SSRF + secret/`schemaName` leak — fixed, 374 tests green.
-- [ ] Isolation-test sweep on 15 modules (turns on the P0 merge gate) — `test-author` fan-out.
+- [x] **e2e harness repaired** — was fully broken (uuid ESM, missing AWS env, supertest import, outdated auth flow, stale tenant cache). Built `test/helpers/e2e.ts`; `tenant-isolation` + `tenant-match` specs green (5/5) with real cross-tenant 404. Unblocks all integration/e2e testing.
+- [ ] Isolation-test sweep on remaining 15 modules using the helper (turns on the P0 merge gate) — `test-author` fan-out.
+- [ ] Fix `migrate-all-tenants` TypeORM CLI (broken under pnpm) + supply full e2e env to CI's `e2e` job.
 - [ ] DTO validation sweep (7 controllers with inline-object bodies).
 - [ ] Money fixes: deals float-vs-int cents, products bind-param bug, kanban float coercion.
 - [ ] Coverage ≥ 70% global, ≥ 95% in `packages/shared-utils`.

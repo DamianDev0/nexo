@@ -76,6 +76,22 @@ class EnvironmentVariables {
 
   @IsString()
   EMAIL_FROM: string
+
+  // ─── AWS S3 ────────────────────────────────────────────────────────────────
+  // Required by S3Service at construction (getOrThrow). Validated here so a
+  // missing value fails fast at startup instead of at first DI resolution.
+
+  @IsString()
+  AWS_REGION: string
+
+  @IsString()
+  AWS_ACCESS_KEY_ID: string
+
+  @IsString()
+  AWS_SECRET_ACCESS_KEY: string
+
+  @IsString()
+  AWS_S3_BUCKET: string
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {

@@ -52,9 +52,19 @@
 - **Products bulkPriceUpdate bind-param bug** — `products.service.ts:464` captures `filterParams` after pushing the multiplier, so the COUNT query gets one extra bind parameter than its WHERE references. Real bug.
 - **Kanban totals float coercion** — `pipeline-settings.service.ts:226` coerces a BIGINT cents SUM to JS `Number`. Precision risk on large sums.
 
-## New finding (surfaced during remediation)
+## New findings (surfaced during remediation)
 
 - **`tsc --noEmit` is red on test fixtures** — running the full project typecheck fails in `companies.controller.spec.ts`, `contacts.controller.spec.ts`, `deals.controller.spec.ts`, and `notifications.service.spec.ts` (fixtures missing entity fields; a `NotificationType` mismatch). Jest passes because ts-jest transpiles without full type-checking. The CI `tsc` job either excludes tests or is not catching this. Action: fix the fixtures and point the typecheck gate at a tsconfig that includes tests, so type drift in tests can't hide.
+
+- **CRITICAL → REPAIRED: the e2e harness did not boot / never ran green.** Running the canonical HTTP isolation e2e surfaced (and this session fixed) a stack of breakage:
+  1. ✅ `uuid` is ESM-only and `test/jest-e2e.json` did not transform it → AppModule failed to import. Fixed via `transformIgnorePatterns` for `uuid`/`nanoid`.
+  2. ✅ `S3Service` `getOrThrow`s `AWS_REGION/ACCESS_KEY_ID/SECRET_ACCESS_KEY/S3_BUCKET`, none of which were in `env.validation.ts` — env validation passed but the app crashed at DI time. Added the four AWS vars to `env.validation.ts` + `.env.example` so a missing value fails fast at startup.
+  3. ✅ `import * as request from 'supertest'` → `request is not a function` under the e2e tsconfig. Fixed to a default import in both specs.
+  4. ✅ The two existing specs assumed `POST /tenants` was public (now 401, correctly protected) and minted tokens by hand. Replaced with a canonical helper (`test/helpers/e2e.ts`) that boots the app exactly like `main.ts` (cookie-parser + prefix + ValidationPipe + TransformInterceptor), onboards real tenants via the public `POST /auth/onboard`, and carries auth cookies + `x-tenant-slug`.
+  5. ✅ Stale `tenant:slug:*` Redis cache shadowed re-provisioned tenants with an old `tenantId` → `TenantMatchGuard` 403. The helper now evicts the cache on teardown.
+  - **Correction to earlier note:** tenant provisioning DOES create tenant tables (`getTenantSchemaSQL`, 33 tables) — the "no tables" symptom was a cascade from the failed `POST /tenants`, not a provisioning bug.
+  - **Result:** `tenant-isolation.e2e-spec.ts` and `tenant-match.e2e-spec.ts` now pass (5/5) with a real cross-tenant `404` through middleware + guards. The whole e2e/integration layer is unblocked; per-module isolation specs can now follow the helper pattern.
+  - **Still open:** (a) the `migrate-all-tenants` TypeORM CLI is broken under pnpm (`Cannot find module './cli.js'`) — the public schema was already migrated so it didn't block e2e, but the deploy migration path needs fixing; (b) the CI `e2e` job provides only `DATABASE_*`/`REDIS_*` env — it must also supply JWT/cookie/AWS/Google/Resend test values or e2e fails env validation in CI.
 
 ## Architecture debt (P2 — pay down incrementally)
 

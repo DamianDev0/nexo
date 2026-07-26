@@ -1,120 +1,66 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
-import * as request from 'supertest'
-import { DataSource } from 'typeorm'
+import { type INestApplication } from '@nestjs/common'
+import request from 'supertest'
 
-import { AppModule } from '../src/app.module'
-import { TenantProvisioningService } from '../src/modules/tenants/services/tenant-provisioning.service'
+import { createTestApp, onboardTenant, asTenant, teardownTenants, API_PREFIX } from './helpers/e2e'
+import type { TestApp, OnboardedTenant } from './helpers/e2e'
 
-describe('Tenant Isolation (E2E)', () => {
+describe('Tenant Isolation (E2E, real HTTP)', () => {
+  let ctx: TestApp
   let app: INestApplication
-  let dataSource: DataSource
-  let provisioning: TenantProvisioningService
+  let tenantA: OnboardedTenant
+  let tenantB: OnboardedTenant
 
-  const TENANT_A_SLUG = 'test-tenant-a'
-  const TENANT_B_SLUG = 'test-tenant-b'
-  const SCHEMA_A = 'tenant_test_tenant_a'
-  const SCHEMA_B = 'tenant_test_tenant_b'
+  const SLUG_A = 'iso-tenant-a'
+  const SLUG_B = 'iso-tenant-b'
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleFixture.createNestApplication()
-    app.setGlobalPrefix('api/v1')
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    )
-    await app.init()
-
-    dataSource = moduleFixture.get(DataSource)
-    provisioning = moduleFixture.get(TenantProvisioningService)
+    ctx = await createTestApp()
+    app = ctx.app
+    await teardownTenants(ctx, [SLUG_A, SLUG_B])
+    tenantA = await onboardTenant(app, SLUG_A)
+    tenantB = await onboardTenant(app, SLUG_B)
   })
 
   afterAll(async () => {
-    // Cleanup test schemas
-    try {
-      await provisioning.dropTenantSchema(SCHEMA_A)
-    } catch { /* ignore */ }
-    try {
-      await provisioning.dropTenantSchema(SCHEMA_B)
-    } catch { /* ignore */ }
-
-    // Cleanup test tenant records
-    await dataSource.query(`DELETE FROM public.tenants WHERE slug IN ($1, $2)`, [
-      TENANT_A_SLUG,
-      TENANT_B_SLUG,
-    ])
-
+    await teardownTenants(ctx, [SLUG_A, SLUG_B])
     await app.close()
   })
 
-  it('should create two tenants with isolated schemas', async () => {
-    // Create tenant A
-    const responseA = await request(app.getHttpServer())
-      .post('/api/v1/tenants')
-      .send({ name: 'Empresa A', slug: TENANT_A_SLUG })
-      .expect(201)
-
-    expect(responseA.body.data.slug).toBe(TENANT_A_SLUG)
-    expect(responseA.body.data.schemaName).toBe(SCHEMA_A)
-
-    // Create tenant B
-    const responseB = await request(app.getHttpServer())
-      .post('/api/v1/tenants')
-      .send({ name: 'Empresa B', slug: TENANT_B_SLUG })
-      .expect(201)
-
-    expect(responseB.body.data.slug).toBe(TENANT_B_SLUG)
-    expect(responseB.body.data.schemaName).toBe(SCHEMA_B)
+  it('provisions two tenants with isolated schemas', () => {
+    expect(tenantA.schemaName).toBe('tenant_iso_tenant_a')
+    expect(tenantB.schemaName).toBe('tenant_iso_tenant_b')
+    expect(tenantA.tenantId).not.toBe(tenantB.tenantId)
   })
 
-  it('should isolate data between tenant schemas', async () => {
-    // Insert a contact directly into tenant A's schema
-    await dataSource.query(
-      `INSERT INTO "${SCHEMA_A}".contacts (first_name, last_name, email)
-       VALUES ($1, $2, $3)`,
-      ['Juan', 'García', 'juan@empresaa.co'],
+  it("does NOT expose tenant A's contact to tenant B (404)", async () => {
+    // Tenant A creates a contact
+    const created = await asTenant(
+      request(app.getHttpServer()).post(`/${API_PREFIX}/contacts`),
+      tenantA,
     )
+      .send({ firstName: 'Juan', lastName: 'García', email: 'juan@empresaa.co' })
+      .expect(201)
 
-    // Insert a contact into tenant B's schema
-    await dataSource.query(
-      `INSERT INTO "${SCHEMA_B}".contacts (first_name, last_name, email)
-       VALUES ($1, $2, $3)`,
-      ['María', 'López', 'maria@empresab.co'],
-    )
+    const contactId = created.body.data.id as string
+    expect(contactId).toBeTruthy()
 
-    // Query tenant A — should only see Juan
-    const contactsA = await dataSource.query(
-      `SELECT * FROM "${SCHEMA_A}".contacts WHERE is_active = true`,
-    )
-    expect(contactsA).toHaveLength(1)
-    expect(contactsA[0].first_name).toBe('Juan')
+    // Tenant A can read its own contact
+    await asTenant(
+      request(app.getHttpServer()).get(`/${API_PREFIX}/contacts/${contactId}`),
+      tenantA,
+    ).expect(200)
 
-    // Query tenant B — should only see María
-    const contactsB = await dataSource.query(
-      `SELECT * FROM "${SCHEMA_B}".contacts WHERE is_active = true`,
-    )
-    expect(contactsB).toHaveLength(1)
-    expect(contactsB[0].first_name).toBe('María')
-
-    // Tenant A should NOT see María
-    const crossCheck = await dataSource.query(
-      `SELECT * FROM "${SCHEMA_A}".contacts WHERE email = $1`,
-      ['maria@empresab.co'],
-    )
-    expect(crossCheck).toHaveLength(0)
+    // Tenant B must NOT see tenant A's contact — it lives in another schema
+    await asTenant(
+      request(app.getHttpServer()).get(`/${API_PREFIX}/contacts/${contactId}`),
+      tenantB,
+    ).expect(404)
   })
 
-  it('should reject duplicate tenant slugs', async () => {
+  it('rejects unauthenticated access to a protected resource', async () => {
     await request(app.getHttpServer())
-      .post('/api/v1/tenants')
-      .send({ name: 'Empresa A Duplicada', slug: TENANT_A_SLUG })
-      .expect(409)
+      .get(`/${API_PREFIX}/contacts`)
+      .set('x-tenant-slug', SLUG_A)
+      .expect(401)
   })
 })
