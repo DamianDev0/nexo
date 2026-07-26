@@ -1,24 +1,29 @@
-export type WebhookEvent =
-  | 'contact.created'
-  | 'contact.updated'
-  | 'contact.deleted'
-  | 'company.created'
-  | 'company.updated'
-  | 'company.deleted'
-  | 'deal.created'
-  | 'deal.updated'
-  | 'deal.won'
-  | 'deal.lost'
-  | 'deal.stage_changed'
-  | 'activity.created'
-  | 'activity.completed'
-  | 'invoice.created'
-  | 'invoice.approved'
-  | 'invoice.paid'
-  | 'payment.received'
-  | 'payment.failed'
-  | 'product.created'
-  | 'product.updated'
+import type { DomainEvent } from './events'
+
+export const WEBHOOK_EVENTS = [
+  'contact.created',
+  'contact.updated',
+  'contact.deleted',
+  'company.created',
+  'company.updated',
+  'company.deleted',
+  'deal.created',
+  'deal.updated',
+  'deal.won',
+  'deal.lost',
+  'deal.stage_changed',
+  'activity.created',
+  'activity.completed',
+  'invoice.created',
+  'invoice.approved',
+  'invoice.paid',
+  'payment.received',
+  'payment.failed',
+  'product.created',
+  'product.updated',
+] as const satisfies readonly DomainEvent[]
+
+export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number]
 
 export type Webhook = {
   id: string

@@ -1,4 +1,4 @@
-import type { UserRole } from './enums'
+import type { PlanName, UserRole } from './enums'
 
 export interface JwtPayload {
   sub: string
@@ -38,7 +38,7 @@ export type OnboardingRequest = {
   ownerEmail: string
   ownerPassword: string
   ownerFullName: string
-  planName?: string
+  planName?: PlanName
 }
 
 export type LoginResponse = {
@@ -52,6 +52,6 @@ export type OnboardingResponse = {
     slug: string
     name: string
     schemaName: string
-    plan: string
+    plan: PlanName
   }
 }

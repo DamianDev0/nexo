@@ -1,3 +1,5 @@
+import type { IndustrySector, PlanName, TaxRegime, UserRole } from './enums'
+
 export type ThemeColors = {
   primary: string
   primaryForeground: string
@@ -245,10 +247,10 @@ export type GeneralSettings = {
   id: string
   name: string
   slug: string
-  plan: string
+  plan: PlanName
   business: {
     nit?: string
-    taxRegime?: string
+    taxRegime?: TaxRegime
     phone?: string
     email?: string
     website?: string
@@ -263,7 +265,7 @@ export type GeneralSettings = {
   }
   billing: Record<string, unknown>
   industry: {
-    sector?: string
+    sector?: IndustrySector
     nomenclature?: Record<string, string>
     iconPack?: string
   }
@@ -294,7 +296,7 @@ export type ThemeHistoryEntry = {
 
 export type InviteUserRequest = {
   email: string
-  role: string
+  role: UserRole
 }
 
 export type InviteUserResponse = {

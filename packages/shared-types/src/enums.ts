@@ -199,3 +199,22 @@ export enum PaymentStatus {
   VOIDED = 'voided',
   REFUNDED = 'refunded',
 }
+
+export enum PlanName {
+  FREE = 'free',
+  STARTER = 'starter',
+  PRO = 'pro',
+  BUSINESS = 'business',
+}
+
+export enum IndustrySector {
+  SALUD = 'salud',
+  EDUCACION = 'educacion',
+  INMOBILIARIA = 'inmobiliaria',
+  COMERCIO = 'comercio',
+  SERVICIOS = 'servicios',
+  RESTAURANTE = 'restaurante',
+  TECNOLOGIA = 'tecnologia',
+  CONSTRUCCION = 'construccion',
+  OTROS = 'otros',
+}
