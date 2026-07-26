@@ -5,13 +5,15 @@ import { useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { QUERY_KEYS } from '@/shared/config/query-keys'
 
 import { derivePalette } from '../model/palette.utils'
 
+import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
 import type { ColorOverrides, OverridableColorKey, ThemeMode } from './appearance.types'
-import type { TenantTheme, ThemeTypography } from '@repo/shared-types'
+import type { TenantTheme, ThemeConfig, ThemeTypography } from '@repo/shared-types'
 
 interface AppearanceFormValues {
   primaryColor: string
@@ -48,6 +50,29 @@ export function useStepAppearance(onNext: () => void) {
     defaultValues: DEFAULT_VALUES,
   })
   const values = watch()
+
+  useStepHydration({
+    queryKey: QUERY_KEYS.settings.theme,
+    queryFn: settingsService.getTheme,
+    hydrate: useCallback(
+      (theme: ThemeConfig) => {
+        const { primary, primaryForeground: _pf, ...overrides } = theme.colors ?? {}
+        reset({
+          ...DEFAULT_VALUES,
+          primaryColor: primary ?? DEFAULT_VALUES.primaryColor,
+          colorOverrides: theme.colors ? (overrides as ColorOverrides) : {},
+          fontFamily: theme.typography?.fontFamily ?? DEFAULT_VALUES.fontFamily,
+          borderRadius: theme.typography?.borderRadius ?? DEFAULT_VALUES.borderRadius,
+          density: theme.typography?.density ?? DEFAULT_VALUES.density,
+          darkMode: theme.darkModeDefault ?? DEFAULT_VALUES.darkMode,
+          productName: theme.branding?.companyName ?? '',
+          tagline: theme.branding?.loginTagline ?? '',
+          logoUrl: theme.branding?.logoUrl ?? null,
+        })
+      },
+      [reset],
+    ),
+  })
 
   const colors = useMemo(
     () => derivePalette(values.primaryColor, values.colorOverrides),

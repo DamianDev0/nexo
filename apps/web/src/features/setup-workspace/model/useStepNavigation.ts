@@ -2,21 +2,35 @@ import { useCallback } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { QUERY_KEYS } from '@/shared/config/query-keys'
 
 import { DEFAULT_MODULES } from './navigation.constants'
+import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
-import type { SidebarModule } from '@repo/shared-types'
+import type { SidebarConfig, SidebarModule } from '@repo/shared-types'
 
 interface NavigationFormValues {
   modules: SidebarModule[]
 }
 
 export function useStepNavigation(onNext: () => void) {
-  const { control, watch, getValues } = useForm<NavigationFormValues>({
+  const { control, watch, getValues, reset } = useForm<NavigationFormValues>({
     defaultValues: { modules: [...DEFAULT_MODULES] },
   })
   const { fields, move, update } = useFieldArray({ control, name: 'modules' })
+
+  useStepHydration({
+    queryKey: QUERY_KEYS.settings.navigation,
+    queryFn: settingsService.getNavigation,
+    hydrate: useCallback(
+      (config: SidebarConfig) => {
+        if (config.modules.length === 0) return
+        reset({ modules: [...config.modules].sort((a, b) => a.order - b.order) })
+      },
+      [reset],
+    ),
+  })
   const watchedModules = watch('modules')
 
   const modules = fields.map((field, index) => watchedModules[index] ?? field)

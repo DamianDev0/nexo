@@ -1,11 +1,15 @@
 import { STAGE_COLOR_OPTIONS } from '@repo/shared-utils'
 import { t } from 'i18next'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { QUERY_KEYS } from '@/shared/config/query-keys'
 
+import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
+
+import type { Pipeline } from '@repo/shared-types'
 
 interface Stage {
   name: string
@@ -35,10 +39,37 @@ function newStage(): Stage {
 }
 
 export function useStepPipeline(onNext: () => void) {
-  const { control, watch, setValue, getValues } = useForm<PipelineFormValues>({
+  const {
+    control,
+    watch,
+    setValue,
+    getValues,
+    reset,
+    formState: { isDirty },
+  } = useForm<PipelineFormValues>({
     defaultValues: DEFAULT_VALUES,
   })
   const { fields, append, remove, update } = useFieldArray({ control, name: 'stages' })
+  const existingPipelineId = useRef<string | null>(null)
+
+  useStepHydration({
+    queryKey: QUERY_KEYS.settings.pipelines,
+    queryFn: settingsService.getPipelines,
+    hydrate: useCallback(
+      (pipelines: Pipeline[]) => {
+        const existing = pipelines.find((p) => p.isDefault) ?? pipelines[0]
+        if (!existing) return
+        existingPipelineId.current = existing.id
+        reset({
+          pipelineName: existing.name,
+          stages: [...existing.stages]
+            .sort((a, b) => a.position - b.position)
+            .map(({ name, color, probability }) => ({ name, color, probability })),
+        })
+      },
+      [reset],
+    ),
+  })
   const watchedStages = watch('stages')
 
   const stages = fields.map((field, index) => ({
@@ -68,7 +99,8 @@ export function useStepPipeline(onNext: () => void) {
   )
 
   const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
+      if (existingPipelineId.current && !isDirty) return null
       const form = getValues()
       return settingsService.createPipeline({
         name: form.pipelineName,
