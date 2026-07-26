@@ -38,8 +38,6 @@ export class UsersService {
     private readonly userTenantMap: UserTenantMapService,
   ) {}
 
-  // ─── Send invitation ───────────────────────────────────────────────────────
-
   async invite(
     dto: InviteUserDto,
     tenantCtx: TenantContext,
@@ -61,7 +59,6 @@ export class UsersService {
       throw new ConflictException(`A user with email ${dto.email} already exists in this account`)
     }
 
-    // Replace any previous pending invite for the same email (re-invite flow)
     await this.invitationRepo.deleteByEmail(schemaName, dto.email)
 
     const rawToken = this.token.generateRefreshToken()
@@ -95,8 +92,6 @@ export class UsersService {
 
     return { inviteToken: rawToken, email: dto.email, expiresAt: expiresAt.toISOString() }
   }
-
-  // ─── Accept invitation ─────────────────────────────────────────────────────
 
   async acceptInvite(
     dto: AcceptInviteDto,

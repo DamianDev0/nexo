@@ -4,14 +4,14 @@ import request from 'supertest'
 import { createTestApp, onboardTenant, asTenant, teardownTenants, API_PREFIX } from './helpers/e2e'
 import type { TestApp, OnboardedTenant } from './helpers/e2e'
 
-describe('Tenant Isolation (E2E, real HTTP)', () => {
+describe('Message Templates Tenant Isolation (E2E, real HTTP)', () => {
   let ctx: TestApp
   let app: INestApplication
   let tenantA: OnboardedTenant
   let tenantB: OnboardedTenant
 
-  const SLUG_A = 'iso-tenant-a'
-  const SLUG_B = 'iso-tenant-b'
+  const SLUG_A = 'iso-message-templates-a'
+  const SLUG_B = 'iso-message-templates-b'
 
   beforeAll(async () => {
     ctx = await createTestApp()
@@ -27,36 +27,41 @@ describe('Tenant Isolation (E2E, real HTTP)', () => {
   })
 
   it('provisions two tenants with isolated schemas', () => {
-    expect(tenantA.schemaName).toBe('tenant_iso_tenant_a')
-    expect(tenantB.schemaName).toBe('tenant_iso_tenant_b')
+    expect(tenantA.schemaName).toBe('tenant_iso_message_templates_a')
+    expect(tenantB.schemaName).toBe('tenant_iso_message_templates_b')
     expect(tenantA.tenantId).not.toBe(tenantB.tenantId)
   })
 
-  it("does NOT expose tenant A's contact to tenant B (404)", async () => {
+  it("does NOT expose tenant A's message template to tenant B (404)", async () => {
     const created = await asTenant(
-      request(app.getHttpServer()).post(`/${API_PREFIX}/contacts`),
+      request(app.getHttpServer()).post(`/${API_PREFIX}/message-templates`),
       tenantA,
     )
-      .send({ firstName: 'Juan', lastName: 'García', email: 'juan@empresaa.co' })
+      .send({
+        name: 'Welcome Email',
+        channel: 'email',
+        subject: 'Hola {{name}}',
+        body: 'Bienvenido {{name}} a nuestra empresa.',
+      })
       .expect(201)
 
-    const contactId = created.body.data.id as string
-    expect(contactId).toBeTruthy()
+    const templateId = created.body.data.id as string
+    expect(templateId).toBeTruthy()
 
     await asTenant(
-      request(app.getHttpServer()).get(`/${API_PREFIX}/contacts/${contactId}`),
+      request(app.getHttpServer()).get(`/${API_PREFIX}/message-templates/${templateId}`),
       tenantA,
     ).expect(200)
 
     await asTenant(
-      request(app.getHttpServer()).get(`/${API_PREFIX}/contacts/${contactId}`),
+      request(app.getHttpServer()).get(`/${API_PREFIX}/message-templates/${templateId}`),
       tenantB,
     ).expect(404)
   })
 
   it('rejects unauthenticated access to a protected resource', async () => {
     await request(app.getHttpServer())
-      .get(`/${API_PREFIX}/contacts`)
+      .get(`/${API_PREFIX}/message-templates`)
       .set('x-tenant-slug', SLUG_A)
       .expect(401)
   })

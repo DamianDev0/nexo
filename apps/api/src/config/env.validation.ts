@@ -15,8 +15,6 @@ class EnvironmentVariables {
   @Min(1)
   PORT: number
 
-  // ─── Database ──────────────────────────────────────────────────────────────
-
   @IsString()
   DATABASE_HOST: string
 
@@ -33,8 +31,6 @@ class EnvironmentVariables {
   @IsString()
   DATABASE_NAME: string
 
-  // ─── Redis ─────────────────────────────────────────────────────────────────
-
   @IsString()
   REDIS_HOST: string
 
@@ -42,23 +38,17 @@ class EnvironmentVariables {
   @Min(1)
   REDIS_PORT: number
 
-  // ─── JWT ───────────────────────────────────────────────────────────────────
-
   @IsString()
   JWT_PRIVATE_KEY: string
 
   @IsString()
   JWT_PUBLIC_KEY: string
 
-  // ─── App ───────────────────────────────────────────────────────────────────
-
   @IsString()
   COOKIE_SECRET: string
 
   @IsUrl({ require_tld: false })
   FRONTEND_URL: string
-
-  // ─── Google OAuth ──────────────────────────────────────────────────────────
 
   @IsString()
   GOOGLE_CLIENT_ID: string
@@ -69,17 +59,11 @@ class EnvironmentVariables {
   @IsUrl({ require_tld: false })
   GOOGLE_CALLBACK_URL: string
 
-  // ─── Email (Resend) ────────────────────────────────────────────────────────
-
   @IsString()
   RESEND_API_KEY: string
 
   @IsString()
   EMAIL_FROM: string
-
-  // ─── AWS S3 ────────────────────────────────────────────────────────────────
-  // Required by S3Service at construction (getOrThrow). Validated here so a
-  // missing value fails fast at startup instead of at first DI resolution.
 
   @IsString()
   AWS_REGION: string

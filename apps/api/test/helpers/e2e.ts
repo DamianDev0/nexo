@@ -19,11 +19,6 @@ export interface TestApp {
   cache: CacheService
 }
 
-/**
- * Boots the real AppModule the same way main.ts does (cookie parser, global
- * prefix, validation pipe) so that cookie-based auth and the tenant middleware
- * behave exactly as in production.
- */
 export async function createTestApp(): Promise<TestApp> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile()
 
@@ -52,11 +47,6 @@ export interface OnboardedTenant {
   cookies: string[]
 }
 
-/**
- * Creates a fresh tenant + owner through the public onboarding endpoint and
- * returns the auth cookies. This is the canonical way to obtain an authenticated
- * session in e2e tests — never mint tokens by hand.
- */
 export async function onboardTenant(app: INestApplication, slug: string): Promise<OnboardedTenant> {
   const email = `owner@${slug}.co`
   const res = await request(app.getHttpServer())
@@ -81,7 +71,6 @@ export async function onboardTenant(app: INestApplication, slug: string): Promis
   }
 }
 
-/** Attaches the tenant's auth cookies and the x-tenant-slug header (honored in non-prod). */
 export function asTenant(
   req: request.Test,
   tenant: Pick<OnboardedTenant, 'cookies' | 'slug'>,
@@ -89,19 +78,13 @@ export function asTenant(
   return req.set('Cookie', tenant.cookies).set('x-tenant-slug', tenant.slug)
 }
 
-/** Best-effort teardown: drop test schemas and delete their tenant rows. */
 export async function teardownTenants(
   { dataSource, provisioning, cache }: TestApp,
   slugs: string[],
 ): Promise<void> {
   for (const slug of slugs) {
     const schema = `tenant_${slug.replace(/-/g, '_')}`
-    try {
-      await provisioning.dropTenantSchema(schema)
-    } catch {
-      /* ignore */
-    }
-    // Evict stale slug→tenant cache so a re-provisioned tenant isn't shadowed by an old id.
+    await provisioning.dropTenantSchema(schema).catch(() => undefined)
     await cache.del(`tenant:slug:${slug}`)
   }
   await dataSource.query(`DELETE FROM public.tenants WHERE slug = ANY($1::text[])`, [slugs])

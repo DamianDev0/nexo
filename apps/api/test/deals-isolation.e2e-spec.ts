@@ -4,14 +4,14 @@ import request from 'supertest'
 import { createTestApp, onboardTenant, asTenant, teardownTenants, API_PREFIX } from './helpers/e2e'
 import type { TestApp, OnboardedTenant } from './helpers/e2e'
 
-describe('Tenant Isolation (E2E, real HTTP)', () => {
+describe('Deals Tenant Isolation (E2E, real HTTP)', () => {
   let ctx: TestApp
   let app: INestApplication
   let tenantA: OnboardedTenant
   let tenantB: OnboardedTenant
 
-  const SLUG_A = 'iso-tenant-a'
-  const SLUG_B = 'iso-tenant-b'
+  const SLUG_A = 'iso-deals-a'
+  const SLUG_B = 'iso-deals-b'
 
   beforeAll(async () => {
     ctx = await createTestApp()
@@ -27,36 +27,36 @@ describe('Tenant Isolation (E2E, real HTTP)', () => {
   })
 
   it('provisions two tenants with isolated schemas', () => {
-    expect(tenantA.schemaName).toBe('tenant_iso_tenant_a')
-    expect(tenantB.schemaName).toBe('tenant_iso_tenant_b')
+    expect(tenantA.schemaName).toBe('tenant_iso_deals_a')
+    expect(tenantB.schemaName).toBe('tenant_iso_deals_b')
     expect(tenantA.tenantId).not.toBe(tenantB.tenantId)
   })
 
-  it("does NOT expose tenant A's contact to tenant B (404)", async () => {
+  it("does NOT expose tenant A's deal to tenant B (404)", async () => {
     const created = await asTenant(
-      request(app.getHttpServer()).post(`/${API_PREFIX}/contacts`),
+      request(app.getHttpServer()).post(`/${API_PREFIX}/deals`),
       tenantA,
     )
-      .send({ firstName: 'Juan', lastName: 'García', email: 'juan@empresaa.co' })
+      .send({ title: 'Acme expansion', valueCents: 500000 })
       .expect(201)
 
-    const contactId = created.body.data.id as string
-    expect(contactId).toBeTruthy()
+    const dealId = created.body.data.id as string
+    expect(dealId).toBeTruthy()
 
     await asTenant(
-      request(app.getHttpServer()).get(`/${API_PREFIX}/contacts/${contactId}`),
+      request(app.getHttpServer()).get(`/${API_PREFIX}/deals/${dealId}`),
       tenantA,
     ).expect(200)
 
     await asTenant(
-      request(app.getHttpServer()).get(`/${API_PREFIX}/contacts/${contactId}`),
+      request(app.getHttpServer()).get(`/${API_PREFIX}/deals/${dealId}`),
       tenantB,
     ).expect(404)
   })
 
-  it('rejects unauthenticated access to a protected resource', async () => {
+  it('rejects unauthenticated access to the deals list', async () => {
     await request(app.getHttpServer())
-      .get(`/${API_PREFIX}/contacts`)
+      .get(`/${API_PREFIX}/deals`)
       .set('x-tenant-slug', SLUG_A)
       .expect(401)
   })
