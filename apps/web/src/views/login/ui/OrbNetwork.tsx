@@ -4,10 +4,7 @@ import { motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 
 import {
-  ORB_GRADIENT,
-  ORB_SHADOW,
-  ORB_SPECULAR,
-  ORB_RIM_LIGHT,
+  SIRI_ORB,
   CONNECTOR_LINE_LIGHT,
   CONNECTOR_LINE_DARK,
   ORB_LABEL_DARK,
@@ -17,6 +14,7 @@ import {
   ORB_LINK_STROKE,
   NODE_GRADIENT_STOPS,
 } from '@/shared/config/tokens/effects'
+import { SiriOrb } from '@/shared/ui/atoms/siri-orb'
 
 const CENTER = { x: 50, y: 50 } as const
 
@@ -112,20 +110,12 @@ export function OrbNetwork() {
       </svg>
 
       <motion.div
-        className="absolute z-2 size-40 rounded-full lg:size-48"
+        className="absolute z-2"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' as const }}
-        style={{ background: ORB_GRADIENT, boxShadow: ORB_SHADOW }}
       >
-        <div
-          className="pointer-events-none absolute left-[18%] top-[13%] h-[28%] w-[40%] rounded-full"
-          style={{ background: ORB_SPECULAR }}
-        />
-        <div
-          className="pointer-events-none absolute bottom-[12%] left-[30%] h-[8%] w-[40%] rounded-full"
-          style={{ background: ORB_RIM_LIGHT, filter: 'blur(4px)' }}
-        />
+        <SiriOrb size={192} colors={isDark ? SIRI_ORB.dark : SIRI_ORB.light} />
       </motion.div>
     </div>
   )

@@ -8,16 +8,6 @@ export const PANEL_GLOW_LIGHT =
 export const PANEL_GLOW_DARK =
   'radial-gradient(ellipse 100% 70% at 50% 50%, rgba(165,233,111,0.06) 0%, transparent 70%)'
 
-export const ORB_GRADIENT =
-  'radial-gradient(circle at 36% 32%, #EFFFD8 0%, #A5E96F 36%, #6FCB3A 65%, #3F8C1C 84%, #22590F 100%)'
-
-export const ORB_SHADOW =
-  '0 28px 72px rgba(45,110,20,0.42), 0 8px 28px rgba(111,203,58,0.22), inset 0 -14px 38px rgba(0,0,0,0.22), inset 6px 6px 22px rgba(230,255,200,0.13)'
-
-export const ORB_SPECULAR = 'radial-gradient(ellipse, rgba(253,255,240,0.55) 0%, transparent 80%)'
-
-export const ORB_RIM_LIGHT = 'radial-gradient(ellipse, rgba(200,255,150,0.25) 0%, transparent 80%)'
-
 export const NODE_DOT_STYLE = {
   background: 'radial-gradient(circle at 38% 35%, #F7FFE8, #C6E97A 55%, #8FC430)',
   boxShadow: '0 2px 14px rgba(120,200,0,0.25), inset 0 1px 3px rgba(245,255,224,0.65)',
@@ -74,4 +64,9 @@ export const MESH_BLOOM = {
   blobC: '#F2FFDA',
   dotInk: 'rgba(14,15,12,0.16)',
   dotInkDark: 'rgba(255,255,255,0.12)',
+} as const
+
+export const SIRI_ORB = {
+  light: { bg: '#DFF3C6', c1: '#6FCB3A', c2: '#5BC4AC', c3: '#A5E96F' },
+  dark: { bg: '#1E2A16', c1: '#A5E96F', c2: '#7FD6C2', c3: '#F2FFDA' },
 } as const
