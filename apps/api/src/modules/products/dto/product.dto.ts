@@ -143,8 +143,6 @@ export class ProductQueryDto {
   limit?: number
 }
 
-// ─── Execute import (step 2) ─────────────────────────────────────────────────
-
 export class ExecuteImportDto {
   @IsString()
   @IsNotEmpty()
@@ -157,8 +155,6 @@ export class ExecuteImportDto {
   @IsIn(['skip', 'create', 'update'])
   duplicateStrategy?: string
 }
-
-// ─── Bulk price update ───────────────────────────────────────────────────────
 
 export class BulkPriceUpdateDto {
   @IsOptional()
@@ -177,8 +173,6 @@ export class BulkPriceUpdateDto {
   @Type(() => Number)
   percentChange: number
 }
-
-// ─── Inventory adjustment ────────────────────────────────────────────────────
 
 export class InventoryAdjustmentDto {
   @IsInt()

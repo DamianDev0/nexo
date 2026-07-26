@@ -115,7 +115,6 @@ export class CreateContactDto {
   customFields?: Record<string, unknown>
 }
 
-// All fields optional — inherits all validators from CreateContactDto via PartialType
 export class UpdateContactDto extends PartialType(CreateContactDto) {}
 
 export class ContactQueryDto {

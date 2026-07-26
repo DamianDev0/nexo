@@ -1,11 +1,9 @@
-// ─── Pipeline types ───────────────────────────────────────────────────────────
-
 export type PipelineStage = {
   id: string
   pipelineId: string
   name: string
   color: string
-  probability: number // 0–100
+  probability: number
   position: number
 }
 
@@ -19,8 +17,6 @@ export type Pipeline = {
 export type PipelineListItem = Omit<Pipeline, 'stages'> & {
   stageCount: number
 }
-
-// ─── Kanban board view ────────────────────────────────────────────────────────
 
 export type KanbanStageSummary = PipelineStage & {
   dealCount: number

@@ -10,8 +10,6 @@ import {
 } from 'class-validator'
 
 export class OnboardingDto {
-  // ─── Business info ────────────────────────────────────────────────────────
-
   @ApiProperty({ example: 'Distribuidora ABC', description: 'Business name' })
   @IsString()
   @MinLength(2)
@@ -34,8 +32,6 @@ export class OnboardingDto {
   @IsOptional()
   @IsString()
   planName?: string
-
-  // ─── Owner credentials ────────────────────────────────────────────────────
 
   @ApiProperty({ example: 'admin@distribuidora-abc.com' })
   @IsEmail()

@@ -52,8 +52,6 @@ export class AuthController {
     private readonly config: ConfigService,
   ) {}
 
-  // ─── Onboard ─────────────────────────────────────────────────────────────
-
   @Public()
   @Post('onboard')
   @HttpCode(HttpStatus.CREATED)
@@ -76,8 +74,6 @@ export class AuthController {
     return { user: result.user, tenant: result.tenant }
   }
 
-  // ─── Resolve tenant by email ─────────────────────────────────────────────
-
   @Public()
   @Post('resolve-tenant')
   @HttpCode(HttpStatus.OK)
@@ -90,8 +86,6 @@ export class AuthController {
   async resolveTenant(@Body() dto: ResolveTenantDto): Promise<{ slug: string }> {
     return this.authService.resolveTenantByEmail(dto.email)
   }
-
-  // ─── Login ───────────────────────────────────────────────────────────────
 
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -112,8 +106,6 @@ export class AuthController {
     return { user: result.user }
   }
 
-  // ─── Google OAuth ─────────────────────────────────────────────────────────
-
   @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google')
@@ -130,7 +122,7 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleCallbackGuard)
   @Get('google/callback')
-  @ApiExcludeEndpoint() // Internal redirect — not useful in Swagger
+  @ApiExcludeEndpoint()
   async googleCallback(
     @Req() req: Request & { user: GoogleProfile },
     @Res() res: Response,
@@ -141,8 +133,6 @@ export class AuthController {
     const frontendUrl = this.config.get<string>('app.frontendUrl') ?? 'http://localhost:3001'
     res.redirect(`${frontendUrl}/dashboard`)
   }
-
-  // ─── Refresh ─────────────────────────────────────────────────────────────
 
   @Public()
   @Post('refresh')
@@ -168,8 +158,6 @@ export class AuthController {
     return { user: result.user }
   }
 
-  // ─── Logout ──────────────────────────────────────────────────────────────
-
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Auth()
@@ -185,8 +173,6 @@ export class AuthController {
     }
     clearAuthCookies(res)
   }
-
-  // ─── Forgot password ──────────────────────────────────────────────────────
 
   @Public()
   @Post('forgot-password')
@@ -204,8 +190,6 @@ export class AuthController {
   ): Promise<void> {
     await this.passwordResetService.forgotPassword(dto.email, tenantCtx, extractMeta(req))
   }
-
-  // ─── Reset password ───────────────────────────────────────────────────────
 
   @Public()
   @Post('reset-password')
@@ -226,8 +210,6 @@ export class AuthController {
       extractMeta(req),
     )
   }
-
-  // ─── Me ──────────────────────────────────────────────────────────────────
 
   @Get('me')
   @Auth()

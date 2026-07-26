@@ -1,7 +1,5 @@
 import type { UserRole, TenantContext } from '@repo/shared-types'
 
-// ─── DATABASE ROW SHAPES (API-internal, never sent to client) ────────
-
 export interface UserRow {
   id: string
   email: string
@@ -20,17 +18,10 @@ export interface RefreshTokenRow {
   revoked_at: string | null
 }
 
-// ─── REQUEST METADATA ────────────────────────────────────────────────
-
 export type RequestMeta = {
   ip: string
   userAgent: string
 }
-
-// ─── INTERNAL AUTH RESULT (includes raw refresh token for cookie) ────
-// Defined independently (not extending AuthTokensResponse) to avoid
-// cross-package type resolution issues at the service/controller layer.
-// The public API shape (AuthTokensResponse) lives in @repo/shared-types.
 
 export type AuthUser = {
   id: string

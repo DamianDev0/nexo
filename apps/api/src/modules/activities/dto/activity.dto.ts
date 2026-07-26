@@ -12,8 +12,6 @@ import {
   Min,
 } from 'class-validator'
 
-// ─── Create ──────────────────────────────────────────────────────────────────
-
 export class CreateActivityDto {
   @IsString()
   @IsNotEmpty()
@@ -61,11 +59,7 @@ export class CreateActivityDto {
   assignedToId?: string
 }
 
-// ─── Update ──────────────────────────────────────────────────────────────────
-
 export class UpdateActivityDto extends PartialType(CreateActivityDto) {}
-
-// ─── Query / Filters ─────────────────────────────────────────────────────────
 
 export class ActivityQueryDto {
   @IsOptional()
@@ -105,8 +99,6 @@ export class ActivityQueryDto {
   @Max(100)
   limit?: number
 }
-
-// ─── Calendar query ──────────────────────────────────────────────────────────
 
 export class CalendarQueryDto {
   @IsDateString()

@@ -1,5 +1,3 @@
-// ─── DB row shapes returned by raw SQL queries ───────────────────────────────
-
 export interface CompanyRow {
   id: string
   name: string

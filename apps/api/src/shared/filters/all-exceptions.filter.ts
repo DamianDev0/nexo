@@ -20,7 +20,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>()
     const request = ctx.getRequest<Request>()
 
-    // Skip if already handled by a more specific filter
     if (exception instanceof HttpException || exception instanceof QueryFailedError) {
       throw exception
     }

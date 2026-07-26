@@ -1,8 +1,5 @@
 import { UserRole } from '@repo/shared-types'
 
-// ─── RBAC PERMISSION MATRIX ─────────────────────────────────────────
-// Identical in API (guards) and Frontend (UI conditionals)
-
 export type Resource =
   | 'contacts'
   | 'companies'
@@ -140,28 +137,15 @@ const ROLE_PERMISSIONS: Record<UserRole, PermissionMap> = {
   },
 }
 
-/**
- * Check if a role has permission for a specific action on a resource.
- * Use in both API guards and frontend UI conditionals.
- *
- * @example hasPermission(UserRole.SALES_REP, 'invoices', 'create') → false
- * @example hasPermission(UserRole.ADMIN, 'contacts', 'delete') → true
- */
 export function hasPermission(role: UserRole, resource: Resource, action: Action): boolean {
   const permissions = ROLE_PERMISSIONS[role]
   return permissions[resource].includes(action)
 }
 
-/**
- * Get all allowed actions for a role on a resource.
- */
 export function getAllowedActions(role: UserRole, resource: Resource): Action[] {
   return ROLE_PERMISSIONS[role][resource]
 }
 
-/**
- * Get all resources a role can access (at least one action).
- */
 export function getAccessibleResources(role: UserRole): Resource[] {
   const permissions = ROLE_PERMISSIONS[role]
   return (Object.entries(permissions) as [Resource, Action[]][])

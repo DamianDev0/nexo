@@ -5,8 +5,6 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { CacheService } from '@/shared/cache/cache.service'
 import type { Pipeline } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const SCHEMA = 'tenant_acme'
 
 const mockStageRow = {
@@ -36,8 +34,6 @@ const mockPipeline: Pipeline = {
   ],
 }
 
-// ─── Mock setup ───────────────────────────────────────────────────────────────
-
 function buildQrMock() {
   return { query: jest.fn() }
 }
@@ -56,8 +52,6 @@ function buildCacheMock() {
     del: jest.fn().mockResolvedValue(undefined),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('PipelineSettingsService', () => {
   let service: PipelineSettingsService
@@ -80,8 +74,6 @@ describe('PipelineSettingsService', () => {
 
     service = module.get(PipelineSettingsService)
   })
-
-  // ─── findAll ────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('returns pipelines with their stages', async () => {
@@ -123,8 +115,6 @@ describe('PipelineSettingsService', () => {
     })
   })
 
-  // ─── findOne ────────────────────────────────────────────────────────────
-
   describe('findOne', () => {
     it('returns a pipeline by id with stages', async () => {
       cache.get.mockResolvedValue(null)
@@ -153,14 +143,12 @@ describe('PipelineSettingsService', () => {
     })
   })
 
-  // ─── create ─────────────────────────────────────────────────────────────
-
   describe('create', () => {
     it('inserts pipeline and stages, then invalidates list cache', async () => {
       qr.query
-        .mockResolvedValueOnce([]) // clear default if isDefault
-        .mockResolvedValueOnce([mockPipelineRow]) // INSERT pipeline
-        .mockResolvedValueOnce([mockStageRow]) // INSERT stages
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([mockPipelineRow])
+        .mockResolvedValueOnce([mockStageRow])
 
       const result = await service.create(SCHEMA, {
         name: 'Sales',
@@ -182,25 +170,22 @@ describe('PipelineSettingsService', () => {
         stages: [{ name: 'Lead', color: '#22C55E', probability: 5, position: 0 }],
       })
 
-      // No UPDATE to clear defaults — first query is the INSERT, not the UPDATE
       const firstQuery: string = qr.query.mock.calls[0][0] as string
       expect(firstQuery).toContain('INSERT INTO pipelines')
     })
   })
 
-  // ─── update ─────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('updates pipeline name and invalidates cache', async () => {
       qr.query
-        .mockResolvedValueOnce([mockPipelineRow]) // fetchPipelineOrFail
-        .mockResolvedValueOnce([{ ...mockPipelineRow, name: 'New Name' }]) // UPDATE RETURNING
-        .mockResolvedValueOnce([mockStageRow]) // fetchStagesForPipeline
+        .mockResolvedValueOnce([mockPipelineRow])
+        .mockResolvedValueOnce([{ ...mockPipelineRow, name: 'New Name' }])
+        .mockResolvedValueOnce([mockStageRow])
 
       const result = await service.update(SCHEMA, 'pipe-1', { name: 'New Name' })
 
       expect(result.name).toBe('New Name')
-      expect(cache.del).toHaveBeenCalledTimes(2) // list + one key
+      expect(cache.del).toHaveBeenCalledTimes(2)
     })
 
     it('returns existing pipeline when no fields to update', async () => {
@@ -209,13 +194,11 @@ describe('PipelineSettingsService', () => {
       const result = await service.update(SCHEMA, 'pipe-1', {})
 
       expect(result.id).toBe('pipe-1')
-      // No UPDATE query — only fetchPipelineOrFail + fetchStagesForPipeline
+
       const queries = qr.query.mock.calls.map((c) => c[0] as string)
       expect(queries.some((q) => q.includes('UPDATE pipelines'))).toBe(false)
     })
   })
-
-  // ─── remove ─────────────────────────────────────────────────────────────
 
   describe('remove', () => {
     it('throws BadRequestException when trying to delete the default pipeline', async () => {
@@ -236,8 +219,8 @@ describe('PipelineSettingsService', () => {
       qr.query
         .mockResolvedValueOnce([{ ...mockPipelineRow, is_default: false }])
         .mockResolvedValueOnce([{ count: '3' }])
-        .mockResolvedValueOnce([]) // DELETE stages
-        .mockResolvedValueOnce([]) // DELETE pipeline
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
 
       await service.remove(SCHEMA, 'pipe-1')
 
@@ -252,15 +235,13 @@ describe('PipelineSettingsService', () => {
     })
   })
 
-  // ─── reorderStages ──────────────────────────────────────────────────────
-
   describe('reorderStages', () => {
     it('replaces all stages and invalidates cache', async () => {
       const newStage = { name: 'Closed', color: '#22C55E', probability: 100, position: 1 }
       qr.query
-        .mockResolvedValueOnce([mockPipelineRow]) // fetchPipelineOrFail
-        .mockResolvedValueOnce([]) // DELETE old stages
-        .mockResolvedValueOnce([{ ...mockStageRow, ...newStage, id: 'stage-2' }]) // INSERT new
+        .mockResolvedValueOnce([mockPipelineRow])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ ...mockStageRow, ...newStage, id: 'stage-2' }])
 
       const result = await service.reorderStages(SCHEMA, 'pipe-1', { stages: [newStage] })
 

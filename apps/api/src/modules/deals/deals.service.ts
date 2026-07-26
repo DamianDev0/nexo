@@ -34,16 +34,12 @@ import {
   UPDATABLE_FIELDS,
 } from './constants/deal.constants'
 
-// ─── Service ──────────────────────────────────────────────────────────────────
-
 @Injectable()
 export class DealsService {
   constructor(
     private readonly db: TenantDbService,
     private readonly audit: AuditLogService,
   ) {}
-
-  // ─── List ─────────────────────────────────────────────────────────────────
 
   async findAll(schemaName: string, query: DealQueryDto): Promise<PaginatedDeals> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedDeals> => {
@@ -73,13 +69,9 @@ export class DealsService {
     })
   }
 
-  // ─── Find one ─────────────────────────────────────────────────────────────
-
   async findOne(schemaName: string, dealId: string): Promise<DealDetail> {
     return this.db.query(schemaName, (qr) => this.fetchDealOrFail(qr, dealId))
   }
-
-  // ─── Create ───────────────────────────────────────────────────────────────
 
   async create(schemaName: string, dto: CreateDealDto, createdById: string): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
@@ -111,7 +103,6 @@ export class DealsService {
 
       const dealId = insertRows[0].id
 
-      // Record initial stage assignment in history
       if (dto.stageId) {
         await this.recordStageChange(
           qr,
@@ -136,8 +127,6 @@ export class DealsService {
       return result
     })
   }
-
-  // ─── Update ───────────────────────────────────────────────────────────────
 
   async update(schemaName: string, dealId: string, dto: UpdateDealDto): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
@@ -182,8 +171,6 @@ export class DealsService {
     })
   }
 
-  // ─── Delete (soft) ────────────────────────────────────────────────────────
-
   async remove(schemaName: string, dealId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
       await this.assertDealExists(qr, dealId)
@@ -200,8 +187,6 @@ export class DealsService {
       )
     })
   }
-
-  // ─── Move to stage ────────────────────────────────────────────────────────
 
   async moveStage(
     schemaName: string,
@@ -244,8 +229,6 @@ export class DealsService {
     })
   }
 
-  // ─── Mark won ─────────────────────────────────────────────────────────────
-
   async markWon(schemaName: string, dealId: string, userId?: string): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
       const deal = await this.fetchDealRowOrFail(qr, dealId)
@@ -280,8 +263,6 @@ export class DealsService {
       return result
     })
   }
-
-  // ─── Mark lost ────────────────────────────────────────────────────────────
 
   async markLost(
     schemaName: string,
@@ -324,8 +305,6 @@ export class DealsService {
     })
   }
 
-  // ─── Reopen ───────────────────────────────────────────────────────────────
-
   async reopen(schemaName: string, dealId: string, userId?: string): Promise<DealDetail> {
     return this.db.query(schemaName, async (qr): Promise<DealDetail> => {
       const deal = await this.fetchDealRowOrFail(qr, dealId)
@@ -353,10 +332,6 @@ export class DealsService {
       return this.fetchDealOrFail(qr, dealId)
     })
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  Deal Items
-  // ═══════════════════════════════════════════════════════════════════════════
 
   async addItem(schemaName: string, dealId: string, dto: CreateDealItemDto): Promise<DealItem> {
     return this.db.transactional(schemaName, async (qr): Promise<DealItem> => {
@@ -459,10 +434,6 @@ export class DealsService {
     })
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  Forecast
-  // ═══════════════════════════════════════════════════════════════════════════
-
   async getForecast(schemaName: string, months = 6): Promise<ForecastEntry[]> {
     return this.db.query(schemaName, async (qr): Promise<ForecastEntry[]> => {
       const rows: ForecastRow[] = await qr.query(
@@ -493,8 +464,6 @@ export class DealsService {
       )
     })
   }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private async fetchDealOrFail(qr: QueryRunner, dealId: string): Promise<DealDetail> {
     const rows: DealDetailRow[] = await qr.query(
@@ -586,7 +555,6 @@ export class DealsService {
     return (rows[0].max_pos ?? -1) + 1
   }
 
-  /** Recalculate deal.value_cents from the sum of its items subtotals */
   private async recalcDealValue(qr: QueryRunner, dealId: string): Promise<void> {
     await qr.query(
       `UPDATE deals SET
@@ -657,8 +625,6 @@ export class DealsService {
 
     return { where: conditions.join(' AND '), params }
   }
-
-  // ─── Mappers ──────────────────────────────────────────────────────────────
 
   private mapListItem(r: DealListRow): DealListItem {
     return {

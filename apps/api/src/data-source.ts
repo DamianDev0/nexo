@@ -4,15 +4,6 @@ import { Tenant } from './modules/tenants/entities/tenant.entity'
 import { Plan } from './modules/tenants/entities/plan.entity'
 import { UserTenantMap } from './modules/tenants/entities/user-tenant-map.entity'
 
-/**
- * Standalone DataSource for TypeORM migration CLI (PUBLIC schema only:
- * tenants / plans / user_tenant_map). Tenant schemas use the custom runner in
- * shared/database. Runtime app config lives in config/database.config.ts.
- *
- * Generate:  pnpm migration:generate src/migrations/<Name>
- * Run:       pnpm migration:run
- * Revert:    pnpm migration:revert
- */
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DATABASE_HOST ?? 'localhost',

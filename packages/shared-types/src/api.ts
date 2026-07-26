@@ -1,5 +1,3 @@
-// ─── API RESPONSE TYPES (shared between API and Frontend) ───────────
-
 export type BaseResponse = {
   statusCode: number
   timestamp: string
@@ -40,7 +38,6 @@ export type ApiValidationErrorResponse = ApiErrorResponse & {
   errors: ValidationErrorDetail[]
 }
 
-// ─── PAGINATED RESULT (returned by services, unwrapped by interceptor) ──
 export type PaginatedResult<T> = {
   data: T[]
   pagination: PaginationMeta

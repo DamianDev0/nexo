@@ -10,8 +10,6 @@ import type {
   PaginatedContacts,
 } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
@@ -63,8 +61,6 @@ const mockPaginated: PaginatedContacts = {
   limit: 25,
 }
 
-// ─── Mock service ─────────────────────────────────────────────────────────────
-
 function buildServiceMock() {
   return {
     findAll: jest.fn(),
@@ -75,8 +71,6 @@ function buildServiceMock() {
     getTimeline: jest.fn(),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ContactsController', () => {
   let controller: ContactsController
@@ -95,8 +89,6 @@ describe('ContactsController', () => {
 
     controller = module.get(ContactsController)
   })
-
-  // ─── findAll ────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('delegates to service with schema and query', async () => {
@@ -120,8 +112,6 @@ describe('ContactsController', () => {
     })
   })
 
-  // ─── create ─────────────────────────────────────────────────────────────
-
   describe('create', () => {
     it('delegates to service with schema, dto and user id', async () => {
       service.create.mockResolvedValue(mockContact)
@@ -133,8 +123,6 @@ describe('ContactsController', () => {
       expect(result.id).toBe('c-1')
     })
   })
-
-  // ─── findOne ────────────────────────────────────────────────────────────
 
   describe('findOne', () => {
     it('delegates to service with schema and id', async () => {
@@ -154,8 +142,6 @@ describe('ContactsController', () => {
     })
   })
 
-  // ─── update ─────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('delegates to service with schema, id and dto', async () => {
       const updated = { ...mockContact, firstName: 'Jane' }
@@ -168,8 +154,6 @@ describe('ContactsController', () => {
     })
   })
 
-  // ─── remove ─────────────────────────────────────────────────────────────
-
   describe('remove', () => {
     it('delegates to service and returns void', async () => {
       service.remove.mockResolvedValue(undefined)
@@ -178,8 +162,6 @@ describe('ContactsController', () => {
       expect(service.remove).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1')
     })
   })
-
-  // ─── getTimeline ────────────────────────────────────────────────────────
 
   describe('getTimeline', () => {
     it('delegates to service and returns timeline', async () => {

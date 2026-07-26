@@ -38,10 +38,6 @@ import {
   UPDATABLE_FIELDS,
 } from './constants/product.constants'
 
-// ─── Service ──────────────────────────────────────────────────────────────────
-
-// ─── CSV column definitions for export ────────────────────────────────────────
-
 const CSV_COLUMNS = [
   { header: 'name', value: (r: ProductRow) => r.name },
   { header: 'sku', value: (r: ProductRow) => r.sku ?? '' },
@@ -68,8 +64,6 @@ export class ProductsService {
     private readonly importService: ImportService,
     private readonly audit: AuditLogService,
   ) {}
-
-  // ─── List ─────────────────────────────────────────────────────────────────
 
   async findAll(schemaName: string, query: ProductQueryDto): Promise<PaginatedProducts> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedProducts> => {
@@ -99,13 +93,9 @@ export class ProductsService {
     })
   }
 
-  // ─── Find one ─────────────────────────────────────────────────────────────
-
   async findOne(schemaName: string, productId: string): Promise<Product> {
     return this.db.query(schemaName, (qr) => this.fetchProductOrFail(qr, productId))
   }
-
-  // ─── Find one with movements ──────────────────────────────────────────────
 
   async findOneWithMovements(schemaName: string, productId: string): Promise<ProductWithMovements> {
     return this.db.query(schemaName, async (qr): Promise<ProductWithMovements> => {
@@ -125,8 +115,6 @@ export class ProductsService {
       }
     })
   }
-
-  // ─── Create ───────────────────────────────────────────────────────────────
 
   async create(schemaName: string, dto: CreateProductDto, createdById: string): Promise<Product> {
     return this.db.query(schemaName, async (qr): Promise<Product> => {
@@ -177,8 +165,6 @@ export class ProductsService {
     })
   }
 
-  // ─── Update ───────────────────────────────────────────────────────────────
-
   async update(schemaName: string, productId: string, dto: UpdateProductDto): Promise<Product> {
     return this.db.query(schemaName, async (qr): Promise<Product> => {
       await this.assertProductExists(qr, productId)
@@ -220,8 +206,6 @@ export class ProductsService {
     })
   }
 
-  // ─── Delete (soft) ────────────────────────────────────────────────────────
-
   async remove(schemaName: string, productId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
       await this.assertProductExists(qr, productId)
@@ -238,8 +222,6 @@ export class ProductsService {
       )
     })
   }
-
-  // ─── Inventory adjustment ─────────────────────────────────────────────────
 
   async adjustInventory(
     schemaName: string,
@@ -281,7 +263,6 @@ export class ProductsService {
         ],
       )
 
-      // Update stock
       await qr.query(`UPDATE products SET stock = stock + $1, updated_at = NOW() WHERE id = $2`, [
         delta,
         productId,
@@ -292,8 +273,6 @@ export class ProductsService {
       return this.mapMovement(row)
     })
   }
-
-  // ─── Low stock alert ──────────────────────────────────────────────────────
 
   async getLowStock(schemaName: string): Promise<LowStockItem[]> {
     return this.db.query(schemaName, async (qr): Promise<LowStockItem[]> => {
@@ -318,10 +297,6 @@ export class ProductsService {
       )
     })
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  Export / Import / Duplicate / Bulk
-  // ═══════════════════════════════════════════════════════════════════════════
 
   async exportCsv(schemaName: string): Promise<Buffer> {
     return this.db.query(schemaName, async (qr): Promise<Buffer> => {
@@ -383,7 +358,7 @@ export class ProductsService {
           } else if (duplicateStrategy === 'skip') {
             skipped++
           } else {
-            await this.insertImportRow(qr, data, name, null, createdById) // create with no SKU
+            await this.insertImportRow(qr, data, name, null, createdById)
             imported++
           }
           continue
@@ -457,11 +432,10 @@ export class ProductsService {
         conditions.push(`brand = $${params.length}`)
       }
 
-      // Calculate multiplier: +10% → 1.10, -5% → 0.95
       const multiplier = (100 + dto.percentChange) / 100
       params.push(multiplier)
 
-      const filterParams = [...params] // save before adding multiplier
+      const filterParams = [...params]
       params.push(multiplier)
 
       await qr.query(
@@ -480,8 +454,6 @@ export class ProductsService {
       return { updated: Number.parseInt(countRows[0].count, 10) }
     })
   }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private async fetchProductOrFail(qr: QueryRunner, productId: string): Promise<Product> {
     const rows: ProductRow[] = await qr.query(
@@ -615,7 +587,7 @@ export class ProductsService {
       case 'transfer':
         return -quantity
       case 'adjustment':
-        return quantity // can be positive or negative
+        return quantity
       default:
         return 0
     }
@@ -658,8 +630,6 @@ export class ProductsService {
 
     return { where: conditions.join(' AND '), params }
   }
-
-  // ─── Mappers ──────────────────────────────────────────────────────────────
 
   private mapProduct(r: ProductRow): Product {
     return {

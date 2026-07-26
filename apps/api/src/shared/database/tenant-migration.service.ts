@@ -54,7 +54,6 @@ export class TenantMigrationService implements OnApplicationBootstrap {
     await qr.connect()
 
     try {
-      // Ensure the migrations tracking table exists (bootstraps old schemas)
       await qr.query(`
         CREATE TABLE IF NOT EXISTS "${schemaName}".schema_migrations (
           id         VARCHAR(100) PRIMARY KEY,
@@ -62,7 +61,6 @@ export class TenantMigrationService implements OnApplicationBootstrap {
         )
       `)
 
-      // Find already-applied migration IDs
       const applied = (await qr.query(
         `SELECT id FROM "${schemaName}".schema_migrations`,
       )) as MigrationRow[]

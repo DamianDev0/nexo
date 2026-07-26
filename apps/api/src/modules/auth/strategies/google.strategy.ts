@@ -17,7 +17,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     })
   }
 
-  // Called by passport after Google redirects back
   validate(
     req: Request,
     _accessToken: string,
@@ -30,7 +29,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       return done(new UnauthorizedException('Google account has no email address'), false)
     }
 
-    // Tenant slug was encoded in the OAuth state param at initiation
     const rawState = req.query['state']
     const stateStr = Array.isArray(rawState) ? rawState[0] : rawState
 

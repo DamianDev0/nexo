@@ -11,10 +11,6 @@ export class TenantProvisioningService {
     private readonly dataSource: DataSource,
   ) {}
 
-  /**
-   * Creates a new isolated PostgreSQL schema for a tenant
-   * with all required tables, indices, and extensions.
-   */
   async createTenantSchema(schemaName: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner()
     await queryRunner.connect()
@@ -36,10 +32,6 @@ export class TenantProvisioningService {
     }
   }
 
-  /**
-   * Drops a tenant schema. USE WITH EXTREME CAUTION.
-   * Intended for onboarding rollback only — never exposed via API.
-   */
   async dropTenantSchema(schemaName: string): Promise<void> {
     await this.dataSource.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
     this.logger.warn({ schemaName }, 'Tenant schema dropped')

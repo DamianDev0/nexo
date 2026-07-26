@@ -4,8 +4,6 @@ import { NavigationController } from '../controllers/navigation.controller'
 import { TenantConfigService } from '../services/tenant-config.service'
 import type { TenantContext, SidebarConfig } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
@@ -51,16 +49,12 @@ function makeSidebarConfig(overrides: Partial<SidebarConfig> = {}): SidebarConfi
   }
 }
 
-// ─── Mock service ─────────────────────────────────────────────────────────────
-
 function buildServiceMock() {
   return {
     getSidebarConfig: jest.fn(),
     updateSidebarConfig: jest.fn(),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('NavigationController', () => {
   let controller: NavigationController
@@ -77,8 +71,6 @@ describe('NavigationController', () => {
     controller = module.get(NavigationController)
   })
 
-  // ─── getSidebar ─────────────────────────────────────────────────────────
-
   describe('getSidebar', () => {
     it('returns the sidebar config from service', async () => {
       const sidebar = makeSidebarConfig()
@@ -90,8 +82,6 @@ describe('NavigationController', () => {
       expect(result.modules).toHaveLength(3)
     })
   })
-
-  // ─── updateSidebar ──────────────────────────────────────────────────────
 
   describe('updateSidebar', () => {
     it('updates the sidebar when all required modules stay enabled', async () => {
@@ -135,7 +125,7 @@ describe('NavigationController', () => {
         updated,
         mockCtx.slug,
       )
-      expect(result.modules[1]?.enabled).toBe(false) // contacts can be disabled
+      expect(result.modules[1]?.enabled).toBe(false)
     })
 
     it('propagates BadRequestException when a required module is disabled', async () => {
@@ -203,8 +193,6 @@ describe('NavigationController', () => {
     })
   })
 })
-
-// ─── TenantConfigService.updateSidebarConfig — unit test for the guard logic ─
 
 describe('TenantConfigService sidebar required module guard', () => {
   it('validates required modules directly via service integration', async () => {

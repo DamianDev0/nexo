@@ -51,8 +51,6 @@ export class AuthService {
     private readonly userTenantMap: UserTenantMapService,
   ) {}
 
-  // ─── Resolve tenant from email ──────────────────────────────────────────────
-
   async resolveTenantByEmail(email: string): Promise<{ slug: string }> {
     const tenant = await this.userTenantMap.findTenantByEmail(email)
 
@@ -63,7 +61,6 @@ export class AuthService {
     return { slug: tenant.slug }
   }
 
-  /** Check if tenant has completed onboarding */
   async getTenantOnboardingStatus(tenantId: string): Promise<boolean> {
     const tenant = await this.tenantRepo.findOne({ where: { id: tenantId } })
     if (!tenant) return false
@@ -72,12 +69,9 @@ export class AuthService {
     return onboarding?.completed ?? false
   }
 
-  /** Delegates to UserTenantMapService — kept as a convenience for internal callers */
   async registerUserTenantMapping(email: string, tenantId: string): Promise<void> {
     await this.userTenantMap.register(email, tenantId)
   }
-
-  // ─── Onboarding ───────────────────────────────────────────────────────────
 
   async onboard(dto: OnboardingDto, meta?: RequestMeta): Promise<OnboardingResult> {
     const tenant = await this.tenantsService.create({
@@ -120,7 +114,6 @@ export class AuthService {
       throw error
     }
 
-    // Set initial onboarding state
     await this.tenantRepo.update(tenant.id, {
       config: { ...tenantCtx.config, onboarding: { step: 1, completed: false } },
     })
@@ -158,8 +151,6 @@ export class AuthService {
     }
   }
 
-  // ─── Validate credentials (used by LocalStrategy) ─────────────────────────
-
   async validateUser(
     email: string,
     rawPassword: string,
@@ -189,15 +180,11 @@ export class AuthService {
     return user
   }
 
-  // ─── Login ────────────────────────────────────────────────────────────────
-
   async login(user: UserRow, tenantCtx: TenantContext, meta: RequestMeta): Promise<AuthResult> {
     const result = await this.session.issue(user, tenantCtx, meta)
     await this.audit.authLogin({ id: user.id, email: user.email }, tenantCtx.schemaName, meta)
     return result
   }
-
-  // ─── Google OAuth ─────────────────────────────────────────────────────────
 
   async validateGoogleUser(profile: GoogleProfile, meta: RequestMeta): Promise<GoogleAuthResult> {
     const tenant = await this.tenantRepo.findOne({
@@ -236,8 +223,6 @@ export class AuthService {
     return { ...authResult, tenantCtx }
   }
 
-  // ─── Refresh tokens ───────────────────────────────────────────────────────
-
   async refresh(
     rawRefreshToken: string,
     tenantCtx: TenantContext,
@@ -271,14 +256,10 @@ export class AuthService {
     return result
   }
 
-  // ─── Logout ───────────────────────────────────────────────────────────────
-
   async logout(rawRefreshToken: string, schemaName: string, meta?: RequestMeta): Promise<void> {
     await this.session.revokeByRawToken(schemaName, rawRefreshToken)
     await this.audit.authLogout(schemaName, meta)
   }
-
-  // ─── Rate limiting (scoped per tenant+IP) ─────────────────────────────────
 
   private async checkRateLimit(schemaName: string, ip: string): Promise<void> {
     const count = await this.cache.get<number>(rateLimitCacheKey(schemaName, ip))

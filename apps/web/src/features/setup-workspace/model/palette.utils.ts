@@ -40,10 +40,6 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`.toUpperCase()
 }
 
-/**
- * Derives a full ThemeColors palette from a primary hex color.
- * Overrides allow the user to customize individual colors.
- */
 export function derivePalette(
   primary: string,
   overrides?: Partial<Omit<ThemeColors, 'primary' | 'primaryForeground'>>,
@@ -60,9 +56,6 @@ export function derivePalette(
   }
 }
 
-/**
- * Inverts a light palette to dark mode equivalents.
- */
 export function deriveDarkPalette(colors: ThemeColors): ThemeColors {
   const [h, s] = hexToHsl(colors.primary)
 

@@ -26,8 +26,6 @@ export class ContactsService {
     private readonly audit: AuditLogService,
   ) {}
 
-  // ─── List ─────────────────────────────────────────────────────────────────
-
   async findAll(schemaName: string, query: ContactQueryDto): Promise<PaginatedContacts> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedContacts> => {
       const page = query.page ?? 1
@@ -56,15 +54,11 @@ export class ContactsService {
     })
   }
 
-  // ─── Find one ─────────────────────────────────────────────────────────────
-
   async findOne(schemaName: string, contactId: string): Promise<Contact> {
     return this.db.query(schemaName, async (qr): Promise<Contact> => {
       return this.fetchContactOrFail(qr, contactId)
     })
   }
-
-  // ─── Create ───────────────────────────────────────────────────────────────
 
   async create(schemaName: string, dto: CreateContactDto, createdById: string): Promise<Contact> {
     return this.db.query(schemaName, async (qr): Promise<Contact> => {
@@ -112,8 +106,6 @@ export class ContactsService {
     })
   }
 
-  // ─── Update ───────────────────────────────────────────────────────────────
-
   async update(schemaName: string, contactId: string, dto: UpdateContactDto): Promise<Contact> {
     return this.db.transactional(schemaName, async (qr): Promise<Contact> => {
       await this.assertContactExists(qr, contactId)
@@ -151,8 +143,6 @@ export class ContactsService {
     })
   }
 
-  // ─── Remove (soft delete) ─────────────────────────────────────────────────
-
   async remove(schemaName: string, contactId: string): Promise<void> {
     await this.db.transactional(schemaName, async (qr): Promise<void> => {
       await this.assertContactExists(qr, contactId)
@@ -170,13 +160,10 @@ export class ContactsService {
     })
   }
 
-  // ─── Timeline ─────────────────────────────────────────────────────────────
-
   async getTimeline(schemaName: string, contactId: string): Promise<ContactTimeline> {
     return this.db.query(schemaName, async (qr): Promise<ContactTimeline> => {
       await this.assertContactExists(qr, contactId)
 
-      // Fetch activities and deals in parallel — independent queries
       const [activityRows, dealRows] = await Promise.all([
         qr.query(
           `SELECT id, activity_type, title, description, due_date, completed_at,
@@ -204,12 +191,6 @@ export class ContactsService {
     })
   }
 
-  // ─── Private helpers ──────────────────────────────────────────────────────
-
-  /**
-   * Throws NotFoundException if the contact does not exist or is soft-deleted.
-   * Reused by update, remove and getTimeline to avoid duplicate queries.
-   */
   private async assertContactExists(qr: QueryRunner, contactId: string): Promise<void> {
     const rows: [{ id: string }?] = await qr.query(
       `SELECT id FROM contacts WHERE id = $1 AND is_active = true`,
@@ -218,10 +199,6 @@ export class ContactsService {
     if (!rows[0]) throw new NotFoundException(`Contact ${contactId} not found`)
   }
 
-  /**
-   * Fetches a full contact row within an existing QueryRunner.
-   * Used by update (read-after-write on the same connection) and findOne.
-   */
   private async fetchContactOrFail(qr: QueryRunner, contactId: string): Promise<Contact> {
     const rows: ContactRow[] = await qr.query(
       `SELECT ${CONTACT_COLUMNS} FROM contacts WHERE id = $1 AND is_active = true`,
@@ -232,10 +209,6 @@ export class ContactsService {
     return this.mapContact(row)
   }
 
-  /**
-   * Builds the parameterized WHERE clause from ContactQueryDto filters.
-   * Returns the clause string and the bound params array.
-   */
   private buildWhereClause(query: ContactQueryDto): { where: string; params: unknown[] } {
     const conditions: string[] = ['is_active = true']
     const params: unknown[] = []
@@ -265,8 +238,6 @@ export class ContactsService {
 
     return { where: conditions.join(' AND '), params }
   }
-
-  // ─── Mappers ──────────────────────────────────────────────────────────────
 
   private mapListItem(r: ContactRow): ContactListItem {
     return {

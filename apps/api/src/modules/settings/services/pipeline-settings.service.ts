@@ -6,7 +6,7 @@ import type { Pipeline, PipelineStage, KanbanBoard, KanbanStageSummary } from '@
 import type { CreatePipelineDto, UpdatePipelineDto, ReorderStagesDto } from '../dto/pipeline.dto'
 import type { PipelineRow, StageRow, KanbanStageRow } from '../interfaces/pipeline.interface'
 
-const PIPELINE_TTL = 300 // 5 minutes — pipelines change rarely (admin-only mutations)
+const PIPELINE_TTL = 300
 
 @Injectable()
 export class PipelineSettingsService {
@@ -14,8 +14,6 @@ export class PipelineSettingsService {
     private readonly db: TenantDbService,
     private readonly cache: CacheService,
   ) {}
-
-  // ─── List ─────────────────────────────────────────────────────────────────
 
   async findAll(schemaName: string): Promise<Pipeline[]> {
     const cacheKey = this.listKey(schemaName)
@@ -69,8 +67,6 @@ export class PipelineSettingsService {
     return result
   }
 
-  // ─── Create ───────────────────────────────────────────────────────────────
-
   async create(schemaName: string, dto: CreatePipelineDto): Promise<Pipeline> {
     const result = await this.db.transactional<Pipeline>(
       schemaName,
@@ -93,8 +89,6 @@ export class PipelineSettingsService {
     await this.cache.del(this.listKey(schemaName))
     return result
   }
-
-  // ─── Update ───────────────────────────────────────────────────────────────
 
   async update(schemaName: string, pipelineId: string, dto: UpdatePipelineDto): Promise<Pipeline> {
     const result = await this.db.transactional<Pipeline>(
@@ -139,8 +133,6 @@ export class PipelineSettingsService {
     return result
   }
 
-  // ─── Delete ───────────────────────────────────────────────────────────────
-
   async remove(schemaName: string, pipelineId: string): Promise<void> {
     await this.db.transactional<void>(schemaName, async (qr): Promise<void> => {
       const rows: PipelineRow[] = await qr.query(
@@ -169,8 +161,6 @@ export class PipelineSettingsService {
     await this.invalidateCache(schemaName, pipelineId)
   }
 
-  // ─── Stages ───────────────────────────────────────────────────────────────
-
   async reorderStages(
     schemaName: string,
     pipelineId: string,
@@ -191,8 +181,6 @@ export class PipelineSettingsService {
     await this.invalidateCache(schemaName, pipelineId)
     return result
   }
-
-  // ─── Kanban board ───────────────────────────────────────────────────────
 
   async getKanbanBoard(schemaName: string, pipelineId: string): Promise<KanbanBoard> {
     return this.db.query(schemaName, async (qr): Promise<KanbanBoard> => {
@@ -229,8 +217,6 @@ export class PipelineSettingsService {
       }
     })
   }
-
-  // ─── Private — DB helpers ─────────────────────────────────────────────────
 
   private async fetchPipelineOrFail(qr: QueryRunner, pipelineId: string): Promise<PipelineRow> {
     const rows: PipelineRow[] = await qr.query(
@@ -271,8 +257,6 @@ export class PipelineSettingsService {
     return rows.map((s) => this.mapStage(s))
   }
 
-  // ─── Private — cache helpers ──────────────────────────────────────────────
-
   private listKey(schemaName: string): string {
     return `pipeline:list:${schemaName}`
   }
@@ -287,8 +271,6 @@ export class PipelineSettingsService {
       this.cache.del(this.oneKey(schemaName, pipelineId)),
     ])
   }
-
-  // ─── Private — mappers ────────────────────────────────────────────────────
 
   private buildPipeline(p: PipelineRow, stages: PipelineStage[]): Pipeline {
     return { id: p.id, name: p.name, isDefault: p.is_default, stages }

@@ -10,11 +10,6 @@ import {
 
 import { Tenant } from './tenant.entity'
 
-/**
- * Lookup table in the public schema that maps user emails to tenants.
- * Enables resolving which tenant a user belongs to without knowing the schema.
- * Populated during onboarding, user invites, and Google OAuth sign-ups.
- */
 @Entity({ name: 'user_tenant_map', schema: 'public' })
 @Index(['email', 'tenantId'], { unique: true })
 export class UserTenantMap {

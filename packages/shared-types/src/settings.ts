@@ -1,5 +1,3 @@
-// ─── THEME ────────────────────────────────────────────────────────────────────
-
 export type ThemeColors = {
   primary: string
   primaryForeground: string
@@ -81,8 +79,6 @@ export type ResolvedThemeTokens = {
   dark: ThemeTokens
 }
 
-// ─── NOMENCLATURE ─────────────────────────────────────────────────────────────
-
 export type EntityTerm = {
   singular: string
   plural: string
@@ -94,8 +90,6 @@ export type TenantNomenclature = {
   deal: EntityTerm
   activity: EntityTerm
 }
-
-// ─── SIDEBAR / NAVIGATION ─────────────────────────────────────────────────────
 
 export type SidebarModule = {
   key: string
@@ -124,8 +118,6 @@ export const DEFAULT_SIDEBAR_MODULE_KEYS = [
   'reports',
   'settings',
 ] as const
-
-// ─── CUSTOM FIELDS ────────────────────────────────────────────────────────────
 
 export type CustomFieldType =
   | 'text'
@@ -184,18 +176,13 @@ export type FieldPermission = {
 
 export type FieldPermissionsConfig = Record<CustomFieldEntity, Record<string, FieldPermission>>
 
-// ─── PIPELINE (see pipelines.ts for full types) ──────────────────────────────
-// Pipeline and PipelineStage are exported from pipelines.ts
-
-// ─── ACTIVITY TYPES ───────────────────────────────────────────────────────────
-
 export type ActivityTypeDef = {
   key: string
   label: string
   icon: string
   color: string
   trackDuration: boolean
-  isSystem: boolean // system types cannot be deleted
+  isSystem: boolean
 }
 
 export const DEFAULT_ACTIVITY_TYPES: ActivityTypeDef[] = [
@@ -249,14 +236,10 @@ export const DEFAULT_ACTIVITY_TYPES: ActivityTypeDef[] = [
   },
 ]
 
-// ─── ONBOARDING ──────────────────────────────────────────────────────────────
-
 export type OnboardingStatus = {
   step: number
   completed: boolean
 }
-
-// ─── GENERAL SETTINGS (GET /settings/general response) ───────────────────────
 
 export type GeneralSettings = {
   id: string
@@ -286,15 +269,11 @@ export type GeneralSettings = {
   }
 }
 
-// ─── PIPELINE CREATE REQUEST ─────────────────────────────────────────────────
-
 export type CreatePipelineRequest = {
   name: string
   isDefault?: boolean
   stages: Array<{ name: string; color: string; probability: number }>
 }
-
-// ─── NOMENCLATURE CONFIG ─────────────────────────────────────────────────────
 
 export type NomenclatureConfig = {
   contact?: EntityTerm
@@ -303,11 +282,7 @@ export type NomenclatureConfig = {
   activity?: EntityTerm
 }
 
-// ─── THEME CONFIG (patch) ────────────────────────────────────────────────────
-
 export type ThemeConfig = Partial<TenantTheme>
-
-// ─── THEME HISTORY ──────────────────────────────────────────────────────────
 
 export type ThemeHistoryEntry = {
   id: string
@@ -316,8 +291,6 @@ export type ThemeHistoryEntry = {
   previousConfig: TenantTheme
   createdAt: string
 }
-
-// ─── USER INVITE ─────────────────────────────────────────────────────────────
 
 export type InviteUserRequest = {
   email: string
@@ -329,8 +302,6 @@ export type InviteUserResponse = {
   email: string
   expiresAt: string
 }
-
-// ─── EMAIL BRANDING ───────────────────────────────────────────────────────────
 
 export type EmailBrandingContext = {
   companyName: string

@@ -1,5 +1,3 @@
-// ─── Multer file (avoids Express.Multer global namespace dependency) ──────────
-
 export type MulterFile = {
   fieldname: string
   originalname: string
@@ -8,18 +6,13 @@ export type MulterFile = {
   buffer: Buffer
 }
 
-// ─── Upload result ────────────────────────────────────────────────────────────
-
 export type UploadResult = {
-  /** Full public URL (or CloudFront URL when configured) */
   url: string
-  /** S3 object key — store this to delete the file later */
+
   key: string
   sizeBytes: number
   mimeType: string
 }
-
-// ─── Categories ───────────────────────────────────────────────────────────────
 
 export enum S3Category {
   TENANT_LOGO = 'tenant_logo',
@@ -30,16 +23,13 @@ export enum S3Category {
   DEAL_ATTACHMENT = 'deal_attachment',
 }
 
-// ─── Category config ──────────────────────────────────────────────────────────
-
 type CategoryConfig = {
-  /** S3 path prefix, receives the tenant slug */
   pathPrefix: (tenantSlug: string) => string
   allowedMimeTypes: string[]
   allowedExtensions: string[]
-  /** Max file size in bytes */
+
   maxSizeBytes: number
-  /** Whether the object should be publicly readable */
+
   public: boolean
 }
 

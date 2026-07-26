@@ -1,7 +1,3 @@
-/**
- * Returns the SQL to create all tables for a tenant schema.
- * Each tenant lives in an isolated PostgreSQL schema identified by `schemaName`.
- */
 export function getTenantSchemaSQL(schema: string): string {
   return `
     -- Users within the tenant
@@ -520,9 +516,6 @@ export function getTenantSchemaSQL(schema: string): string {
   `
 }
 
-/**
- * Returns the SQL to create all indices for a tenant schema.
- */
 export function getTenantIndicesSQL(schema: string): string {
   return `
     -- Full-text search on companies (name + NIT)

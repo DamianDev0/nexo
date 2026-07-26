@@ -130,10 +130,6 @@ export class ProductsController {
     return this.productsService.remove(ctx.schemaName, id)
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  Inventory
-  // ═══════════════════════════════════════════════════════════════════════════
-
   @Post(':id/inventory')
   @Auth(UserRole.SALES_REP)
   @ApiParam({ name: 'id', description: 'Product UUID' })

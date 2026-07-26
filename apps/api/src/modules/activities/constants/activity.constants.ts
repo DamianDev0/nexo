@@ -1,7 +1,5 @@
 import type { UpdateActivityDto } from '../dto/activity.dto'
 
-// ─── Updatable fields map: DTO key → SQL column ──────────────────────────────
-
 export const UPDATABLE_FIELDS: [keyof UpdateActivityDto, string][] = [
   ['activityType', 'activity_type'],
   ['title', 'title'],
@@ -14,8 +12,6 @@ export const UPDATABLE_FIELDS: [keyof UpdateActivityDto, string][] = [
   ['dealId', 'deal_id'],
   ['assignedToId', 'assigned_to_id'],
 ]
-
-// ─── SQL column selections ───────────────────────────────────────────────────
 
 export const ACTIVITY_LIST_COLUMNS = `
   a.id, a.activity_type, a.title, a.description, a.due_date,

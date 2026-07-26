@@ -19,7 +19,6 @@ interface BrandSeeds {
   sidebarForeground: string
 }
 
-/** Move `base` lightness a fraction `t` toward `target`'s lightness (keeps hue + chroma). */
 function blendLightness(base: string, target: string, t: number): string {
   const b = hexToOklch(base)
   const goal = hexToOklch(target)

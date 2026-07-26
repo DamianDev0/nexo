@@ -29,8 +29,6 @@ export class PasswordResetService {
     private readonly config: ConfigService,
   ) {}
 
-  // ─── Step 1: request reset ────────────────────────────────────────────────
-
   async forgotPassword(email: string, tenantCtx: TenantContext, meta?: RequestMeta): Promise<void> {
     const { schemaName } = tenantCtx
     const user = await this.authRepo.findUserByEmail(schemaName, email)
@@ -59,8 +57,6 @@ export class PasswordResetService {
     this.logger.info({ email, schemaName }, 'Password reset email sent')
   }
 
-  // ─── Step 2: confirm reset ────────────────────────────────────────────────
-
   async resetPassword(
     rawToken: string,
     newPassword: string,
@@ -78,8 +74,6 @@ export class PasswordResetService {
 
     this.logger.info({ userId: user.id, schemaName }, 'Password reset successful')
   }
-
-  // ─── Private ──────────────────────────────────────────────────────────────
 
   private async findValidToken(schemaName: string, rawToken: string): Promise<PasswordResetRow> {
     const row = await this.resetRepo.findByTokenHash(schemaName, this.token.hashToken(rawToken))

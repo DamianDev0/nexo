@@ -119,14 +119,12 @@ export function oklchToHex({ l, c, h }: Oklch): string {
   })
 }
 
-/** Build a perceptually-tinted neutral: brand hue, low chroma, given lightness. */
 export function tintedNeutral(brand: string, lightness: number, chroma = 0.01): string {
   const base = hexToOklch(brand)
   if (!base) return oklchToHex({ l: lightness, c: 0, h: 0 })
   return oklchToHex({ l: lightness, c: chroma, h: base.h })
 }
 
-/** Rotate OKLCH hue by degrees, keep lightness + chroma. */
 export function rotateHue(hex: string, degrees: number): string {
   const base = hexToOklch(hex)
   if (!base) return hex

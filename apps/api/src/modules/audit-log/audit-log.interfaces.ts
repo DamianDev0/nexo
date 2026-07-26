@@ -1,5 +1,3 @@
-// ─── Internal refs ────────────────────────────────────────────────────────────
-
 export interface UserRef {
   id: string
   email: string
@@ -12,11 +10,7 @@ export interface TenantRef {
   plan: string
 }
 
-// ─── Severity ────────────────────────────────────────────────────────────────
-
 export type AuditSeverity = 'info' | 'warning' | 'critical'
-
-// ─── Entity types ─────────────────────────────────────────────────────────────
 
 export enum AuditEntityType {
   User = 'user',
@@ -35,10 +29,7 @@ export enum AuditEntityType {
   System = 'system',
 }
 
-// ─── Actions ──────────────────────────────────────────────────────────────────
-
 export enum AuditAction {
-  // Auth
   AuthLogin = 'auth.login',
   AuthLoginFailed = 'auth.login.failed',
   AuthLoginGoogle = 'auth.login.google',
@@ -52,13 +43,11 @@ export enum AuditAction {
   AuthAccountEnabled = 'auth.account.enabled',
   AuthSessionsRevoked = 'auth.sessions.revoked',
 
-  // Users
   UserCreated = 'user.created',
   UserUpdated = 'user.updated',
   UserDeleted = 'user.deleted',
   UserRoleChanged = 'user.role.changed',
 
-  // Contacts
   ContactCreated = 'contact.created',
   ContactUpdated = 'contact.updated',
   ContactDeleted = 'contact.deleted',
@@ -66,12 +55,10 @@ export enum AuditAction {
   ContactTagged = 'contact.tagged',
   ContactImported = 'contact.imported',
 
-  // Companies
   CompanyCreated = 'company.created',
   CompanyUpdated = 'company.updated',
   CompanyDeleted = 'company.deleted',
 
-  // Deals
   DealCreated = 'deal.created',
   DealUpdated = 'deal.updated',
   DealDeleted = 'deal.deleted',
@@ -80,18 +67,15 @@ export enum AuditAction {
   DealLost = 'deal.lost',
   DealAssigned = 'deal.assigned',
 
-  // Products
   ProductCreated = 'product.created',
   ProductUpdated = 'product.updated',
   ProductDeleted = 'product.deleted',
 
-  // Activities
   ActivityCreated = 'activity.created',
   ActivityUpdated = 'activity.updated',
   ActivityDeleted = 'activity.deleted',
   ActivityCompleted = 'activity.completed',
 
-  // Invoices
   InvoiceCreated = 'invoice.created',
   InvoiceUpdated = 'invoice.updated',
   InvoiceDeleted = 'invoice.deleted',
@@ -101,12 +85,10 @@ export enum AuditAction {
   InvoiceDianValidated = 'invoice.dian.validated',
   InvoiceDianRejected = 'invoice.dian.rejected',
 
-  // Payments
   PaymentRecorded = 'payment.recorded',
   PaymentUpdated = 'payment.updated',
   PaymentRefunded = 'payment.refunded',
 
-  // Pipelines
   PipelineCreated = 'pipeline.created',
   PipelineUpdated = 'pipeline.updated',
   PipelineDeleted = 'pipeline.deleted',
@@ -114,7 +96,6 @@ export enum AuditAction {
   PipelineStageUpdated = 'pipeline.stage.updated',
   PipelineStageDeleted = 'pipeline.stage.deleted',
 
-  // Workflows
   WorkflowCreated = 'workflow.created',
   WorkflowUpdated = 'workflow.updated',
   WorkflowDeleted = 'workflow.deleted',
@@ -123,7 +104,6 @@ export enum AuditAction {
   WorkflowExecuted = 'workflow.executed',
   WorkflowFailed = 'workflow.failed',
 
-  // System
   TenantCreated = 'system.tenant.created',
   TenantUpdated = 'system.tenant.updated',
   TenantDeleted = 'system.tenant.deleted',
@@ -131,15 +111,11 @@ export enum AuditAction {
   SettingsUpdated = 'system.settings.updated',
 }
 
-// ─── Request context (subset of RequestMeta — all fields optional for audit) ──
-
 export interface AuditMeta {
   ip?: string
   userAgent?: string
   metadata?: Record<string, unknown>
 }
-
-// ─── Event payload ────────────────────────────────────────────────────────────
 
 export interface AuditEvent {
   schemaName: string

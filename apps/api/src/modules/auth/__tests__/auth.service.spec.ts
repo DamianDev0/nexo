@@ -135,8 +135,6 @@ describe('AuthService', () => {
     service = module.get(AuthService)
   })
 
-  // ─── onboard ────────────────────────────────────────────────────────────────
-
   describe('onboard', () => {
     const dto: OnboardingDto = {
       businessName: 'Acme Corp',
@@ -196,8 +194,6 @@ describe('AuthService', () => {
       expect(mocks.tenantsService.delete).toHaveBeenCalledWith(mockTenantResponse.id)
     })
   })
-
-  // ─── validateUser ────────────────────────────────────────────────────────────
 
   describe('validateUser', () => {
     const ip = '1.2.3.4'
@@ -276,8 +272,6 @@ describe('AuthService', () => {
     })
   })
 
-  // ─── login ───────────────────────────────────────────────────────────────────
-
   describe('login', () => {
     it('issues a session and records audit event', async () => {
       mocks.session.issue.mockResolvedValue(mockAuthResult)
@@ -294,8 +288,6 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('access-token')
     })
   })
-
-  // ─── refresh ─────────────────────────────────────────────────────────────────
 
   describe('refresh', () => {
     const futureDate = new Date(Date.now() + 86400000).toISOString()
@@ -374,8 +366,6 @@ describe('AuthService', () => {
     })
   })
 
-  // ─── logout ──────────────────────────────────────────────────────────────────
-
   describe('logout', () => {
     it('revokes the refresh token and logs audit event', async () => {
       mocks.session.revokeByRawToken.mockResolvedValue(undefined)
@@ -387,8 +377,6 @@ describe('AuthService', () => {
       expect(mocks.audit.authLogout).toHaveBeenCalledWith(SCHEMA, mockMeta)
     })
   })
-
-  // ─── validateGoogleUser ──────────────────────────────────────────────────────
 
   describe('validateGoogleUser', () => {
     const profile = {

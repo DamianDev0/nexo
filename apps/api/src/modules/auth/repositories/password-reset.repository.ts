@@ -10,7 +10,6 @@ export class PasswordResetRepository {
   constructor(private readonly tenantDb: TenantDbService) {}
 
   async create(schemaName: string, data: CreateResetTokenData): Promise<void> {
-    // Revoke any existing unused tokens for the user before issuing a new one
     await this.tenantDb.query(schemaName, async (qr) => {
       await qr.query(
         `UPDATE "${schemaName}".password_reset_tokens

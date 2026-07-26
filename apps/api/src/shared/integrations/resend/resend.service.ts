@@ -29,8 +29,6 @@ export class ResendService {
     this.client = new Resend(apiKey)
   }
 
-  // ─── Typed email methods ──────────────────────────────────────────────────
-
   async sendInviteEmail(to: string, params: InviteEmailParams): Promise<void> {
     const { subject, html } = buildInviteEmail(params)
     await this.send({ to, subject, html })
@@ -45,8 +43,6 @@ export class ResendService {
     const { subject, html } = buildWelcomeEmail(params)
     await this.send({ to, subject, html })
   }
-
-  // ─── Low-level send ───────────────────────────────────────────────────────
 
   private async send(options: SendEmailOptions): Promise<void> {
     const { data, error } = await this.client.emails.send({

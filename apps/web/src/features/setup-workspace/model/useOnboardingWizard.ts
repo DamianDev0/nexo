@@ -20,7 +20,6 @@ export function useOnboardingWizard() {
     queryFn: () => settingsService.getOnboarding(),
   })
 
-  // Derive current step from server state (TanStack Query IS the cache)
   const currentStep = data?.step ?? 1
 
   const { mutate: persistStep } = useMutation({

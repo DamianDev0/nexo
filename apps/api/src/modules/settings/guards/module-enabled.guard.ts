@@ -10,7 +10,6 @@ import { TenantConfigService } from '../services/tenant-config.service'
 
 export const MODULE_KEY = 'requiredModule'
 
-/** Decorate a controller or handler to gate access on a sidebar module being enabled. */
 export const RequireModule = (key: string) => SetMetadata(MODULE_KEY, key)
 
 @Injectable()

@@ -32,7 +32,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       method: request.method,
     }
 
-    // ─── VALIDATION ERRORS (400) ──────────────────────────────────
     if (status === HttpStatus.BAD_REQUEST && this.isValidationError(exceptionResponse)) {
       const validationResponse: ApiValidationErrorResponse = {
         ...base,
@@ -44,7 +43,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return
     }
 
-    // ─── ALL OTHER HTTP ERRORS ────────────────────────────────────
     const errorResponse: ApiErrorResponse = {
       ...base,
       message: this.extractMessage(exceptionResponse, exception),

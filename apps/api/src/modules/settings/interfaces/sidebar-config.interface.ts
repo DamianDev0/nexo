@@ -1,4 +1,3 @@
-// Types are defined in @repo/shared-types and re-exported here for internal use
 export type { SidebarModule, SidebarConfig } from '@repo/shared-types'
 export {
   REQUIRED_SIDEBAR_MODULES as REQUIRED_MODULES,

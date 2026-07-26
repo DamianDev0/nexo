@@ -14,10 +14,6 @@ function hostOf(value: string): string | null {
   }
 }
 
-/**
- * Allows the configured frontend origin plus any subdomain of its apex domain
- * (tenant subdomains like acme.app.com), and localhost for local development.
- */
 export function buildCorsOrigin(frontendUrl: string): CorsOriginFn {
   const frontendHost = hostOf(frontendUrl)
   const apex = frontendHost ? apexOf(frontendHost) : ''

@@ -12,8 +12,6 @@ export class AuditLogService {
     private readonly tenantDb: TenantDbService,
   ) {}
 
-  // ─── Auth events ──────────────────────────────────────────────────────────
-
   async authLogin(user: UserRef, schemaName: string, meta?: AuditMeta): Promise<void> {
     await this.write({
       schemaName,
@@ -166,8 +164,6 @@ export class AuditLogService {
     })
   }
 
-  // ─── User events ──────────────────────────────────────────────────────────
-
   async userCreated(
     user: UserRef,
     role: string,
@@ -187,8 +183,6 @@ export class AuditLogService {
     })
   }
 
-  // ─── Settings events ──────────────────────────────────────────────────────
-
   async settingsUpdated(
     tenantId: string,
     userId: string | undefined,
@@ -207,8 +201,6 @@ export class AuditLogService {
       ...meta,
     })
   }
-
-  // ─── Tenant events ────────────────────────────────────────────────────────
 
   async tenantCreated(tenant: TenantRef, schemaName: string, meta?: AuditMeta): Promise<void> {
     await this.write({
@@ -255,8 +247,6 @@ export class AuditLogService {
       return 'critical'
     return 'info'
   }
-
-  // ─── Private write ────────────────────────────────────────────────────────
 
   private async write(event: AuditEvent): Promise<void> {
     const {

@@ -4,11 +4,6 @@ import { UserRole } from '@repo/shared-types'
 import { ROLES_KEY } from '@/shared/decorators/roles.decorator'
 import { ROLE_HIERARCHY } from '../constants/role-hierarchy.constants'
 
-/**
- * Guards routes that require a minimum role level.
- * Use @Roles(UserRole.ADMIN) to restrict access.
- * Higher roles always have access to lower-role routes (hierarchy-based).
- */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}

@@ -36,10 +36,6 @@ import {
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  CRUD
-  // ═══════════════════════════════════════════════════════════════════════════
-
   @Get()
   @Auth(UserRole.VIEWER)
   @ApiOperation({ summary: 'List activities with pagination and filters' })
@@ -102,10 +98,6 @@ export class ActivitiesController {
   remove(@Param('id', ParseUUIDPipe) id: string, @TenantCtx() ctx: TenantContext): Promise<void> {
     return this.activitiesService.remove(ctx.schemaName, id)
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  Status transitions
-  // ═══════════════════════════════════════════════════════════════════════════
 
   @Patch(':id/complete')
   @Auth(UserRole.SALES_REP)

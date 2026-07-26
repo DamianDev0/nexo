@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config'
 import type { Request } from 'express'
 import type { JwtPayload } from '@repo/shared-types'
 
-/** Extract JWT from Authorization: Bearer header OR access_token httpOnly cookie */
 function cookieOrBearerExtractor(req: Request): string | null {
   const fromHeader = ExtractJwt.fromAuthHeaderAsBearerToken()(req)
   if (fromHeader) return fromHeader
@@ -29,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!payload.sub || !payload.tenantId || !payload.schemaName) {
       throw new UnauthorizedException('Invalid token payload')
     }
-    // Return value is attached to req.user
+
     return {
       id: payload.sub,
       email: payload.email,

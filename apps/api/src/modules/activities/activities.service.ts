@@ -29,16 +29,12 @@ import {
   UPDATABLE_FIELDS,
 } from './constants/activity.constants'
 
-// ─── Service ──────────────────────────────────────────────────────────────────
-
 @Injectable()
 export class ActivitiesService {
   constructor(
     private readonly db: TenantDbService,
     private readonly audit: AuditLogService,
   ) {}
-
-  // ─── List ─────────────────────────────────────────────────────────────────
 
   async findAll(schemaName: string, query: ActivityQueryDto): Promise<PaginatedActivities> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedActivities> => {
@@ -68,8 +64,6 @@ export class ActivitiesService {
     })
   }
 
-  // ─── Find one ─────────────────────────────────────────────────────────────
-
   async findOne(schemaName: string, activityId: string): Promise<ActivityListItem> {
     return this.db.query(schemaName, async (qr): Promise<ActivityListItem> => {
       const rows: ActivityListRow[] = await qr.query(
@@ -84,8 +78,6 @@ export class ActivitiesService {
       return this.mapListItem(row)
     })
   }
-
-  // ─── Create ───────────────────────────────────────────────────────────────
 
   async create(
     schemaName: string,
@@ -128,8 +120,6 @@ export class ActivitiesService {
     })
   }
 
-  // ─── Update ───────────────────────────────────────────────────────────────
-
   async update(
     schemaName: string,
     activityId: string,
@@ -171,8 +161,6 @@ export class ActivitiesService {
     })
   }
 
-  // ─── Delete (soft) ────────────────────────────────────────────────────────
-
   async remove(schemaName: string, activityId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
       await this.assertActivityExists(qr, activityId)
@@ -189,8 +177,6 @@ export class ActivitiesService {
       )
     })
   }
-
-  // ─── Complete ─────────────────────────────────────────────────────────────
 
   async complete(schemaName: string, activityId: string): Promise<ActivityListItem> {
     return this.db.query(schemaName, async (qr): Promise<ActivityListItem> => {
@@ -216,8 +202,6 @@ export class ActivitiesService {
     })
   }
 
-  // ─── Cancel ───────────────────────────────────────────────────────────────
-
   async cancel(schemaName: string, activityId: string): Promise<ActivityListItem> {
     return this.db.query(schemaName, async (qr): Promise<ActivityListItem> => {
       await this.assertActivityExists(qr, activityId)
@@ -233,8 +217,6 @@ export class ActivitiesService {
     })
   }
 
-  // ─── Reopen ───────────────────────────────────────────────────────────────
-
   async reopen(schemaName: string, activityId: string): Promise<ActivityListItem> {
     return this.db.query(schemaName, async (qr): Promise<ActivityListItem> => {
       await this.assertActivityExists(qr, activityId)
@@ -249,8 +231,6 @@ export class ActivitiesService {
       return this.fetchActivityOrFail(qr, activityId)
     })
   }
-
-  // ─── Calendar ─────────────────────────────────────────────────────────────
 
   async getCalendar(schemaName: string, query: CalendarQueryDto): Promise<CalendarActivity[]> {
     return this.db.query(schemaName, async (qr): Promise<CalendarActivity[]> => {
@@ -287,8 +267,6 @@ export class ActivitiesService {
       )
     })
   }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private async fetchActivityOrFail(
     qr: QueryRunner,
@@ -353,8 +331,6 @@ export class ActivitiesService {
 
     return { where: conditions.join(' AND '), params }
   }
-
-  // ─── Mappers ──────────────────────────────────────────────────────────────
 
   private mapActivity(r: ActivityRow): Activity {
     return {

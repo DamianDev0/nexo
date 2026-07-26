@@ -6,7 +6,7 @@ export interface ProductRow {
   description: string | null
   category: string | null
   brand: string | null
-  price_cents: string // BIGINT → string
+  price_cents: string
   cost_cents: string
   iva_rate: number
   product_type: string

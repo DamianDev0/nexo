@@ -8,7 +8,7 @@ import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { CacheService } from '@/shared/cache/cache.service'
 import type { TenantContext } from '@repo/shared-types'
 
-const TENANT_CACHE_TTL = 300 // 5 minutes
+const TENANT_CACHE_TTL = 300
 
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
@@ -26,11 +26,9 @@ export class TenantMiddleware implements NestMiddleware {
 
   async use(req: Request, _res: Response, next: NextFunction) {
     const host = req.headers.host ?? ''
-    const hostname = host.split(':')[0] ?? '' // Strip port
+    const hostname = host.split(':')[0] ?? ''
     const parts = hostname.split('.')
 
-    // Resolve subdomain from Host header
-    // Fall back to x-tenant-slug header only in non-production (dev/test convenience)
     let subdomain: string | undefined
 
     const isDirectAccess = parts.length < 2 || hostname === 'localhost' || hostname === '127.0.0.1'

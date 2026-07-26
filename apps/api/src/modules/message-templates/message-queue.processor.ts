@@ -24,17 +24,17 @@ export class MessageQueueProcessor extends WorkerHost {
     switch (channel) {
       case 'email':
         this.logger.log(`[EMAIL] To: ${recipient} | Subject: ${subject}`)
-        // TODO: connect to ResendService or SendGrid when ready
+
         break
 
       case 'sms':
         this.logger.log(`[SMS] To: ${recipient}`)
-        // TODO: connect to Twilio when ready
+
         break
 
       case 'whatsapp':
         this.logger.log(`[WHATSAPP] To: ${recipient}`)
-        // TODO: connect to 360dialog/Meta when ready
+
         break
 
       default:

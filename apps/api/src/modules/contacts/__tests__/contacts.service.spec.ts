@@ -6,8 +6,6 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { PaginatedContacts } from '@repo/shared-types'
 import { ContactStatus, ContactSource } from '@repo/shared-types'
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 const SCHEMA = 'tenant_acme'
 
 function makeContactRow(overrides: Record<string, unknown> = {}) {
@@ -38,8 +36,6 @@ function makeContactRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-// ─── Mock setup ───────────────────────────────────────────────────────────────
-
 function buildQrMock(overrides: Record<string, jest.Mock> = {}) {
   return { query: jest.fn(), ...overrides }
 }
@@ -50,8 +46,6 @@ function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
     transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ContactsService', () => {
   let service: ContactsService
@@ -72,8 +66,6 @@ describe('ContactsService', () => {
 
     service = module.get(ContactsService)
   })
-
-  // ─── findAll ───────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('returns paginated contacts with defaults', async () => {
@@ -97,7 +89,7 @@ describe('ContactsService', () => {
 
       expect(result.page).toBe(3)
       expect(result.limit).toBe(10)
-      // Verify OFFSET was calculated as (3-1)*10=20
+
       const listQuery: string = qr.query.mock.calls[1][0] as string
       expect(listQuery).toContain('OFFSET')
     })
@@ -136,8 +128,6 @@ describe('ContactsService', () => {
     })
   })
 
-  // ─── findOne ──────────────────────────────────────────────────────────────
-
   describe('findOne', () => {
     it('returns a contact when found', async () => {
       qr.query.mockResolvedValueOnce([makeContactRow()])
@@ -156,14 +146,11 @@ describe('ContactsService', () => {
     })
 
     it('throws NotFoundException for soft-deleted contacts', async () => {
-      // is_active = false means the WHERE is_active = true query returns nothing
       qr.query.mockResolvedValueOnce([])
 
       await expect(service.findOne(SCHEMA, 'c-deleted')).rejects.toThrow(NotFoundException)
     })
   })
-
-  // ─── create ───────────────────────────────────────────────────────────────
 
   describe('create', () => {
     it('inserts a contact and returns the mapped result', async () => {
@@ -211,14 +198,11 @@ describe('ContactsService', () => {
     })
   })
 
-  // ─── update ───────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('updates provided fields and returns updated contact', async () => {
-      // assertContactExists + fetchContactOrFail after UPDATE RETURNING
       qr.query
-        .mockResolvedValueOnce([{ id: 'c-1' }]) // assertContactExists
-        .mockResolvedValueOnce([makeContactRow({ first_name: 'Jane' })]) // UPDATE RETURNING
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([makeContactRow({ first_name: 'Jane' })])
 
       const result = await service.update(SCHEMA, 'c-1', { firstName: 'Jane' })
 
@@ -229,19 +213,17 @@ describe('ContactsService', () => {
     })
 
     it('returns existing contact when no fields are provided', async () => {
-      qr.query
-        .mockResolvedValueOnce([{ id: 'c-1' }]) // assertContactExists
-        .mockResolvedValueOnce([makeContactRow()]) // fetchContactOrFail (no-op path)
+      qr.query.mockResolvedValueOnce([{ id: 'c-1' }]).mockResolvedValueOnce([makeContactRow()])
 
       const result = await service.update(SCHEMA, 'c-1', {})
 
       expect(result.id).toBe('c-1')
-      // Only 2 queries: assert + fetch (no UPDATE)
+
       expect(qr.query).toHaveBeenCalledTimes(2)
     })
 
     it('throws NotFoundException when contact does not exist', async () => {
-      qr.query.mockResolvedValueOnce([]) // assertContactExists → empty
+      qr.query.mockResolvedValueOnce([])
 
       await expect(service.update(SCHEMA, 'missing', { firstName: 'X' })).rejects.toThrow(
         NotFoundException,
@@ -262,13 +244,9 @@ describe('ContactsService', () => {
     })
   })
 
-  // ─── remove ───────────────────────────────────────────────────────────────
-
   describe('remove', () => {
     it('soft-deletes the contact by setting is_active = false', async () => {
-      qr.query
-        .mockResolvedValueOnce([{ id: 'c-1' }]) // assertContactExists
-        .mockResolvedValueOnce([]) // UPDATE is_active = false
+      qr.query.mockResolvedValueOnce([{ id: 'c-1' }]).mockResolvedValueOnce([])
 
       await service.remove(SCHEMA, 'c-1')
 
@@ -282,8 +260,6 @@ describe('ContactsService', () => {
       await expect(service.remove(SCHEMA, 'missing')).rejects.toThrow(NotFoundException)
     })
   })
-
-  // ─── getTimeline ──────────────────────────────────────────────────────────
 
   describe('getTimeline', () => {
     it('returns activities and deals in parallel', async () => {
@@ -310,9 +286,9 @@ describe('ContactsService', () => {
       }
 
       qr.query
-        .mockResolvedValueOnce([{ id: 'c-1' }]) // assertContactExists
-        .mockResolvedValueOnce([activityRow]) // activities (Promise.all[0])
-        .mockResolvedValueOnce([dealRow]) // deals (Promise.all[1])
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([activityRow])
+        .mockResolvedValueOnce([dealRow])
 
       const result = await service.getTimeline(SCHEMA, 'c-1')
 
@@ -341,11 +317,12 @@ describe('ContactsService', () => {
     })
   })
 
-  // ─── buildWhereClause (via findAll) ───────────────────────────────────────
-
   describe('buildWhereClause filters', () => {
     beforeEach(() => {
-      qr.query.mockReset().mockResolvedValueOnce([{ count: '0' }]).mockResolvedValueOnce([])
+      qr.query
+        .mockReset()
+        .mockResolvedValueOnce([{ count: '0' }])
+        .mockResolvedValueOnce([])
     })
 
     it('always includes is_active = true', async () => {

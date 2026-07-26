@@ -7,8 +7,6 @@ import { ImportService } from '@/shared/imports/services/import.service'
 import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import type { PaginatedProducts } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const SCHEMA = 'tenant_acme'
 const PRODUCT_ID = 'prod-1'
 const USER_ID = 'user-1'
@@ -57,8 +55,6 @@ function makeMovementRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-// ─── Mock setup ───────────────────────────────────────────────────────────────
-
 function buildQrMock() {
   return { query: jest.fn() }
 }
@@ -70,8 +66,6 @@ function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
     transactional: jest.fn(executor),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ProductsService', () => {
   let service: ProductsService
@@ -96,8 +90,6 @@ describe('ProductsService', () => {
 
     service = module.get(ProductsService)
   })
-
-  // ─── findAll ──────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('returns paginated products', async () => {
@@ -149,8 +141,6 @@ describe('ProductsService', () => {
     })
   })
 
-  // ─── findOne ──────────────────────────────────────────────────────────────
-
   describe('findOne', () => {
     it('returns full product detail', async () => {
       qr.query.mockResolvedValueOnce([makeProductRow()])
@@ -170,8 +160,6 @@ describe('ProductsService', () => {
     })
   })
 
-  // ─── findOneWithMovements ─────────────────────────────────────────────────
-
   describe('findOneWithMovements', () => {
     it('returns product with movement history', async () => {
       qr.query
@@ -189,14 +177,12 @@ describe('ProductsService', () => {
     })
   })
 
-  // ─── create ───────────────────────────────────────────────────────────────
-
   describe('create', () => {
     it('inserts product and returns detail', async () => {
       qr.query
-        .mockResolvedValueOnce([]) // assertSkuUnique
-        .mockResolvedValueOnce([{ id: PRODUCT_ID }]) // INSERT
-        .mockResolvedValueOnce([makeProductRow()]) // fetchProductOrFail
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ id: PRODUCT_ID }])
+        .mockResolvedValueOnce([makeProductRow()])
 
       const result = await service.create(
         SCHEMA,
@@ -212,7 +198,7 @@ describe('ProductsService', () => {
     })
 
     it('throws BadRequestException for duplicate SKU', async () => {
-      qr.query.mockResolvedValueOnce([{ id: 'other' }]) // assertSkuUnique → found
+      qr.query.mockResolvedValueOnce([{ id: 'other' }])
 
       await expect(
         service.create(SCHEMA, { name: 'Dup', sku: 'WDG-001', priceCents: 1000 }, USER_ID),
@@ -221,7 +207,7 @@ describe('ProductsService', () => {
 
     it('skips SKU validation when no SKU provided', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: PRODUCT_ID }]) // INSERT (no assertSkuUnique)
+        .mockResolvedValueOnce([{ id: PRODUCT_ID }])
         .mockResolvedValueOnce([makeProductRow({ sku: null })])
 
       const result = await service.create(SCHEMA, { name: 'No SKU', priceCents: 500 }, USER_ID)
@@ -230,13 +216,11 @@ describe('ProductsService', () => {
     })
   })
 
-  // ─── update ───────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('updates fields and returns product', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: PRODUCT_ID }]) // assertProductExists
-        .mockResolvedValueOnce([]) // UPDATE
+        .mockResolvedValueOnce([{ id: PRODUCT_ID }])
+        .mockResolvedValueOnce([])
         .mockResolvedValueOnce([makeProductRow({ name: 'Widget Pro V2' })])
 
       const result = await service.update(SCHEMA, PRODUCT_ID, { name: 'Widget Pro V2' })
@@ -246,16 +230,14 @@ describe('ProductsService', () => {
 
     it('validates SKU uniqueness on update', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: PRODUCT_ID }]) // assertProductExists
-        .mockResolvedValueOnce([{ id: 'other-prod' }]) // assertSkuUnique → found
+        .mockResolvedValueOnce([{ id: PRODUCT_ID }])
+        .mockResolvedValueOnce([{ id: 'other-prod' }])
 
       await expect(service.update(SCHEMA, PRODUCT_ID, { sku: 'TAKEN-SKU' })).rejects.toThrow(
         BadRequestException,
       )
     })
   })
-
-  // ─── remove ───────────────────────────────────────────────────────────────
 
   describe('remove', () => {
     it('soft-deletes by setting is_active = false', async () => {
@@ -268,14 +250,12 @@ describe('ProductsService', () => {
     })
   })
 
-  // ─── adjustInventory ─────────────────────────────────────────────────────
-
   describe('adjustInventory', () => {
     it('records purchase movement and increases stock', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: PRODUCT_ID }]) // assertProductExists
-        .mockResolvedValueOnce([makeMovementRow()]) // INSERT movement
-        .mockResolvedValueOnce([]) // UPDATE stock
+        .mockResolvedValueOnce([{ id: PRODUCT_ID }])
+        .mockResolvedValueOnce([makeMovementRow()])
+        .mockResolvedValueOnce([])
 
       const result = await service.adjustInventory(
         SCHEMA,
@@ -293,7 +273,7 @@ describe('ProductsService', () => {
     })
 
     it('checks stock for sale movements and throws if insufficient', async () => {
-      qr.query.mockResolvedValueOnce([{ stock: 5 }]) // SELECT FOR UPDATE
+      qr.query.mockResolvedValueOnce([{ stock: 5 }])
 
       await expect(
         service.adjustInventory(
@@ -310,9 +290,9 @@ describe('ProductsService', () => {
 
     it('allows sale when stock is sufficient', async () => {
       qr.query
-        .mockResolvedValueOnce([{ stock: 50 }]) // SELECT FOR UPDATE
-        .mockResolvedValueOnce([makeMovementRow({ movement_type: 'sale', quantity: 5 })]) // INSERT
-        .mockResolvedValueOnce([]) // UPDATE stock
+        .mockResolvedValueOnce([{ stock: 50 }])
+        .mockResolvedValueOnce([makeMovementRow({ movement_type: 'sale', quantity: 5 })])
+        .mockResolvedValueOnce([])
 
       const result = await service.adjustInventory(
         SCHEMA,
@@ -327,8 +307,6 @@ describe('ProductsService', () => {
       expect(result.movementType).toBe('sale')
     })
   })
-
-  // ─── getLowStock ──────────────────────────────────────────────────────────
 
   describe('getLowStock', () => {
     it('returns products below minimum stock', async () => {

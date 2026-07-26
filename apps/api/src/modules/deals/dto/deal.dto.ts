@@ -15,8 +15,6 @@ import {
 import { Type } from 'class-transformer'
 import { DealStatus } from '@repo/shared-types'
 
-// ─── Create ───────────────────────────────────────────────────────────────────
-
 export class CreateDealDto {
   @IsString()
   @IsNotEmpty()
@@ -63,11 +61,7 @@ export class CreateDealDto {
   customFields?: Record<string, unknown>
 }
 
-// ─── Update ───────────────────────────────────────────────────────────────────
-
 export class UpdateDealDto extends PartialType(CreateDealDto) {}
-
-// ─── Query / filters ─────────────────────────────────────────────────────────
 
 export class DealQueryDto {
   @IsOptional()
@@ -112,8 +106,6 @@ export class DealQueryDto {
   limit?: number
 }
 
-// ─── Move stage ───────────────────────────────────────────────────────────────
-
 export class MoveDealDto {
   @IsUUID()
   stageId: string
@@ -121,8 +113,6 @@ export class MoveDealDto {
   @IsUUID()
   pipelineId: string
 }
-
-// ─── Deal items ──────────────────────────────────────────────────────────────
 
 export class CreateDealItemDto {
   @IsOptional()
@@ -161,8 +151,6 @@ export class CreateDealItemDto {
 }
 
 export class UpdateDealItemDto extends PartialType(CreateDealItemDto) {}
-
-// ─── Mark lost ────────────────────────────────────────────────────────────────
 
 export class LoseDealDto {
   @IsString()

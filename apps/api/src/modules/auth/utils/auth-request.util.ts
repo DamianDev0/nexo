@@ -8,7 +8,6 @@ import {
   REFRESH_TOKEN_MAX_AGE_MS,
 } from '../constants/auth-cookies.constants'
 
-/** Extract IP address and User-Agent from an incoming Express request */
 export function extractMeta(req: Request): RequestMeta {
   const ip = String(req.ip ?? req.socket?.remoteAddress ?? 'unknown').replace('::ffff:', '')
   const header = req.headers['user-agent'] as string | string[] | undefined
@@ -16,7 +15,6 @@ export function extractMeta(req: Request): RequestMeta {
   return { ip, userAgent }
 }
 
-/** Set both auth cookies (access + refresh) on the response */
 export function setAuthCookies(
   res: Response,
   accessToken: string,
@@ -34,13 +32,11 @@ export function setAuthCookies(
   })
 }
 
-/** Extract a cookie value from an incoming request by name */
 export function extractCookie(req: Request, name: string): string | undefined {
   const cookies = req.cookies as Record<string, string> | undefined
   return cookies?.[name]
 }
 
-/** Clear both auth cookies */
 export function clearAuthCookies(res: Response): void {
   res.clearCookie(ACCESS_COOKIE)
   res.clearCookie(REFRESH_COOKIE, { path: REFRESH_COOKIE_PATH })

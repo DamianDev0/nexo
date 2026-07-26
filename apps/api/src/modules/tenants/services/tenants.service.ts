@@ -62,10 +62,6 @@ export class TenantsService {
     return TenantResponseDto.fromEntity(tenant)
   }
 
-  /**
-   * Hard-deletes a tenant record and drops its schema.
-   * Used as rollback during failed onboarding — not exposed via API.
-   */
   async delete(tenantId: string): Promise<void> {
     const tenant = await this.tenantsRepo.findById(tenantId)
     if (!tenant) return

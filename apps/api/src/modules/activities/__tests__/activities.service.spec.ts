@@ -5,8 +5,6 @@ import { ActivitiesService } from '../activities.service'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { PaginatedActivities } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const SCHEMA = 'tenant_acme'
 const ACTIVITY_ID = 'act-1'
 const USER_ID = 'user-1'
@@ -40,8 +38,6 @@ function makeActivityListRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-// ─── Mock setup ───────────────────────────────────────────────────────────────
-
 function buildQrMock() {
   return { query: jest.fn() }
 }
@@ -51,8 +47,6 @@ function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
     query: jest.fn((_schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ActivitiesService', () => {
   let service: ActivitiesService
@@ -72,8 +66,6 @@ describe('ActivitiesService', () => {
 
     service = module.get(ActivitiesService)
   })
-
-  // ─── findAll ──────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('returns paginated activities', async () => {
@@ -117,8 +109,6 @@ describe('ActivitiesService', () => {
     })
   })
 
-  // ─── findOne ──────────────────────────────────────────────────────────────
-
   describe('findOne', () => {
     it('returns activity with joined names', async () => {
       qr.query.mockResolvedValueOnce([makeActivityListRow()])
@@ -138,13 +128,11 @@ describe('ActivitiesService', () => {
     })
   })
 
-  // ─── create ───────────────────────────────────────────────────────────────
-
   describe('create', () => {
     it('inserts and returns the created activity', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: ACTIVITY_ID }]) // INSERT
-        .mockResolvedValueOnce([makeActivityListRow()]) // fetchActivityOrFail
+        .mockResolvedValueOnce([{ id: ACTIVITY_ID }])
+        .mockResolvedValueOnce([makeActivityListRow()])
 
       const result = await service.create(
         SCHEMA,
@@ -171,19 +159,17 @@ describe('ActivitiesService', () => {
       await service.create(SCHEMA, { activityType: 'note' }, USER_ID)
 
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      // assigned_to_id is param index 9 (0-based), should be USER_ID
+
       expect(params[9]).toBe(USER_ID)
     })
   })
 
-  // ─── update ───────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('updates fields and returns updated activity', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: ACTIVITY_ID }]) // assertActivityExists
-        .mockResolvedValueOnce([]) // UPDATE
-        .mockResolvedValueOnce([makeActivityListRow({ title: 'Updated call' })]) // fetch
+        .mockResolvedValueOnce([{ id: ACTIVITY_ID }])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([makeActivityListRow({ title: 'Updated call' })])
 
       const result = await service.update(SCHEMA, ACTIVITY_ID, { title: 'Updated call' })
 
@@ -192,18 +178,16 @@ describe('ActivitiesService', () => {
 
     it('returns current state when no fields provided', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: ACTIVITY_ID }]) // assertActivityExists
-        .mockResolvedValueOnce([makeActivityListRow()]) // fetchActivityOrFail
+        .mockResolvedValueOnce([{ id: ACTIVITY_ID }])
+        .mockResolvedValueOnce([makeActivityListRow()])
 
       const result = await service.update(SCHEMA, ACTIVITY_ID, {})
 
       expect(result.id).toBe(ACTIVITY_ID)
-      // Only 2 queries: assertExists + fetch (no UPDATE)
+
       expect(qr.query).toHaveBeenCalledTimes(2)
     })
   })
-
-  // ─── remove ───────────────────────────────────────────────────────────────
 
   describe('remove', () => {
     it('soft-deletes by setting is_active = false', async () => {
@@ -216,13 +200,11 @@ describe('ActivitiesService', () => {
     })
   })
 
-  // ─── complete ─────────────────────────────────────────────────────────────
-
   describe('complete', () => {
     it('sets status to completed and completed_at', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: ACTIVITY_ID }]) // assertExists
-        .mockResolvedValueOnce([]) // UPDATE
+        .mockResolvedValueOnce([{ id: ACTIVITY_ID }])
+        .mockResolvedValueOnce([])
         .mockResolvedValueOnce([
           makeActivityListRow({ status: 'completed', completed_at: '2026-03-20T12:00:00Z' }),
         ])
@@ -238,8 +220,6 @@ describe('ActivitiesService', () => {
     })
   })
 
-  // ─── cancel ───────────────────────────────────────────────────────────────
-
   describe('cancel', () => {
     it('sets status to cancelled', async () => {
       qr.query
@@ -252,8 +232,6 @@ describe('ActivitiesService', () => {
       expect(result.status).toBe('cancelled')
     })
   })
-
-  // ─── reopen ───────────────────────────────────────────────────────────────
 
   describe('reopen', () => {
     it('sets status back to pending and clears completed_at', async () => {
@@ -272,8 +250,6 @@ describe('ActivitiesService', () => {
       expect(updateSql).toContain('completed_at = NULL')
     })
   })
-
-  // ─── getCalendar ──────────────────────────────────────────────────────────
 
   describe('getCalendar', () => {
     it('returns activities within date range', async () => {

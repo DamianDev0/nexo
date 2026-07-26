@@ -1,13 +1,9 @@
 export interface TenantMigration {
   id: string
-  /** Returns the SQL to apply. Must be idempotent (use IF NOT EXISTS, IF EXISTS, etc.) */
+
   up(schema: string): string
 }
 
-/**
- * Ordered list of migrations applied to every tenant schema.
- * New entries MUST be appended — never reorder or remove.
- */
 export const TENANT_MIGRATIONS: TenantMigration[] = [
   {
     id: '0001_audit_log_description_metadata',
@@ -59,8 +55,6 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
     `,
   },
   {
-    // Adds email, tags, assigned_to_id to companies (not in original schema)
-    // + GIN indices for full-text search and tag filtering
     id: '0005_companies_email_tags_assigned_to',
     up: (schema) => `
       ALTER TABLE "${schema}".companies
@@ -86,7 +80,6 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
     `,
   },
   {
-    // Enforce NIT uniqueness per tenant (only active companies with non-null NIT)
     id: '0006_companies_nit_unique',
     up: (schema) => `
       CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_companies_nit"

@@ -6,8 +6,6 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { DealStatus } from '@repo/shared-types'
 import type { DealDetail, PaginatedDeals } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const SCHEMA = 'tenant_acme'
 const DEAL_ID = 'deal-1'
 const USER_ID = 'user-1'
@@ -73,8 +71,6 @@ function makeItemRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-// ─── Mock setup ───────────────────────────────────────────────────────────────
-
 function buildQrMock() {
   return { query: jest.fn() }
 }
@@ -86,7 +82,6 @@ function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
   }
 }
 
-/** fetchDealOrFail does 2 queries: SELECT detail + SELECT items */
 function mockFetchDeal(
   qr: ReturnType<typeof buildQrMock>,
   detailOverrides = {},
@@ -94,8 +89,6 @@ function mockFetchDeal(
 ) {
   qr.query.mockResolvedValueOnce([makeDealDetailRow(detailOverrides)]).mockResolvedValueOnce(items)
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('DealsService', () => {
   let service: DealsService
@@ -116,8 +109,6 @@ describe('DealsService', () => {
 
     service = module.get(DealsService)
   })
-
-  // ─── findAll ──────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('returns paginated deals', async () => {
@@ -171,8 +162,6 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── findOne ──────────────────────────────────────────────────────────────
-
   describe('findOne', () => {
     it('returns deal detail with joined relations and items', async () => {
       mockFetchDeal(qr, {}, [makeItemRow()])
@@ -194,15 +183,13 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── create ───────────────────────────────────────────────────────────────
-
   describe('create', () => {
     it('inserts a deal with stage history and returns detail', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: STAGE_ID }]) // assertStageInPipeline
-        .mockResolvedValueOnce([{ id: DEAL_ID }]) // INSERT RETURNING id
-        .mockResolvedValueOnce([]) // recordStageChange
-      mockFetchDeal(qr) // fetchDealOrFail (detail + items)
+        .mockResolvedValueOnce([{ id: STAGE_ID }])
+        .mockResolvedValueOnce([{ id: DEAL_ID }])
+        .mockResolvedValueOnce([])
+      mockFetchDeal(qr)
 
       const result = await service.create(
         SCHEMA,
@@ -211,14 +198,14 @@ describe('DealsService', () => {
       )
 
       expect(result.title).toBe('Big Deal')
-      // Verify stage history was recorded
+
       const historyCall = qr.query.mock.calls[2]
       const historySql: string = historyCall[0] as string
       expect(historySql).toContain('deal_stage_history')
     })
 
     it('skips stage validation when no stageId/pipelineId', async () => {
-      qr.query.mockResolvedValueOnce([{ id: DEAL_ID }]) // INSERT
+      qr.query.mockResolvedValueOnce([{ id: DEAL_ID }])
       mockFetchDeal(qr, { stage_id: null, pipeline_id: null })
 
       await service.create(SCHEMA, { title: 'No Stage Deal' }, USER_ID)
@@ -228,13 +215,11 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── update ───────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('updates deal fields and returns detail', async () => {
-      qr.query.mockResolvedValueOnce([{ id: DEAL_ID }]) // assertDealExists
-      qr.query.mockResolvedValueOnce([]) // UPDATE
-      mockFetchDeal(qr, { title: 'Updated' }) // fetchDealOrFail
+      qr.query.mockResolvedValueOnce([{ id: DEAL_ID }])
+      qr.query.mockResolvedValueOnce([])
+      mockFetchDeal(qr, { title: 'Updated' })
 
       const result = await service.update(SCHEMA, DEAL_ID, { title: 'Updated' })
 
@@ -242,8 +227,8 @@ describe('DealsService', () => {
     })
 
     it('returns current state when no fields provided', async () => {
-      qr.query.mockResolvedValueOnce([{ id: DEAL_ID }]) // assertDealExists
-      mockFetchDeal(qr) // fetchDealOrFail
+      qr.query.mockResolvedValueOnce([{ id: DEAL_ID }])
+      mockFetchDeal(qr)
 
       const result = await service.update(SCHEMA, DEAL_ID, {})
 
@@ -259,8 +244,6 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── remove ───────────────────────────────────────────────────────────────
-
   describe('remove', () => {
     it('soft-deletes by setting is_active = false', async () => {
       qr.query.mockResolvedValueOnce([{ id: DEAL_ID }]).mockResolvedValueOnce([])
@@ -272,17 +255,15 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── moveStage ────────────────────────────────────────────────────────────
-
   describe('moveStage', () => {
     it('updates stage and records history', async () => {
       const newStage = 'stage-2'
       qr.query
-        .mockResolvedValueOnce([{ id: DEAL_ID, stage_id: STAGE_ID, status: 'open' }]) // fetchDealRowOrFail
-        .mockResolvedValueOnce([{ id: newStage }]) // assertStageInPipeline
-        .mockResolvedValueOnce([]) // UPDATE
-        .mockResolvedValueOnce([]) // recordStageChange
-      mockFetchDeal(qr, { stage_id: newStage }) // fetchDealOrFail
+        .mockResolvedValueOnce([{ id: DEAL_ID, stage_id: STAGE_ID, status: 'open' }])
+        .mockResolvedValueOnce([{ id: newStage }])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+      mockFetchDeal(qr, { stage_id: newStage })
 
       const result = await service.moveStage(
         SCHEMA,
@@ -298,14 +279,12 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── markWon ──────────────────────────────────────────────────────────────
-
   describe('markWon', () => {
     it('sets status to won and records history', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: DEAL_ID, stage_id: STAGE_ID, status: 'open' }]) // fetchDealRowOrFail
-        .mockResolvedValueOnce([]) // UPDATE
-        .mockResolvedValueOnce([]) // recordStageChange
+        .mockResolvedValueOnce([{ id: DEAL_ID, stage_id: STAGE_ID, status: 'open' }])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
       mockFetchDeal(qr, { status: 'won' })
 
       const result = await service.markWon(SCHEMA, DEAL_ID, USER_ID)
@@ -325,8 +304,6 @@ describe('DealsService', () => {
       await expect(service.markWon(SCHEMA, DEAL_ID)).rejects.toThrow(BadRequestException)
     })
   })
-
-  // ─── markLost ─────────────────────────────────────────────────────────────
 
   describe('markLost', () => {
     it('sets status to lost with required loss reason', async () => {
@@ -356,8 +333,6 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── reopen ───────────────────────────────────────────────────────────────
-
   describe('reopen', () => {
     it('reopens a won deal', async () => {
       qr.query
@@ -378,15 +353,13 @@ describe('DealsService', () => {
     })
   })
 
-  // ─── Deal Items ───────────────────────────────────────────────────────────
-
   describe('addItem', () => {
     it('inserts item and recalculates deal value', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: DEAL_ID }]) // assertDealExists
-        .mockResolvedValueOnce([{ max_pos: 0 }]) // getNextItemPosition
-        .mockResolvedValueOnce([makeItemRow()]) // INSERT RETURNING
-        .mockResolvedValueOnce([]) // recalcDealValue
+        .mockResolvedValueOnce([{ id: DEAL_ID }])
+        .mockResolvedValueOnce([{ max_pos: 0 }])
+        .mockResolvedValueOnce([makeItemRow()])
+        .mockResolvedValueOnce([])
 
       const result = await service.addItem(SCHEMA, DEAL_ID, {
         description: 'Consulting service',
@@ -394,9 +367,8 @@ describe('DealsService', () => {
       })
 
       expect(result.description).toBe('Consulting service')
-      expect(result.subtotalCents).toBe(90000) // 2 * 50000 * (100-10)/100 = 90000
+      expect(result.subtotalCents).toBe(90000)
 
-      // Verify recalc was called
       const lastSql: string = qr.query.mock.calls[3][0] as string
       expect(lastSql).toContain('SUM(quantity * unit_price_cents')
     })
@@ -405,10 +377,10 @@ describe('DealsService', () => {
   describe('updateItem', () => {
     it('updates item and recalculates deal value', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: ITEM_ID }]) // assertItemExists
-        .mockResolvedValueOnce([]) // UPDATE
-        .mockResolvedValueOnce([]) // recalcDealValue
-        .mockResolvedValueOnce([makeItemRow({ quantity: 5 })]) // fetchItemOrFail
+        .mockResolvedValueOnce([{ id: ITEM_ID }])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([makeItemRow({ quantity: 5 })])
 
       const result = await service.updateItem(SCHEMA, DEAL_ID, ITEM_ID, { quantity: 5 })
 
@@ -419,15 +391,15 @@ describe('DealsService', () => {
   describe('removeItem', () => {
     it('deletes item and recalculates deal value', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: ITEM_ID }]) // assertItemExists
-        .mockResolvedValueOnce([]) // DELETE
-        .mockResolvedValueOnce([]) // recalcDealValue
+        .mockResolvedValueOnce([{ id: ITEM_ID }])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
 
       await expect(service.removeItem(SCHEMA, DEAL_ID, ITEM_ID)).resolves.toBeUndefined()
     })
 
     it('throws NotFoundException for missing item', async () => {
-      qr.query.mockResolvedValueOnce([]) // assertItemExists → empty
+      qr.query.mockResolvedValueOnce([])
 
       await expect(service.removeItem(SCHEMA, DEAL_ID, 'missing')).rejects.toThrow(
         NotFoundException,
@@ -438,7 +410,7 @@ describe('DealsService', () => {
   describe('getItems', () => {
     it('returns items for a deal', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: DEAL_ID }]) // assertDealExists
+        .mockResolvedValueOnce([{ id: DEAL_ID }])
         .mockResolvedValueOnce([makeItemRow(), makeItemRow({ id: 'item-2', position: 1 })])
 
       const result = await service.getItems(SCHEMA, DEAL_ID)
@@ -447,8 +419,6 @@ describe('DealsService', () => {
       expect(result[0]?.subtotalCents).toBe(90000)
     })
   })
-
-  // ─── Forecast ─────────────────────────────────────────────────────────────
 
   describe('getForecast', () => {
     it('returns forecast grouped by month', async () => {

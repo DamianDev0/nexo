@@ -40,8 +40,6 @@ export class S3Service {
     this.logger.log(`S3Service ready — bucket: ${bucket}, region: ${region}`)
   }
 
-  // ─── Upload ───────────────────────────────────────────────────────────────
-
   async upload(file: MulterFile, category: S3Category, tenantSlug: string): Promise<UploadResult> {
     const cfg = S3_CATEGORY_CONFIG[category]
 
@@ -64,22 +62,16 @@ export class S3Service {
     return { url, key, sizeBytes: file.size, mimeType: file.mimetype }
   }
 
-  // ─── Delete ───────────────────────────────────────────────────────────────
-
   async delete(key: string): Promise<void> {
     await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }))
     this.logger.log(`Deleted → ${key}`)
   }
-
-  // ─── Presigned URL (for private files) ───────────────────────────────────
 
   async presignedUrl(key: string, expiresIn = 3600): Promise<string> {
     return getSignedUrl(this.client, new GetObjectCommand({ Bucket: this.bucket, Key: key }), {
       expiresIn,
     })
   }
-
-  // ─── Download buffer ──────────────────────────────────────────────────────
 
   async download(key: string): Promise<Buffer> {
     const response = await this.client.send(new GetObjectCommand({ Bucket: this.bucket, Key: key }))
@@ -89,14 +81,10 @@ export class S3Service {
     return Buffer.concat(chunks)
   }
 
-  // ─── Key extractor (from full URL → S3 key) ──────────────────────────────
-
   extractKey(url: string): string {
     const base = this.cdnUrl ?? `https://${this.bucket}.s3.${this.region}.amazonaws.com`
     return url.replaceAll(`${base}/`, '')
   }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private validateFile(
     file: MulterFile,

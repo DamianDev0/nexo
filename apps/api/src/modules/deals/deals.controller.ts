@@ -44,10 +44,6 @@ export class DealsController {
     private readonly customFields: CustomFieldsValidator,
   ) {}
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  CRUD
-  // ═══════════════════════════════════════════════════════════════════════════
-
   @Get()
   @Auth(UserRole.VIEWER)
   @ApiOperation({ summary: 'List deals with pagination and filters' })
@@ -107,10 +103,6 @@ export class DealsController {
     return this.dealsService.remove(ctx.schemaName, id)
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  Status transitions
-  // ═══════════════════════════════════════════════════════════════════════════
-
   @Patch(':id/stage')
   @Auth(UserRole.SALES_REP)
   @ApiParam({ name: 'id', description: 'Deal UUID' })
@@ -160,10 +152,6 @@ export class DealsController {
   ): Promise<DealDetail> {
     return this.dealsService.reopen(ctx.schemaName, id, user.id)
   }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  Deal Items
-  // ═══════════════════════════════════════════════════════════════════════════
 
   @Get(':id/items')
   @Auth(UserRole.VIEWER)

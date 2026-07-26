@@ -37,7 +37,6 @@ export class TransformInterceptor implements NestInterceptor {
           message: customMessage ?? defaultMessage,
         }
 
-        // If the service returns a PaginatedResult, unwrap it
         if (this.isPaginatedResult(data)) {
           return {
             ...base,

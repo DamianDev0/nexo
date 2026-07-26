@@ -8,12 +8,6 @@ import type {
   WelcomeEmailParams,
 } from './interfaces/resend.interfaces'
 
-/**
- * Tenant-aware email service.
- * Automatically injects the tenant's branding (companyName, logoUrl, primaryColor)
- * into every transactional email so recipients see the business' identity,
- * not the platform's.
- */
 @Injectable()
 export class TenantEmailService {
   constructor(
@@ -47,8 +41,6 @@ export class TenantEmailService {
     const branding = await this.getBranding(tenantId)
     return this.resend.sendInviteEmail(to, { ...params, branding })
   }
-
-  // ─── Private ──────────────────────────────────────────────────────────────
 
   private async getBranding(tenantId: string): Promise<EmailBrandingContext> {
     const theme = await this.tenantConfig.getTheme(tenantId)

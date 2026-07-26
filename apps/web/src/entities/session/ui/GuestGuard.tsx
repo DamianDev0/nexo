@@ -11,7 +11,6 @@ interface GuestGuardProps {
   readonly children: React.ReactNode
 }
 
-/** Protects auth routes — redirects to dashboard if already authenticated */
 export function GuestGuard({ children }: GuestGuardProps) {
   const { data, isLoading } = useAuth()
   const router = useRouter()

@@ -1,7 +1,5 @@
 import type { UpdateDealDto } from '../dto/deal.dto'
 
-// ─── Field mapping: DTO key → SQL column ─────────────────────────────────────
-
 export const UPDATABLE_FIELDS: Array<[keyof UpdateDealDto, string]> = [
   ['title', 'title'],
   ['valueCents', 'value_cents'],
@@ -15,9 +13,6 @@ export const UPDATABLE_FIELDS: Array<[keyof UpdateDealDto, string]> = [
   ['customFields', 'custom_fields'],
 ]
 
-// ─── SQL column lists ─────────────────────────────────────────────────────────
-
-/** Columns for list view — no custom_fields, no contact/company detail */
 export const DEAL_LIST_COLUMNS = `
   d.id, d.title, d.value_cents, d.expected_close_date, d.close_date_actual,
   d.stage_id,
@@ -33,7 +28,6 @@ export const DEAL_LIST_COLUMNS = `
   d.is_active, d.created_by, d.created_at, d.updated_at
 `
 
-/** Columns for detail view — includes custom_fields + joined contact/company */
 export const DEAL_DETAIL_COLUMNS = `
   d.id, d.title, d.value_cents, d.expected_close_date,
   d.stage_id,
@@ -57,8 +51,6 @@ export const DEAL_DETAIL_COLUMNS = `
   d.close_date_actual,
   d.custom_fields, d.is_active, d.created_by, d.created_at, d.updated_at
 `
-
-// ─── FROM clauses with JOINs ─────────────────────────────────────────────────
 
 export const DEAL_LIST_FROM = `
   FROM deals d

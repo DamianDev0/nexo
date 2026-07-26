@@ -26,16 +26,12 @@ import {
   COMPANY_LIST_COLUMNS,
 } from './constants/company.constants'
 
-// ─── Service ──────────────────────────────────────────────────────────────────
-
 @Injectable()
 export class CompaniesService {
   constructor(
     private readonly db: TenantDbService,
     private readonly audit: AuditLogService,
   ) {}
-
-  // ─── List ─────────────────────────────────────────────────────────────────
 
   async findAll(schemaName: string, query: CompanyQueryDto): Promise<PaginatedCompanies> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedCompanies> => {
@@ -65,13 +61,9 @@ export class CompaniesService {
     })
   }
 
-  // ─── Find one ─────────────────────────────────────────────────────────────
-
   async findOne(schemaName: string, companyId: string): Promise<Company> {
     return this.db.query(schemaName, (qr) => this.fetchCompanyOrFail(qr, companyId))
   }
-
-  // ─── Create ───────────────────────────────────────────────────────────────
 
   async create(schemaName: string, dto: CreateCompanyDto, createdById: string): Promise<Company> {
     const { nit, nitDv } = this.resolveNit(dto.nit)
@@ -122,8 +114,6 @@ export class CompaniesService {
     })
   }
 
-  // ─── Update ───────────────────────────────────────────────────────────────
-
   async update(schemaName: string, companyId: string, dto: UpdateCompanyDto): Promise<Company> {
     return this.db.query(schemaName, async (qr): Promise<Company> => {
       await this.assertCompanyExists(qr, companyId)
@@ -131,7 +121,6 @@ export class CompaniesService {
       const sets: string[] = ['updated_at = NOW()']
       const params: unknown[] = []
 
-      // Handle NIT separately — needs DV recalculation + uniqueness check
       if (dto.nit !== undefined) {
         const { nit, nitDv } = this.resolveNit(dto.nit)
         if (nit) {
@@ -172,8 +161,6 @@ export class CompaniesService {
     })
   }
 
-  // ─── Delete (soft) ────────────────────────────────────────────────────────
-
   async remove(schemaName: string, companyId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
       await this.assertCompanyExists(qr, companyId)
@@ -190,8 +177,6 @@ export class CompaniesService {
       )
     })
   }
-
-  // ─── Summary ─────────────────────────────────────────────────────────────
 
   async getSummary(schemaName: string, companyId: string): Promise<CompanySummary> {
     return this.db.query(schemaName, async (qr): Promise<CompanySummary> => {
@@ -265,8 +250,6 @@ export class CompaniesService {
     })
   }
 
-  // ─── Assign contact ───────────────────────────────────────────────────────
-
   async assignContact(schemaName: string, companyId: string, contactId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
       await this.assertCompanyExists(qr, companyId)
@@ -285,8 +268,6 @@ export class CompaniesService {
     })
   }
 
-  // ─── Remove contact ───────────────────────────────────────────────────────
-
   async removeContact(schemaName: string, companyId: string, contactId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
       const rows: [{ id: string }?] = await qr.query(
@@ -302,8 +283,6 @@ export class CompaniesService {
       }
     })
   }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private async fetchCompanyOrFail(qr: QueryRunner, companyId: string): Promise<Company> {
     const rows: CompanyRow[] = await qr.query(
@@ -329,7 +308,6 @@ export class CompaniesService {
     }
   }
 
-  /** Throws ConflictException if another active company already has this NIT. */
   private async assertNitUnique(qr: QueryRunner, nit: string, excludeId?: string): Promise<void> {
     const rows: [{ id: string }?] = excludeId
       ? await qr.query(
@@ -345,10 +323,6 @@ export class CompaniesService {
     }
   }
 
-  /**
-   * Validates and strips a NIT string, returning the 9-digit value and its DV.
-   * Accepts: "900123456", "900.123.456-7", "9001234567"
-   */
   private resolveNit(rawNit: string | undefined): { nit: string | null; nitDv: string | null } {
     if (!rawNit) return { nit: null, nitDv: null }
 
@@ -409,9 +383,6 @@ export class CompaniesService {
     return { where: conditions.join(' AND '), params }
   }
 
-  // ─── Mappers ──────────────────────────────────────────────────────────────
-
-  /** Extracts the first row from a RETURNING/SELECT result — avoids non-null assertions. */
   private mapRow(rows: CompanyRow[]): Company {
     const row = rows[0]
     if (!row) throw new NotFoundException('Company not found')

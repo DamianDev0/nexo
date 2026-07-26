@@ -9,8 +9,6 @@ import type {
   AuthenticatedUser,
 } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   schemaName: 'tenant_acme',
@@ -58,8 +56,6 @@ const mockPaginated: PaginatedActivities = {
   page: 1,
   limit: 25,
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ActivitiesController', () => {
   let controller: ActivitiesController

@@ -1,14 +1,5 @@
-// ─── COLOMBIAN DATE UTILITIES ────────────────────────────────────────
-// UI format: DD/MM/YYYY (never MM/DD/YYYY)
-// API format: ISO 8601 with timezone
-// Timezone: America/Bogota (UTC-5, no DST)
-
 export const CO_TIMEZONE = 'America/Bogota'
 
-/**
- * Format a date for Colombian UI display: DD/MM/YYYY
- * @example formatDateCO(new Date('2026-03-15')) → "15/03/2026"
- */
 export function formatDateCO(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
   return new Intl.DateTimeFormat('es-CO', {
@@ -19,10 +10,6 @@ export function formatDateCO(date: Date | string): string {
   }).format(d)
 }
 
-/**
- * Format a date with time for Colombian UI: DD/MM/YYYY HH:mm
- * @example formatDateTimeCO(new Date()) → "15/03/2026 10:30"
- */
 export function formatDateTimeCO(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
   return new Intl.DateTimeFormat('es-CO', {
@@ -36,10 +23,6 @@ export function formatDateTimeCO(date: Date | string): string {
   }).format(d)
 }
 
-/**
- * Parse a DD/MM/YYYY string to a Date object in Colombia timezone.
- * @example parseDateCO("15/03/2026") → Date
- */
 export function parseDateCO(dateString: string): Date {
   const parts = dateString.split('/')
   if (parts.length !== 3) throw new Error(`Invalid date format: ${dateString}. Expected DD/MM/YYYY`)
@@ -48,16 +31,10 @@ export function parseDateCO(dateString: string): Date {
   return new Date(`${year}-${month}-${day}T00:00:00-05:00`)
 }
 
-/**
- * Get current date/time as ISO 8601 string in Colombia timezone.
- */
 export function nowCO(): string {
   return new Date().toLocaleString('sv-SE', { timeZone: CO_TIMEZONE }).replace(' ', 'T') + '-05:00'
 }
 
-/**
- * Format a date as relative time (e.g. "hace 2 horas", "hace 3 días").
- */
 export function timeAgoCO(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
   const now = new Date()

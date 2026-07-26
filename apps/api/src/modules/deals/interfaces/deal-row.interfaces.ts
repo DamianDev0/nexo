@@ -1,7 +1,3 @@
-// ─── DB row shapes returned by raw SQL queries ───────────────────────────────
-// value_cents is BIGINT → node-postgres returns it as string
-// stage_probability / stage_position are INTEGER → returned as number
-
 export interface DealListRow {
   id: string
   title: string
@@ -50,7 +46,7 @@ export interface DealItemRow {
   product_id: string | null
   description: string
   quantity: number
-  unit_price_cents: string // BIGINT → string
+  unit_price_cents: string
   discount_percent: number
   iva_rate: number
   position: number

@@ -22,8 +22,6 @@ export class UsersController {
     private readonly authService: AuthService,
   ) {}
 
-  // ─── Invite a team member ─────────────────────────────────────────────────
-
   @Post('invite')
   @HttpCode(HttpStatus.CREATED)
   @Auth(UserRole.MANAGER)
@@ -49,8 +47,6 @@ export class UsersController {
       extractMeta(req),
     )
   }
-
-  // ─── Accept invitation ────────────────────────────────────────────────────
 
   @Public()
   @Post('invite/accept')

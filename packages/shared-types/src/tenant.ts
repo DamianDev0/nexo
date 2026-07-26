@@ -1,6 +1,5 @@
 import type { UserRole } from './enums'
 
-// ─── TENANT CONTEXT (attached to every request by middleware) ─────────
 export type TenantContext = {
   tenantId: string
   slug: string
@@ -11,7 +10,6 @@ export type TenantContext = {
   customDomain: string | null
 }
 
-// ─── AUTHENTICATED CONTEXT (after JWT validation) ────────────────────
 export type AuthenticatedUser = {
   id: string
   email: string

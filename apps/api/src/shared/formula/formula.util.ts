@@ -102,7 +102,7 @@ class Parser {
   }
 
   private group(): number {
-    this.pos++ // consume '('
+    this.pos++
     const value = this.expression()
     if (this.peek()?.value !== ')') throw new Error('missing closing parenthesis')
     this.pos++
@@ -124,7 +124,7 @@ class Parser {
   }
 
   private arguments(): number[] {
-    this.pos++ // consume '('
+    this.pos++
     const args: number[] = [this.expression()]
     while (this.peek()?.type === 'comma') {
       this.pos++

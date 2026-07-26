@@ -45,5 +45,4 @@ export class UpdatePipelineDto {
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isDefault?: boolean
 }
 
-// Full replacement of stages — reuses the stages field definition from CreatePipelineDto
 export class ReorderStagesDto extends PickType(CreatePipelineDto, ['stages'] as const) {}

@@ -89,8 +89,6 @@ describe('PasswordResetService', () => {
     service = module.get(PasswordResetService)
   })
 
-  // ─── forgotPassword ───────────────────────────────────────────────────────────
-
   describe('forgotPassword', () => {
     beforeEach(() => {
       mocks.authRepo.findUserByEmail.mockResolvedValue(mockUser)
@@ -150,8 +148,6 @@ describe('PasswordResetService', () => {
       )
     })
   })
-
-  // ─── resetPassword ────────────────────────────────────────────────────────────
 
   describe('resetPassword', () => {
     beforeEach(() => {

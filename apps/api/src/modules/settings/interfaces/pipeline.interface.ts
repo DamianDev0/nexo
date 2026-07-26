@@ -13,6 +13,6 @@ export interface StageRow {
 }
 
 export interface KanbanStageRow extends StageRow {
-  deal_count: string // COUNT → string from pg
-  total_value_cents: string // SUM → string from pg
+  deal_count: string
+  total_value_cents: string
 }

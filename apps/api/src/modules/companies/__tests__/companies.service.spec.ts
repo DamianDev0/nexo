@@ -6,8 +6,6 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { Company, PaginatedCompanies, CompanySummary } from '@repo/shared-types'
 import { TaxRegime, CompanySize, CIIUSector } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const SCHEMA = 'tenant_acme'
 const COMPANY_ID = 'co-1'
 const USER_ID = 'user-1'
@@ -78,8 +76,6 @@ function makeDealRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-// ─── Mock setup ───────────────────────────────────────────────────────────────
-
 function buildQrMock(overrides: Record<string, jest.Mock> = {}) {
   return { query: jest.fn(), ...overrides }
 }
@@ -90,8 +86,6 @@ function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
     transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('CompaniesService', () => {
   let service: CompaniesService
@@ -112,8 +106,6 @@ describe('CompaniesService', () => {
 
     service = module.get(CompaniesService)
   })
-
-  // ─── findAll ──────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('returns paginated companies with defaults', async () => {
@@ -220,8 +212,6 @@ describe('CompaniesService', () => {
     })
   })
 
-  // ─── findOne ──────────────────────────────────────────────────────────────
-
   describe('findOne', () => {
     it('returns a company when found', async () => {
       qr.query.mockResolvedValueOnce([makeCompanyRow()])
@@ -269,10 +259,7 @@ describe('CompaniesService', () => {
     })
   })
 
-  // ─── create ───────────────────────────────────────────────────────────────
-
   describe('create', () => {
-    // When NIT is provided, create() calls: 1) assertNitUnique (SELECT), 2) INSERT RETURNING
     it('inserts a company and returns the mapped result', async () => {
       qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce([makeCompanyRow()])
 
@@ -295,8 +282,8 @@ describe('CompaniesService', () => {
       await service.create(SCHEMA, { name: 'Test', nit: '900123456' }, USER_ID)
 
       const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(params).toContain('900123456') // nit
-      expect(params).toContain('8') // nit_dv
+      expect(params).toContain('900123456')
+      expect(params).toContain('8')
     })
 
     it('accepts formatted NIT with check digit "900.123.456-8"', async () => {
@@ -334,7 +321,6 @@ describe('CompaniesService', () => {
     })
 
     it('throws BadRequestException when NIT check digit is wrong', async () => {
-      // "9001234567" — wrong DV (should be 8, not 7)
       await expect(
         service.create(SCHEMA, { name: 'Test', nit: '9001234567' }, USER_ID),
       ).rejects.toThrow(BadRequestException)
@@ -346,8 +332,8 @@ describe('CompaniesService', () => {
       await service.create(SCHEMA, { name: 'No NIT Co' }, USER_ID)
 
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[1]).toBeNull() // nit param position
-      expect(params[2]).toBeNull() // nit_dv param position
+      expect(params[1]).toBeNull()
+      expect(params[2]).toBeNull()
     })
 
     it('defaults tags to empty array and customFields to empty object', async () => {
@@ -370,13 +356,11 @@ describe('CompaniesService', () => {
     })
   })
 
-  // ─── update ───────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('updates provided fields and returns updated company', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: COMPANY_ID }]) // assertCompanyExists
-        .mockResolvedValueOnce([makeCompanyRow({ name: 'New Name' })]) // UPDATE RETURNING
+        .mockResolvedValueOnce([{ id: COMPANY_ID }])
+        .mockResolvedValueOnce([makeCompanyRow({ name: 'New Name' })])
 
       const result = await service.update(SCHEMA, COMPANY_ID, { name: 'New Name' })
 
@@ -388,9 +372,9 @@ describe('CompaniesService', () => {
 
     it('recalculates NIT DV when NIT is updated', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: COMPANY_ID }]) // assertCompanyExists
-        .mockResolvedValueOnce([]) // assertNitUnique
-        .mockResolvedValueOnce([makeCompanyRow()]) // UPDATE RETURNING
+        .mockResolvedValueOnce([{ id: COMPANY_ID }])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([makeCompanyRow()])
 
       await service.update(SCHEMA, COMPANY_ID, { nit: '900123456' })
 
@@ -417,13 +401,9 @@ describe('CompaniesService', () => {
     })
   })
 
-  // ─── remove ───────────────────────────────────────────────────────────────
-
   describe('remove', () => {
     it('soft-deletes by setting is_active = false', async () => {
-      qr.query
-        .mockResolvedValueOnce([{ id: COMPANY_ID }]) // assertCompanyExists
-        .mockResolvedValueOnce([]) // UPDATE is_active = false
+      qr.query.mockResolvedValueOnce([{ id: COMPANY_ID }]).mockResolvedValueOnce([])
 
       await service.remove(SCHEMA, COMPANY_ID)
 
@@ -444,15 +424,13 @@ describe('CompaniesService', () => {
     })
   })
 
-  // ─── getSummary ───────────────────────────────────────────────────────────
-
   describe('getSummary', () => {
     it('returns company with stats, contacts and deals', async () => {
       qr.query
-        .mockResolvedValueOnce([makeCompanyRow()]) // fetchCompanyOrFail
-        .mockResolvedValueOnce([makeStatsRow()]) // stats query
-        .mockResolvedValueOnce([makeContactRow()]) // contacts query
-        .mockResolvedValueOnce([makeDealRow()]) // deals query
+        .mockResolvedValueOnce([makeCompanyRow()])
+        .mockResolvedValueOnce([makeStatsRow()])
+        .mockResolvedValueOnce([makeContactRow()])
+        .mockResolvedValueOnce([makeDealRow()])
 
       const result: CompanySummary = await service.getSummary(SCHEMA, COMPANY_ID)
 
@@ -534,13 +512,11 @@ describe('CompaniesService', () => {
     })
   })
 
-  // ─── assignContact ────────────────────────────────────────────────────────
-
   describe('assignContact', () => {
     it('updates contact company_id and resolves', async () => {
       qr.query
-        .mockResolvedValueOnce([{ id: COMPANY_ID }]) // assertCompanyExists
-        .mockResolvedValueOnce([{ id: CONTACT_ID }]) // UPDATE contacts
+        .mockResolvedValueOnce([{ id: COMPANY_ID }])
+        .mockResolvedValueOnce([{ id: CONTACT_ID }])
 
       await expect(service.assignContact(SCHEMA, COMPANY_ID, CONTACT_ID)).resolves.toBeUndefined()
 
@@ -557,15 +533,13 @@ describe('CompaniesService', () => {
     })
 
     it('throws NotFoundException when contact is not found or already inactive', async () => {
-      qr.query.mockResolvedValueOnce([{ id: COMPANY_ID }]).mockResolvedValueOnce([]) // contact not found
+      qr.query.mockResolvedValueOnce([{ id: COMPANY_ID }]).mockResolvedValueOnce([])
 
       await expect(service.assignContact(SCHEMA, COMPANY_ID, 'missing-contact')).rejects.toThrow(
         NotFoundException,
       )
     })
   })
-
-  // ─── removeContact ────────────────────────────────────────────────────────
 
   describe('removeContact', () => {
     it('sets company_id to NULL and resolves', async () => {

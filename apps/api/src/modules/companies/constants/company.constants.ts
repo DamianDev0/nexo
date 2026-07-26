@@ -1,7 +1,5 @@
 import type { UpdateCompanyDto } from '../dto/company.dto'
 
-// ─── Field mapping: DTO key → SQL column ─────────────────────────────────────
-
 export const UPDATABLE_FIELDS: Array<[keyof UpdateCompanyDto, string]> = [
   ['name', 'name'],
   ['taxRegime', 'tax_regime'],
@@ -18,8 +16,6 @@ export const UPDATABLE_FIELDS: Array<[keyof UpdateCompanyDto, string]> = [
   ['assignedToId', 'assigned_to_id'],
   ['customFields', 'custom_fields'],
 ]
-
-// ─── SQL column lists ─────────────────────────────────────────────────────────
 
 export const COMPANY_COLUMNS = `
   id, name, nit, nit_dv, tax_regime, company_size, sector_ciiu,

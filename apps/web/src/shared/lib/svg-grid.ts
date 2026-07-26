@@ -9,7 +9,6 @@ interface DrawGridOptions {
   readonly opacity?: number
 }
 
-/** Draws a faint grid pattern on an SVG — reused across orb and map panels */
 export function drawSvgGrid({
   svg,
   width,

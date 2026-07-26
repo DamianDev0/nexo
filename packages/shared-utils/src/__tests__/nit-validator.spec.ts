@@ -1,18 +1,14 @@
 import { calculateCheckDigit, validateNIT, formatNIT, stripNIT } from '../nit-validator'
 
-// ─── calculateCheckDigit ──────────────────────────────────────────────────────
-
 describe('calculateCheckDigit', () => {
   it('returns the correct DV for known NITs', () => {
-    // Real Colombian company NITs with verified check digits (DIAN mod-11 algorithm)
-    expect(calculateCheckDigit('900123456')).toBe('8') // DV=8
-    expect(calculateCheckDigit('800197268')).toBe('4') // DIAN NIT (well-known), DV=4
-    expect(calculateCheckDigit('860002534')).toBe('0') // DV=0 (remainder=0 edge case)
-    expect(calculateCheckDigit('900775106')).toBe('2') // DV=2
+    expect(calculateCheckDigit('900123456')).toBe('8')
+    expect(calculateCheckDigit('800197268')).toBe('4')
+    expect(calculateCheckDigit('860002534')).toBe('0')
+    expect(calculateCheckDigit('900775106')).toBe('2')
   })
 
   it('returns "0" when remainder is 0 (edge case)', () => {
-    // 860002534 → remainder=0 → DV='0'
     expect(calculateCheckDigit('860002534')).toBe('0')
   })
 
@@ -28,11 +24,7 @@ describe('calculateCheckDigit', () => {
   })
 })
 
-// ─── validateNIT ─────────────────────────────────────────────────────────────
-
 describe('validateNIT', () => {
-  // ─── Valid inputs ────────────────────────────────────────────────────────
-
   it('validates a plain 9-digit NIT (no check digit)', () => {
     const result = validateNIT('900123456')
 
@@ -73,10 +65,7 @@ describe('validateNIT', () => {
     expect(result.checkDigit).toBe('8')
   })
 
-  // ─── Invalid inputs ──────────────────────────────────────────────────────
-
   it('returns isValid: false for wrong check digit', () => {
-    // "9001234567" — DV should be 8, not 7
     const result = validateNIT('9001234567')
 
     expect(result.isValid).toBe(false)
@@ -104,8 +93,6 @@ describe('validateNIT', () => {
   })
 })
 
-// ─── formatNIT ────────────────────────────────────────────────────────────────
-
 describe('formatNIT', () => {
   it('formats a 9-digit NIT with check digit', () => {
     expect(formatNIT('900123456', '8')).toBe('900.123.456-8')
@@ -127,8 +114,6 @@ describe('formatNIT', () => {
   })
 })
 
-// ─── stripNIT ─────────────────────────────────────────────────────────────────
-
 describe('stripNIT', () => {
   it('strips formatting from "900.123.456-7" → "900123456"', () => {
     expect(stripNIT('900.123.456-7')).toBe('900123456')
@@ -146,8 +131,6 @@ describe('stripNIT', () => {
     expect(stripNIT('900 123 456')).toBe('900123456')
   })
 })
-
-// ─── Round-trip ───────────────────────────────────────────────────────────────
 
 describe('round-trip: validateNIT → formatNIT → stripNIT', () => {
   const nits = ['900123456', '800197268', '860002534', '900775106']

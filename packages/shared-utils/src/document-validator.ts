@@ -2,8 +2,6 @@ import { DocumentType } from '@repo/shared-types'
 
 import { validateNIT } from './nit-validator'
 
-// ─── COLOMBIAN DOCUMENT VALIDATION ──────────────────────────────────
-
 const DOCUMENT_RULES: Record<
   DocumentType,
   { pattern: RegExp; minLength: number; maxLength: number }
@@ -17,9 +15,6 @@ const DOCUMENT_RULES: Record<
   [DocumentType.PPT]: { pattern: /^[a-zA-Z0-9]+$/, minLength: 6, maxLength: 15 },
 }
 
-/**
- * Validate a Colombian document number based on its type.
- */
 export function validateDocumentNumber(
   type: DocumentType,
   number: string,
@@ -38,7 +33,6 @@ export function validateDocumentNumber(
     }
   }
 
-  // NIT has additional check digit validation
   if (type === DocumentType.NIT) {
     const result = validateNIT(cleaned)
     if (!result.isValid) {
@@ -49,11 +43,6 @@ export function validateDocumentNumber(
   return { isValid: true }
 }
 
-/**
- * Format a document number for display based on type.
- * CC: 1.234.567.890
- * NIT: 900.123.456-7
- */
 export function formatDocumentNumber(type: DocumentType, number: string): string {
   const cleaned = number.replace(/[.\-\s]/g, '')
 
@@ -73,9 +62,6 @@ export function formatDocumentNumber(type: DocumentType, number: string): string
   return cleaned
 }
 
-/**
- * Labels for each document type (Spanish).
- */
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   [DocumentType.CC]: 'Cédula de Ciudadanía',
   [DocumentType.NIT]: 'NIT',

@@ -42,7 +42,6 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
     detail?: string,
   ): { status: number; message: string; error: string } {
     const map: Record<string, { status: number; message: string; error: string }> = {
-      // Unique constraint violation
       '23505': {
         status: HttpStatus.CONFLICT,
         message: detail
@@ -50,31 +49,31 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
           : 'A record with that value already exists',
         error: 'CONFLICT',
       },
-      // Foreign key constraint violation
+
       '23503': {
         status: HttpStatus.BAD_REQUEST,
         message: 'Referenced record does not exist',
         error: 'FOREIGN_KEY_VIOLATION',
       },
-      // Not null violation
+
       '23502': {
         status: HttpStatus.BAD_REQUEST,
         message: 'A required field is missing',
         error: 'NOT_NULL_VIOLATION',
       },
-      // Check constraint violation
+
       '23514': {
         status: HttpStatus.BAD_REQUEST,
         message: 'Value does not meet the required constraints',
         error: 'CHECK_VIOLATION',
       },
-      // String data right truncation
+
       '22001': {
         status: HttpStatus.BAD_REQUEST,
         message: 'Value is too long for the field',
         error: 'VALUE_TOO_LONG',
       },
-      // Invalid text representation (e.g., invalid UUID)
+
       '22P02': {
         status: HttpStatus.BAD_REQUEST,
         message: 'Invalid data format',
@@ -91,10 +90,6 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
     )
   }
 
-  /**
-   * Extracts the field name from PostgreSQL's detail message.
-   * e.g., "Key (email)=(test@test.com) already exists" → "email"
-   */
   private extractField(detail: string): string {
     const match = new RegExp(/Key \((.+?)\)/).exec(detail)
     return match?.[1] ?? 'unknown'

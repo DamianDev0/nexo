@@ -9,13 +9,10 @@ import {
   UserRole,
 } from '@repo/shared-types'
 
-// ─── CURRENCY ────────────────────────────────────────────────────────
 export const CURRENCY_CODE = 'COP'
 export const MAX_INVOICE_ITEMS = 100
 export const VAT_RATES = [0, 5, 19] as const
 export type VATRate = (typeof VAT_RATES)[number]
-
-// ─── UI LABELS ───────────────────────────────────────────────────────
 
 export const CONTACT_STATUS_LABELS: Record<ContactStatus, string> = {
   [ContactStatus.NEW]: 'Nuevo',
@@ -103,8 +100,6 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   [PaymentStatus.REFUNDED]: 'Reembolsado',
 }
 
-// ─── TIMEZONES (LATAM focused) ───────────────────────────────────────
-
 export const TIMEZONE_OPTIONS = [
   { value: 'America/Bogota', label: 'Bogota (UTC-5)' },
   { value: 'America/Mexico_City', label: 'Mexico City (UTC-6)' },
@@ -115,8 +110,6 @@ export const TIMEZONE_OPTIONS = [
   { value: 'America/New_York', label: 'New York (UTC-5)' },
   { value: 'Europe/Madrid', label: 'Madrid (UTC+1)' },
 ] as const
-
-// ─── CURRENCIES ─────────────────────────────────────────────────────
 
 export const CURRENCY_OPTIONS = [
   { value: 'COP', label: 'COP — Colombian Peso' },
@@ -129,8 +122,6 @@ export const CURRENCY_OPTIONS = [
   { value: 'PEN', label: 'PEN — Peruvian Sol' },
 ] as const
 
-// ─── INDUSTRY SECTORS ───────────────────────────────────────────────
-
 export const SECTOR_OPTIONS = [
   { id: 'technology', label: 'Technology', icon: '💻' },
   { id: 'retail', label: 'Retail', icon: '🏪' },
@@ -142,8 +133,6 @@ export const SECTOR_OPTIONS = [
   { id: 'services', label: 'Services', icon: '🔧' },
   { id: 'other', label: 'Other', icon: '⚡' },
 ] as const
-
-// ─── BRAND COLORS ───────────────────────────────────────────────────
 
 export const BRAND_COLOR_OPTIONS = [
   '#4F46E5',
@@ -158,8 +147,6 @@ export const BRAND_COLOR_OPTIONS = [
   '#0F172A',
 ] as const
 
-// ─── STAGE COLORS ───────────────────────────────────────────────────
-
 export const STAGE_COLOR_OPTIONS = [
   '#6366F1',
   '#8B5CF6',
@@ -173,11 +160,7 @@ export const STAGE_COLOR_OPTIONS = [
   '#6B7280',
 ] as const
 
-// ─── THEME MODES ────────────────────────────────────────────────────
-
 export const THEME_MODE_OPTIONS = ['light', 'dark', 'system'] as const
-
-// ─── INVITE ROLES ───────────────────────────────────────────────────
 
 export const INVITE_ROLE_OPTIONS = [
   UserRole.ADMIN,
@@ -185,8 +168,6 @@ export const INVITE_ROLE_OPTIONS = [
   UserRole.SALES_REP,
   UserRole.VIEWER,
 ] as const
-
-// ─── DEFAULT PIPELINE STAGES (by industry sector) ───────────────────
 
 export const DEFAULT_PIPELINE_STAGES = {
   general: [

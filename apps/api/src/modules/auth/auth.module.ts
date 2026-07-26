@@ -20,7 +20,7 @@ import { OnboardingListener } from './listeners/onboarding.listener'
 @Module({
   imports: [
     PassportModule,
-    // JwtModule without global options — TokenService handles signing options per-call
+
     JwtModule.register({}),
     TypeOrmModule.forFeature([Tenant]),
     TenantsModule,

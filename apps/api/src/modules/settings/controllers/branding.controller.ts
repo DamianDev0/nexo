@@ -19,8 +19,6 @@ export class BrandingController {
     private readonly configService: TenantConfigService,
   ) {}
 
-  // ─── Logo ─────────────────────────────────────────────────────────────────
-
   @Post('logo')
   @Auth(UserRole.ADMIN)
   @UseInterceptors(FileInterceptor('file'))
@@ -38,8 +36,6 @@ export class BrandingController {
     await this.patchBranding(ctx, { logoUrl: result.url }, user.id)
     return result
   }
-
-  // ─── Favicon ──────────────────────────────────────────────────────────────
 
   @Post('favicon')
   @Auth(UserRole.ADMIN)
@@ -59,8 +55,6 @@ export class BrandingController {
     return result
   }
 
-  // ─── Login background ─────────────────────────────────────────────────────
-
   @Post('login-bg')
   @Auth(UserRole.ADMIN)
   @UseInterceptors(FileInterceptor('file'))
@@ -79,8 +73,6 @@ export class BrandingController {
     return result
   }
 
-  // ─── Delete old file when replacing ──────────────────────────────────────
-
   private async patchBranding(
     ctx: TenantContext,
     patch: Partial<{ logoUrl: string; faviconUrl: string; loginBgUrl: string }>,
@@ -88,7 +80,6 @@ export class BrandingController {
   ): Promise<void> {
     const current = await this.configService.getTheme(ctx.tenantId)
 
-    // Delete old file from S3 before replacing
     let oldUrl: string | null = null
     if (patch.logoUrl) oldUrl = current.branding.logoUrl
     else if (patch.faviconUrl) oldUrl = current.branding.faviconUrl

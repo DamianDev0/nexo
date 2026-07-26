@@ -12,7 +12,6 @@ interface AuthGuardProps {
   readonly children: React.ReactNode
 }
 
-/** Protects app routes — redirects to login or onboarding setup */
 export function AuthGuard({ children }: AuthGuardProps) {
   const { data, isLoading, isError } = useAuth()
   const router = useRouter()

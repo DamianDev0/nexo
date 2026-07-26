@@ -70,7 +70,6 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     ApiKeysModule,
   ],
   providers: [
-    // Global guards — order matters: Throttler → JWT → TenantMatch → Roles
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: TenantMatchGuard },

@@ -12,8 +12,6 @@ import type {
   CompanySummary,
 } from '@repo/shared-types'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
-
 const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
@@ -79,8 +77,6 @@ const mockSummary: CompanySummary = {
   deals: [],
 }
 
-// ─── Mock service ─────────────────────────────────────────────────────────────
-
 function buildServiceMock() {
   return {
     findAll: jest.fn(),
@@ -93,8 +89,6 @@ function buildServiceMock() {
     removeContact: jest.fn(),
   }
 }
-
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('CompaniesController', () => {
   let controller: CompaniesController
@@ -113,8 +107,6 @@ describe('CompaniesController', () => {
 
     controller = module.get(CompaniesController)
   })
-
-  // ─── findAll ──────────────────────────────────────────────────────────────
 
   describe('findAll', () => {
     it('delegates to service with schema and query', async () => {
@@ -139,8 +131,6 @@ describe('CompaniesController', () => {
     })
   })
 
-  // ─── create ───────────────────────────────────────────────────────────────
-
   describe('create', () => {
     it('delegates to service with schema, dto and user id', async () => {
       service.create.mockResolvedValue(mockCompany)
@@ -153,8 +143,6 @@ describe('CompaniesController', () => {
       expect(result.nitFormatted).toBe('900.123.456-8')
     })
   })
-
-  // ─── findOne ──────────────────────────────────────────────────────────────
 
   describe('findOne', () => {
     it('delegates to service with schema and id', async () => {
@@ -173,8 +161,6 @@ describe('CompaniesController', () => {
     })
   })
 
-  // ─── update ───────────────────────────────────────────────────────────────
-
   describe('update', () => {
     it('delegates to service with schema, id and dto', async () => {
       const updated = { ...mockCompany, name: 'Updated Corp' }
@@ -189,8 +175,6 @@ describe('CompaniesController', () => {
     })
   })
 
-  // ─── remove ───────────────────────────────────────────────────────────────
-
   describe('remove', () => {
     it('delegates to service and returns void', async () => {
       service.remove.mockResolvedValue(undefined)
@@ -199,8 +183,6 @@ describe('CompaniesController', () => {
       expect(service.remove).toHaveBeenCalledWith(mockCtx.schemaName, 'co-1')
     })
   })
-
-  // ─── getSummary ───────────────────────────────────────────────────────────
 
   describe('getSummary', () => {
     it('delegates to service and returns summary', async () => {
@@ -220,8 +202,6 @@ describe('CompaniesController', () => {
     })
   })
 
-  // ─── assignContact ────────────────────────────────────────────────────────
-
   describe('assignContact', () => {
     it('delegates to service with company id and contact id', async () => {
       service.assignContact.mockResolvedValue(undefined)
@@ -233,8 +213,6 @@ describe('CompaniesController', () => {
       expect(service.assignContact).toHaveBeenCalledWith(mockCtx.schemaName, 'co-1', 'cnt-1')
     })
   })
-
-  // ─── removeContact ────────────────────────────────────────────────────────
 
   describe('removeContact', () => {
     it('delegates to service with company id and contact id', async () => {

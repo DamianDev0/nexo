@@ -35,8 +35,6 @@ export class TenantConfigService {
     private readonly cache: CacheService,
   ) {}
 
-  // ─── Theme ────────────────────────────────────────────────────────────────
-
   async getTheme(tenantId: string): Promise<TenantTheme> {
     const cached = await this.cache.get<TenantTheme>(this.themeKey(tenantId))
     if (cached) return cached
@@ -88,8 +86,6 @@ export class TenantConfigService {
     return record.previousConfig
   }
 
-  // ─── Nomenclature ─────────────────────────────────────────────────────────
-
   async getNomenclature(tenantId: string): Promise<TenantNomenclature> {
     const cached = await this.cache.get<TenantNomenclature>(this.nomenclatureKey(tenantId))
     if (cached) return cached
@@ -120,8 +116,6 @@ export class TenantConfigService {
     return updated
   }
 
-  // ─── Sidebar ──────────────────────────────────────────────────────────────
-
   async getSidebarConfig(tenantId: string): Promise<SidebarConfig> {
     const cached = await this.cache.get<SidebarConfig>(this.sidebarKey(tenantId))
     if (cached) return cached
@@ -149,8 +143,6 @@ export class TenantConfigService {
     return updated
   }
 
-  // ─── Custom fields ────────────────────────────────────────────────────────
-
   async getCustomFields(tenantId: string): Promise<CustomFieldsConfig> {
     const config = await this.getRawConfig(tenantId)
     return config.customFields ?? { contacts: [], companies: [], deals: [] }
@@ -165,8 +157,6 @@ export class TenantConfigService {
     await this.cache.del(`tenant:slug:${slug}`)
     return updated
   }
-
-  // ─── Activity types ───────────────────────────────────────────────────────
 
   async getActivityTypes(tenantId: string): Promise<ActivityTypeDef[]> {
     const cached = await this.cache.get<ActivityTypeDef[]>(this.activityTypesKey(tenantId))
@@ -211,8 +201,6 @@ export class TenantConfigService {
     await this.cache.del(`tenant:slug:${slug}`)
     return updated
   }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private async getRawConfig(tenantId: string): Promise<TenantFullConfig> {
     const tenant = await this.tenantRepo.findOne({ where: { id: tenantId } })

@@ -4,8 +4,6 @@ import type {
   ImportRowMapper,
 } from '@/shared/imports/interfaces/import.interfaces'
 
-// ─── Field definitions with aliases for smart mapping ────────────────────────
-
 const PRODUCT_FIELD_DEFS: ImportFieldDef[] = [
   {
     field: 'name',
@@ -106,8 +104,6 @@ const PRODUCT_FIELD_DEFS: ImportFieldDef[] = [
     aliases: ['etiquetas', 'labels', 'categorias'],
   },
 ]
-
-// ─── Product row mapper implementation ───────────────────────────────────────
 
 export const productImportMapper: ImportRowMapper = {
   fieldDefs: PRODUCT_FIELD_DEFS,
