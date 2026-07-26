@@ -22,32 +22,32 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: { children: 'Nuevo negocio' },
+  args: { children: 'New deal' },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole('button', { name: 'Nuevo negocio' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'New deal' }))
     await expect(args.onClick).toHaveBeenCalledOnce()
   },
 }
 
 export const Ink: Story = {
-  args: { variant: 'ink', children: 'Registrar actividad' },
+  args: { variant: 'ink', children: 'Log activity' },
 }
 
 export const Secondary: Story = {
-  args: { variant: 'secondary', children: 'Secundario' },
+  args: { variant: 'secondary', children: 'Secondary' },
 }
 
 export const Tertiary: Story = {
-  args: { variant: 'tertiary', children: 'Terciario' },
+  args: { variant: 'tertiary', children: 'Tertiary' },
 }
 
 export const Ghost: Story = {
-  args: { variant: 'ghost', children: 'Cancelar' },
+  args: { variant: 'ghost', children: 'Cancel' },
 }
 
 export const Icon: Story = {
-  args: { variant: 'icon', children: '+', 'aria-label': 'Agregar' },
+  args: { variant: 'icon', children: '+', 'aria-label': 'Add' },
 }
 
 export const Sizes: Story = {
@@ -68,20 +68,20 @@ export const Sizes: Story = {
 }
 
 export const States: Story = {
-  args: { children: 'Nuevo negocio' },
+  args: { children: 'New deal' },
   render: () => (
     <div className="flex items-center gap-3">
-      <PillButton>Nuevo negocio</PillButton>
-      <PillButton disabled>Deshabilitado</PillButton>
+      <PillButton>New deal</PillButton>
+      <PillButton disabled>Disabled</PillButton>
     </div>
   ),
 }
 
 export const WorstCase: Story = {
-  args: { children: 'Crear negocio para Barrancabermeja Distribuciones y Suministros S.A.S.' },
+  args: { children: 'Create deal for Barrancabermeja Distribuciones y Suministros S.A.S.' },
 }
 
 export const Playground: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
-  args: { variant: 'primary', size: 'lg', children: 'Nuevo negocio' },
+  args: { variant: 'primary', size: 'lg', children: 'New deal' },
 }

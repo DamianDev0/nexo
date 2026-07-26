@@ -49,7 +49,7 @@ export const InvertedFinal: Story = {
 }
 
 export const WorstCase: Story = {
-  args: { header: { stage: 'Negociación', count: 1, totalCents: 120_000_000_000 }, children: null },
+  args: { header: { stage: 'Negotiation', count: 1, totalCents: 120_000_000_000 }, children: null },
   render: (args) => (
     <KanbanColumn {...args} className="w-80">
       <KanbanCard data={KANBAN_FIXTURES.worstCard} />

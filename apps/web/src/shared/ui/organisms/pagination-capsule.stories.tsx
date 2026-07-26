@@ -19,10 +19,10 @@ export const Default: Story = {
 }
 
 export const Numbered: Story = {
-  args: { data: { page: 1, totalPages: 64, totalLabel: '1.284 contactos' } },
+  args: { data: { page: 1, totalPages: 64, totalLabel: '1,284 contacts' } },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole('button', { name: 'Página siguiente' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Next page' }))
     await expect(args.onPageChange).toHaveBeenCalledWith(2)
   },
 }
@@ -32,10 +32,10 @@ export const FirstPage: Story = {
 }
 
 export const WorstCase: Story = {
-  args: { data: { page: 500, totalPages: 999, totalLabel: '128.412 negocios' } },
+  args: { data: { page: 500, totalPages: 999, totalLabel: '128,412 deals' } },
 }
 
 export const Playground: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
-  args: { data: { page: 3, totalPages: 12, totalLabel: '1.284 contactos' } },
+  args: { data: { page: 3, totalPages: 12, totalLabel: '1,284 contacts' } },
 }

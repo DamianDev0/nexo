@@ -19,11 +19,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: { children: 'Abierto' },
+  args: { children: 'Open' },
 }
 
 export const AllTones: Story = {
-  args: { children: 'Abierto' },
+  args: { children: 'Open' },
   render: () => (
     <div className="flex flex-wrap items-center gap-2.5">
       {BADGE_SOFT_FIXTURES.map((badge) => (
@@ -36,11 +36,11 @@ export const AllTones: Story = {
 }
 
 export const WorstCase: Story = {
-  args: { children: 'En riesgo' },
+  args: { children: 'At risk' },
   render: () => (
     <div className="flex max-w-64 flex-wrap items-center gap-2.5">
-      <BadgeSoft tone="warning">En riesgo</BadgeSoft>
-      <BadgeSoft tone="positive">Firma pendiente aprobación</BadgeSoft>
+      <BadgeSoft tone="warning">At risk</BadgeSoft>
+      <BadgeSoft tone="positive">Signature pending approval</BadgeSoft>
       <BadgeSoft tone="outline">Barrancabermeja Distribuciones S.A.S.</BadgeSoft>
     </div>
   ),
@@ -48,5 +48,5 @@ export const WorstCase: Story = {
 
 export const Playground: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
-  args: { tone: 'positive', children: 'Ganado' },
+  args: { tone: 'positive', children: 'Won' },
 }

@@ -44,10 +44,10 @@ function ContactHeader() {
   return (
     <DataTable.Header>
       <DataTable.Cell className="max-w-[46px]" />
-      <DataTable.Cell className="flex-[1.7]">Nombre</DataTable.Cell>
-      <DataTable.Cell className="flex-[1.5]">Empresa</DataTable.Cell>
-      <DataTable.Cell className="flex-[1.4]">Correo</DataTable.Cell>
-      <DataTable.Cell className="flex-[0.9]">Ciudad</DataTable.Cell>
+      <DataTable.Cell className="flex-[1.7]">Name</DataTable.Cell>
+      <DataTable.Cell className="flex-[1.5]">Company</DataTable.Cell>
+      <DataTable.Cell className="flex-[1.4]">Email</DataTable.Cell>
+      <DataTable.Cell className="flex-[0.9]">City</DataTable.Cell>
     </DataTable.Header>
   )
 }
@@ -57,7 +57,7 @@ export const Default: Story = {
   render: () => (
     <DataTable className="min-w-[860px]">
       <DataTable.Toolbar>
-        <DataTable.Search placeholder="Buscar nombre, correo o NIT…" />
+        <DataTable.Search placeholder="Search name, email or NIT…" />
       </DataTable.Toolbar>
       <ContactHeader />
       {CONTACT_ROWS.map((row) => (
@@ -72,12 +72,12 @@ export const WithBulkSelection: Story = {
   render: () => (
     <DataTable className="min-w-[860px]">
       <DataTable.Toolbar>
-        <DataTable.Search placeholder="Buscar nombre, correo o NIT…" />
+        <DataTable.Search placeholder="Search name, email or NIT…" />
       </DataTable.Toolbar>
-      <DataTable.BulkBar label="2 contactos seleccionados">
-        <DataTable.BulkAction>Asignar responsable</DataTable.BulkAction>
-        <DataTable.BulkAction>Agregar a lista</DataTable.BulkAction>
-        <DataTable.BulkAction destructive>Eliminar</DataTable.BulkAction>
+      <DataTable.BulkBar label="2 contacts selected">
+        <DataTable.BulkAction>Assign owner</DataTable.BulkAction>
+        <DataTable.BulkAction>Add to list</DataTable.BulkAction>
+        <DataTable.BulkAction destructive>Delete</DataTable.BulkAction>
       </DataTable.BulkBar>
       <ContactHeader />
       {CONTACT_ROWS.map((row) => (

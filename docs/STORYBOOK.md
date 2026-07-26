@@ -56,7 +56,7 @@ Views and pages are not stories — they are Playwright specs.
 - Fixture data imported from a sibling `*.fixtures.ts` (or the slice `model/`)
   — never inlined in the story file.
 - No component defined inside a story; layout needs become decorators.
-- Copy in stories is Spanish. Story names and docs are English.
+- Everything in Storybook is English: copy, fixtures, story names and docs. (Product UI copy is Spanish via i18n; stories exercise components with English fixtures.)
 - Interactive behaviour asserted with `play()` from `storybook/test`; any
   story with a `play()` is a test under `pnpm test`.
 - `Playground` stories carry

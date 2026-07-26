@@ -20,31 +20,31 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: { children: 'Sin tocar' },
+  args: { children: 'Untouched' },
 }
 
 export const Sending: Story = {
-  args: { tone: 'info', indicator: 'spinner', children: 'Enviando' },
+  args: { tone: 'info', indicator: 'spinner', children: 'Sending' },
 }
 
 export const Won: Story = {
-  args: { tone: 'positive', indicator: 'check', children: 'Ganado' },
+  args: { tone: 'positive', indicator: 'check', children: 'Won' },
 }
 
 export const Lost: Story = {
-  args: { tone: 'negative', indicator: 'cross', children: 'Perdido' },
+  args: { tone: 'negative', indicator: 'cross', children: 'Lost' },
 }
 
 export const Sizes: Story = {
-  args: { children: 'Sin tocar' },
+  args: { children: 'Untouched' },
   render: () => (
     <div className="flex items-center gap-4">
-      <BadgeInk size="sm">Sin tocar</BadgeInk>
+      <BadgeInk size="sm">Untouched</BadgeInk>
       <BadgeInk size="md" tone="positive" indicator="dot">
-        Firma pendiente
+        Signature pending
       </BadgeInk>
       <BadgeInk size="lg" tone="warning" indicator="dot">
-        En revisión
+        Under review
       </BadgeInk>
     </div>
   ),
@@ -54,11 +54,11 @@ export const WorstCase: Story = {
   args: {
     tone: 'positive',
     indicator: 'check',
-    children: 'Contrato marco plurianual firmado y radicado',
+    children: 'Multi-year master agreement signed and filed',
   },
 }
 
 export const Playground: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
-  args: { tone: 'info', indicator: 'spinner', size: 'lg', children: 'Enviando' },
+  args: { tone: 'info', indicator: 'spinner', size: 'lg', children: 'Sending' },
 }

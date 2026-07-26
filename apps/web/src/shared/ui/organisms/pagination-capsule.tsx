@@ -12,9 +12,24 @@ interface PaginationData {
   readonly totalLabel?: string
 }
 
+interface PaginationLabels {
+  readonly root: string
+  readonly prev: string
+  readonly next: string
+  readonly page: string
+}
+
+const DEFAULT_LABELS: PaginationLabels = {
+  root: 'Pagination',
+  prev: 'Previous page',
+  next: 'Next page',
+  page: 'Page',
+}
+
 interface PaginationCapsuleProps {
   readonly data: PaginationData
   readonly onPageChange: (page: number) => void
+  readonly labels?: PaginationLabels
   readonly className?: string
 }
 
@@ -27,14 +42,20 @@ function pageItems(page: number, totalPages: number): ReadonlyArray<number | 'ga
 
 function Chevron({
   direction,
+  label,
   disabled,
   onClick,
-}: Readonly<{ direction: 'prev' | 'next'; disabled: boolean; onClick: () => void }>) {
+}: Readonly<{
+  direction: 'prev' | 'next'
+  label: string
+  disabled: boolean
+  onClick: () => void
+}>) {
   const Icon = direction === 'prev' ? ChevronLeft : ChevronRight
   return (
     <button
       type="button"
-      aria-label={direction === 'prev' ? 'Página anterior' : 'Página siguiente'}
+      aria-label={label}
       disabled={disabled}
       onClick={onClick}
       className={cn(
@@ -47,7 +68,15 @@ function Chevron({
   )
 }
 
-function Dots({ data, onPageChange }: Readonly<Omit<PaginationCapsuleProps, 'className'>>) {
+function Dots({
+  data,
+  labels,
+  onPageChange,
+}: Readonly<{
+  data: PaginationData
+  labels: PaginationLabels
+  onPageChange: (page: number) => void
+}>) {
   return (
     <>
       {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((page) =>
@@ -57,7 +86,7 @@ function Dots({ data, onPageChange }: Readonly<Omit<PaginationCapsuleProps, 'cla
           <button
             key={page}
             type="button"
-            aria-label={`Página ${page}`}
+            aria-label={`${labels.page} ${page}`}
             onClick={() => onPageChange(page)}
             className="size-2.5 cursor-pointer rounded-full bg-border"
           />
@@ -67,7 +96,10 @@ function Dots({ data, onPageChange }: Readonly<Omit<PaginationCapsuleProps, 'cla
   )
 }
 
-function Numbers({ data, onPageChange }: Readonly<Omit<PaginationCapsuleProps, 'className'>>) {
+function Numbers({
+  data,
+  onPageChange,
+}: Readonly<{ data: PaginationData; onPageChange: (page: number) => void }>) {
   return (
     <>
       {pageItems(data.page, data.totalPages).map((item, position) =>
@@ -102,6 +134,7 @@ function Numbers({ data, onPageChange }: Readonly<Omit<PaginationCapsuleProps, '
 export function PaginationCapsule({
   data,
   onPageChange,
+  labels = DEFAULT_LABELS,
   className,
 }: Readonly<PaginationCapsuleProps>) {
   const numbered = data.totalPages > DOTS_MAX_PAGES
@@ -109,7 +142,7 @@ export function PaginationCapsule({
   return (
     <nav
       data-slot="pagination-capsule"
-      aria-label="Paginación"
+      aria-label={labels.root}
       className={cn(
         'inline-flex h-[58px] items-center gap-1.5 rounded-full bg-card px-3.5',
         'shadow-capsule',
@@ -123,16 +156,18 @@ export function PaginationCapsule({
       )}
       <Chevron
         direction="prev"
+        label={labels.prev}
         disabled={data.page <= 1}
         onClick={() => onPageChange(data.page - 1)}
       />
       {numbered ? (
         <Numbers data={data} onPageChange={onPageChange} />
       ) : (
-        <Dots data={data} onPageChange={onPageChange} />
+        <Dots data={data} labels={labels} onPageChange={onPageChange} />
       )}
       <Chevron
         direction="next"
+        label={labels.next}
         disabled={data.page >= data.totalPages}
         onClick={() => onPageChange(data.page + 1)}
       />

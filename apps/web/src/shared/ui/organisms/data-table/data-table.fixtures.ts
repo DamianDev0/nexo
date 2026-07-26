@@ -14,7 +14,7 @@ export const CONTACT_ROWS: ReadonlyArray<ContactRow> = [
   {
     id: 'c1',
     name: 'Andrés Gómez',
-    role: 'Gerente de compras',
+    role: 'Purchasing manager',
     company: 'Distrialimentos Andina',
     email: 'agomez@distri.co',
     city: 'Bogotá',
@@ -25,7 +25,7 @@ export const CONTACT_ROWS: ReadonlyArray<ContactRow> = [
   {
     id: 'c2',
     name: 'Laura Vargas',
-    role: 'Directora administrativa',
+    role: 'Administrative director',
     company: 'Ferretería El Roble',
     email: 'laura@elroble.com',
     city: 'Medellín',
@@ -36,7 +36,7 @@ export const CONTACT_ROWS: ReadonlyArray<ContactRow> = [
   {
     id: 'c3',
     name: 'Sofía Martínez',
-    role: 'Jefe de operaciones',
+    role: 'Head of operations',
     company: 'Textiles Medellín',
     email: 'smartinez@txm.co',
     city: 'Medellín',
@@ -47,7 +47,7 @@ export const CONTACT_ROWS: ReadonlyArray<ContactRow> = [
   {
     id: 'c4',
     name: 'Ricardo Quintero',
-    role: 'Gerente general',
+    role: 'General manager',
     company: 'Logística del Valle',
     email: 'rq@logisticavalle.co',
     city: 'Cali',
@@ -60,7 +60,7 @@ export const CONTACT_ROWS: ReadonlyArray<ContactRow> = [
 export const WORST_ROW: ContactRow = {
   id: 'w1',
   name: 'María del Carmen Rodríguez de Barrancabermeja',
-  role: 'Coordinadora regional de compras institucionales',
+  role: 'Regional coordinator of institutional purchasing',
   company: 'Barrancabermeja Distribuciones y Suministros S.A.S.',
   email: 'maria.rodriguez@barrancabermejadistribuciones.com.co',
   city: 'Barrancabermeja',
