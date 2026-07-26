@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { t } from 'i18next'
-import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
@@ -13,7 +13,6 @@ import { useLogin } from './useLogin'
 export function useLoginForm() {
   const { mutate: login, isPending: isLoginPending } = useLogin()
   const { setTenantSlug } = useAuthStore()
-  const [isResolving, setIsResolving] = useState(false)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -21,28 +20,26 @@ export function useLoginForm() {
     mode: 'onBlur',
   })
 
-  const onSubmit = useCallback(
-    async (values: LoginFormValues) => {
-      setIsResolving(true)
-      try {
-        const { slug } = await authService.resolveTenant(values.email)
-        setTenantSlug(slug)
-        login({ email: values.email, password: values.password })
-      } catch {
-        sileo.error({
-          title: t('auth.toasts.workspaceNotFound'),
-          description: t('auth.toasts.workspaceNotFoundDesc'),
-        })
-      } finally {
-        setIsResolving(false)
-      }
+  const resolveTenant = useMutation({
+    mutationFn: async (values: LoginFormValues) => {
+      const { slug } = await authService.resolveTenant(values.email)
+      return { slug, values }
     },
-    [login, setTenantSlug],
-  )
+    onSuccess: ({ slug, values }) => {
+      setTenantSlug(slug)
+      login({ email: values.email, password: values.password })
+    },
+    onError: () => {
+      sileo.error({
+        title: t('auth.toasts.workspaceNotFound'),
+        description: t('auth.toasts.workspaceNotFoundDesc'),
+      })
+    },
+  })
 
   return {
     control: form.control,
-    handleSubmit: form.handleSubmit(onSubmit),
-    isPending: isResolving || isLoginPending,
+    handleSubmit: form.handleSubmit((values) => resolveTenant.mutate(values)),
+    isPending: resolveTenant.isPending || isLoginPending,
   }
 }
