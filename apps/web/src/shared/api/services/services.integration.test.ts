@@ -1,6 +1,9 @@
+import { HttpResponse, http } from 'msw'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 import { server } from '@/test/msw/server'
+
+const API = 'http://localhost:8080/api/v1'
 
 import authService from './auth.service'
 import settingsService from './settings.service'
@@ -24,9 +27,26 @@ describe('services against MSW backend', () => {
     })
   })
 
-  it('authService.login rejects with a normalized ApiErrorResponse on 401', async () => {
-    await expect(
-      authService.login({ email: 'bad@nexo.test', password: 'wrong' }),
-    ).rejects.toMatchObject({ statusCode: 401, message: 'Invalid credentials' })
+  it('rejects with a normalized ApiErrorResponse on 401', async () => {
+    server.use(
+      http.get(`${API}/auth/me`, () =>
+        HttpResponse.json(
+          {
+            statusCode: 401,
+            message: 'Invalid credentials',
+            error: 'Unauthorized',
+            timestamp: '',
+            path: '/auth/me',
+            method: 'GET',
+          },
+          { status: 401 },
+        ),
+      ),
+    )
+
+    await expect(authService.me()).rejects.toMatchObject({
+      statusCode: 401,
+      message: 'Invalid credentials',
+    })
   })
 })

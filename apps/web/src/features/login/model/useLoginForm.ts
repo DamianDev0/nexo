@@ -1,17 +1,32 @@
+'use client'
+
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import { useAuthStore } from '@/entities/session'
-import authService from '@/shared/api/services/auth.service'
+import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { ROUTES } from '@/shared/config/routes'
+
+import { loginAction } from '../api/login.action'
 
 import { loginSchema, type LoginFormValues } from './login.schema'
-import { useLogin } from './useLogin'
+
+const ERROR_TOAST_KEYS = {
+  workspace_not_found: {
+    title: 'auth.toasts.workspaceNotFound',
+    description: 'auth.toasts.workspaceNotFoundDesc',
+  },
+  invalid_credentials: { title: 'auth.toasts.loginFailed', description: null },
+  unknown: { title: 'auth.toasts.loginFailed', description: null },
+} as const
 
 export function useLoginForm() {
-  const { mutate: login, isPending: isLoginPending } = useLogin()
+  const router = useRouter()
+  const queryClient = useQueryClient()
   const { setTenantSlug } = useAuthStore()
 
   const form = useForm<LoginFormValues>({
@@ -20,26 +35,29 @@ export function useLoginForm() {
     mode: 'onBlur',
   })
 
-  const resolveTenant = useMutation({
-    mutationFn: async (values: LoginFormValues) => {
-      const { slug } = await authService.resolveTenant(values.email)
-      return { slug, values }
-    },
-    onSuccess: ({ slug, values }) => {
-      setTenantSlug(slug)
-      login({ email: values.email, password: values.password })
+  const login = useMutation({
+    mutationFn: loginAction,
+    onSuccess: async (result) => {
+      if (!result.ok) {
+        const toast = ERROR_TOAST_KEYS[result.error]
+        sileo.error({
+          title: t(toast.title),
+          description: toast.description ? t(toast.description) : undefined,
+        })
+        return
+      }
+      setTenantSlug(result.slug)
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me })
+      router.push(ROUTES.app.dashboard)
     },
     onError: () => {
-      sileo.error({
-        title: t('auth.toasts.workspaceNotFound'),
-        description: t('auth.toasts.workspaceNotFoundDesc'),
-      })
+      sileo.error({ title: t('auth.toasts.loginFailed') })
     },
   })
 
   return {
     control: form.control,
-    handleSubmit: form.handleSubmit((values) => resolveTenant.mutate(values)),
-    isPending: resolveTenant.isPending || isLoginPending,
+    handleSubmit: form.handleSubmit((values) => login.mutate(values)),
+    isPending: login.isPending,
   }
 }

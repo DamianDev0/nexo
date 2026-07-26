@@ -32,11 +32,14 @@ async function toApiError(res: Response): Promise<ApiError> {
   return new ApiError(json ?? fallback)
 }
 
-export async function apiFetch<T>(endpoint: string, options: ApiFetchOptions<T> = {}): Promise<T> {
+async function requestApi<T>(
+  endpoint: string,
+  options: ApiFetchOptions<T>,
+): Promise<{ data: T; response: Response }> {
   const { tags, revalidate, parse, body, headers, ...rest } = options
   const cookieHeader = (await cookies()).toString()
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
+  const response = await fetch(`${API_BASE}${endpoint}`, {
     ...rest,
     headers: {
       'Content-Type': 'application/json',
@@ -44,14 +47,29 @@ export async function apiFetch<T>(endpoint: string, options: ApiFetchOptions<T> 
       ...headers,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
-    next: { tags, revalidate: revalidate ?? DEFAULT_REVALIDATE_SECONDS },
+    ...(rest.cache === 'no-store'
+      ? {}
+      : { next: { tags, revalidate: revalidate ?? DEFAULT_REVALIDATE_SECONDS } }),
   })
 
-  if (!res.ok) throw await toApiError(res)
-  if (res.status === 204) return undefined as T
+  if (!response.ok) throw await toApiError(response)
+  if (response.status === 204) return { data: undefined as T, response }
 
-  const json: unknown = await res.json()
+  const json: unknown = await response.json()
   const payload =
     json && typeof json === 'object' && 'data' in json ? (json as { data: unknown }).data : json
-  return (parse ? parse(payload) : payload) as T
+  return { data: (parse ? parse(payload) : payload) as T, response }
+}
+
+export async function apiFetch<T>(endpoint: string, options: ApiFetchOptions<T> = {}): Promise<T> {
+  const { data } = await requestApi(endpoint, options)
+  return data
+}
+
+export async function apiFetchWithCookies<T>(
+  endpoint: string,
+  options: ApiFetchOptions<T> = {},
+): Promise<{ data: T; setCookies: string[] }> {
+  const { data, response } = await requestApi(endpoint, { ...options, cache: 'no-store' })
+  return { data, setCookies: response.headers.getSetCookie() }
 }
