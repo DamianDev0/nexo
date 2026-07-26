@@ -67,3 +67,13 @@ export const SWATCH_PRESETS = [
   { value: '#79E7D0' },
   { value: '#7AA2F7' },
 ] as const
+
+export const MESH_BLOOM = {
+  base: '#DFF3C6',
+  baseDark: '#1E2A16',
+  blobA: '#A5E96F',
+  blobB: '#7FD6C2',
+  blobC: '#F2FFDA',
+  dotInk: 'rgba(14,15,12,0.16)',
+  dotInkDark: 'rgba(255,255,255,0.12)',
+} as const

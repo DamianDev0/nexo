@@ -1,0 +1,13 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+import { RADIUS_SCALE } from '../shared/config/tokens/design-scale'
+import { ScaleTable } from './ScaleTable'
+
+<Meta title="Foundations/Radius" />
+
+# Radius
+
+Nothing in the system is a sharp rectangle, and nothing exceeds 24px except
+full pills. All components inherit the scale — never mix radii randomly.
+
+<ScaleTable rows={RADIUS_SCALE} />

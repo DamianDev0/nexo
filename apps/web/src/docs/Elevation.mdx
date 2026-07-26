@@ -1,0 +1,14 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+import { ELEVATION_SCALE } from '../shared/config/tokens/design-scale'
+import { ScaleTable } from './ScaleTable'
+
+<Meta title="Foundations/Elevation" />
+
+# Elevation
+
+Surface contrast is the primary elevation cue. Only two levels use a shadow.
+Dark mode expresses the ladder as surface steps
+(`#0E0F0C → #171915 → #1D201B → #232620`), never light-mode shadows.
+
+<ScaleTable rows={ELEVATION_SCALE} />
