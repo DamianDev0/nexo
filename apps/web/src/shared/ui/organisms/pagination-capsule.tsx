@@ -4,8 +4,9 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-re
 
 import { cn } from '@/shared/lib'
 
-import type { PaginationMeta } from '@repo/shared-types'
 import type { ReactNode } from 'react'
+
+const PROGRESS_SEGMENTS = 8
 
 export interface NavLabels {
   readonly root: string
@@ -25,7 +26,7 @@ function Root({ children, className }: Readonly<{ children: ReactNode; className
       data-slot="pagination-capsule"
       aria-label={DEFAULT_LABELS.root}
       className={cn(
-        'inline-flex h-12 items-center gap-1 rounded-full bg-card py-1.5 pl-2 pr-1.5 shadow-capsule',
+        'inline-flex items-center gap-4 rounded-xl bg-card p-3 shadow-capsule',
         className,
       )}
     >
@@ -35,7 +36,7 @@ function Root({ children, className }: Readonly<{ children: ReactNode; className
 }
 
 function Divider() {
-  return <span className="mx-1 h-5 w-px shrink-0 bg-border" />
+  return <span className="h-6 w-px shrink-0 bg-border" />
 }
 
 function IconButton({
@@ -51,7 +52,7 @@ function IconButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'inline-flex size-9 items-center justify-center rounded-full transition-colors duration-[120ms]',
+        'inline-flex size-8 items-center justify-center rounded-md transition-colors duration-[120ms]',
         disabled ? 'cursor-default text-disabled-fg' : 'cursor-pointer text-body hover:bg-muted',
       )}
     >
@@ -60,27 +61,28 @@ function IconButton({
   )
 }
 
-export type NavProps = Pick<PaginationMeta, 'page' | 'totalPages'> & {
+export interface NavProps {
+  readonly page: number
+  readonly totalPages: number
   readonly onPageChange: (page: number) => void
   readonly labels?: NavLabels
 }
 
 function Nav({ page, totalPages, onPageChange, labels = DEFAULT_LABELS }: Readonly<NavProps>) {
   return (
-    <span className="inline-flex items-center">
+    <span className="inline-flex items-center gap-1.5">
       <IconButton label={labels.prev} disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-        <ChevronLeft className="size-4" />
+        <ChevronLeft className="size-4.5" />
       </IconButton>
-      <span aria-current="page" className="px-1 text-sm font-bold tabular-nums text-foreground">
-        {page}
-        <span className="font-medium text-muted-foreground">/{totalPages}</span>
+      <span aria-current="page" className="text-[15px] font-medium tabular-nums text-body">
+        {page} / {totalPages}
       </span>
       <IconButton
         label={labels.next}
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
       >
-        <ChevronRight className="size-4" />
+        <ChevronRight className="size-4.5" />
       </IconButton>
     </span>
   )
@@ -95,12 +97,12 @@ export interface PageSizeProps {
 
 function PageSize({ value, options, onChange, label = 'Rows per page' }: Readonly<PageSizeProps>) {
   return (
-    <span className="relative inline-flex items-center">
+    <span className="relative inline-flex w-20 items-center">
       <select
         aria-label={label}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-9 cursor-pointer appearance-none rounded-full bg-transparent pl-3 pr-7 text-sm font-bold tabular-nums text-foreground hover:bg-muted"
+        className="h-8 w-full cursor-pointer appearance-none rounded-md bg-transparent pl-2.5 pr-6 text-[15px] font-bold tabular-nums text-primary-deep hover:bg-muted"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -108,21 +110,29 @@ function PageSize({ value, options, onChange, label = 'Rows per page' }: Readonl
           </option>
         ))}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-muted-foreground" />
+      <ChevronDown className="pointer-events-none absolute right-1.5 size-4 text-primary-deep" />
     </span>
   )
 }
 
 function Progress({ value, label = 'Progress' }: Readonly<{ value: number; label?: string }>) {
   const clamped = Math.min(100, Math.max(0, value))
+  const filled = Math.round((clamped / 100) * PROGRESS_SEGMENTS)
   return (
     <span
       role="progressbar"
       aria-label={label}
       aria-valuenow={Math.round(clamped)}
-      className="inline-flex h-4 w-24 overflow-hidden rounded-full bg-muted"
+      className="inline-flex h-8 w-52 items-center rounded-md bg-muted px-1.5"
     >
-      <span className="h-full rounded-full bg-primary" style={{ width: `${clamped}%` }} />
+      <span className="inline-flex h-5 items-center gap-0.5 rounded-sm bg-card px-1">
+        {Array.from({ length: PROGRESS_SEGMENTS }, (_, i) => (
+          <span
+            key={`segment-${i + 1}`}
+            className={cn('h-3.5 w-1.5 rounded-[2px]', i < filled ? 'bg-primary' : 'bg-muted')}
+          />
+        ))}
+      </span>
     </span>
   )
 }
@@ -133,7 +143,7 @@ function JumpEnd({
 }: Readonly<{ onClick: () => void; label?: string }>) {
   return (
     <IconButton label={label} onClick={onClick}>
-      <ChevronsRight className="size-4" />
+      <ChevronsRight className="size-4.5" />
     </IconButton>
   )
 }
