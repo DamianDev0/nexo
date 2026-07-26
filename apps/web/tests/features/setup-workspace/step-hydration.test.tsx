@@ -11,6 +11,12 @@ import { useStepNavigation } from '@/features/setup-workspace/model/useStepNavig
 import { useStepNomenclature } from '@/features/setup-workspace/model/useStepNomenclature'
 import { useStepPipeline } from '@/features/setup-workspace/model/useStepPipeline'
 
+vi.mock('server-only', () => ({}))
+vi.mock('next/cache', () => ({ updateTag: vi.fn() }))
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(async () => ({ toString: (): string => '' })),
+}))
+
 const server = createMswServer()
 
 describe('useStepCompany hydration', () => {

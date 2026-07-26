@@ -6,6 +6,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 
+import { createPipelineAction } from '../api/setup-steps.actions'
+
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
@@ -102,15 +104,16 @@ export function useStepPipeline(onNext: () => void) {
     mutationFn: async () => {
       if (existingPipelineId.current && !isDirty) return null
       const form = getValues()
-      return settingsService.createPipeline({
+      const result = await createPipelineAction({
         name: form.pipelineName,
-        isDefault: true,
         stages: form.stages.map((s) => ({
           name: s.name,
           color: s.color,
           probability: s.probability,
         })),
       })
+      if (!result.ok) throw new Error(result.error)
+      return result.data
     },
     onNext,
     errorTitle: t('auth.toasts.pipelineFailed'),

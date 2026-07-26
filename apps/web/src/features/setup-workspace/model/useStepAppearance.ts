@@ -7,6 +7,7 @@ import { sileo } from 'sileo'
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 
+import { saveThemeAction } from '../api/setup-steps.actions'
 import { derivePalette } from '../model/palette.utils'
 
 import { useStepHydration } from './useStepHydration'
@@ -111,9 +112,9 @@ export function useStepAppearance(onNext: () => void) {
   }, [setValue])
 
   const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const form = getValues()
-      return settingsService.updateTheme({
+      const result = await saveThemeAction({
         colors: derivePalette(form.primaryColor, form.colorOverrides),
         typography: {
           fontFamily: form.fontFamily,
@@ -130,6 +131,8 @@ export function useStepAppearance(onNext: () => void) {
         iconPack: 'outline',
         darkModeDefault: form.darkMode,
       })
+      if (!result.ok) throw new Error(result.error)
+      return result.data
     },
     onNext,
   })

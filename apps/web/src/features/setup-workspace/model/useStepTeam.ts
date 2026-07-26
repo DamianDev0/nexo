@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
-import settingsService from '@/shared/api/services/settings.service'
+import { inviteUsersAction } from '../api/setup-steps.actions'
 
 import { useStepMutation } from './useStepMutation'
 
@@ -57,10 +57,10 @@ export function useStepTeam(onNext: () => void) {
   const { handleSave, isPending } = useStepMutation({
     mutationFn: async () => {
       const valid = getValues('invites').filter((inv) => inv.email.trim().length > 0)
-      await Promise.all(
-        valid.map((inv) => settingsService.inviteUser({ email: inv.email, role: inv.role })),
-      )
-      return valid.length
+      if (valid.length === 0) return 0
+      const result = await inviteUsersAction(valid)
+      if (!result.ok) throw new Error(result.error)
+      return result.data
     },
     onNext,
     errorTitle: t('auth.toasts.invitesFailed'),

@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 
+import { saveNomenclatureAction } from '../api/setup-steps.actions'
+
 import { DEFAULT_NOMENCLATURE, NOMENCLATURE_PRESETS } from './nomenclature.constants'
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
@@ -48,7 +50,11 @@ export function useStepNomenclature(onNext: () => void) {
   )
 
   const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => settingsService.updateNomenclature(getValues()),
+    mutationFn: async () => {
+      const result = await saveNomenclatureAction(getValues())
+      if (!result.ok) throw new Error(result.error)
+      return result.data
+    },
     onNext,
   })
 

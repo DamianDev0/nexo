@@ -1,10 +1,11 @@
 import { IndustrySector } from '@repo/shared-types'
-import { CO_TIMEZONE, CURRENCY_CODE } from '@repo/shared-utils'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
+
+import { saveGeneralAction } from '../api/setup-steps.actions'
 
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
@@ -44,13 +45,10 @@ export function useStepCompany(onNext: () => void) {
   })
 
   const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => {
-      const form = getValues()
-      return settingsService.updateGeneral({
-        business: { phone: form.phone, website: form.website },
-        i18n: { timezone: CO_TIMEZONE, currency: CURRENCY_CODE },
-        industry: { sector: form.sector },
-      })
+    mutationFn: async () => {
+      const result = await saveGeneralAction(getValues())
+      if (!result.ok) throw new Error(result.error)
+      return result.data
     },
     onNext,
   })

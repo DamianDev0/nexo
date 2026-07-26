@@ -4,6 +4,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 
+import { saveNavigationAction } from '../api/setup-steps.actions'
+
 import { DEFAULT_MODULES } from './navigation.constants'
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
@@ -57,10 +59,13 @@ export function useStepNavigation(onNext: () => void) {
   )
 
   const { handleSave, isPending } = useStepMutation({
-    mutationFn: () =>
-      settingsService.updateNavigation({
+    mutationFn: async () => {
+      const result = await saveNavigationAction({
         modules: getValues('modules').map((module, index) => ({ ...module, order: index + 1 })),
-      }),
+      })
+      if (!result.ok) throw new Error(result.error)
+      return result.data
+    },
     onNext,
   })
 
