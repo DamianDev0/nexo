@@ -216,6 +216,9 @@ const es = {
     theme: 'Tema',
     nomenclature: 'Nomenclatura',
   },
+  language: {
+    switch: 'Cambiar idioma',
+  },
   entities: {
     contact: { singular: 'Contacto', plural: 'Contactos' },
     company: { singular: 'Empresa', plural: 'Empresas' },

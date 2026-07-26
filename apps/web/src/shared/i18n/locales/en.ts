@@ -214,6 +214,9 @@ const en = {
     theme: 'Theme',
     nomenclature: 'Nomenclature',
   },
+  language: {
+    switch: 'Change language',
+  },
   entities: {
     contact: { singular: 'Contact', plural: 'Contacts' },
     company: { singular: 'Company', plural: 'Companies' },

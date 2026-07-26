@@ -1,13 +1,13 @@
 import { Inbox } from 'lucide-react'
 
-import { t } from '@/shared/i18n/server'
+import { getT } from '@/shared/i18n/server'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 
 import { getDashboard } from '../api/get-dashboard'
 
 export async function DashboardView() {
-  const { user } = await getDashboard()
+  const [t, { user }] = await Promise.all([getT(), getDashboard()])
   const firstName = user.email.split('@')[0]
 
   return (

@@ -1,5 +1,6 @@
 'use client'
 
+import { LanguageSwitcher } from '@/features/switch-language'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 
 interface AuthLayoutProps {
@@ -14,7 +15,10 @@ export function AuthLayout({ children }: Readonly<AuthLayoutProps>) {
           <div className="size-2 rounded-full bg-foreground" />
           <span className="text-xs font-bold uppercase tracking-widest text-foreground">Nexo</span>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
       </div>
 
       {children}

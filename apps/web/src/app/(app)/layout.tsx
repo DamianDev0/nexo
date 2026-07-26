@@ -1,6 +1,7 @@
 'use client'
 
 import { AuthGuard } from '@/entities/session'
+import { LanguageSwitcher } from '@/features/switch-language'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
@@ -18,6 +19,7 @@ export default function AppLayout({ children }: Readonly<{ children: ReactNode }
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <div className="flex-1" />
+            <LanguageSwitcher />
             <ThemeToggle />
           </header>
           <main className="flex-1 overflow-y-auto">{children}</main>
