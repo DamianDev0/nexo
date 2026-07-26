@@ -1,12 +1,12 @@
 import { HttpResponse, http } from 'msw'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 
-import { server } from '@/test/msw/server'
+import { server } from '../../../msw/server'
 
 const API = 'http://localhost:8080/api/v1'
 
-import authService from './auth.service'
-import settingsService from './settings.service'
+import authService from '@/shared/api/services/auth.service'
+import settingsService from '@/shared/api/services/settings.service'
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 afterEach(() => server.resetHandlers())

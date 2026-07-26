@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cn } from './cn'
+import { cn } from '@/shared/lib/cn'
 
 describe('cn', () => {
   it('merges class names', () => {

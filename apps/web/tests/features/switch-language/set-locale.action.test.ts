@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { setLocaleAction } from './set-locale.action'
+import { setLocaleAction } from '@/features/switch-language/api/set-locale.action'
 
 const cookieSet = vi.fn()
 

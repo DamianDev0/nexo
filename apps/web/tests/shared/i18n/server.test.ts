@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getLocale, getT } from './server'
+import { getLocale, getT } from '@/shared/i18n/server'
 
 const cookieGet = vi.fn()
 const headerGet = vi.fn()

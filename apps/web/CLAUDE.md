@@ -57,7 +57,8 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 
 ## Testing
 
-- `pnpm test` — Vitest + Testing Library (jsdom). MSW mocks the NestJS API at network level (`src/test/msw/`).
+- `pnpm test` — Vitest + Testing Library (jsdom). MSW mocks the NestJS API at network level (`tests/msw/`).
+- Tests NEVER live in `src/` — they go in `tests/` mirroring the `src` structure, importing via `@/` aliases.
 - `pnpm test:e2e` — Playwright against `pnpm dev` on :3001 (requires `npx playwright install chromium` once).
 - New logic ships with tests (TDD preferred: red → green).
 

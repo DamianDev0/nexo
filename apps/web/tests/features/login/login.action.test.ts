@@ -2,7 +2,7 @@ import { HttpResponse, http } from 'msw'
 import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { loginAction } from './login.action'
+import { loginAction } from '@/features/login/api/login.action'
 
 const cookieSet = vi.fn()
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isLocale, negotiateLocale } from './locale'
+import { isLocale, negotiateLocale } from '@/shared/i18n/locale'
 
 describe('negotiateLocale', () => {
   it('picks the first supported language from the header', () => {

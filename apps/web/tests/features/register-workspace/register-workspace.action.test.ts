@@ -3,7 +3,7 @@ import { HttpResponse, http } from 'msw'
 import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { registerWorkspaceAction } from './register-workspace.action'
+import { registerWorkspaceAction } from '@/features/register-workspace/api/register-workspace.action'
 
 const cookieSet = vi.fn()
 

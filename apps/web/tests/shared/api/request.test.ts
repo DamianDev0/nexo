@@ -2,8 +2,7 @@ import { AxiosError, AxiosHeaders } from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import apiUrl from '@/shared/api/http'
-
-import { request } from './request'
+import { request } from '@/shared/api/request'
 
 vi.mock('@/shared/api/http', () => ({
   default: { request: vi.fn() },

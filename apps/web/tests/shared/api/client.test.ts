@@ -2,8 +2,8 @@ import { HttpResponse, http } from 'msw'
 import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { ApiError } from './api-error'
-import { apiFetch } from './client'
+import { ApiError } from '@/shared/api/api-error'
+import { apiFetch } from '@/shared/api/client'
 
 vi.mock('server-only', () => ({}))
 vi.mock('next/headers', () => ({

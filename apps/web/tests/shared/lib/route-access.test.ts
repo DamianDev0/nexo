@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { decideRoute } from './route-access'
+import { decideRoute } from '@/shared/lib/route-access'
 
 describe('decideRoute', () => {
   describe('without session', () => {
