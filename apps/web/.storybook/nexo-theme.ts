@@ -1,0 +1,26 @@
+import { create } from 'storybook/theming'
+
+export const nexoTheme = create({
+  base: 'light',
+  brandTitle: 'Nexo Design System',
+  brandTarget: '_self',
+  colorPrimary: '#A5E96F',
+  colorSecondary: '#0E0F0C',
+  appBg: '#E8EBE6',
+  appContentBg: '#FFFFFF',
+  appPreviewBg: '#E8EBE6',
+  appBorderColor: '#DCE0D9',
+  appBorderRadius: 12,
+  fontBase: "'Satoshi', system-ui, sans-serif",
+  fontCode: "'Geist Mono', ui-monospace, monospace",
+  textColor: '#0E0F0C',
+  textMutedColor: '#5F665D',
+  barBg: '#FFFFFF',
+  barTextColor: '#454745',
+  barSelectedColor: '#0E0F0C',
+  barHoverColor: '#25400F',
+  inputBg: '#FFFFFF',
+  inputBorder: '#8B9288',
+  inputTextColor: '#0E0F0C',
+  inputBorderRadius: 12,
+})

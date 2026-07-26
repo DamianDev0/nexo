@@ -5,7 +5,7 @@ import unusedImports from 'eslint-plugin-unused-imports'
 
 export default [
   {
-    ignores: ['.next/**', 'next-env.d.ts', 'node_modules/**'],
+    ignores: ['.next/**', 'next-env.d.ts', 'node_modules/**', 'storybook-static/**'],
   },
   ...nextJsConfig,
   {
@@ -35,6 +35,7 @@ export default [
       ],
       '@typescript-eslint/no-explicit-any': 'error',
       'react/prop-types': 'off',
+      '@next/next/no-page-custom-font': 'off',
       'react/no-array-index-key': 'error',
       'react/display-name': 'error',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
