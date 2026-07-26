@@ -28,6 +28,7 @@ import {
   CALENDAR_FROM,
   UPDATABLE_FIELDS,
 } from './constants/activity.constants'
+import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 
 @Injectable()
 export class ActivitiesService {
@@ -39,7 +40,7 @@ export class ActivitiesService {
   async findAll(schemaName: string, query: ActivityQueryDto): Promise<PaginatedActivities> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedActivities> => {
       const page = query.page ?? 1
-      const limit = query.limit ?? 25
+      const limit = query.limit ?? DEFAULT_PAGE_SIZE
       const offset = (page - 1) * limit
 
       const { where, params } = this.buildWhereClause(query)

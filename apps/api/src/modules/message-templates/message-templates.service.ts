@@ -14,6 +14,7 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { QUEUE_NAMES } from '@/shared/queue/queue-names'
 import type { MessageJobData } from './message-queue.processor'
 import type { TemplateRow } from './interfaces/message-template-row.interfaces'
+import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 
 @Injectable()
 export class MessageTemplatesService {
@@ -27,7 +28,7 @@ export class MessageTemplatesService {
     channel?: string,
     category?: string,
     page = 1,
-    limit = 25,
+    limit = DEFAULT_PAGE_SIZE,
   ): Promise<PaginatedTemplates> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedTemplates> => {
       const conditions: string[] = ['is_active = true']

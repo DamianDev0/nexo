@@ -17,8 +17,7 @@ import type {
   TodayActivityRow,
   TopSalesRepRow,
 } from './interfaces/dashboard-row.interfaces'
-
-const CACHE_TTL = 300
+import { CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
 
 @Injectable()
 export class DashboardService {
@@ -79,7 +78,7 @@ export class DashboardService {
       }
     })
 
-    await this.cache.set(cacheKey, metrics, CACHE_TTL)
+    await this.cache.set(cacheKey, metrics, CACHE_TTL_SHORT_SECONDS)
     return metrics
   }
 

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { OnEvent } from '@nestjs/event-emitter'
-import type { NotificationType } from '@repo/shared-types'
 import type { NotificationEvent } from '@/shared/events/notification.events'
 import { NotificationsService } from './notifications.service'
 import { NotificationsGateway } from './notifications.gateway'
@@ -20,7 +19,7 @@ export class NotificationsListener {
   @OnEvent('import.**')
   async handleNotificationEvent(event: NotificationEvent): Promise<void> {
     const notification = await this.notificationsService.send(event.schemaName, event.userId, {
-      type: event.type as NotificationType,
+      type: event.type,
       title: event.title,
       body: event.body,
       entityType: event.entityType,

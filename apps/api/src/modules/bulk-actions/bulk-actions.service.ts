@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import type { BulkActionResult } from '@repo/shared-types'
+import type { BulkActionResult, CustomFieldEntity } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import type { EntityTable } from './interfaces/bulk-actions.interface'
 
-const ALLOWED_TABLES = new Set<EntityTable>(['contacts', 'companies', 'deals'])
+const ALLOWED_TABLES = new Set<CustomFieldEntity>(['contacts', 'companies', 'deals'])
 
 @Injectable()
 export class BulkActionsService {
@@ -102,12 +101,12 @@ export class BulkActionsService {
     })
   }
 
-  private validateTable(entity: string): EntityTable {
-    if (!ALLOWED_TABLES.has(entity as EntityTable)) {
+  private validateTable(entity: string): CustomFieldEntity {
+    if (!ALLOWED_TABLES.has(entity as CustomFieldEntity)) {
       throw new BadRequestException(
         `Bulk actions not supported for entity "${entity}". Allowed: ${[...ALLOWED_TABLES].join(', ')}`,
       )
     }
-    return entity as EntityTable
+    return entity as CustomFieldEntity
   }
 }

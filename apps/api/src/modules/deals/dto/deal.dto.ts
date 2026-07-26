@@ -14,6 +14,7 @@ import {
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { DealStatus } from '@repo/shared-types'
+import { MAX_PAGE_SIZE } from '@repo/shared-utils'
 
 export class CreateDealDto {
   @IsString()
@@ -101,7 +102,7 @@ export class DealQueryDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(MAX_PAGE_SIZE)
   @Type(() => Number)
   limit?: number
 }

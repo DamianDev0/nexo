@@ -1,3 +1,4 @@
+import { PlanName } from '@repo/shared-types'
 import type { Tenant } from '../entities/tenant.entity'
 
 export class TenantResponseDto {
@@ -5,7 +6,7 @@ export class TenantResponseDto {
   slug: string
   name: string
   schemaName: string
-  plan: string
+  plan: PlanName
   isActive: boolean
   createdAt: Date
 
@@ -15,7 +16,7 @@ export class TenantResponseDto {
       slug: tenant.slug,
       name: tenant.name,
       schemaName: tenant.schemaName,
-      plan: tenant.plan?.name ?? 'free',
+      plan: (tenant.plan?.name ?? PlanName.FREE) as PlanName,
       isActive: tenant.isActive,
       createdAt: tenant.createdAt,
     }

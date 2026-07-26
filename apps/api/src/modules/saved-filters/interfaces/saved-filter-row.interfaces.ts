@@ -1,7 +1,9 @@
+import type { SavedFilterEntityType } from '@repo/shared-types'
+
 export interface FilterRow {
   id: string
   user_id: string
-  entity_type: string
+  entity_type: SavedFilterEntityType
   name: string
   filters: Record<string, unknown>
   is_default: boolean

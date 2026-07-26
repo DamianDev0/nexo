@@ -157,7 +157,7 @@ export class WebhooksService {
     return {
       id: r.id,
       url: r.url,
-      events: r.events as WebhookEvent[],
+      events: r.events,
       secret: opts?.revealSecret ? r.secret : '',
       isActive: r.is_active,
       lastTriggeredAt: r.last_triggered_at,
@@ -172,7 +172,7 @@ export class WebhooksService {
     return {
       id: r.id,
       webhookId: r.webhook_id,
-      event: r.event as WebhookEvent,
+      event: r.event,
       payload: r.payload,
       statusCode: r.status_code,
       responseTime: r.response_time,

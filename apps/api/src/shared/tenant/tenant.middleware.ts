@@ -6,9 +6,8 @@ import type { Request, Response, NextFunction } from 'express'
 
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { CacheService } from '@/shared/cache/cache.service'
-import type { TenantContext } from '@repo/shared-types'
-
-const TENANT_CACHE_TTL = 300
+import type { PlanName, TenantContext } from '@repo/shared-types'
+import { CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
 
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
@@ -68,13 +67,13 @@ export class TenantMiddleware implements NestMiddleware {
         tenantId: tenant.id,
         slug: tenant.slug,
         schemaName: tenant.schemaName,
-        plan: tenant.plan.name,
+        plan: tenant.plan.name as PlanName,
         config: tenant.config,
         productName: tenant.productName ?? 'NexoCRM',
         customDomain: tenant.customDomain ?? null,
       }
 
-      await this.cache.set(cacheKey, tenantContext, TENANT_CACHE_TTL)
+      await this.cache.set(cacheKey, tenantContext, CACHE_TTL_SHORT_SECONDS)
       this.logger.debug(`Tenant resolved: ${subdomain} → ${tenant.schemaName}`)
     }
 

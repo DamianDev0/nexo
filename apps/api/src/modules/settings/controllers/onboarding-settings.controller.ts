@@ -1,14 +1,14 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from '@nestjs/common'
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
-import type { TenantContext } from '@repo/shared-types'
+import type { OnboardingStatus, TenantContext } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { UpdateOnboardingDto } from '../dto/onboarding-settings.dto'
-import type { TenantConfig, OnboardingConfig } from '../interfaces/settings.interface'
+import type { TenantSettingsRow } from '../interfaces/settings.interface'
 
 @ApiTags('Settings - Onboarding')
 @Controller('settings/onboarding')
@@ -22,9 +22,9 @@ export class OnboardingSettingsController {
   @Auth(UserRole.VIEWER)
   @ApiOperation({ summary: 'Get current onboarding step and completion status' })
   @ApiOkResponse()
-  async getOnboarding(@TenantCtx() tenantCtx: TenantContext): Promise<OnboardingConfig> {
+  async getOnboarding(@TenantCtx() tenantCtx: TenantContext): Promise<OnboardingStatus> {
     const tenant = await this.tenantRepo.findOneOrFail({ where: { id: tenantCtx.tenantId } })
-    const config = (tenant.config ?? {}) as TenantConfig
+    const config = (tenant.config ?? {}) as TenantSettingsRow
     return config.onboarding ?? { step: 1, completed: false }
   }
 
@@ -36,11 +36,11 @@ export class OnboardingSettingsController {
   async updateOnboarding(
     @Body() dto: UpdateOnboardingDto,
     @TenantCtx() tenantCtx: TenantContext,
-  ): Promise<OnboardingConfig> {
+  ): Promise<OnboardingStatus> {
     const tenant = await this.tenantRepo.findOneOrFail({ where: { id: tenantCtx.tenantId } })
-    const config = (tenant.config ?? {}) as TenantConfig
+    const config = (tenant.config ?? {}) as TenantSettingsRow
 
-    const onboarding: OnboardingConfig = {
+    const onboarding: OnboardingStatus = {
       step: dto.step,
       completed: dto.completed ?? dto.step >= 6,
     }

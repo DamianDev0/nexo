@@ -2,18 +2,19 @@ import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ProductsController } from '../products.controller'
 import { ProductsService } from '../products.service'
-import type {
-  Product,
-  PaginatedProducts,
-  TenantContext,
-  AuthenticatedUser,
+import {
+  type AuthenticatedUser,
+  type PaginatedProducts,
+  PlanName,
+  type Product,
+  type TenantContext,
 } from '@repo/shared-types'
 
 const mockCtx: TenantContext = {
   tenantId: 't-1',
   schemaName: 'tenant_acme',
   slug: 'acme',
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

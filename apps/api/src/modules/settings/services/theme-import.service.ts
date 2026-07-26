@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import type { ThemeColors } from '@repo/shared-types'
-import { isHexColor, readableForeground } from '@/shared/color/color.util'
+import { isHexColor, readableForeground } from '@repo/shared-utils'
 
 const CSS_VAR_PATTERN = /--(?:color-)?([\w-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g
 

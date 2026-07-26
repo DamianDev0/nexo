@@ -1,3 +1,5 @@
+import type { DomainEvent } from '@repo/shared-types'
+
 export interface UserRef {
   id: string
   email: string
@@ -31,22 +33,22 @@ export enum AuditEntityType {
 
 export enum AuditAction {
   AuthLogin = 'auth.login',
-  AuthLoginFailed = 'auth.login.failed',
-  AuthLoginGoogle = 'auth.login.google',
+  AuthLoginFailed = 'auth.login_failed',
+  AuthLoginGoogle = 'auth.login_google',
   AuthLogout = 'auth.logout',
-  AuthTokenRefreshed = 'auth.token.refreshed',
-  AuthPasswordChanged = 'auth.password.changed',
-  AuthPasswordResetRequested = 'auth.password.reset.requested',
-  AuthInviteSent = 'auth.invite.sent',
-  AuthInviteAccepted = 'auth.invite.accepted',
-  AuthAccountDisabled = 'auth.account.disabled',
-  AuthAccountEnabled = 'auth.account.enabled',
-  AuthSessionsRevoked = 'auth.sessions.revoked',
+  AuthTokenRefreshed = 'auth.token_refreshed',
+  AuthPasswordChanged = 'auth.password_changed',
+  AuthPasswordResetRequested = 'auth.password_reset_requested',
+  AuthInviteSent = 'auth.invite_sent',
+  AuthInviteAccepted = 'auth.invite_accepted',
+  AuthAccountDisabled = 'auth.account_disabled',
+  AuthAccountEnabled = 'auth.account_enabled',
+  AuthSessionsRevoked = 'auth.sessions_revoked',
 
   UserCreated = 'user.created',
   UserUpdated = 'user.updated',
   UserDeleted = 'user.deleted',
-  UserRoleChanged = 'user.role.changed',
+  UserRoleChanged = 'user.role_changed',
 
   ContactCreated = 'contact.created',
   ContactUpdated = 'contact.updated',
@@ -62,7 +64,7 @@ export enum AuditAction {
   DealCreated = 'deal.created',
   DealUpdated = 'deal.updated',
   DealDeleted = 'deal.deleted',
-  DealStageChanged = 'deal.stage.changed',
+  DealStageChanged = 'deal.stage_changed',
   DealWon = 'deal.won',
   DealLost = 'deal.lost',
   DealAssigned = 'deal.assigned',
@@ -82,8 +84,8 @@ export enum AuditAction {
   InvoiceIssued = 'invoice.issued',
   InvoiceVoided = 'invoice.voided',
   InvoiceSent = 'invoice.sent',
-  InvoiceDianValidated = 'invoice.dian.validated',
-  InvoiceDianRejected = 'invoice.dian.rejected',
+  InvoiceDianValidated = 'invoice.dian_validated',
+  InvoiceDianRejected = 'invoice.dian_rejected',
 
   PaymentRecorded = 'payment.recorded',
   PaymentUpdated = 'payment.updated',
@@ -92,9 +94,9 @@ export enum AuditAction {
   PipelineCreated = 'pipeline.created',
   PipelineUpdated = 'pipeline.updated',
   PipelineDeleted = 'pipeline.deleted',
-  PipelineStageCreated = 'pipeline.stage.created',
-  PipelineStageUpdated = 'pipeline.stage.updated',
-  PipelineStageDeleted = 'pipeline.stage.deleted',
+  PipelineStageCreated = 'pipeline.stage_created',
+  PipelineStageUpdated = 'pipeline.stage_updated',
+  PipelineStageDeleted = 'pipeline.stage_deleted',
 
   WorkflowCreated = 'workflow.created',
   WorkflowUpdated = 'workflow.updated',
@@ -104,12 +106,20 @@ export enum AuditAction {
   WorkflowExecuted = 'workflow.executed',
   WorkflowFailed = 'workflow.failed',
 
-  TenantCreated = 'system.tenant.created',
-  TenantUpdated = 'system.tenant.updated',
-  TenantDeleted = 'system.tenant.deleted',
-  DataExported = 'system.data.exported',
-  SettingsUpdated = 'system.settings.updated',
+  TenantCreated = 'system.tenant_created',
+  TenantUpdated = 'system.tenant_updated',
+  TenantDeleted = 'system.tenant_deleted',
+  DataExported = 'system.data_exported',
+  SettingsUpdated = 'system.settings_updated',
 }
+
+type Assert<T extends true> = T
+
+export type AuditEntityAction = Exclude<`${AuditAction}`, `auth.${string}` | `system.${string}`>
+
+export type AuditEntityActionsAreDomainEvents = Assert<
+  AuditEntityAction extends DomainEvent ? true : false
+>
 
 export interface AuditMeta {
   ip?: string

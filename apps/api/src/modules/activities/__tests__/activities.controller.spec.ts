@@ -2,18 +2,19 @@ import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ActivitiesController } from '../activities.controller'
 import { ActivitiesService } from '../activities.service'
-import type {
-  ActivityListItem,
-  PaginatedActivities,
-  TenantContext,
-  AuthenticatedUser,
+import {
+  type ActivityListItem,
+  type AuthenticatedUser,
+  type PaginatedActivities,
+  PlanName,
+  type TenantContext,
 } from '@repo/shared-types'
 
 const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   schemaName: 'tenant_acme',
   slug: 'acme',
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

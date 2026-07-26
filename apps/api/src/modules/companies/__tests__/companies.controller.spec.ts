@@ -4,12 +4,13 @@ import { CompaniesController } from '../companies.controller'
 import { CompaniesService } from '../companies.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import {
-  UserRole,
-  TaxRegime,
-  CompanySize,
-  CIIUSector,
   AccountType,
+  CIIUSector,
+  CompanySize,
   PersonType,
+  PlanName,
+  TaxRegime,
+  UserRole,
 } from '@repo/shared-types'
 import type {
   TenantContext,
@@ -23,7 +24,7 @@ const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
   schemaName: 'tenant_acme',
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

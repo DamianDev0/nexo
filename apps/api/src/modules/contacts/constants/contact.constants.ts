@@ -1,6 +1,7 @@
+import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateContactDto } from '../dto/contact.dto'
 
-export const UPDATABLE_FIELDS: Array<[keyof UpdateContactDto, string]> = [
+export const UPDATABLE_FIELDS: FieldMap<UpdateContactDto> = [
   ['firstName', 'first_name'],
   ['lastName', 'last_name'],
   ['email', 'email'],

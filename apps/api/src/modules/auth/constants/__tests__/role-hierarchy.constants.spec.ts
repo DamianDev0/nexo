@@ -1,5 +1,5 @@
 import { UserRole } from '@repo/shared-types'
-import { canAssignRole } from '../role-hierarchy.constants'
+import { canAssignRole } from '@repo/shared-utils'
 
 describe('canAssignRole', () => {
   it('allows inviting a strictly lower role', () => {

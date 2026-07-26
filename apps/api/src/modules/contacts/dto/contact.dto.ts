@@ -15,6 +15,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
 import { Transform, Type } from 'class-transformer'
 import { DocumentType, ContactStatus, ContactSource } from '@repo/shared-types'
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@repo/shared-utils'
 
 export class CreateContactDto {
   @ApiProperty()
@@ -159,11 +160,11 @@ export class ContactQueryDto {
   @Min(1)
   page?: number = 1
 
-  @ApiPropertyOptional({ default: 25, minimum: 1, maximum: 100 })
+  @ApiPropertyOptional({ default: DEFAULT_PAGE_SIZE, minimum: 1, maximum: MAX_PAGE_SIZE })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
-  limit?: number = 25
+  @Max(MAX_PAGE_SIZE)
+  limit?: number = DEFAULT_PAGE_SIZE
 }

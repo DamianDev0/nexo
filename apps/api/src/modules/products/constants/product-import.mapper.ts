@@ -1,8 +1,10 @@
+import type { ProductType } from '@repo/shared-types'
 import type {
   ImportFieldDef,
   ImportFieldError,
   ImportRowMapper,
 } from '@/shared/imports/interfaces/import.interfaces'
+import { PRODUCT_TYPES } from './product.constants'
 
 const PRODUCT_FIELD_DEFS: ImportFieldDef[] = [
   {
@@ -122,8 +124,9 @@ export const productImportMapper: ImportRowMapper = {
 
       case 'productType': {
         const lower = value.toLowerCase().trim()
-        if (lower === 'servicio' || lower === 'service') return 'service'
-        return 'product'
+        const type: ProductType =
+          lower === 'servicio' || lower === 'service' ? 'service' : 'product'
+        return type
       }
 
       case 'tags':
@@ -155,7 +158,7 @@ export const productImportMapper: ImportRowMapper = {
         break
 
       case 'productType':
-        if (typeof value === 'string' && !['product', 'service'].includes(value)) {
+        if (typeof value === 'string' && !PRODUCT_TYPES.includes(value as ProductType)) {
           return { field, message: 'Type must be "product" or "service"', value }
         }
         break

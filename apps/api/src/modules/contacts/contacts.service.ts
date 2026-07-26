@@ -18,6 +18,7 @@ import {
   CONTACT_COLUMNS,
   CONTACT_LIST_COLUMNS,
 } from './constants/contact.constants'
+import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 
 @Injectable()
 export class ContactsService {
@@ -29,7 +30,7 @@ export class ContactsService {
   async findAll(schemaName: string, query: ContactQueryDto): Promise<PaginatedContacts> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedContacts> => {
       const page = query.page ?? 1
-      const limit = query.limit ?? 25
+      const limit = query.limit ?? DEFAULT_PAGE_SIZE
       const offset = (page - 1) * limit
 
       const { where, params } = this.buildWhereClause(query)

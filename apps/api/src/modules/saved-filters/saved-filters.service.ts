@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import type { SavedFilter } from '@repo/shared-types'
+import type { SavedFilter, SavedFilterEntityType } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { FilterRow } from './interfaces/saved-filter-row.interfaces'
 
@@ -7,7 +7,11 @@ import type { FilterRow } from './interfaces/saved-filter-row.interfaces'
 export class SavedFiltersService {
   constructor(private readonly db: TenantDbService) {}
 
-  async findAll(schemaName: string, userId: string, entityType?: string): Promise<SavedFilter[]> {
+  async findAll(
+    schemaName: string,
+    userId: string,
+    entityType?: SavedFilterEntityType,
+  ): Promise<SavedFilter[]> {
     return this.db.query(schemaName, async (qr): Promise<SavedFilter[]> => {
       const params: unknown[] = [userId]
       let entityFilter = ''
@@ -28,7 +32,7 @@ export class SavedFiltersService {
     schemaName: string,
     userId: string,
     data: {
-      entityType: string
+      entityType: SavedFilterEntityType
       name: string
       filters: Record<string, unknown>
       isDefault?: boolean
@@ -102,7 +106,7 @@ export class SavedFiltersService {
     return {
       id: r.id,
       userId: r.user_id,
-      entityType: r.entity_type as SavedFilter['entityType'],
+      entityType: r.entity_type,
       name: r.name,
       filters: r.filters,
       isDefault: r.is_default,

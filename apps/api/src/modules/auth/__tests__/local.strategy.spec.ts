@@ -1,5 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common'
-import { UserRole } from '@repo/shared-types'
+import { PlanName, UserRole } from '@repo/shared-types'
 import type { TenantContext } from '@repo/shared-types'
 import { LocalStrategy } from '../strategies/local.strategy'
 import type { AuthService } from '../services/auth.service'
@@ -10,7 +10,7 @@ const mockTenantCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
   schemaName: 'tenant_acme',
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

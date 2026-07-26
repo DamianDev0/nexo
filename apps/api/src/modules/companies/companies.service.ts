@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
-import { validateNIT, formatNIT } from '@repo/shared-utils'
+import { validateNIT, formatNIT, DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { AuditAction, AuditEntityType } from '@/modules/audit-log/audit-log.interfaces'
@@ -36,7 +36,7 @@ export class CompaniesService {
   async findAll(schemaName: string, query: CompanyQueryDto): Promise<PaginatedCompanies> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedCompanies> => {
       const page = query.page ?? 1
-      const limit = query.limit ?? 25
+      const limit = query.limit ?? DEFAULT_PAGE_SIZE
       const offset = (page - 1) * limit
 
       const { where, params } = this.buildWhereClause(query)

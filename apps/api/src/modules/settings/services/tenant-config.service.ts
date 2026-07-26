@@ -18,11 +18,8 @@ import { DEFAULT_ACTIVITY_TYPES } from '@repo/shared-types'
 import type { ActivityTypeDef } from '@repo/shared-types'
 import { deepMerge } from '@/shared/utils/deep-merge'
 import type { ThemePatch, TenantFullConfig } from '../interfaces/tenant-config.interface'
+import { CACHE_TTL_MEDIUM_SECONDS, CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
 
-const THEME_TTL = 600
-const NOMENCLATURE_TTL = 600
-const SIDEBAR_TTL = 300
-const ACTIVITY_TYPES_TTL = 600
 const HISTORY_LIMIT = 30
 
 @Injectable()
@@ -44,7 +41,7 @@ export class TenantConfigService {
       ...DEFAULT_THEME,
       ...(config.theme as Partial<TenantTheme> | null | undefined),
     }
-    await this.cache.set(this.themeKey(tenantId), theme, THEME_TTL)
+    await this.cache.set(this.themeKey(tenantId), theme, CACHE_TTL_MEDIUM_SECONDS)
     return theme
   }
 
@@ -96,7 +93,7 @@ export class TenantConfigService {
       DEFAULT_NOMENCLATURE as unknown as Record<string, unknown>,
       raw as Record<string, unknown>,
     ) as unknown as TenantNomenclature
-    await this.cache.set(this.nomenclatureKey(tenantId), nomenclature, NOMENCLATURE_TTL)
+    await this.cache.set(this.nomenclatureKey(tenantId), nomenclature, CACHE_TTL_MEDIUM_SECONDS)
     return nomenclature
   }
 
@@ -122,7 +119,7 @@ export class TenantConfigService {
 
     const config = await this.getRawConfig(tenantId)
     const sidebar = config.sidebarConfig ?? DEFAULT_SIDEBAR_CONFIG
-    await this.cache.set(this.sidebarKey(tenantId), sidebar, SIDEBAR_TTL)
+    await this.cache.set(this.sidebarKey(tenantId), sidebar, CACHE_TTL_SHORT_SECONDS)
     return sidebar
   }
 
@@ -166,7 +163,7 @@ export class TenantConfigService {
     const stored = config.activityTypes
     const types: ActivityTypeDef[] =
       Array.isArray(stored) && stored.length > 0 ? [...stored] : DEFAULT_ACTIVITY_TYPES
-    await this.cache.set(this.activityTypesKey(tenantId), types, ACTIVITY_TYPES_TTL)
+    await this.cache.set(this.activityTypesKey(tenantId), types, CACHE_TTL_MEDIUM_SECONDS)
     return types
   }
 

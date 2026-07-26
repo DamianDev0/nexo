@@ -1,4 +1,4 @@
-import type { UserRole, TenantContext } from '@repo/shared-types'
+import type { AuthUser, PlanName, UserRole, TenantContext } from '@repo/shared-types'
 
 export interface UserRow {
   id: string
@@ -23,14 +23,6 @@ export type RequestMeta = {
   userAgent: string
 }
 
-export type AuthUser = {
-  id: string
-  email: string
-  fullName: string
-  role: UserRole
-  avatarUrl: string | null
-}
-
 export type AuthResult = {
   accessToken: string
   refreshToken: string
@@ -38,7 +30,7 @@ export type AuthResult = {
 }
 
 export type OnboardingResult = AuthResult & {
-  tenant: { id: string; slug: string; name: string; schemaName: string; plan: string }
+  tenant: { id: string; slug: string; name: string; schemaName: string; plan: PlanName }
 }
 
 export type GoogleAuthResult = AuthResult & { tenantCtx: TenantContext }

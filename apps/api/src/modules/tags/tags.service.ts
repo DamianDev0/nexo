@@ -7,7 +7,7 @@ import type { TagRow } from './interfaces/tag-row.interfaces'
 export class TagsService {
   constructor(private readonly db: TenantDbService) {}
 
-  async findAll(schemaName: string, entityType?: string): Promise<Tag[]> {
+  async findAll(schemaName: string, entityType?: TagEntityType): Promise<Tag[]> {
     return this.db.query(schemaName, async (qr): Promise<Tag[]> => {
       const params: unknown[] = []
       let where = ''
@@ -28,7 +28,7 @@ export class TagsService {
 
   async create(
     schemaName: string,
-    data: { name: string; color?: string; entityType: string },
+    data: { name: string; color?: string; entityType: TagEntityType },
   ): Promise<Tag> {
     return this.db.query(schemaName, async (qr): Promise<Tag> => {
       const existing: TagRow[] = await qr.query(
@@ -95,7 +95,7 @@ export class TagsService {
       id: r.id,
       name: r.name,
       color: r.color,
-      entityType: r.entity_type as TagEntityType,
+      entityType: r.entity_type,
       createdAt: r.created_at,
     }
   }

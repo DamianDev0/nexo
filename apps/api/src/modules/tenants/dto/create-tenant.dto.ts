@@ -1,5 +1,7 @@
-import { IsNotEmpty, IsOptional, IsString, Length, Matches } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsOptional, IsString, Length, Matches } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { PlanName } from '@repo/shared-types'
+import { TENANT_SLUG_REGEX } from '@repo/shared-utils'
 
 export class CreateTenantDto {
   @ApiProperty({ example: 'Distribuidora ABC' })
@@ -8,17 +10,21 @@ export class CreateTenantDto {
   @Length(2, 300)
   name: string
 
-  @ApiProperty({ example: 'distribuidora-abc', description: 'Tenant subdomain (lowercase letters, numbers, and hyphens only)' })
+  @ApiProperty({
+    example: 'distribuidora-abc',
+    description: 'Tenant subdomain (lowercase letters, numbers, and hyphens only)',
+  })
   @IsString()
   @IsNotEmpty()
   @Length(3, 63)
-  @Matches(/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, {
-    message: 'Slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with a hyphen.',
+  @Matches(TENANT_SLUG_REGEX, {
+    message:
+      'Slug must contain only lowercase letters, numbers, and hyphens. Cannot start or end with a hyphen.',
   })
   slug: string
 
-  @ApiPropertyOptional({ example: 'free' })
+  @ApiPropertyOptional({ enum: Object.values(PlanName), example: PlanName.FREE })
   @IsOptional()
-  @IsString()
-  planName?: string
+  @IsEnum(PlanName)
+  planName?: PlanName
 }

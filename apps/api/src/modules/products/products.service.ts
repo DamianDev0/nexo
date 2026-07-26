@@ -37,6 +37,7 @@ import {
   PRODUCT_LIST_COLUMNS,
   UPDATABLE_FIELDS,
 } from './constants/product.constants'
+import { CURRENCY_CODE, DEFAULT_PAGE_SIZE, DEFAULT_VAT_RATE } from '@repo/shared-utils'
 
 const CSV_COLUMNS = [
   { header: 'name', value: (r: ProductRow) => r.name },
@@ -68,7 +69,7 @@ export class ProductsService {
   async findAll(schemaName: string, query: ProductQueryDto): Promise<PaginatedProducts> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedProducts> => {
       const page = query.page ?? 1
-      const limit = query.limit ?? 25
+      const limit = query.limit ?? DEFAULT_PAGE_SIZE
       const offset = (page - 1) * limit
 
       const { where, params } = this.buildWhereClause(query)
@@ -139,10 +140,10 @@ export class ProductsService {
           dto.brand ?? null,
           dto.priceCents,
           dto.costCents ?? 0,
-          dto.ivaRate ?? 19,
+          dto.ivaRate ?? DEFAULT_VAT_RATE,
           dto.productType ?? 'product',
           dto.unitOfMeasure ?? 'unit',
-          dto.currency ?? 'COP',
+          dto.currency ?? CURRENCY_CODE,
           dto.minStock ?? 0,
           dto.weightGrams ?? null,
           dto.tags ?? [],
@@ -507,10 +508,10 @@ export class ProductsService {
         data['brand'] ?? null,
         data['priceCents'] ?? 0,
         data['costCents'] ?? 0,
-        data['ivaRate'] ?? 19,
+        data['ivaRate'] ?? DEFAULT_VAT_RATE,
         data['productType'] ?? 'product',
         data['unitOfMeasure'] ?? 'unit',
-        data['currency'] ?? 'COP',
+        data['currency'] ?? CURRENCY_CODE,
         data['stock'] ?? 0,
         data['minStock'] ?? 0,
         data['tags'] ?? [],

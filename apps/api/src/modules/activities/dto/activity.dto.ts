@@ -11,6 +11,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator'
+import { MAX_PAGE_SIZE } from '@repo/shared-utils'
 
 export class CreateActivityDto {
   @IsString()
@@ -96,7 +97,7 @@ export class ActivityQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(MAX_PAGE_SIZE)
   limit?: number
 }
 

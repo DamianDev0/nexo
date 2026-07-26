@@ -1,6 +1,7 @@
+import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateCompanyDto } from '../dto/company.dto'
 
-export const UPDATABLE_FIELDS: Array<[keyof UpdateCompanyDto, string]> = [
+export const UPDATABLE_FIELDS: FieldMap<UpdateCompanyDto> = [
   ['name', 'name'],
   ['taxRegime', 'tax_regime'],
   ['companySize', 'company_size'],

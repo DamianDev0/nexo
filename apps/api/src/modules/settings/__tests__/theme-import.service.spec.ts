@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
-import { isHexColor } from '@/shared/color/color.util'
+import { isHexColor } from '@repo/shared-utils'
 import { ThemeImportService } from '../services/theme-import.service'
 
 describe('ThemeImportService', () => {

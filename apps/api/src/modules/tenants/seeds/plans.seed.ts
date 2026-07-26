@@ -1,9 +1,16 @@
 import type { DataSource } from 'typeorm'
+import { PlanName } from '@repo/shared-types'
 import { Plan } from '../entities/plan.entity'
 
-const PLANS = [
+type PlanSeed = {
+  name: PlanName
+  priceCop: number
+  limits: Plan['limits']
+}
+
+const PLANS: PlanSeed[] = [
   {
-    name: 'free',
+    name: PlanName.FREE,
     priceCop: 0,
     limits: {
       users: 1,
@@ -17,8 +24,8 @@ const PLANS = [
     },
   },
   {
-    name: 'starter',
-    priceCop: 7900000, // $79.000 COP in centavos
+    name: PlanName.STARTER,
+    priceCop: 7900000,
     limits: {
       users: 3,
       contacts: 1000,
@@ -31,8 +38,8 @@ const PLANS = [
     },
   },
   {
-    name: 'pro',
-    priceCop: 19900000, // $199.000 COP in centavos
+    name: PlanName.PRO,
+    priceCop: 19900000,
     limits: {
       users: 10,
       contacts: 10000,
@@ -45,8 +52,8 @@ const PLANS = [
     },
   },
   {
-    name: 'business',
-    priceCop: 49900000, // $499.000 COP in centavos
+    name: PlanName.BUSINESS,
+    priceCop: 49900000,
     limits: {
       users: 50,
       contacts: 50000,

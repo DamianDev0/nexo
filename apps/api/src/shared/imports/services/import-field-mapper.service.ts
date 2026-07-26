@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { normalizeText } from '@repo/shared-utils'
 import type {
   ColumnAnalysis,
   ImportFieldDef,
@@ -11,13 +12,7 @@ import type {
 @Injectable()
 export class ImportFieldMapperService {
   normalizeColumnName(name: string): string {
-    return name
-      .toLowerCase()
-      .trim()
-      .normalize('NFD')
-      .replaceAll(/[\u0300-\u036f]/g, '')
-      .replaceAll(/[_-]/g, ' ')
-      .replaceAll(/\s+/g, ' ')
+    return normalizeText(name).replaceAll(/[_-]/g, ' ').replaceAll(/\s+/g, ' ')
   }
 
   suggestMapping(columns: string[], fieldDefs: ImportFieldDef[]): Record<string, string | null> {
