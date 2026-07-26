@@ -31,20 +31,20 @@ export function BrandColorSection({
         {t('onboarding.steps.appearance.primaryColor')}
       </Label>
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        {BRAND_COLOR_OPTIONS.map((color) => (
+        {BRAND_COLOR_OPTIONS.map(({ hex, label }) => (
           <button
-            key={color}
+            key={hex}
             type="button"
-            onClick={() => onPrimaryColorChange(color)}
+            onClick={() => onPrimaryColorChange(hex)}
             className={cn(
               'size-7 rounded-full border-2 transition-transform duration-150',
-              primaryColor === color
+              primaryColor === hex
                 ? 'scale-110 border-foreground'
                 : 'border-transparent hover:scale-105',
             )}
-            style={{ background: color }}
-            aria-label={`Select ${COLOR_NAMES[color] ?? color}`}
-            aria-pressed={primaryColor === color}
+            style={{ background: hex }}
+            aria-label={`Select ${label}`}
+            aria-pressed={primaryColor === hex}
           />
         ))}
         <Popover>

@@ -9,7 +9,7 @@ import type { ComponentProps } from 'react'
 interface KanbanCardData {
   readonly title: string
   readonly company: string
-  readonly amountCents: number
+  readonly valueCents: number
   readonly ownerInitials: string
   readonly badge?: {
     readonly tone: ComponentProps<typeof BadgeSoft>['tone']
@@ -48,7 +48,7 @@ export function KanbanCard({ data, inverted, dragging, className }: Readonly<Kan
       <p className="mt-1.5 text-[13px] text-muted-foreground">{data.company}</p>
       <footer className="mt-4 flex items-center justify-between">
         <Amount
-          cents={data.amountCents}
+          cents={data.valueCents}
           className={cn('font-bold', inverted && 'text-sidebar-foreground')}
         />
         <AvatarSquircle initials={data.ownerInitials} size="kanban" />

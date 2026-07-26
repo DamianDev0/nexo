@@ -5,13 +5,13 @@ export const KANBAN_FIXTURES = {
       {
         title: 'Invoicing platform',
         company: 'Contabilidad Sierra',
-        amountCents: 980_000_000,
+        valueCents: 980_000_000,
         ownerInitials: 'CR',
       },
       {
         title: 'Sales team licenses',
         company: 'Seguros Bolívar Norte',
-        amountCents: 2_150_000_000,
+        valueCents: 2_150_000_000,
         ownerInitials: 'JD',
       },
     ],
@@ -21,7 +21,7 @@ export const KANBAN_FIXTURES = {
     riskCard: {
       title: 'Multi-store POS rollout',
       company: 'Distrialimentos Andina',
-      amountCents: 3_890_000_000,
+      valueCents: 3_890_000_000,
       ownerInitials: 'CR',
       badge: { tone: 'warning', label: 'At risk' },
     },
@@ -32,13 +32,13 @@ export const KANBAN_FIXTURES = {
       {
         title: 'Full suite — 3 years',
         company: 'Textiles Medellín',
-        amountCents: 2_450_000_000,
+        valueCents: 2_450_000_000,
         ownerInitials: 'JD',
       },
       {
         title: 'Collections module',
         company: 'Inversiones Caribe',
-        amountCents: 760_000_000,
+        valueCents: 760_000_000,
         ownerInitials: 'CR',
       },
     ],
@@ -46,7 +46,7 @@ export const KANBAN_FIXTURES = {
   worstCard: {
     title: 'Multi-country end-to-end rollout for Barrancabermeja Distribuciones y Suministros',
     company: 'Barrancabermeja Distribuciones y Suministros S.A.S.',
-    amountCents: 120_000_000_000,
+    valueCents: 120_000_000_000,
     ownerInitials: 'BD',
   },
 } as const

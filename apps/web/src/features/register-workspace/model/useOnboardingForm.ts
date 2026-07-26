@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PlanName } from '@repo/shared-types'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -13,7 +14,7 @@ export function useOnboardingForm() {
     defaultValues: {
       businessName: '',
       slug: '',
-      planName: 'free',
+      planName: PlanName.FREE,
       ownerFullName: '',
       ownerEmail: '',
       ownerPassword: '',

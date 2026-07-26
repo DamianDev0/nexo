@@ -1,4 +1,13 @@
+import { IndustrySector, PlanName, UserRole } from '@repo/shared-types'
+import { CO_TIMEZONE, CURRENCY_CODE } from '@repo/shared-utils'
 import { HttpResponse, http } from 'msw'
+
+import type {
+  ApiErrorResponse,
+  ApiSuccessResponse,
+  GeneralSettings,
+  MeResponse,
+} from '@repo/shared-types'
 
 const API = 'http://localhost:8080/api/v1'
 
@@ -10,14 +19,15 @@ export const handlers = [
       data: {
         id: 'user-1',
         email: 'damian@nexo.test',
-        fullName: 'Damian Garcia',
-        role: 'owner',
+        role: UserRole.OWNER,
+        tenantId: 'tenant-1',
+        schemaName: 'tenant_nexo',
         onboardingCompleted: true,
       },
       timestamp: new Date().toISOString(),
       path: '/auth/me',
       method: 'GET',
-    }),
+    } satisfies ApiSuccessResponse<MeResponse>),
   ),
 
   http.get(`${API}/settings/general`, () =>
@@ -25,14 +35,19 @@ export const handlers = [
       statusCode: 200,
       message: 'OK',
       data: {
+        id: 'tenant-1',
+        name: 'Nexo Test',
+        slug: 'nexo',
+        plan: PlanName.FREE,
         business: { phone: '+57 300 123 4567', website: 'https://nexo.test' },
-        i18n: { timezone: 'America/Bogota', currency: 'COP' },
-        industry: { sector: 'technology' },
+        i18n: { timezone: CO_TIMEZONE, currency: CURRENCY_CODE },
+        billing: {},
+        industry: { sector: IndustrySector.TECNOLOGIA },
       },
       timestamp: new Date().toISOString(),
       path: '/settings/general',
       method: 'GET',
-    }),
+    } satisfies ApiSuccessResponse<GeneralSettings>),
   ),
 
   http.post(`${API}/auth/login`, () =>
@@ -44,7 +59,7 @@ export const handlers = [
         timestamp: new Date().toISOString(),
         path: '/auth/login',
         method: 'POST',
-      },
+      } satisfies ApiErrorResponse,
       { status: 401 },
     ),
   ),

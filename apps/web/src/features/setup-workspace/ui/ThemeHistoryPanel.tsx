@@ -1,3 +1,4 @@
+import { formatDateTimeCO } from '@repo/shared-utils'
 import { useQuery } from '@tanstack/react-query'
 import { History, RotateCcw } from 'lucide-react'
 
@@ -8,15 +9,6 @@ import type { ThemeHistoryEntry, TenantTheme } from '@repo/shared-types'
 
 interface ThemeHistoryPanelProps {
   readonly onRestore: (config: Partial<TenantTheme>) => void
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }
 
 function ColorDot({ color }: Readonly<{ readonly color: string }>) {
@@ -51,7 +43,7 @@ function HistoryCard({
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>{branding.companyName}</span>
           <span>·</span>
-          <span>{formatDate(entry.createdAt)}</span>
+          <span>{formatDateTimeCO(entry.createdAt)}</span>
         </div>
       </div>
       <Button

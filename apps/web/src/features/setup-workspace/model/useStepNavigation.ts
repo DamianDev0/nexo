@@ -1,97 +1,28 @@
+import { DEFAULT_SIDEBAR_MODULE_KEYS, REQUIRED_SIDEBAR_MODULES } from '@repo/shared-types'
+import { t } from 'i18next'
 import { useState, useCallback } from 'react'
 
 import settingsService from '@/shared/api/services/settings.service'
 
+import { MODULE_ICON_NAMES } from './icon-map.constants'
 import { useStepMutation } from './useStepMutation'
 
 import type { SidebarModule } from '@repo/shared-types'
 
-const DEFAULT_MODULES: SidebarModule[] = [
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    icon: 'home',
+function buildDefaultModules(): SidebarModule[] {
+  return DEFAULT_SIDEBAR_MODULE_KEYS.map((key, index) => ({
+    key,
+    label: t(`nav.${key}`),
+    icon: MODULE_ICON_NAMES[key],
     enabled: true,
-    order: 1,
+    order: index + 1,
     customIconUrl: null,
-    required: true,
-  },
-  {
-    key: 'contacts',
-    label: 'Contacts',
-    icon: 'users',
-    enabled: true,
-    order: 2,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'companies',
-    label: 'Companies',
-    icon: 'building',
-    enabled: true,
-    order: 3,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'deals',
-    label: 'Deals',
-    icon: 'briefcase',
-    enabled: true,
-    order: 4,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'activities',
-    label: 'Activities',
-    icon: 'calendar',
-    enabled: true,
-    order: 5,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'invoices',
-    label: 'Invoices',
-    icon: 'file-text',
-    enabled: true,
-    order: 6,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'products',
-    label: 'Products',
-    icon: 'package',
-    enabled: true,
-    order: 7,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'reports',
-    label: 'Reports',
-    icon: 'bar-chart',
-    enabled: true,
-    order: 8,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'settings',
-    label: 'Settings',
-    icon: 'settings',
-    enabled: true,
-    order: 9,
-    customIconUrl: null,
-    required: true,
-  },
-]
+    required: REQUIRED_SIDEBAR_MODULES.has(key),
+  }))
+}
 
 export function useStepNavigation(onNext: () => void) {
-  const [modules, setModules] = useState<SidebarModule[]>(DEFAULT_MODULES)
+  const [modules, setModules] = useState<SidebarModule[]>(buildDefaultModules)
 
   const handleToggle = useCallback((key: string) => {
     setModules((prev) =>

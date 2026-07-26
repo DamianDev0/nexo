@@ -4,20 +4,22 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 
-import { NOMENCLATURE_PRESETS, type NomenclatureState } from '../model/useStepNomenclature'
+import { NOMENCLATURE_PRESETS } from '../model/useStepNomenclature'
 
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
+import type { TenantNomenclature } from '@repo/shared-types'
+
 const ENTITY_COLORS = {
-  contact: BRAND_COLOR_OPTIONS[0],
-  company: BRAND_COLOR_OPTIONS[7],
-  deal: BRAND_COLOR_OPTIONS[6],
-  activity: BRAND_COLOR_OPTIONS[5],
+  contact: BRAND_COLOR_OPTIONS[0].hex,
+  company: BRAND_COLOR_OPTIONS[7].hex,
+  deal: BRAND_COLOR_OPTIONS[6].hex,
+  activity: BRAND_COLOR_OPTIONS[5].hex,
 } as const
 
 interface NomenclatureActions {
   readonly onUpdate: (
-    entity: keyof NomenclatureState,
+    entity: keyof TenantNomenclature,
     field: 'singular' | 'plural',
     value: string,
   ) => void
@@ -25,7 +27,7 @@ interface NomenclatureActions {
 }
 
 interface StepNomenclatureProps {
-  readonly data: NomenclatureState
+  readonly data: TenantNomenclature
   readonly actions: NomenclatureActions
   readonly nav: WizardStepNav
 }
@@ -52,7 +54,7 @@ export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatu
           {t(`${s}.plural`)}
         </span>
 
-        {(Object.keys(data) as Array<keyof NomenclatureState>).map((entity) => (
+        {(Object.keys(data) as Array<keyof TenantNomenclature>).map((entity) => (
           <div key={entity} className="contents">
             <div className="flex items-center gap-2">
               <div className="size-2 rounded-full" style={{ background: ENTITY_COLORS[entity] }} />

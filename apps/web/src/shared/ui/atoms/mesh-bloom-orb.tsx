@@ -37,7 +37,7 @@ export function MeshBloomOrb({ size = 192, className }: Readonly<MeshBloomOrbPro
       className={cn('relative overflow-hidden rounded-full', className)}
       style={{ width: size, height: size }}
     >
-      <div className="absolute inset-0 bg-[var(--mesh-base)] [--mesh-base:#DFF3C6] dark:[--mesh-base:#1E2A16]" />
+      <div className="absolute inset-0 bg-mesh-base" />
       {BLOBS.map((blob) => (
         <div
           key={blob.color}

@@ -2,24 +2,11 @@ import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
 
 import type { ThemeTypography } from '@repo/shared-types'
 
-const BRAND_COLOR_LABELS: readonly string[] = [
-  'Indigo',
-  'Violet',
-  'Pink',
-  'Red',
-  'Orange',
-  'Amber',
-  'Emerald',
-  'Cyan',
-  'Blue',
-  'Slate',
-]
-
 export const COLOR_NAMES: Record<string, string> = Object.fromEntries(
-  BRAND_COLOR_OPTIONS.map((hex, i) => [hex, BRAND_COLOR_LABELS[i] ?? hex]),
+  BRAND_COLOR_OPTIONS.map(({ hex, label }) => [hex, label]),
 )
 
-export const GOOGLE_FONT_MAP: Record<string, string> = {
+export const GOOGLE_FONT_MAP: Record<ThemeTypography['fontFamily'], string> = {
   inter: 'Inter',
   roboto: 'Roboto',
   poppins: 'Poppins',
@@ -60,7 +47,7 @@ export const DENSITY_OPTIONS: ReadonlyArray<{
   { value: 'spacious', label: 'Spacious' },
 ]
 
-export const RADIUS_MAP: Record<string, string> = {
+export const RADIUS_MAP: Record<ThemeTypography['borderRadius'], string> = {
   none: '0px',
   sm: '4px',
   md: '6px',
@@ -68,7 +55,10 @@ export const RADIUS_MAP: Record<string, string> = {
   full: '9999px',
 }
 
-export const DENSITY_MAP: Record<string, { px: string; py: string; gap: string }> = {
+export const DENSITY_MAP: Record<
+  ThemeTypography['density'],
+  { px: string; py: string; gap: string }
+> = {
   compact: { px: '8px', py: '4px', gap: '4px' },
   comfortable: { px: '12px', py: '6px', gap: '8px' },
   spacious: { px: '16px', py: '10px', gap: '12px' },

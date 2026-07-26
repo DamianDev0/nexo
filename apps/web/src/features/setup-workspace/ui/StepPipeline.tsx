@@ -6,12 +6,9 @@ import { Input } from '@/shared/ui/shadcn/input'
 
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
-interface Stage {
-  readonly id: string
-  readonly name: string
-  readonly color: string
-  readonly probability: number
-}
+import type { CreatePipelineRequest } from '@repo/shared-types'
+
+type Stage = Readonly<CreatePipelineRequest['stages'][number] & { id: string }>
 
 interface PipelineData {
   readonly pipelineName: string

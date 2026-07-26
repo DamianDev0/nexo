@@ -185,6 +185,7 @@ const en = {
     contacts: 'Contacts',
     companies: 'Companies',
     deals: 'Deals',
+    invoices: 'Invoices',
     products: 'Products',
     activities: 'Activities',
     reports: 'Reports',
@@ -209,16 +210,6 @@ const en = {
     deal: { singular: 'Deal', plural: 'Deals' },
     activity: { singular: 'Activity', plural: 'Activities' },
     product: { singular: 'Product', plural: 'Products' },
-  },
-  roles: {
-    owner: 'Owner',
-    admin: 'Admin',
-    manager: 'Manager',
-    sales_rep: 'Sales Rep',
-    marketing: 'Marketing',
-    billing: 'Billing',
-    support: 'Support',
-    viewer: 'Viewer',
   },
 } as const
 

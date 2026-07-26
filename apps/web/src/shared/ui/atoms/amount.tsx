@@ -1,3 +1,4 @@
+import { CURRENCY_CODE, centavosToPesos, formatCOP } from '@repo/shared-utils'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/shared/lib'
@@ -24,11 +25,11 @@ const symbolVariants = cva('font-medium text-muted-foreground', {
   defaultVariants: { variant: 'inline' },
 })
 
-const COP_FORMAT = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 })
 const COMPACT_FORMAT = new Intl.NumberFormat('es-CO', {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 })
+const PESOS_PER_MILLION = 1_000_000
 
 function symbolFor(currency: string) {
   return currency === 'USD' ? 'US$' : '$'
@@ -43,14 +44,15 @@ interface AmountProps extends VariantProps<typeof figureVariants> {
 
 export function Amount({
   cents,
-  currency = 'COP',
+  currency = CURRENCY_CODE,
   voided = false,
   variant,
   className,
 }: Readonly<AmountProps>) {
-  const pesos = Math.round(cents) / 100
   const isCompact = variant === 'compact'
-  const figure = isCompact ? COMPACT_FORMAT.format(pesos / 1_000_000) : COP_FORMAT.format(pesos)
+  const figure = isCompact
+    ? COMPACT_FORMAT.format(centavosToPesos(cents) / PESOS_PER_MILLION)
+    : formatCOP(cents).replace('$', '')
 
   return (
     <span
@@ -64,7 +66,7 @@ export function Amount({
       <span className={symbolVariants({ variant })}>{symbolFor(currency)}</span>
       <span className={cn(figureVariants({ variant }), voided && 'line-through')}>{figure}</span>
       {isCompact && <span className="text-[17px] font-black text-body">M</span>}
-      {currency !== 'COP' && (
+      {currency !== CURRENCY_CODE && (
         <span className="text-[11px] font-bold text-muted-foreground">{currency}</span>
       )}
     </span>

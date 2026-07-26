@@ -15,11 +15,9 @@ import {
 import { RolePermissionsMatrix } from './RolePermissionsMatrix'
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
-interface InviteRow {
-  readonly id: string
-  readonly email: string
-  readonly role: string
-}
+import type { InviteUserRequest, UserRole } from '@repo/shared-types'
+
+type InviteRow = Readonly<InviteUserRequest & { id: string }>
 
 interface TeamActions {
   readonly onAdd: () => void
@@ -52,7 +50,10 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
               value={inv.email}
               onChange={(e) => actions.onUpdate(inv.id, { email: e.target.value })}
             />
-            <Select value={inv.role} onValueChange={(v) => actions.onUpdate(inv.id, { role: v })}>
+            <Select
+              value={inv.role}
+              onValueChange={(v) => actions.onUpdate(inv.id, { role: v as UserRole })}
+            >
               <SelectTrigger className="h-9 w-36 text-xs font-semibold">
                 <SelectValue />
               </SelectTrigger>

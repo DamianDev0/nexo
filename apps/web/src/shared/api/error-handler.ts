@@ -1,44 +1,63 @@
 import { AxiosError } from 'axios'
 
-import type { ApiErrorResponse } from '@repo/shared-types'
+import type { ApiErrorResponse, ApiValidationErrorResponse } from '@repo/shared-types'
 
-export function handleApiError(error: unknown): ApiErrorResponse {
+const UNKNOWN_ERROR_MESSAGE = 'Unknown error occurred'
+const NETWORK_ERROR_MESSAGE = 'Unable to connect to the server'
+const UNEXPECTED_ERROR_MESSAGE = 'Unexpected error occurred'
+const NETWORK_ERROR_LABEL = 'Network Error'
+const UNEXPECTED_ERROR_LABEL = 'Unexpected Error'
+const GENERIC_ERROR_LABEL = 'Error'
+
+type ApiErrorBody = Partial<Omit<ApiValidationErrorResponse, 'message'>> & {
+  message?: string | string[]
+}
+
+function emptyMeta() {
+  return { timestamp: new Date().toISOString(), path: '', method: '' }
+}
+
+function fromResponseBody(
+  status: number,
+  body: ApiErrorBody,
+): ApiErrorResponse | ApiValidationErrorResponse {
+  const rawMessage = body.message
+  const message = Array.isArray(rawMessage)
+    ? rawMessage.join(', ')
+    : (rawMessage ?? body.error ?? UNKNOWN_ERROR_MESSAGE)
+
+  const base: ApiErrorResponse = {
+    statusCode: status,
+    message,
+    error: body.error ?? GENERIC_ERROR_LABEL,
+    timestamp: body.timestamp ?? new Date().toISOString(),
+    path: body.path ?? '',
+    method: body.method ?? '',
+  }
+
+  return body.errors ? { ...base, errors: body.errors } : base
+}
+
+export function handleApiError(error: unknown): ApiErrorResponse | ApiValidationErrorResponse {
   if (error instanceof AxiosError) {
     if (error.response) {
-      const { status, data } = error.response
-      const rawMessage = data?.message
-      const message = Array.isArray(rawMessage)
-        ? rawMessage.join(', ')
-        : rawMessage || data?.error || 'Unknown error occurred'
-
-      return {
-        statusCode: status,
-        message,
-        error: data?.error ?? 'Error',
-        timestamp: data?.timestamp ?? new Date().toISOString(),
-        path: data?.path ?? '',
-        method: data?.method ?? '',
-      }
+      return fromResponseBody(error.response.status, (error.response.data ?? {}) as ApiErrorBody)
     }
 
     if (error.request) {
       return {
         statusCode: 0,
-        message: 'Unable to connect to the server',
-        error: 'Network Error',
-        timestamp: new Date().toISOString(),
-        path: '',
-        method: '',
+        message: NETWORK_ERROR_MESSAGE,
+        error: NETWORK_ERROR_LABEL,
+        ...emptyMeta(),
       }
     }
   }
 
   return {
     statusCode: 0,
-    message: error instanceof Error ? error.message : 'Unexpected error occurred',
-    error: 'Unexpected Error',
-    timestamp: new Date().toISOString(),
-    path: '',
-    method: '',
+    message: error instanceof Error ? error.message : UNEXPECTED_ERROR_MESSAGE,
+    error: UNEXPECTED_ERROR_LABEL,
+    ...emptyMeta(),
   }
 }

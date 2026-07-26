@@ -7,11 +7,9 @@ import { useEditableList } from '@/shared/lib/hooks/useEditableList'
 
 import { useStepMutation } from './useStepMutation'
 
-interface Stage {
-  name: string
-  color: string
-  probability: number
-}
+import type { CreatePipelineRequest } from '@repo/shared-types'
+
+type Stage = CreatePipelineRequest['stages'][number]
 
 const DEFAULT_STAGES: Stage[] = [
   { name: 'MQL', color: STAGE_COLOR_OPTIONS[0], probability: 10 },
@@ -35,7 +33,7 @@ export function useStepPipeline(onNext: () => void) {
       settingsService.createPipeline({
         name: pipelineName,
         isDefault: true,
-        stages: stages.map((s) => ({ name: s.name, color: s.color, probability: s.probability })),
+        stages: stages.map(({ id: _id, ...stage }) => stage),
       }),
     onNext,
     errorTitle: t('auth.toasts.pipelineFailed'),

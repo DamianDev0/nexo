@@ -187,6 +187,7 @@ const es = {
     contacts: 'Contactos',
     companies: 'Empresas',
     deals: 'Negocios',
+    invoices: 'Facturas',
     products: 'Productos',
     activities: 'Actividades',
     reports: 'Reportes',
@@ -211,16 +212,6 @@ const es = {
     deal: { singular: 'Negocio', plural: 'Negocios' },
     activity: { singular: 'Actividad', plural: 'Actividades' },
     product: { singular: 'Producto', plural: 'Productos' },
-  },
-  roles: {
-    owner: 'Propietario',
-    admin: 'Administrador',
-    manager: 'Gerente',
-    sales_rep: 'Vendedor',
-    marketing: 'Marketing',
-    billing: 'Facturación',
-    support: 'Soporte',
-    viewer: 'Solo lectura',
   },
 } as const
 

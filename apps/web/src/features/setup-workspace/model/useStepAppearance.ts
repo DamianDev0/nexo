@@ -9,15 +9,14 @@ import { derivePalette } from '../model/palette.utils'
 
 import { useStepMutation } from './useStepMutation'
 
-import type { ThemeTypography, ThemeColors, TenantTheme } from '@repo/shared-types'
-
-type ColorOverrides = Partial<Omit<ThemeColors, 'primary' | 'primaryForeground'>>
+import type { ColorOverrides, ThemeMode } from './appearance.types'
+import type { ThemeTypography, TenantTheme } from '@repo/shared-types'
 
 export function useStepAppearance(onNext: () => void) {
-  const [primaryColor, setPrimaryColor] = useState<string>(BRAND_COLOR_OPTIONS[0])
+  const [primaryColor, setPrimaryColor] = useState<string>(BRAND_COLOR_OPTIONS[0].hex)
   const [colorOverrides, setColorOverrides] = useState<ColorOverrides>({})
   const [grainIntensity, setGrainIntensity] = useState(0)
-  const [darkMode, setDarkMode] = useState<'light' | 'dark' | 'system'>('system')
+  const [darkMode, setDarkMode] = useState<ThemeMode>('system')
   const [fontFamily, setFontFamily] = useState<ThemeTypography['fontFamily']>('inter')
   const [borderRadius, setBorderRadius] = useState<ThemeTypography['borderRadius']>('lg')
   const [density, setDensity] = useState<ThemeTypography['density']>('comfortable')

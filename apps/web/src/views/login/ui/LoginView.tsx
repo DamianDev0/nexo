@@ -14,11 +14,7 @@ export function LoginView() {
   const { showPassword, togglePassword } = usePasswordToggle()
 
   return (
-    <AuthSplitView
-      branding={<LoginBranding />}
-      contentClassName="overflow-y-auto"
-      innerClassName="relative z-1 max-w-none items-center gap-8"
-    >
+    <AuthSplitView branding={<LoginBranding />} innerClassName="relative z-1 items-center">
       <LoginForm
         control={control}
         onSubmit={handleSubmit}
@@ -26,7 +22,7 @@ export function LoginView() {
         showPassword={showPassword}
         onTogglePassword={togglePassword}
       />
-      <div className="flex flex-col gap-1.5 text-center lg:hidden">
+      <div className="mt-8 flex flex-col gap-1.5 text-center lg:hidden">
         <h2 className="text-xl font-light text-foreground">
           {t('auth.mobileHeadline')}{' '}
           <em className="italic text-foreground/35">{t('auth.mobileHeadlineEm')}</em>

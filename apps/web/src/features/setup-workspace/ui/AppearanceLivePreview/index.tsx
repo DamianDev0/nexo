@@ -4,14 +4,15 @@ import { deriveDarkPalette } from '../../model/palette.utils'
 import { PreviewMain } from './PreviewMain'
 import { PreviewSidebar } from './PreviewSidebar'
 
-import type { SidebarModule, ThemeColors } from '@repo/shared-types'
+import type { ThemeMode } from '../../model/appearance.types'
+import type { SidebarModule, ThemeColors, ThemeTypography } from '@repo/shared-types'
 
 export interface LivePreviewData {
   readonly colors: ThemeColors
-  readonly darkMode: 'light' | 'dark' | 'system'
-  readonly fontFamily: string
-  readonly borderRadius: string
-  readonly density: string
+  readonly darkMode: ThemeMode
+  readonly fontFamily: ThemeTypography['fontFamily']
+  readonly borderRadius: ThemeTypography['borderRadius']
+  readonly density: ThemeTypography['density']
   readonly productName: string
   readonly logoPreview: string | null
   readonly navModules: ReadonlyArray<SidebarModule>
@@ -25,11 +26,9 @@ export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewPr
   const isDark = data.darkMode === 'dark'
   const colors = isDark ? deriveDarkPalette(data.colors) : data.colors
 
-  const fontFace =
-    data.fontFamily === 'system' ? 'system-ui' : (GOOGLE_FONT_MAP[data.fontFamily] ?? 'system-ui')
-  const r = RADIUS_MAP[data.borderRadius] ?? '8px'
-  const d = DENSITY_MAP[data.density] ?? DENSITY_MAP.comfortable
-  if (!d) return null
+  const fontFace = GOOGLE_FONT_MAP[data.fontFamily]
+  const r = RADIUS_MAP[data.borderRadius]
+  const d = DENSITY_MAP[data.density]
 
   const enabledModules = data.navModules.filter((m) => m.enabled)
 

@@ -1,3 +1,4 @@
+import { UserRole } from '@repo/shared-types'
 import { t } from 'i18next'
 import { sileo } from 'sileo'
 
@@ -6,13 +7,10 @@ import { useEditableList } from '@/shared/lib/hooks/useEditableList'
 
 import { useStepMutation } from './useStepMutation'
 
-interface InviteRow {
-  email: string
-  role: string
-}
+import type { InviteUserRequest } from '@repo/shared-types'
 
-function newInvite(): InviteRow {
-  return { email: '', role: 'sales_rep' }
+function newInvite(): InviteUserRequest {
+  return { email: '', role: UserRole.SALES_REP }
 }
 
 export function useStepTeam(onNext: () => void) {
@@ -21,7 +19,7 @@ export function useStepTeam(onNext: () => void) {
     add,
     remove,
     update,
-  } = useEditableList<InviteRow>([newInvite()], newInvite)
+  } = useEditableList<InviteUserRequest>([newInvite()], newInvite)
 
   const { handleSave, isPending } = useStepMutation({
     mutationFn: async () => {

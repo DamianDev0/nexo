@@ -78,6 +78,7 @@
   --color-map-node: var(--map-node);
   --color-map-grid: var(--map-grid);
   --color-map-line: var(--map-line);
+  --color-mesh-base: var(--mesh-base);
 }
 
 :root {
@@ -145,6 +146,7 @@
   --map-node: #f7ffe8;
   --map-grid: #dfe4db;
   --map-line: rgba(111, 203, 58, 0.5);
+  --mesh-base: #dff3c6;
 }
 
 .dark {
@@ -212,6 +214,7 @@
   --map-grid: #2a2d27;
   --map-node: #1e2a16;
   --map-line: rgba(165, 233, 111, 0.3);
+  --mesh-base: #1e2a16;
 }
 
 @layer base {

@@ -9,16 +9,18 @@ import { REGIONAL_DEFAULTS } from '../model/company.constants'
 
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
+import type { IndustrySector } from '@repo/shared-types'
+
 interface CompanyData {
   readonly phone: string
   readonly website: string
-  readonly sector: string
+  readonly sector: IndustrySector
 }
 
 interface CompanyActions {
   readonly onPhoneChange: (v: string) => void
   readonly onWebsiteChange: (v: string) => void
-  readonly onSectorChange: (v: string) => void
+  readonly onSectorChange: (v: IndustrySector) => void
 }
 
 interface StepCompanyProps {

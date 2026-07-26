@@ -1,57 +1,49 @@
 'use client'
 
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react'
 
 import { cn } from '@/shared/lib'
 
-const DOTS_MAX_PAGES = 9
+import type { PaginationMeta } from '@repo/shared-types'
+import type { ReactNode } from 'react'
 
-interface PaginationData {
-  readonly page: number
-  readonly totalPages: number
-  readonly totalLabel?: string
-}
-
-interface PaginationLabels {
+export interface NavLabels {
   readonly root: string
   readonly prev: string
   readonly next: string
-  readonly page: string
 }
 
-const DEFAULT_LABELS: PaginationLabels = {
+const DEFAULT_LABELS: NavLabels = {
   root: 'Pagination',
   prev: 'Previous page',
   next: 'Next page',
-  page: 'Page',
 }
 
-interface PaginationCapsuleProps {
-  readonly data: PaginationData
-  readonly onPageChange: (page: number) => void
-  readonly labels?: PaginationLabels
-  readonly className?: string
+function Root({ children, className }: Readonly<{ children: ReactNode; className?: string }>) {
+  return (
+    <nav
+      data-slot="pagination-capsule"
+      aria-label={DEFAULT_LABELS.root}
+      className={cn(
+        'inline-flex h-12 items-center gap-1 rounded-full bg-card py-1.5 pl-2 pr-1.5 shadow-capsule',
+        className,
+      )}
+    >
+      {children}
+    </nav>
+  )
 }
 
-function pageItems(page: number, totalPages: number): ReadonlyArray<number | 'gap'> {
-  if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1)
-  if (page <= 3) return [1, 2, 3, 'gap', totalPages]
-  if (page >= totalPages - 2) return [1, 'gap', totalPages - 2, totalPages - 1, totalPages]
-  return [1, 'gap', page, 'gap', totalPages]
+function Divider() {
+  return <span className="mx-1 h-5 w-px shrink-0 bg-border" />
 }
 
-function Chevron({
-  direction,
+function IconButton({
   label,
   disabled,
   onClick,
-}: Readonly<{
-  direction: 'prev' | 'next'
-  label: string
-  disabled: boolean
-  onClick: () => void
-}>) {
-  const Icon = direction === 'prev' ? ChevronLeft : ChevronRight
+  children,
+}: Readonly<{ label: string; disabled?: boolean; onClick: () => void; children: ReactNode }>) {
   return (
     <button
       type="button"
@@ -59,118 +51,97 @@ function Chevron({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'inline-flex size-9.5 items-center justify-center rounded-full',
+        'inline-flex size-9 items-center justify-center rounded-full transition-colors duration-[120ms]',
         disabled ? 'cursor-default text-disabled-fg' : 'cursor-pointer text-body hover:bg-muted',
       )}
     >
-      <Icon className="size-4" />
+      {children}
     </button>
   )
 }
 
-function Dots({
-  data,
-  labels,
-  onPageChange,
-}: Readonly<{
-  data: PaginationData
-  labels: PaginationLabels
-  onPageChange: (page: number) => void
-}>) {
-  return (
-    <>
-      {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((page) =>
-        page === data.page ? (
-          <span key={page} aria-current="page" className="h-3 w-9 rounded-full bg-sidebar" />
-        ) : (
-          <button
-            key={page}
-            type="button"
-            aria-label={`${labels.page} ${page}`}
-            onClick={() => onPageChange(page)}
-            className="size-2.5 cursor-pointer rounded-full bg-border"
-          />
-        ),
-      )}
-    </>
-  )
+export type NavProps = Pick<PaginationMeta, 'page' | 'totalPages'> & {
+  readonly onPageChange: (page: number) => void
+  readonly labels?: NavLabels
 }
 
-function Numbers({
-  data,
-  onPageChange,
-}: Readonly<{ data: PaginationData; onPageChange: (page: number) => void }>) {
+function Nav({ page, totalPages, onPageChange, labels = DEFAULT_LABELS }: Readonly<NavProps>) {
   return (
-    <>
-      {pageItems(data.page, data.totalPages).map((item, position) =>
-        item === 'gap' ? (
-          <span
-            key={`gap-${position === 1 ? 'left' : 'right'}`}
-            className="inline-flex h-9.5 w-6 items-center justify-center text-sm text-faint"
-          >
-            …
-          </span>
-        ) : (
-          <button
-            key={item}
-            type="button"
-            aria-current={item === data.page ? 'page' : undefined}
-            onClick={() => onPageChange(item)}
-            className={cn(
-              'inline-flex h-9.5 min-w-9.5 cursor-pointer items-center justify-center rounded-full px-3 text-sm tabular-nums',
-              item === data.page
-                ? 'bg-sidebar font-black text-sidebar-foreground'
-                : 'font-medium text-body hover:bg-muted',
-            )}
-          >
-            {item}
-          </button>
-        ),
-      )}
-    </>
-  )
-}
-
-export function PaginationCapsule({
-  data,
-  onPageChange,
-  labels = DEFAULT_LABELS,
-  className,
-}: Readonly<PaginationCapsuleProps>) {
-  const numbered = data.totalPages > DOTS_MAX_PAGES
-
-  return (
-    <nav
-      data-slot="pagination-capsule"
-      aria-label={labels.root}
-      className={cn(
-        'inline-flex h-14.5 items-center gap-1.5 rounded-full bg-card px-3.5',
-        'shadow-capsule',
-        className,
-      )}
-    >
-      {numbered && data.totalLabel && (
-        <span className="pl-2.5 pr-2 text-sm font-medium text-muted-foreground">
-          {data.totalLabel}
-        </span>
-      )}
-      <Chevron
-        direction="prev"
-        label={labels.prev}
-        disabled={data.page <= 1}
-        onClick={() => onPageChange(data.page - 1)}
-      />
-      {numbered ? (
-        <Numbers data={data} onPageChange={onPageChange} />
-      ) : (
-        <Dots data={data} labels={labels} onPageChange={onPageChange} />
-      )}
-      <Chevron
-        direction="next"
+    <span className="inline-flex items-center">
+      <IconButton label={labels.prev} disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+        <ChevronLeft className="size-4" />
+      </IconButton>
+      <span aria-current="page" className="px-1 text-sm font-bold tabular-nums text-foreground">
+        {page}
+        <span className="font-medium text-muted-foreground">/{totalPages}</span>
+      </span>
+      <IconButton
         label={labels.next}
-        disabled={data.page >= data.totalPages}
-        onClick={() => onPageChange(data.page + 1)}
-      />
-    </nav>
+        disabled={page >= totalPages}
+        onClick={() => onPageChange(page + 1)}
+      >
+        <ChevronRight className="size-4" />
+      </IconButton>
+    </span>
   )
 }
+
+export interface PageSizeProps {
+  readonly value: number
+  readonly options: ReadonlyArray<number>
+  readonly onChange: (size: number) => void
+  readonly label?: string
+}
+
+function PageSize({ value, options, onChange, label = 'Rows per page' }: Readonly<PageSizeProps>) {
+  return (
+    <span className="relative inline-flex items-center">
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="h-9 cursor-pointer appearance-none rounded-full bg-transparent pl-3 pr-7 text-sm font-bold tabular-nums text-foreground hover:bg-muted"
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-muted-foreground" />
+    </span>
+  )
+}
+
+function Progress({ value, label = 'Progress' }: Readonly<{ value: number; label?: string }>) {
+  const clamped = Math.min(100, Math.max(0, value))
+  return (
+    <span
+      role="progressbar"
+      aria-label={label}
+      aria-valuenow={Math.round(clamped)}
+      className="inline-flex h-4 w-24 overflow-hidden rounded-full bg-muted"
+    >
+      <span className="h-full rounded-full bg-primary" style={{ width: `${clamped}%` }} />
+    </span>
+  )
+}
+
+function JumpEnd({
+  onClick,
+  label = 'Last page',
+}: Readonly<{ onClick: () => void; label?: string }>) {
+  return (
+    <IconButton label={label} onClick={onClick}>
+      <ChevronsRight className="size-4" />
+    </IconButton>
+  )
+}
+
+export const PaginationCapsule = Object.assign(Root, {
+  Nav,
+  PageSize,
+  Progress,
+  JumpEnd,
+  Divider,
+})

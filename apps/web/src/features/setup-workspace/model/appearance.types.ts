@@ -1,7 +1,8 @@
 import type { SidebarModule, TenantTheme, ThemeColors, ThemeTypography } from '@repo/shared-types'
 
-export type ThemeMode = 'light' | 'dark' | 'system'
-export type OverridableColorKey = 'accent' | 'secondary' | 'sidebar' | 'sidebarForeground'
+export type ThemeMode = TenantTheme['darkModeDefault']
+export type OverridableColorKey = keyof Omit<ThemeColors, 'primary' | 'primaryForeground'>
+export type ColorOverrides = Partial<Omit<ThemeColors, 'primary' | 'primaryForeground'>>
 
 export interface AppearanceData {
   readonly primaryColor: string

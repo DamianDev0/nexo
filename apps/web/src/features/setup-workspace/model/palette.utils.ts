@@ -1,5 +1,6 @@
 import { WHITE } from '@/shared/config/tokens/effects'
 
+import type { ColorOverrides } from './appearance.types'
 import type { ThemeColors } from '@repo/shared-types'
 
 function hexToHsl(hex: string): [number, number, number] {
@@ -40,10 +41,7 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`.toUpperCase()
 }
 
-export function derivePalette(
-  primary: string,
-  overrides?: Partial<Omit<ThemeColors, 'primary' | 'primaryForeground'>>,
-): ThemeColors {
+export function derivePalette(primary: string, overrides?: ColorOverrides): ThemeColors {
   const [h, s] = hexToHsl(primary)
 
   return {

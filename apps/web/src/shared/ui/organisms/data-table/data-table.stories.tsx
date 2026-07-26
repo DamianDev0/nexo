@@ -31,7 +31,7 @@ function ContactRowView({ row }: Readonly<{ row: ContactRow }>) {
       </DataTable.Cell>
       <DataTable.Cell className="flex flex-[1.7] items-center gap-3">
         <AvatarSquircle initials={row.initials} tone={row.tone} />
-        <DataTable.RowTitle title={row.name} subtitle={row.role} />
+        <DataTable.RowTitle title={row.fullName} subtitle={row.role} />
       </DataTable.Cell>
       <DataTable.Cell className="flex-[1.5] truncate">{row.company}</DataTable.Cell>
       <DataTable.Cell className="flex-[1.4] truncate text-sm">{row.email}</DataTable.Cell>

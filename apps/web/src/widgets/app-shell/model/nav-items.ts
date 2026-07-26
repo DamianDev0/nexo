@@ -11,10 +11,13 @@ import {
 
 import { ROUTES } from '@/shared/config/routes'
 
+import type { DEFAULT_SIDEBAR_MODULE_KEYS } from '@repo/shared-types'
 import type { LucideIcon } from 'lucide-react'
 
+export type SidebarModuleKey = (typeof DEFAULT_SIDEBAR_MODULE_KEYS)[number]
+
 export interface NavItem {
-  readonly titleKey: string
+  readonly titleKey: `nav.${SidebarModuleKey}`
   readonly url: string
   readonly icon: LucideIcon
 }

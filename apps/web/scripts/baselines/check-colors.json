@@ -1,6 +1,5 @@
 [
   "src/shared/ui/atoms/badge-ink.tsx :: ? '0 10px 26px -12px rgba(14,15,12,0.55)'",
-  "src/shared/ui/atoms/mesh-bloom-orb.tsx :: <div className=\"absolute inset-0 bg-[var(--mesh-base)] [--mesh-base:#DFF3C6] dar",
   "src/shared/ui/molecules/color-picker/useArcColorPicker.ts :: onColorChange(`hsla(${newHue}, 100%, 50%, ${newOpacity / 100})`)",
   "src/shared/ui/molecules/color-picker/useArcColorPicker.ts :: onColorChange(`hsla(${newHue}, 100%, 50%, ${newOpacity / 100})`)",
   "src/shared/ui/shadcn/sidebar.tsx :: 'bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-ac"

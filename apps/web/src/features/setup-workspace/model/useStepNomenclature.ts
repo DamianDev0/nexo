@@ -4,28 +4,16 @@ import settingsService from '@/shared/api/services/settings.service'
 
 import { useStepMutation } from './useStepMutation'
 
-interface EntityLabels {
-  singular: string
-  plural: string
-}
+import type { EntityTerm, TenantNomenclature } from '@repo/shared-types'
 
-interface NomenclatureState {
-  contact: EntityLabels
-  company: EntityLabels
-  deal: EntityLabels
-  activity: EntityLabels
-}
-
-const DEFAULT_NOMENCLATURE: NomenclatureState = {
+const DEFAULT_NOMENCLATURE: TenantNomenclature = {
   contact: { singular: 'Contact', plural: 'Contacts' },
   company: { singular: 'Company', plural: 'Companies' },
   deal: { singular: 'Deal', plural: 'Deals' },
   activity: { singular: 'Activity', plural: 'Activities' },
 }
 
-export type { NomenclatureState }
-
-export const NOMENCLATURE_PRESETS: Record<string, { label: string; values: NomenclatureState }> = {
+export const NOMENCLATURE_PRESETS: Record<string, { label: string; values: TenantNomenclature }> = {
   b2b: {
     label: '🏢 B2B (Accounts / Opportunities)',
     values: {
@@ -64,7 +52,7 @@ export function useStepNomenclature(onNext: () => void) {
   })
 
   const handleUpdate = useCallback(
-    (entity: keyof NomenclatureState, field: 'singular' | 'plural', value: string) => {
+    (entity: keyof TenantNomenclature, field: keyof EntityTerm, value: string) => {
       setNomen((prev) => ({ ...prev, [entity]: { ...prev[entity], [field]: value } }))
     },
     [],
