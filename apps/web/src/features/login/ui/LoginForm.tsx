@@ -46,7 +46,7 @@ export function LoginForm({
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-5">
+      <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
         <ControlledField
           control={control}
           name="email"

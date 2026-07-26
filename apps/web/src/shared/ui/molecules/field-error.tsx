@@ -8,7 +8,7 @@ interface FieldErrorProps {
 
 export function FieldError({ message }: Readonly<FieldErrorProps>) {
   return (
-    <span className="mt-1 block min-h-4 text-xs leading-4">
+    <span className="mt-0.5 block min-h-4 text-xs leading-4">
       <AnimatePresence>
         {message && (
           <motion.span

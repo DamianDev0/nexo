@@ -49,8 +49,6 @@ export const ONBOARDING_GLOW_DARK =
 export const TOAST_FILL_LIGHT = '#FFFFFF'
 export const TOAST_FILL_DARK = '#171915'
 
-export const WHITE = '#FFFFFF'
-
 export const PREVIEW_STATUS_WON = { bg: '#05966920', text: '#059669' } as const
 export const PREVIEW_STATUS_LOST = { bg: '#DC262620', text: '#DC2626' } as const
 export const PREVIEW_ROW_OVERLAY = '#ffffff05'

@@ -52,7 +52,7 @@ export function AuthSplitView({
 
       <div
         className={cn(
-          'relative z-3 flex w-full justify-center overflow-y-auto px-6 pb-14 pt-16 lg:w-130 lg:shrink-0 lg:px-12 lg:pt-24 xl:w-140',
+          'relative z-3 flex w-full items-center justify-center overflow-y-auto px-6 py-14 lg:w-130 lg:shrink-0 lg:px-12 xl:w-140',
           contentClassName,
         )}
       >
