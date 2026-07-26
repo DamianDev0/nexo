@@ -1,29 +1,62 @@
 import { UserRole } from '@repo/shared-types'
 import { t } from 'i18next'
+import { useCallback } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
-import { useEditableList } from '@/shared/lib/hooks/useEditableList'
 
 import { useStepMutation } from './useStepMutation'
 
-import type { InviteUserRequest } from '@repo/shared-types'
+interface InviteRow {
+  email: string
+  role: UserRole
+}
 
-function newInvite(): InviteUserRequest {
+interface TeamFormValues {
+  invites: InviteRow[]
+}
+
+function newInvite(): InviteRow {
   return { email: '', role: UserRole.SALES_REP }
 }
 
 export function useStepTeam(onNext: () => void) {
-  const {
-    items: invites,
-    add,
-    remove,
-    update,
-  } = useEditableList<InviteUserRequest>([newInvite()], newInvite)
+  const { control, watch, getValues } = useForm<TeamFormValues>({
+    defaultValues: { invites: [newInvite()] },
+  })
+  const { fields, append, remove, update } = useFieldArray({ control, name: 'invites' })
+  const watchedInvites = watch('invites')
+
+  const invites = fields.map((field, index) => ({
+    ...(watchedInvites[index] ?? field),
+    id: field.id,
+  }))
+
+  const indexOf = useCallback((id: string) => fields.findIndex((f) => f.id === id), [fields])
+
+  const handleAdd = useCallback(() => append(newInvite()), [append])
+
+  const handleRemove = useCallback(
+    (id: string) => {
+      const index = indexOf(id)
+      if (index >= 0) remove(index)
+    },
+    [indexOf, remove],
+  )
+
+  const handleUpdate = useCallback(
+    (id: string, patch: Partial<InviteRow>) => {
+      const index = indexOf(id)
+      if (index < 0) return
+      update(index, { ...getValues(`invites.${index}`), ...patch })
+    },
+    [indexOf, update, getValues],
+  )
 
   const { handleSave, isPending } = useStepMutation({
     mutationFn: async () => {
-      const valid = invites.filter((inv) => inv.email.trim().length > 0)
+      const valid = getValues('invites').filter((inv) => inv.email.trim().length > 0)
       await Promise.all(
         valid.map((inv) => settingsService.inviteUser({ email: inv.email, role: inv.role })),
       )
@@ -38,9 +71,9 @@ export function useStepTeam(onNext: () => void) {
 
   return {
     invites,
-    handleAdd: add,
-    handleRemove: remove,
-    handleUpdate: update,
+    handleAdd,
+    handleRemove,
+    handleUpdate,
     handleSave,
     isPending,
   }

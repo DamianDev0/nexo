@@ -1,67 +1,38 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
 
+import { DEFAULT_NOMENCLATURE, NOMENCLATURE_PRESETS } from './nomenclature.constants'
 import { useStepMutation } from './useStepMutation'
 
-import type { EntityTerm, TenantNomenclature } from '@repo/shared-types'
-
-const DEFAULT_NOMENCLATURE: TenantNomenclature = {
-  contact: { singular: 'Contact', plural: 'Contacts' },
-  company: { singular: 'Company', plural: 'Companies' },
-  deal: { singular: 'Deal', plural: 'Deals' },
-  activity: { singular: 'Activity', plural: 'Activities' },
-}
-
-export const NOMENCLATURE_PRESETS: Record<string, { label: string; values: TenantNomenclature }> = {
-  b2b: {
-    label: '🏢 B2B (Accounts / Opportunities)',
-    values: {
-      contact: { singular: 'Lead', plural: 'Leads' },
-      company: { singular: 'Account', plural: 'Accounts' },
-      deal: { singular: 'Opportunity', plural: 'Opportunities' },
-      activity: { singular: 'Activity', plural: 'Activities' },
-    },
-  },
-  realestate: {
-    label: '🏠 Real Estate (Owners / Properties)',
-    values: {
-      contact: { singular: 'Owner', plural: 'Owners' },
-      company: { singular: 'Property', plural: 'Properties' },
-      deal: { singular: 'Listing', plural: 'Listings' },
-      activity: { singular: 'Showing', plural: 'Showings' },
-    },
-  },
-  saas: {
-    label: '💡 SaaS (Leads / Deals)',
-    values: {
-      contact: { singular: 'Lead', plural: 'Leads' },
-      company: { singular: 'Company', plural: 'Companies' },
-      deal: { singular: 'Deal', plural: 'Deals' },
-      activity: { singular: 'Task', plural: 'Tasks' },
-    },
-  },
-}
+import type { NomenclatureState } from './nomenclature.constants'
 
 export function useStepNomenclature(onNext: () => void) {
-  const [nomen, setNomen] = useState(DEFAULT_NOMENCLATURE)
-
-  const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => settingsService.updateNomenclature(nomen),
-    onNext,
+  const { watch, setValue, getValues, reset } = useForm<NomenclatureState>({
+    defaultValues: DEFAULT_NOMENCLATURE,
   })
+  const nomen = watch()
 
   const handleUpdate = useCallback(
-    (entity: keyof TenantNomenclature, field: keyof EntityTerm, value: string) => {
-      setNomen((prev) => ({ ...prev, [entity]: { ...prev[entity], [field]: value } }))
+    (entity: keyof NomenclatureState, field: 'singular' | 'plural', value: string) => {
+      setValue(`${entity}.${field}`, value)
     },
-    [],
+    [setValue],
   )
 
-  const handlePreset = useCallback((presetKey: string) => {
-    const preset = NOMENCLATURE_PRESETS[presetKey]
-    if (preset) setNomen(preset.values)
-  }, [])
+  const handlePreset = useCallback(
+    (presetKey: string) => {
+      const preset = NOMENCLATURE_PRESETS[presetKey]
+      if (preset) reset(preset.values)
+    },
+    [reset],
+  )
+
+  const { handleSave, isPending } = useStepMutation({
+    mutationFn: () => settingsService.updateNomenclature(getValues()),
+    onNext,
+  })
 
   return { nomen, handleUpdate, handlePreset, handleSave, isPending }
 }

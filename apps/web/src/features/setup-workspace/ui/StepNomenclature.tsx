@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 
-import { NOMENCLATURE_PRESETS } from '../model/useStepNomenclature'
+import { NOMENCLATURE_PRESETS } from '../model/nomenclature.constants'
 
 import { WizardStep, type WizardStepNav } from './WizardStep'
 

@@ -1,51 +1,52 @@
-import { DEFAULT_SIDEBAR_MODULE_KEYS, REQUIRED_SIDEBAR_MODULES } from '@repo/shared-types'
-import { t } from 'i18next'
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
 
-import { MODULE_ICON_NAMES } from './icon-map.constants'
+import { DEFAULT_MODULES } from './navigation.constants'
 import { useStepMutation } from './useStepMutation'
 
 import type { SidebarModule } from '@repo/shared-types'
 
-function buildDefaultModules(): SidebarModule[] {
-  return DEFAULT_SIDEBAR_MODULE_KEYS.map((key, index) => ({
-    key,
-    label: t(`nav.${key}`),
-    icon: MODULE_ICON_NAMES[key],
-    enabled: true,
-    order: index + 1,
-    customIconUrl: null,
-    required: REQUIRED_SIDEBAR_MODULES.has(key),
-  }))
+interface NavigationFormValues {
+  modules: SidebarModule[]
 }
 
 export function useStepNavigation(onNext: () => void) {
-  const [modules, setModules] = useState<SidebarModule[]>(buildDefaultModules)
+  const { control, watch, getValues } = useForm<NavigationFormValues>({
+    defaultValues: { modules: [...DEFAULT_MODULES] },
+  })
+  const { fields, move, update } = useFieldArray({ control, name: 'modules' })
+  const watchedModules = watch('modules')
 
-  const handleToggle = useCallback((key: string) => {
-    setModules((prev) =>
-      prev.map((m) => (m.key === key && !m.required ? { ...m, enabled: !m.enabled } : m)),
-    )
-  }, [])
+  const modules = fields.map((field, index) => watchedModules[index] ?? field)
 
-  const handleReorder = useCallback((activeKey: string, overKey: string) => {
-    setModules((prev) => {
-      const oldIdx = prev.findIndex((m) => m.key === activeKey)
-      const newIdx = prev.findIndex((m) => m.key === overKey)
-      if (oldIdx < 0 || newIdx < 0 || oldIdx === newIdx) return prev
+  const handleToggle = useCallback(
+    (key: string) => {
+      const index = fields.findIndex((f) => f.key === key)
+      if (index < 0) return
+      const current = getValues(`modules.${index}`)
+      if (current.required) return
+      update(index, { ...current, enabled: !current.enabled })
+    },
+    [fields, getValues, update],
+  )
 
-      const next = [...prev]
-      const moved = next.splice(oldIdx, 1)[0]
-      if (!moved) return prev
-      next.splice(newIdx, 0, moved)
-      return next.map((m, i) => ({ ...m, order: i + 1 }))
-    })
-  }, [])
+  const handleReorder = useCallback(
+    (activeKey: string, overKey: string) => {
+      const from = fields.findIndex((f) => f.key === activeKey)
+      const to = fields.findIndex((f) => f.key === overKey)
+      if (from < 0 || to < 0 || from === to) return
+      move(from, to)
+    },
+    [fields, move],
+  )
 
   const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => settingsService.updateNavigation({ modules }),
+    mutationFn: () =>
+      settingsService.updateNavigation({
+        modules: getValues('modules').map((module, index) => ({ ...module, order: index + 1 })),
+      }),
     onNext,
   })
 
