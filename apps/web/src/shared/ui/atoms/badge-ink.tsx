@@ -8,8 +8,8 @@ const badgeInkVariants = cva(
     variants: {
       size: {
         sm: 'h-8 gap-2 px-3.5 text-[12.5px]',
-        md: 'h-[38px] gap-2.5 px-[18px] text-sm',
-        lg: 'h-[46px] gap-2.5 px-[22px] text-[15px]',
+        md: 'h-9.5 gap-2.5 px-4.5 text-sm',
+        lg: 'h-11.5 gap-2.5 px-5.5 text-[15px]',
       },
     },
     defaultVariants: { size: 'lg' },
@@ -35,14 +35,14 @@ function Indicator({ kind, toneVar }: Readonly<{ kind: string; toneVar: string }
   if (kind === 'spinner') {
     return (
       <span
-        className="size-[15px] rounded-full border-2 border-white/20"
+        className="size-3.75 rounded-full border-2 border-white/20"
         style={{ borderTopColor: toneVar, animation: 'badge-spin 900ms linear infinite' }}
       />
     )
   }
   if (kind === 'check') return <span style={{ color: toneVar }}>✓</span>
   if (kind === 'cross') return <span style={{ color: toneVar }}>✕</span>
-  return <span className="size-[9px] rounded-full" style={{ background: toneVar }} />
+  return <span className="size-2.25 rounded-full" style={{ background: toneVar }} />
 }
 
 export function BadgeInk({

@@ -30,6 +30,7 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 - Zero raw `<button>/<input>/<select>/<table>/<textarea>` outside `shared/ui` (`scripts/check-html-primitives.mjs`).
 - Baselines regenerate with `node scripts/check-X.mjs --update` — only when legacy shrinks, never to add debt.
 - Zero comments in code. Names and types carry meaning. Only functional pragmas allowed.
+- No arbitrary px values where a canonical class exists: Tailwind v4 spacing is dynamic, so `h-[38px]` is `h-9.5` (n = px/4); radii use tokens (`rounded-sm/md/lg/xl` = 6/12/18/24). Arbitrary stays only for font sizes from the type scale, em tracking, deg rotation and fractional borders.
 - Zero `any`, `Readonly<Props>`, no index-as-key, no nested component definitions, `??` over `||`.
 - All user-facing strings via i18next (`shared/i18n/locales/{es,en}.ts` — keep both in sync).
 

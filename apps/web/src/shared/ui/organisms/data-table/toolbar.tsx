@@ -18,7 +18,7 @@ export function TableToolbar({
 
 export function TableSearchPill({ placeholder }: Readonly<{ placeholder: string }>) {
   return (
-    <div className="flex h-[42px] max-w-80 flex-1 items-center gap-2 rounded-full bg-muted px-4.5 text-[15px] text-muted-foreground">
+    <div className="flex h-10.5 max-w-80 flex-1 items-center gap-2 rounded-full bg-muted px-4.5 text-[15px] text-muted-foreground">
       <span className="text-faint">⌕</span>
       {placeholder}
     </div>
@@ -52,7 +52,7 @@ export function TableBulkAction({
     <button
       type="button"
       className={cn(
-        'flex h-[34px] cursor-pointer items-center rounded-full bg-card px-4 text-[13px] font-bold',
+        'flex h-8.5 cursor-pointer items-center rounded-full bg-card px-4 text-[13px] font-bold',
         destructive ? 'text-negative-text' : 'text-foreground',
       )}
     >

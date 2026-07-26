@@ -16,14 +16,14 @@ const pillButtonVariants = cva(
         icon: 'rounded-full border border-border-strong bg-card text-body',
       },
       size: {
-        lg: 'h-12 rounded-[24px] px-6 text-base',
-        md: 'h-[42px] rounded-[21px] px-5 text-[15px]',
-        sm: 'h-9 rounded-[18px] px-4 text-sm',
+        lg: 'h-12 rounded-xl px-6 text-base',
+        md: 'h-10.5 rounded-[21px] px-5 text-[15px]',
+        sm: 'h-9 rounded-lg px-4 text-sm',
       },
     },
     compoundVariants: [
       { variant: 'icon', size: 'lg', className: 'w-12 px-0' },
-      { variant: 'icon', size: 'md', className: 'w-[42px] px-0' },
+      { variant: 'icon', size: 'md', className: 'w-10.5 px-0' },
       { variant: 'icon', size: 'sm', className: 'w-9 px-0' },
     ],
     defaultVariants: { variant: 'primary', size: 'lg' },

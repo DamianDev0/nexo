@@ -18,12 +18,12 @@ type Story = StoryObj<typeof meta>
 function ContactRowView({ row }: Readonly<{ row: ContactRow }>) {
   return (
     <DataTable.Row selected={row.selected}>
-      <DataTable.Cell className="flex max-w-[46px] items-center">
+      <DataTable.Cell className="flex max-w-11.5 items-center">
         <span
           className={
             row.selected
-              ? 'flex size-[18px] items-center justify-center rounded-sm bg-primary text-[11px] font-black text-primary-foreground'
-              : 'block size-[18px] rounded-sm border-[1.5px] border-border-strong'
+              ? 'flex size-4.5 items-center justify-center rounded-sm bg-primary text-[11px] font-black text-primary-foreground'
+              : 'block size-4.5 rounded-sm border-[1.5px] border-border-strong'
           }
         >
           {row.selected ? '✓' : ''}
@@ -43,7 +43,7 @@ function ContactRowView({ row }: Readonly<{ row: ContactRow }>) {
 function ContactHeader() {
   return (
     <DataTable.Header>
-      <DataTable.Cell className="max-w-[46px]" />
+      <DataTable.Cell className="max-w-11.5" />
       <DataTable.Cell className="flex-[1.7]">Name</DataTable.Cell>
       <DataTable.Cell className="flex-[1.5]">Company</DataTable.Cell>
       <DataTable.Cell className="flex-[1.4]">Email</DataTable.Cell>
@@ -55,7 +55,7 @@ function ContactHeader() {
 export const Default: Story = {
   args: { children: null },
   render: () => (
-    <DataTable className="min-w-[860px]">
+    <DataTable className="min-w-215">
       <DataTable.Toolbar>
         <DataTable.Search placeholder="Search name, email or NIT…" />
       </DataTable.Toolbar>
@@ -70,7 +70,7 @@ export const Default: Story = {
 export const WithBulkSelection: Story = {
   args: { children: null },
   render: () => (
-    <DataTable className="min-w-[860px]">
+    <DataTable className="min-w-215">
       <DataTable.Toolbar>
         <DataTable.Search placeholder="Search name, email or NIT…" />
       </DataTable.Toolbar>
@@ -90,7 +90,7 @@ export const WithBulkSelection: Story = {
 export const SingleRow: Story = {
   args: { children: null },
   render: () => (
-    <DataTable className="min-w-[860px]">
+    <DataTable className="min-w-215">
       <ContactHeader />
       <ContactRowView row={{ ...CONTACT_ROWS[0]!, selected: false }} />
     </DataTable>
@@ -101,7 +101,7 @@ export const WorstCase: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
   args: { children: null },
   render: () => (
-    <DataTable className="min-w-[860px]">
+    <DataTable className="min-w-215">
       <ContactHeader />
       <ContactRowView row={WORST_ROW} />
       {manyRows(500).map((row) => (

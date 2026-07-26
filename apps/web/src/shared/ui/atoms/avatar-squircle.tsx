@@ -8,7 +8,7 @@ const avatarSquircleVariants = cva(
     variants: {
       size: {
         table: 'size-9 rounded-md text-xs',
-        kanban: 'size-[26px] rounded-full text-[10px]',
+        kanban: 'size-6.5 rounded-full text-[10px]',
       },
       tone: {
         lime: 'bg-primary-pale text-primary-deep',

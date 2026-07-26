@@ -61,7 +61,7 @@ export function KanbanGhost() {
   return (
     <div
       data-slot="kanban-ghost"
-      className="h-[104px] rounded-lg border-[1.5px] border-dashed border-border"
+      className="h-26 rounded-lg border-[1.5px] border-dashed border-border"
     />
   )
 }

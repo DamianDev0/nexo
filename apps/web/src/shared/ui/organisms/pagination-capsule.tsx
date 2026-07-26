@@ -59,7 +59,7 @@ function Chevron({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'inline-flex size-[38px] items-center justify-center rounded-full',
+        'inline-flex size-9.5 items-center justify-center rounded-full',
         disabled ? 'cursor-default text-disabled-fg' : 'cursor-pointer text-body hover:bg-muted',
       )}
     >
@@ -106,7 +106,7 @@ function Numbers({
         item === 'gap' ? (
           <span
             key={`gap-${position === 1 ? 'left' : 'right'}`}
-            className="inline-flex h-[38px] w-6 items-center justify-center text-sm text-faint"
+            className="inline-flex h-9.5 w-6 items-center justify-center text-sm text-faint"
           >
             …
           </span>
@@ -117,7 +117,7 @@ function Numbers({
             aria-current={item === data.page ? 'page' : undefined}
             onClick={() => onPageChange(item)}
             className={cn(
-              'inline-flex h-[38px] min-w-[38px] cursor-pointer items-center justify-center rounded-full px-3 text-sm tabular-nums',
+              'inline-flex h-9.5 min-w-9.5 cursor-pointer items-center justify-center rounded-full px-3 text-sm tabular-nums',
               item === data.page
                 ? 'bg-sidebar font-black text-sidebar-foreground'
                 : 'font-medium text-body hover:bg-muted',
@@ -144,7 +144,7 @@ export function PaginationCapsule({
       data-slot="pagination-capsule"
       aria-label={labels.root}
       className={cn(
-        'inline-flex h-[58px] items-center gap-1.5 rounded-full bg-card px-3.5',
+        'inline-flex h-14.5 items-center gap-1.5 rounded-full bg-card px-3.5',
         'shadow-capsule',
         className,
       )}
