@@ -177,8 +177,18 @@ const en = {
       },
     },
   },
+  dashboard: {
+    greeting: 'Good morning',
+    subtitle: 'Your workspace is ready.',
+    emptyTitle: 'No deals yet',
+    emptyDescription:
+      'Create your first deal or import a spreadsheet — Nexo maps the columns for you.',
+    newDeal: 'New deal',
+    importCsv: 'Import CSV',
+  },
   nav: {
     platform: 'Platform',
+    comingSoon: 'Coming soon',
     teams: 'Teams',
     addTeam: 'Add team',
     dashboard: 'Dashboard',

@@ -179,8 +179,18 @@ const es = {
       },
     },
   },
+  dashboard: {
+    greeting: 'Buenos días',
+    subtitle: 'Tu espacio de trabajo está listo.',
+    emptyTitle: 'Aún no hay negocios',
+    emptyDescription:
+      'Crea tu primer negocio o importa una hoja de cálculo — Nexo mapea las columnas por ti.',
+    newDeal: 'Nuevo negocio',
+    importCsv: 'Importar CSV',
+  },
   nav: {
     platform: 'Plataforma',
+    comingSoon: 'Próximamente',
     teams: 'Equipos',
     addTeam: 'Agregar equipo',
     dashboard: 'Dashboard',

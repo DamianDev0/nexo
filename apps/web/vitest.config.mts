@@ -27,6 +27,7 @@ export default defineConfig({
           name: 'unit',
           environment: 'jsdom',
           globals: true,
+          env: { NEXT_PUBLIC_API_URL: 'http://localhost:8080/api/v1' },
           setupFiles: ['./src/test/setup.ts'],
           include: ['src/**/*.{test,spec}.{ts,tsx}'],
         },

@@ -20,17 +20,60 @@ export interface NavItem {
   readonly titleKey: `nav.${SidebarModuleKey}`
   readonly url: string
   readonly icon: LucideIcon
+  readonly available: boolean
 }
 
+const BUILT_ROUTES: ReadonlySet<string> = new Set([ROUTES.app.dashboard])
+
 export const NAV_CRM: ReadonlyArray<NavItem> = [
-  { titleKey: 'nav.dashboard', url: ROUTES.app.dashboard, icon: LayoutDashboard },
-  { titleKey: 'nav.contacts', url: ROUTES.app.contacts.list, icon: Users },
-  { titleKey: 'nav.companies', url: ROUTES.app.companies.list, icon: Building2 },
-  { titleKey: 'nav.deals', url: ROUTES.app.deals.list, icon: Handshake },
-  { titleKey: 'nav.products', url: ROUTES.app.products.list, icon: Package },
-  { titleKey: 'nav.activities', url: ROUTES.app.activities, icon: CalendarCheck },
-  { titleKey: 'nav.reports', url: ROUTES.app.reports, icon: BarChart3 },
-  { titleKey: 'nav.settings', url: ROUTES.app.settings.general, icon: Settings2 },
+  {
+    titleKey: 'nav.dashboard',
+    url: ROUTES.app.dashboard,
+    icon: LayoutDashboard,
+    available: BUILT_ROUTES.has(ROUTES.app.dashboard),
+  },
+  {
+    titleKey: 'nav.contacts',
+    url: ROUTES.app.contacts.list,
+    icon: Users,
+    available: BUILT_ROUTES.has(ROUTES.app.contacts.list),
+  },
+  {
+    titleKey: 'nav.companies',
+    url: ROUTES.app.companies.list,
+    icon: Building2,
+    available: BUILT_ROUTES.has(ROUTES.app.companies.list),
+  },
+  {
+    titleKey: 'nav.deals',
+    url: ROUTES.app.deals.list,
+    icon: Handshake,
+    available: BUILT_ROUTES.has(ROUTES.app.deals.list),
+  },
+  {
+    titleKey: 'nav.products',
+    url: ROUTES.app.products.list,
+    icon: Package,
+    available: BUILT_ROUTES.has(ROUTES.app.products.list),
+  },
+  {
+    titleKey: 'nav.activities',
+    url: ROUTES.app.activities,
+    icon: CalendarCheck,
+    available: BUILT_ROUTES.has(ROUTES.app.activities),
+  },
+  {
+    titleKey: 'nav.reports',
+    url: ROUTES.app.reports,
+    icon: BarChart3,
+    available: BUILT_ROUTES.has(ROUTES.app.reports),
+  },
+  {
+    titleKey: 'nav.settings',
+    url: ROUTES.app.settings.general,
+    icon: Settings2,
+    available: BUILT_ROUTES.has(ROUTES.app.settings.general),
+  },
 ]
 
 export const DEFAULT_TEAMS = [{ name: 'NexoCRM', logo: LayoutDashboard, plan: 'Free' }] as const

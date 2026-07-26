@@ -116,6 +116,12 @@ export default [
     },
   },
   {
+    files: ['next.config.js'],
+    languageOptions: {
+      globals: { process: 'readonly' },
+    },
+  },
+  {
     files: ['scripts/**'],
     languageOptions: {
       globals: { process: 'readonly', console: 'readonly', URL: 'readonly' },

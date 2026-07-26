@@ -31,12 +31,23 @@ export function NavMain({ items }: Readonly<NavMainProps>) {
           const title = t(item.titleKey)
           return (
             <SidebarMenuItem key={item.titleKey}>
-              <SidebarMenuButton asChild isActive={isActive} tooltip={title}>
-                <Link href={item.url}>
+              {item.available ? (
+                <SidebarMenuButton asChild isActive={isActive} tooltip={title}>
+                  <Link href={item.url}>
+                    <item.icon />
+                    <span>{title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              ) : (
+                <SidebarMenuButton
+                  disabled
+                  tooltip={t('nav.comingSoon')}
+                  className="cursor-default opacity-45"
+                >
                   <item.icon />
                   <span>{title}</span>
-                </Link>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           )
         })}
