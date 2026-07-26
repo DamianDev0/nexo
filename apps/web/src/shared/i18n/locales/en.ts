@@ -79,6 +79,12 @@ const en = {
     byContiuing: 'By continuing you accept our',
   },
   onboarding: {
+    branding: {
+      title: 'Build your workspace,',
+      titleAccent: 'grow across Colombia.',
+      line1: 'Set up your CRM in minutes.',
+      line2: 'Start managing contacts, deals, and teams today.',
+    },
     configureWorkspace: 'Configure your workspace',
     takesLessThan5Min: 'Takes less than 5 minutes.',
     progress: 'Progress',

@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlanName } from '@repo/shared-types'
+import { slugify } from '@repo/shared-utils'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
 import { useRouter } from 'next/navigation'
@@ -55,11 +56,7 @@ export function useOnboardingForm() {
   const handleBusinessNameChange = useCallback(
     (value: string, onChange: (value: string) => void) => {
       onChange(value)
-      const slug = value
-        .toLowerCase()
-        .replaceAll(/\s+/g, '-')
-        .replaceAll(/[^a-z0-9-]/g, '')
-      form.setValue('slug', slug)
+      form.setValue('slug', slugify(value))
     },
     [form],
   )

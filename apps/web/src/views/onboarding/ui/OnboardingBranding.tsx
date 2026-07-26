@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useTheme } from 'next-themes'
+import { useTranslation } from 'react-i18next'
 
 import { ONBOARDING_GLOW_DARK, ONBOARDING_GLOW_LIGHT } from '@/shared/config/tokens/effects'
 
@@ -10,6 +11,7 @@ const ColombiaMap = dynamic(() => import('./ColombiaMap').then((m) => m.Colombia
 })
 
 export function OnboardingBranding() {
+  const { t } = useTranslation()
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
 
@@ -26,12 +28,13 @@ export function OnboardingBranding() {
 
       <div className="relative z-1 bg-linear-to-t from-background via-background/70 to-transparent px-8 pb-8 pt-16">
         <h2 className="text-2xl font-light text-foreground">
-          Build your workspace, <em className="italic text-foreground/35">grow across Colombia.</em>
+          {t('onboarding.branding.title')}{' '}
+          <em className="italic text-foreground/35">{t('onboarding.branding.titleAccent')}</em>
         </h2>
         <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-          Set up your CRM in minutes.
+          {t('onboarding.branding.line1')}
           <br />
-          Start managing contacts, deals, and teams today.
+          {t('onboarding.branding.line2')}
         </p>
       </div>
     </div>

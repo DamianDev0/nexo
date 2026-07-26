@@ -79,6 +79,12 @@ const es = {
     byContiuing: 'Al continuar aceptas nuestros',
   },
   onboarding: {
+    branding: {
+      title: 'Construye tu espacio,',
+      titleAccent: 'crece por toda Colombia.',
+      line1: 'Configura tu CRM en minutos.',
+      line2: 'Empieza a gestionar contactos, negocios y equipos hoy.',
+    },
     configureWorkspace: 'Configura tu espacio',
     takesLessThan5Min: 'Tarda menos de 5 minutos.',
     progress: 'Progreso',
