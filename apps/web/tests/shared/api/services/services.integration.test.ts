@@ -2,8 +2,7 @@ import { HttpResponse, http } from 'msw'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 import { server } from '../../../msw/server'
-
-const API = 'http://localhost:8080/api/v1'
+import { API } from '../../../msw/test-server'
 
 import authService from '@/shared/api/services/auth.service'
 import settingsService from '@/shared/api/services/settings.service'

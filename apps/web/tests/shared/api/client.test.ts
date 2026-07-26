@@ -1,6 +1,7 @@
 import { HttpResponse, http } from 'msw'
-import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+import { API, createMswServer } from '../../msw/test-server'
 
 import { ApiError } from '@/shared/api/api-error'
 import { apiFetch } from '@/shared/api/client'
@@ -10,12 +11,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ toString: (): string => 'access_token=jwt123' })),
 }))
 
-const API = 'http://localhost:8080/api/v1'
-const server = setupServer()
-
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+const server = createMswServer()
 
 describe('apiFetch', () => {
   it('forwards the incoming cookies and unwraps the data envelope', async () => {

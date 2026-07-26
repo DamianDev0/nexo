@@ -1,10 +1,9 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
-import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import type { ReactNode } from 'react'
+import { API, createMswServer } from '../../msw/test-server'
+import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import { useOnboardingWizard } from '@/features/setup-workspace/model/useOnboardingWizard'
 import { STEP_KEYS } from '@/features/setup-workspace/model/wizard-steps'
@@ -13,8 +12,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }))
 
-const API = 'http://localhost:8080/api/v1'
-const server = setupServer()
+const server = createMswServer()
 
 let serverStep = 1
 
@@ -29,15 +27,6 @@ function onboardingHandlers() {
       return HttpResponse.json({ data: { step: serverStep, completed: false } })
     }),
   ]
-}
-
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
-
-function wrapper({ children }: Readonly<{ children: ReactNode }>) {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
 }
 
 describe('useOnboardingWizard', () => {

@@ -1,6 +1,7 @@
 import { HttpResponse, http } from 'msw'
-import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { API, createMswServer } from '../../msw/test-server'
 
 import { loginAction } from '@/features/login/api/login.action'
 
@@ -11,13 +12,9 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ toString: (): string => '', set: cookieSet })),
 }))
 
-const API = 'http://localhost:8080/api/v1'
-const server = setupServer()
+const server = createMswServer()
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 beforeEach(() => cookieSet.mockClear())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
 
 const CREDENTIALS = { email: 'ana@acme.co', password: 'Secret123!' }
 

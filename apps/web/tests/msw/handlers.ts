@@ -2,14 +2,14 @@ import { IndustrySector, PlanName, UserRole } from '@repo/shared-types'
 import { CO_TIMEZONE, CURRENCY_CODE } from '@repo/shared-utils'
 import { HttpResponse, http } from 'msw'
 
+import { API } from './test-server'
+
 import type {
   ApiErrorResponse,
   ApiSuccessResponse,
   GeneralSettings,
   MeResponse,
 } from '@repo/shared-types'
-
-const API = 'http://localhost:8080/api/v1'
 
 export const handlers = [
   http.get(`${API}/auth/me`, () =>
