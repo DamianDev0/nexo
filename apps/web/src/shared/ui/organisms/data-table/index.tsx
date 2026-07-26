@@ -1,28 +1,32 @@
-import { cn } from '@/shared/lib'
-
 import { PaginationCapsule } from '../pagination-capsule'
 
-import { TableCell, TableHeader, TableRow, TableRowTitle } from './rows'
-import { TableBulkAction, TableBulkBar, TableSearchPill, TableToolbar } from './toolbar'
+import { DataTableBody, DataTableRowTitle } from './ui/body'
+import { DataTableBulkAction, DataTableBulkBar } from './ui/bulk-bar'
+import { DataTableHeader } from './ui/header'
+import { DataTableRoot } from './ui/root'
+import { selectionColumn } from './ui/selection'
+import { DataTableSmartLists } from './ui/smart-lists'
+import {
+  DataTableEditColumns,
+  DataTableFilter,
+  DataTableSearch,
+  DataTableToolbar,
+} from './ui/toolbar'
 
-import type { ReactNode } from 'react'
+export { useDataTable, type DataTableInstance } from './model/use-data-table'
+export { selectionColumn }
+export type { SmartListItem } from './ui/smart-lists'
 
-function TableRoot({ children, className }: Readonly<{ children: ReactNode; className?: string }>) {
-  return (
-    <div data-slot="table-root" className={cn('overflow-hidden rounded-xl bg-card', className)}>
-      {children}
-    </div>
-  )
-}
-
-export const DataTable = Object.assign(TableRoot, {
-  Toolbar: TableToolbar,
-  Search: TableSearchPill,
-  BulkBar: TableBulkBar,
-  BulkAction: TableBulkAction,
-  Header: TableHeader,
-  Row: TableRow,
-  Cell: TableCell,
-  RowTitle: TableRowTitle,
+export const DataTable = Object.assign(DataTableRoot, {
+  SmartLists: DataTableSmartLists,
+  Toolbar: DataTableToolbar,
+  Search: DataTableSearch,
+  Filter: DataTableFilter,
+  EditColumns: DataTableEditColumns,
+  BulkBar: DataTableBulkBar,
+  BulkAction: DataTableBulkAction,
+  Header: DataTableHeader,
+  Body: DataTableBody,
+  RowTitle: DataTableRowTitle,
   Pagination: PaginationCapsule,
 })

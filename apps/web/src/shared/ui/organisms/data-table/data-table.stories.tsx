@@ -1,10 +1,118 @@
+'use client'
+
+import { useState } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
+
 import { AvatarSquircle } from '../../atoms/avatar-squircle'
+import { BadgeSoft } from '../../atoms/badge-soft'
 
-import { CONTACT_ROWS, WORST_ROW, manyRows, type ContactRow } from './data-table.fixtures'
+import {
+  CONTACT_ROWS,
+  SMART_LISTS,
+  STATUS_TONE,
+  WORST_ROW,
+  manyRows,
+  type ContactRow,
+} from './data-table.fixtures'
 
-import { DataTable } from './index'
+import { DataTable, selectionColumn, useDataTable } from './index'
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
+import type { ColumnDef } from '@tanstack/react-table'
+
+const COLUMNS: ReadonlyArray<ColumnDef<ContactRow, unknown>> = [
+  selectionColumn<ContactRow>(),
+  {
+    id: 'name',
+    accessorKey: 'name',
+    header: 'Name',
+    size: 240,
+    cell: ({ row }) => (
+      <span className="flex items-center gap-3">
+        <AvatarSquircle initials={row.original.initials} tone={row.original.tone} />
+        <DataTable.RowTitle title={row.original.name} subtitle={row.original.role} />
+      </span>
+    ),
+  },
+  { id: 'company', accessorKey: 'company', header: 'Company', size: 200 },
+  {
+    id: 'status',
+    accessorKey: 'status',
+    header: 'Lead status',
+    size: 130,
+    cell: ({ row }) => {
+      const status = STATUS_TONE[row.original.status]
+      return <BadgeSoft tone={status.tone}>{status.label}</BadgeSoft>
+    },
+  },
+  { id: 'email', accessorKey: 'email', header: 'Email', size: 220 },
+  { id: 'city', accessorKey: 'city', header: 'City', size: 110 },
+]
+
+function ContactsTable({ rows }: Readonly<{ rows: ReadonlyArray<ContactRow> }>) {
+  const instance = useDataTable({ data: rows, columns: COLUMNS, getRowId: (row) => row.id })
+  const [search, setSearch] = useState('')
+  const [activeList, setActiveList] = useState('all')
+  const [ownerFilter, setOwnerFilter] = useState(true)
+  const selected = instance.table.getSelectedRowModel().rows.length
+  const { pageIndex, pageSize } = instance.table.getState().pagination
+
+  return (
+    <DataTable instance={instance} className="min-w-4xl">
+      <DataTable.SmartLists
+        data={{ items: SMART_LISTS, activeId: activeList }}
+        onSelect={setActiveList}
+      />
+      <DataTable.Toolbar>
+        <DataTable.Search
+          value={search}
+          placeholder="Name, address, email, phone or ZIP"
+          onChange={setSearch}
+        />
+        <DataTable.Filter label="City" active={false} onClick={() => undefined} />
+        <DataTable.Filter
+          label="Owner: Camila"
+          active={ownerFilter}
+          onClick={() => setOwnerFilter(true)}
+          onClear={() => setOwnerFilter(false)}
+        />
+        <DataTable.EditColumns label="Edit columns" onClick={() => undefined} />
+      </DataTable.Toolbar>
+      {selected > 0 && (
+        <DataTable.BulkBar label={`${selected} contacts selected`}>
+          <DataTable.BulkAction>Assign owner</DataTable.BulkAction>
+          <DataTable.BulkAction>Add to list</DataTable.BulkAction>
+          <DataTable.BulkAction destructive>Delete</DataTable.BulkAction>
+        </DataTable.BulkBar>
+      )}
+      <DataTable.Header />
+      <DataTable.Body />
+      <div className="flex justify-center py-5">
+        <DataTable.Pagination>
+          <DataTable.Pagination.Nav
+            page={pageIndex + 1}
+            totalPages={instance.table.getPageCount()}
+            onPageChange={(page) => instance.table.setPageIndex(page - 1)}
+          />
+          <DataTable.Pagination.Divider />
+          <DataTable.Pagination.PageSize
+            value={pageSize}
+            options={[10, 25, 50]}
+            onChange={instance.table.setPageSize}
+          />
+          <DataTable.Pagination.Divider />
+          <DataTable.Pagination.Progress
+            value={((pageIndex + 1) / Math.max(1, instance.table.getPageCount())) * 100}
+          />
+          <DataTable.Pagination.Divider />
+          <DataTable.Pagination.JumpEnd
+            onClick={() => instance.table.setPageIndex(instance.table.getPageCount() - 1)}
+          />
+        </DataTable.Pagination>
+      </div>
+    </DataTable>
+  )
+}
 
 const meta = {
   title: 'Organisms/DataTable',
@@ -15,98 +123,22 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-function ContactRowView({ row }: Readonly<{ row: ContactRow }>) {
-  return (
-    <DataTable.Row selected={row.selected}>
-      <DataTable.Cell className="flex max-w-11.5 items-center">
-        <span
-          className={
-            row.selected
-              ? 'flex size-4.5 items-center justify-center rounded-sm bg-primary text-[11px] font-black text-primary-foreground'
-              : 'block size-4.5 rounded-sm border-[1.5px] border-border-strong'
-          }
-        >
-          {row.selected ? '✓' : ''}
-        </span>
-      </DataTable.Cell>
-      <DataTable.Cell className="flex flex-[1.7] items-center gap-3">
-        <AvatarSquircle initials={row.initials} tone={row.tone} />
-        <DataTable.RowTitle title={row.fullName} subtitle={row.role} />
-      </DataTable.Cell>
-      <DataTable.Cell className="flex-[1.5] truncate">{row.company}</DataTable.Cell>
-      <DataTable.Cell className="flex-[1.4] truncate text-sm">{row.email}</DataTable.Cell>
-      <DataTable.Cell className="flex-[0.9]">{row.city}</DataTable.Cell>
-    </DataTable.Row>
-  )
-}
-
-function ContactHeader() {
-  return (
-    <DataTable.Header>
-      <DataTable.Cell className="max-w-11.5" />
-      <DataTable.Cell className="flex-[1.7]">Name</DataTable.Cell>
-      <DataTable.Cell className="flex-[1.5]">Company</DataTable.Cell>
-      <DataTable.Cell className="flex-[1.4]">Email</DataTable.Cell>
-      <DataTable.Cell className="flex-[0.9]">City</DataTable.Cell>
-    </DataTable.Header>
-  )
-}
-
 export const Default: Story = {
-  args: { children: null },
-  render: () => (
-    <DataTable className="min-w-215">
-      <DataTable.Toolbar>
-        <DataTable.Search placeholder="Search name, email or NIT…" />
-      </DataTable.Toolbar>
-      <ContactHeader />
-      {CONTACT_ROWS.map((row) => (
-        <ContactRowView key={row.id} row={{ ...row, selected: false }} />
-      ))}
-    </DataTable>
-  ),
-}
-
-export const WithBulkSelection: Story = {
-  args: { children: null },
-  render: () => (
-    <DataTable className="min-w-215">
-      <DataTable.Toolbar>
-        <DataTable.Search placeholder="Search name, email or NIT…" />
-      </DataTable.Toolbar>
-      <DataTable.BulkBar label="2 contacts selected">
-        <DataTable.BulkAction>Assign owner</DataTable.BulkAction>
-        <DataTable.BulkAction>Add to list</DataTable.BulkAction>
-        <DataTable.BulkAction destructive>Delete</DataTable.BulkAction>
-      </DataTable.BulkBar>
-      <ContactHeader />
-      {CONTACT_ROWS.map((row) => (
-        <ContactRowView key={row.id} row={row} />
-      ))}
-    </DataTable>
-  ),
-}
-
-export const SingleRow: Story = {
-  args: { children: null },
-  render: () => (
-    <DataTable className="min-w-215">
-      <ContactHeader />
-      <ContactRowView row={{ ...CONTACT_ROWS[0]!, selected: false }} />
-    </DataTable>
-  ),
+  args: { instance: undefined as never, children: null },
+  render: () => <ContactsTable rows={CONTACT_ROWS} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: /^Name/ }))
+    const firstCell = canvas.getAllByText(/Andrés|Laura|Ricardo|Sofía/)[0]
+    await expect(firstCell).toHaveTextContent('Andrés Gómez')
+    const checkboxes = canvas.getAllByRole('checkbox', { name: 'Select row' })
+    await userEvent.click(checkboxes[0]!)
+    await expect(canvas.getByText('1 contacts selected')).toBeVisible()
+  },
 }
 
 export const WorstCase: Story = {
   parameters: { chromatic: { disableSnapshot: true } },
-  args: { children: null },
-  render: () => (
-    <DataTable className="min-w-215">
-      <ContactHeader />
-      <ContactRowView row={WORST_ROW} />
-      {manyRows(500).map((row) => (
-        <ContactRowView key={row.id} row={row} />
-      ))}
-    </DataTable>
-  ),
+  args: { instance: undefined as never, children: null },
+  render: () => <ContactsTable rows={[WORST_ROW, ...manyRows(500)]} />,
 }
