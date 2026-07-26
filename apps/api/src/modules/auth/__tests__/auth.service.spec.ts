@@ -75,7 +75,7 @@ function buildMocks() {
       findUserById: jest.fn(),
       countUsers: jest.fn(),
       createOwnerUser: jest.fn(),
-      findOrCreateGoogleUser: jest.fn(),
+      findAndLinkGoogleUser: jest.fn(),
     },
     session: {
       issue: jest.fn(),
@@ -409,21 +409,30 @@ describe('AuthService', () => {
       customDomain: null,
     }
 
-    it('finds or creates a Google user and issues session', async () => {
+    it('links an existing Google user and issues session', async () => {
       mocks.tenantRepo.findOne.mockResolvedValue(mockTenantEntity)
-      mocks.authRepo.findOrCreateGoogleUser.mockResolvedValue(mockUser)
+      mocks.authRepo.findAndLinkGoogleUser.mockResolvedValue(mockUser)
       mocks.session.issue.mockResolvedValue(mockAuthResult)
       mocks.audit.authLoginGoogle.mockResolvedValue(undefined)
 
       const result = await service.validateGoogleUser(profile, mockMeta)
 
-      expect(mocks.authRepo.findOrCreateGoogleUser).toHaveBeenCalledWith(
+      expect(mocks.authRepo.findAndLinkGoogleUser).toHaveBeenCalledWith(
         SCHEMA,
         profile.email,
-        profile.fullName,
         profile.avatarUrl,
       )
       expect(result.tenantCtx.schemaName).toBe(SCHEMA)
+    })
+
+    it('rejects an unknown Google email instead of auto-provisioning an OWNER', async () => {
+      mocks.tenantRepo.findOne.mockResolvedValue(mockTenantEntity)
+      mocks.authRepo.findAndLinkGoogleUser.mockResolvedValue(undefined)
+
+      await expect(service.validateGoogleUser(profile, mockMeta)).rejects.toThrow(
+        UnauthorizedException,
+      )
+      expect(mocks.session.issue).not.toHaveBeenCalled()
     })
 
     it('throws NotFoundException when tenant does not exist', async () => {
@@ -434,7 +443,7 @@ describe('AuthService', () => {
 
     it('throws UnauthorizedException when Google user account is disabled', async () => {
       mocks.tenantRepo.findOne.mockResolvedValue(mockTenantEntity)
-      mocks.authRepo.findOrCreateGoogleUser.mockResolvedValue({ ...mockUser, is_active: false })
+      mocks.authRepo.findAndLinkGoogleUser.mockResolvedValue({ ...mockUser, is_active: false })
 
       await expect(service.validateGoogleUser(profile, mockMeta)).rejects.toThrow(
         UnauthorizedException,

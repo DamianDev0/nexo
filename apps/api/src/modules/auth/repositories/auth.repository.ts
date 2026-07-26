@@ -86,38 +86,26 @@ export class AuthRepository {
     })
   }
 
-  async findOrCreateGoogleUser(
+  async findAndLinkGoogleUser(
     schemaName: string,
     email: string,
-    fullName: string,
     avatarUrl: string | null,
-  ): Promise<UserRow> {
-    return this.tenantDb.transactional<UserRow>(schemaName, async (qr) => {
+  ): Promise<UserRow | undefined> {
+    return this.tenantDb.transactional<UserRow | undefined>(schemaName, async (qr) => {
       const existingRaw: unknown = await qr.query(
         `SELECT id, email, full_name, avatar_url, role, password_hash, is_active
          FROM "${schemaName}".users WHERE email = $1 LIMIT 1`,
         [email.toLowerCase()],
       )
       const existing = (existingRaw as UserRow[])[0]
+      if (!existing) return undefined
 
-      if (existing) {
-        const updatedRaw: unknown = await qr.query(
-          `UPDATE "${schemaName}".users SET avatar_url = $1 WHERE id = $2
-           RETURNING id, email, full_name, avatar_url, role, password_hash, is_active`,
-          [avatarUrl, existing.id],
-        )
-        return (updatedRaw as UserRow[])[0] ?? existing
-      }
-
-      const insertedRaw: unknown = await qr.query(
-        `INSERT INTO "${schemaName}".users (email, full_name, avatar_url, role, is_active)
-         VALUES ($1, $2, $3, $4, true)
+      const updatedRaw: unknown = await qr.query(
+        `UPDATE "${schemaName}".users SET avatar_url = $1 WHERE id = $2
          RETURNING id, email, full_name, avatar_url, role, password_hash, is_active`,
-        [email.toLowerCase(), fullName, avatarUrl, UserRole.OWNER],
+        [avatarUrl, existing.id],
       )
-      const created = (insertedRaw as UserRow[])[0]
-      if (!created) throw new Error('INSERT returned no rows')
-      return created
+      return (updatedRaw as UserRow[])[0] ?? existing
     })
   }
 }

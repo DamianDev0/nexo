@@ -2,18 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 import { Reflector } from '@nestjs/core'
 import { UserRole } from '@repo/shared-types'
 import { ROLES_KEY } from '@/shared/decorators/roles.decorator'
-
-const ROLE_HIERARCHY: Record<UserRole, number> = {
-  [UserRole.SUPER_ADMIN]: 9,
-  [UserRole.OWNER]: 8,
-  [UserRole.ADMIN]: 7,
-  [UserRole.MANAGER]: 6,
-  [UserRole.MARKETING]: 5,
-  [UserRole.BILLING]: 4,
-  [UserRole.SUPPORT]: 3,
-  [UserRole.SALES_REP]: 2,
-  [UserRole.VIEWER]: 1,
-}
+import { ROLE_HIERARCHY } from '../constants/role-hierarchy.constants'
 
 /**
  * Guards routes that require a minimum role level.

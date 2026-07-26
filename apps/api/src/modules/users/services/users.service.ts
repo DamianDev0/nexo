@@ -3,10 +3,13 @@ import {
   ConflictException,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import type { TenantContext } from '@repo/shared-types'
+import type { UserRole } from '@repo/shared-types'
+import { canAssignRole } from '@/modules/auth/constants/role-hierarchy.constants'
 import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { PasswordService } from '@/shared/security/password.service'
 import { TenantEmailService } from '@/shared/integrations/resend/tenant-email.service'
@@ -42,9 +45,16 @@ export class UsersService {
     tenantCtx: TenantContext,
     invitedById: string,
     inviterEmail: string,
+    inviterRole: UserRole,
     meta?: RequestMeta,
   ): Promise<InviteUserResponseDto> {
     const { schemaName } = tenantCtx
+
+    if (!canAssignRole(inviterRole, dto.role)) {
+      throw new ForbiddenException(
+        'You cannot invite a user with a role equal to or above your own',
+      )
+    }
 
     const existing = await this.authRepo.findUserByEmail(schemaName, dto.email)
     if (existing) {

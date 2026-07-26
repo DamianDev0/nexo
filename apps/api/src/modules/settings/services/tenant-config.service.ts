@@ -45,7 +45,7 @@ export class TenantConfigService {
     const theme = {
       ...DEFAULT_THEME,
       ...(config.theme as Partial<TenantTheme> | null | undefined),
-    } as TenantTheme
+    }
     await this.cache.set(this.themeKey(tenantId), theme, THEME_TTL)
     return theme
   }
@@ -216,7 +216,7 @@ export class TenantConfigService {
 
   private async getRawConfig(tenantId: string): Promise<TenantFullConfig> {
     const tenant = await this.tenantRepo.findOne({ where: { id: tenantId } })
-    return (tenant?.config ?? {}) as TenantFullConfig
+    return tenant?.config ?? {}
   }
 
   private async saveConfigSection(
@@ -224,8 +224,6 @@ export class TenantConfigService {
     section: string,
     value: unknown,
   ): Promise<void> {
-    // Atomic per-section write — avoids the lost-update race of read-modify-write
-    // when two sections (theme, nomenclature, ...) are updated concurrently.
     await this.tenantRepo.query(
       `UPDATE public.tenants
          SET config = jsonb_set(COALESCE(config, '{}'::jsonb), $2::text[], $3::jsonb, true)

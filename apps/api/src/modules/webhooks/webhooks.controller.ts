@@ -17,6 +17,7 @@ import type { TenantContext, Webhook, WebhookLog } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { WebhooksService } from './webhooks.service'
+import { CreateWebhookDto, UpdateWebhookDto } from './dto/webhook.dto'
 
 @ApiTags('Webhooks')
 @Controller('webhooks')
@@ -33,10 +34,7 @@ export class WebhooksController {
   @Post()
   @Auth(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a webhook (auto-generates HMAC secret)' })
-  create(
-    @Body() dto: { url: string; events: string[] },
-    @TenantCtx() ctx: TenantContext,
-  ): Promise<Webhook> {
+  create(@Body() dto: CreateWebhookDto, @TenantCtx() ctx: TenantContext): Promise<Webhook> {
     return this.service.create(ctx.schemaName, dto)
   }
 
@@ -45,7 +43,7 @@ export class WebhooksController {
   @ApiOperation({ summary: 'Update webhook URL, events, or active status' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: { url?: string; events?: string[]; isActive?: boolean },
+    @Body() dto: UpdateWebhookDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<Webhook> {
     return this.service.update(ctx.schemaName, id, dto)

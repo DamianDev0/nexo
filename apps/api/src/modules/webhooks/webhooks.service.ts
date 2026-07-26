@@ -3,6 +3,7 @@ import { randomBytes, createHmac } from 'node:crypto'
 import type { Webhook, WebhookDeliveryResult, WebhookEvent, WebhookLog } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { WebhookRow, LogRow } from './interfaces/webhook-row.interfaces'
+import { assertSafeWebhookUrl } from './webhook-url.util'
 
 @Injectable()
 export class WebhooksService {
@@ -18,6 +19,7 @@ export class WebhooksService {
   }
 
   async create(schemaName: string, data: { url: string; events: string[] }): Promise<Webhook> {
+    assertSafeWebhookUrl(data.url)
     return this.db.query(schemaName, async (qr): Promise<Webhook> => {
       const secret = randomBytes(32).toString('hex')
       const rows: WebhookRow[] = await qr.query(
@@ -26,7 +28,7 @@ export class WebhooksService {
       )
       const row = rows[0]
       if (!row) throw new Error('Failed to create webhook')
-      return this.map(row)
+      return this.map(row, { revealSecret: true })
     })
   }
 
@@ -35,6 +37,7 @@ export class WebhooksService {
     webhookId: string,
     data: { url?: string; events?: string[]; isActive?: boolean },
   ): Promise<Webhook> {
+    if (data.url) assertSafeWebhookUrl(data.url)
     return this.db.query(schemaName, async (qr): Promise<Webhook> => {
       const sets: string[] = ['updated_at = NOW()']
       const params: unknown[] = []
@@ -101,6 +104,7 @@ export class WebhooksService {
         let error: string | null = null
 
         try {
+          assertSafeWebhookUrl(hook.url)
           const body = JSON.stringify({ event, data: payload, timestamp: new Date().toISOString() })
           const signature = createHmac('sha256', hook.secret).update(body).digest('hex')
 
@@ -149,12 +153,12 @@ export class WebhooksService {
     })
   }
 
-  private map(r: WebhookRow): Webhook {
+  private map(r: WebhookRow, opts?: { revealSecret?: boolean }): Webhook {
     return {
       id: r.id,
       url: r.url,
       events: r.events as WebhookEvent[],
-      secret: r.secret,
+      secret: opts?.revealSecret ? r.secret : '',
       isActive: r.is_active,
       lastTriggeredAt: r.last_triggered_at,
       lastStatusCode: r.last_status_code,

@@ -216,15 +216,19 @@ export class AuthService {
       customDomain: tenant.customDomain ?? null,
     }
 
-    const user = await this.authRepo.findOrCreateGoogleUser(
+    const user = await this.authRepo.findAndLinkGoogleUser(
       tenantCtx.schemaName,
       profile.email,
-      profile.fullName,
       profile.avatarUrl,
     )
+    if (!user) {
+      throw new UnauthorizedException(
+        'No account exists for this email in this workspace. Ask an administrator to invite you.',
+      )
+    }
     if (!user.is_active) throw new UnauthorizedException('Account is disabled')
 
-    this.logger.info({ slug: tenant.slug, email: profile.email }, 'Google OAuth login')
+    this.logger.info({ slug: tenant.slug, userId: user.id }, 'Google OAuth login')
 
     await this.registerUserTenantMapping(profile.email, tenant.id)
     const authResult = await this.session.issue(user, tenantCtx, meta)

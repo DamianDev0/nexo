@@ -14,7 +14,7 @@ const FUNCTIONS: Record<string, (args: number[]) => number> = {
   abs: ([x]) => Math.abs(x ?? 0),
 }
 
-const TOKEN_PATTERN = /\s*([0-9]*\.?[0-9]+|[A-Za-z_][A-Za-z0-9_]*|[()+\-*/,])/y
+const TOKEN_PATTERN = /\s*(\d*\.?\d+|[A-Za-z_]\w*|[()+\-*/,])/y
 
 function tokenize(input: string): Token[] | null {
   const tokens: Token[] = []
@@ -27,7 +27,7 @@ function tokenize(input: string): Token[] | null {
     if (raw === undefined) return null
     lastIndex = TOKEN_PATTERN.lastIndex
 
-    if (/^[0-9]/.test(raw) || raw.includes('.')) tokens.push({ type: 'number', value: raw })
+    if (/^\d/.test(raw) || raw.includes('.')) tokens.push({ type: 'number', value: raw })
     else if (/^[A-Za-z_]/.test(raw)) tokens.push({ type: 'ident', value: raw })
     else if (raw === '(' || raw === ')') tokens.push({ type: 'paren', value: raw })
     else if (raw === ',') tokens.push({ type: 'comma', value: raw })
@@ -118,7 +118,7 @@ class Parser {
     }
     const value = this.values[name]
     if (typeof value !== 'number' || !Number.isFinite(value)) {
-      throw new Error(`unknown or non-numeric field "${name}"`)
+      throw new TypeError(`unknown or non-numeric field "${name}"`)
     }
     return value
   }
@@ -136,16 +136,7 @@ class Parser {
   }
 }
 
-/**
- * Safely evaluate an arithmetic formula (no eval/Function). Supports + - * /,
- * parentheses, unary minus, numeric field references, and min/max/round/floor/
- * ceil/abs. Returns null on any parse/eval error (missing field, div-by-zero,
- * bad syntax) so a single bad formula never breaks an entity read.
- */
-export function evaluateFormula(
-  expression: string,
-  values: Record<string, number>,
-): number | null {
+export function evaluateFormula(expression: string, values: Record<string, number>): number | null {
   const tokens = tokenize(expression)
   if (!tokens || tokens.length === 0) return null
 

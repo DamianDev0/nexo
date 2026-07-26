@@ -24,10 +24,7 @@ export class WebhooksListener {
   async handleEvent(event: CrmEvent & { _eventName?: string }): Promise<void> {
     if (!event.schemaName || !event._eventName) return
 
-    await this.webhooksService.dispatch(event.schemaName, event._eventName as WebhookEvent, {
-      ...event,
-      entityType: event.entityType,
-      entityId: event.entityId,
-    })
+    const { schemaName, _eventName, ...payload } = event
+    await this.webhooksService.dispatch(schemaName, _eventName as WebhookEvent, payload)
   }
 }

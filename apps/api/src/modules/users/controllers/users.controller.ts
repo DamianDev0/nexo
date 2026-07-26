@@ -40,7 +40,14 @@ export class UsersController {
     @CurrentUser() user: AuthenticatedUser,
     @Req() req: Request,
   ): Promise<InviteUserResponseDto> {
-    return this.usersService.invite(dto, tenantCtx, user.id, user.email, extractMeta(req))
+    return this.usersService.invite(
+      dto,
+      tenantCtx,
+      user.id,
+      user.email,
+      user.role,
+      extractMeta(req),
+    )
   }
 
   // ─── Accept invitation ────────────────────────────────────────────────────
