@@ -1,4 +1,4 @@
-import { OnboardingView } from '@/features/auth/views/OnboardingView'
+import { OnboardingView } from '@/views/onboarding'
 
 export default function OnboardingPage() {
   return <OnboardingView />

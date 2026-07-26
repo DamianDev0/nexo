@@ -1,6 +1,8 @@
+import { Providers } from '@/app/providers'
+
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
-import { Providers } from '@/lib/providers'
+
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {

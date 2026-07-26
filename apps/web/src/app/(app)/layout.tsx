@@ -1,11 +1,12 @@
 'use client'
 
+import { AuthGuard } from '@/entities/session'
+import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
+import { Separator } from '@/shared/ui/shadcn/separator'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
+import { AppSidebar } from '@/widgets/app-shell'
+
 import type { ReactNode } from 'react'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/organisms/sidebar'
-import { Separator } from '@/components/atoms/separator'
-import { ThemeToggle } from '@/components/atoms/theme-toggle'
-import { AuthGuard } from '@/features/app/components/AuthGuard'
-import { AppSidebar } from '@/features/app/components/AppSidebar'
 
 export default function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (

@@ -23,7 +23,8 @@
     "RESEND_API_KEY",
     "EMAIL_FROM",
     "RUN_MIGRATIONS_ON_BOOT",
-    "DB_SYNCHRONIZE"
+    "DB_SYNCHRONIZE",
+    "CI"
   ],
   "tasks": {
     "dev": {

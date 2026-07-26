@@ -1,5 +1,5 @@
-import { SetupWizardView } from '@/features/onboarding/views/SetupWizardView'
+import { SetupWizardView } from '@/views/onboarding-setup'
 
-export default function OnboardingSetupPage() {
+export default function SetupPage() {
   return <SetupWizardView />
 }
