@@ -3,7 +3,14 @@ import { Test } from '@nestjs/testing'
 import { CompaniesController } from '../companies.controller'
 import { CompaniesService } from '../companies.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { UserRole, TaxRegime, CompanySize, CIIUSector } from '@repo/shared-types'
+import {
+  UserRole,
+  TaxRegime,
+  CompanySize,
+  CIIUSector,
+  AccountType,
+  PersonType,
+} from '@repo/shared-types'
 import type {
   TenantContext,
   AuthenticatedUser,
@@ -46,6 +53,18 @@ const mockCompany: Company = {
   city: 'Bogotá',
   department: 'Cundinamarca',
   municipioCode: '11001',
+  country: 'Colombia',
+  description: null,
+  employeeCount: null,
+  annualRevenueCents: null,
+  accountType: AccountType.CUSTOMER,
+  personType: PersonType.JURIDICA,
+  parentCompanyId: null,
+  legalRepName: null,
+  legalRepDocumentType: null,
+  legalRepDocumentNumber: null,
+  camaraComercioNumber: null,
+  rating: null,
   tags: ['cliente'],
   assignedToId: null,
   customFields: {},

@@ -1,5 +1,6 @@
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
+import { NotificationType } from '@repo/shared-types'
 import { NotificationsService } from '../notifications.service'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 
@@ -132,22 +133,22 @@ describe('NotificationsService', () => {
         .mockResolvedValueOnce([makeNotificationRow()])
 
       const result = await service.send(SCHEMA, USER_ID, {
-        type: 'deal.won',
+        type: NotificationType.DEAL_WON,
         title: 'Deal won!',
         body: 'Big Deal was marked as won',
         entityType: 'deal',
         entityId: 'deal-1',
       })
 
-      expect(result.title).toBe('Deal won!')
-      expect(result.notificationType).toBe('deal.won')
+      expect(result!.title).toBe('Deal won!')
+      expect(result!.notificationType).toBe('deal.won')
     })
 
     it('respects muted types', async () => {
       qr.query.mockResolvedValueOnce([makePreferencesRow({ muted_types: ['deal.won'] })])
 
       const result = await service.send(SCHEMA, USER_ID, {
-        type: 'deal.won',
+        type: NotificationType.DEAL_WON,
         title: 'Should be muted',
       })
 

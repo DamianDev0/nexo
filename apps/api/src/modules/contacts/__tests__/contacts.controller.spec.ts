@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing'
 import { ContactsController } from '../contacts.controller'
 import { ContactsService } from '../contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { ContactStatus, ContactSource, UserRole } from '@repo/shared-types'
+import { ContactStatus, ContactSource, LifecycleStage, UserRole } from '@repo/shared-types'
 import type {
   TenantContext,
   AuthenticatedUser,
@@ -37,12 +37,25 @@ const mockContact: Contact = {
   whatsapp: null,
   documentType: null,
   documentNumber: null,
+  jobTitle: null,
+  linkedinUrl: null,
+  birthday: null,
+  address: null,
   city: 'Bogotá',
   department: null,
   municipioCode: null,
+  country: 'Colombia',
   status: ContactStatus.NEW,
+  lifecycleStage: LifecycleStage.LEAD,
   source: ContactSource.MANUAL,
   leadScore: 0,
+  dataConsent: false,
+  consentDate: null,
+  consentSource: null,
+  optOutEmail: false,
+  optOutSms: false,
+  optOutWhatsapp: false,
+  lastContactedAt: null,
   tags: [],
   companyId: null,
   assignedToId: null,

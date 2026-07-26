@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing'
 import { DealsController } from '../deals.controller'
 import { DealsService } from '../deals.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { DealStatus } from '@repo/shared-types'
+import { DealStatus, DealType, DealPriority } from '@repo/shared-types'
 import type {
   DealDetail,
   PaginatedDeals,
@@ -42,6 +42,15 @@ const mockDeal: DealDetail = {
   assignedToId: 'user-1',
   lossReason: null,
   status: DealStatus.OPEN,
+  closeDateActual: null,
+  description: null,
+  nextStep: null,
+  dealType: DealType.NEW_BUSINESS,
+  priority: DealPriority.MEDIUM,
+  probabilityOverride: null,
+  competitors: [],
+  currency: 'COP',
+  leadSource: null,
   customFields: {},
   isActive: true,
   createdById: 'user-1',
