@@ -3,10 +3,10 @@ export const AUTH_BG_LIGHT = '#E8EBE6'
 export const AUTH_BG_DARK = '#0E0F0C'
 
 export const PAGE_GLOW_LIGHT =
-  'radial-gradient(circle at 58% 44%, rgba(150,226,56,0.30) 0%, rgba(139,219,58,0.13) 30%, transparent 60%)'
+  'radial-gradient(circle 34rem at 56% 44%, rgba(174,240,55,0.5) 0%, rgba(154,230,60,0.22) 45%, transparent 100%)'
 
 export const PAGE_GLOW_DARK =
-  'radial-gradient(circle at 58% 44%, rgba(165,233,111,0.12) 0%, rgba(165,233,111,0.05) 28%, transparent 58%)'
+  'radial-gradient(circle 34rem at 56% 44%, rgba(165,233,111,0.20) 0%, rgba(165,233,111,0.08) 45%, transparent 100%)'
 
 export const NODE_DOT_STYLE = {
   background: 'radial-gradient(circle at 38% 35%, #F7FFE8, #C6E97A 55%, #8FC430)',
