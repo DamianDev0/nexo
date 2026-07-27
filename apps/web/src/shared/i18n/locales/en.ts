@@ -79,6 +79,11 @@ const en = {
     byContinuing: 'By continuing you accept our',
     and: 'and',
   },
+  errors: {
+    serverTitle: 'We could not reach the server',
+    serverDescription: 'Check your connection or try again in a few seconds.',
+    retry: 'Retry',
+  },
   onboarding: {
     map: {
       deals: 'deals',

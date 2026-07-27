@@ -79,6 +79,11 @@ const es = {
     byContinuing: 'Al continuar aceptas nuestros',
     and: 'y',
   },
+  errors: {
+    serverTitle: 'No pudimos conectar con el servidor',
+    serverDescription: 'Revisa tu conexión o inténtalo de nuevo en unos segundos.',
+    retry: 'Reintentar',
+  },
   onboarding: {
     map: {
       deals: 'negocios',
