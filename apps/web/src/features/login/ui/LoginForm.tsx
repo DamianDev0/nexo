@@ -59,11 +59,12 @@ export function LoginForm({
         <PasswordField
           control={control}
           name="password"
-          label={t('auth.password')}
-          placeholder={t('auth.passwordPlaceholder')}
-          autoComplete="current-password"
-          showPassword={showPassword}
-          onToggle={onTogglePassword}
+          copy={{
+            label: t('auth.password'),
+            placeholder: t('auth.passwordPlaceholder'),
+            autoComplete: 'current-password',
+          }}
+          visibility={{ shown: showPassword, onToggle: onTogglePassword }}
         />
 
         <div className="flex items-center justify-between">

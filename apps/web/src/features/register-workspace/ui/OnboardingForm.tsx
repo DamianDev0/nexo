@@ -78,11 +78,13 @@ export function OnboardingForm({
         <PasswordField
           control={control}
           name="ownerPassword"
-          label={t('auth.password')}
-          placeholder={t('auth.passwordMinPlaceholder')}
-          autoComplete="new-password"
-          showPassword={showPassword}
-          onToggle={onTogglePassword}
+          copy={{
+            label: t('auth.password'),
+            placeholder: t('auth.passwordMinPlaceholder'),
+            autoComplete: 'new-password',
+          }}
+          visibility={{ shown: showPassword, onToggle: onTogglePassword }}
+          showStrength
         />
 
         <LiquidButton
