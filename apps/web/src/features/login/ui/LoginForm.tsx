@@ -68,10 +68,7 @@ export function LoginForm({
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Checkbox
-              id="remember"
-              className="border-foreground/40 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground"
-            />
+            <Checkbox id="remember" className="border-foreground/40" />
             <Label htmlFor="remember" className="cursor-pointer text-sm text-muted-foreground">
               {t('auth.rememberMe')}
             </Label>

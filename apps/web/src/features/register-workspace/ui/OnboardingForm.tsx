@@ -42,7 +42,7 @@ export function OnboardingForm({
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
+      <form onSubmit={onSubmit} className="flex flex-col gap-2">
         <ControlledField
           control={control}
           name="businessName"

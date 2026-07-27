@@ -3,6 +3,7 @@
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback } from 'react'
+import { flushSync } from 'react-dom'
 
 import { Button } from '@/shared/ui/shadcn/button'
 
@@ -10,7 +11,14 @@ export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
 
   const handleToggle = useCallback(() => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+    const next = resolvedTheme === 'dark' ? 'light' : 'dark'
+    if (typeof document.startViewTransition === 'function') {
+      document.startViewTransition(() => {
+        flushSync(() => setTheme(next))
+      })
+      return
+    }
+    setTheme(next)
   }, [resolvedTheme, setTheme])
 
   return (
