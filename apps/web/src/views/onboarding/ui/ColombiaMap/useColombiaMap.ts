@@ -1,6 +1,7 @@
 'use client'
 
 import * as d3 from 'd3'
+import { t } from 'i18next'
 import { useEffect, useRef } from 'react'
 
 import { drawSvgGrid } from '@/shared/lib/svg-grid'
@@ -8,9 +9,20 @@ import { drawSvgGrid } from '@/shared/lib/svg-grid'
 import { ERROR_TEXT, GEOJSON_URL, MAP_CSS_VARS } from './constants'
 import { drawCornerMarks, drawMap } from './draw'
 
-import type { MapColors } from './constants'
+import type { City, MapColors } from './constants'
 import type { FeatureCollection, Geometry } from 'geojson'
 import type { RefObject } from 'react'
+
+function cityTooltipHtml(city: City): string {
+  return `
+    <div class="min-w-36 rounded-lg border border-border bg-popover px-3 py-2 shadow-lg">
+      <p class="text-xs font-semibold text-popover-foreground">${city.name}</p>
+      <p class="mt-0.5 text-xs text-muted-foreground">${city.deals} ${t('onboarding.map.activeDeals')}</p>
+      <p class="text-xs text-muted-foreground">${city.pipelineCop} ${t('onboarding.map.inPipeline')}</p>
+      <p class="mt-1 text-xs font-medium text-primary-deep dark:text-primary">${t(`onboarding.map.sectors.${city.key}`)}</p>
+    </div>
+  `
+}
 
 function getCssVar(name: string): string {
   return globalThis
@@ -59,13 +71,37 @@ export function useColombiaMap(): UseColombiaMapResult {
       drawSvgGrid({ svg, width, height, color: colors.grid })
       drawCornerMarks(svg, width, colors.accent)
 
+      d3.select(wrapRef.current).selectAll('[data-slot="map-tooltip"]').remove()
+      const tooltip = d3
+        .select(wrapRef.current)
+        .append('div')
+        .attr('data-slot', 'map-tooltip')
+        .attr(
+          'class',
+          'pointer-events-none absolute z-10 hidden -translate-x-1/2 -translate-y-full',
+        )
+
+      const interaction = {
+        dealsLabel: t('onboarding.map.deals'),
+        onHover: (city: City, x: number, y: number) => {
+          tooltip
+            .html(cityTooltipHtml(city))
+            .style('left', `${x}px`)
+            .style('top', `${y - 10}px`)
+            .classed('hidden', false)
+        },
+        onLeave: () => {
+          tooltip.classed('hidden', true)
+        },
+      }
+
       fetch(GEOJSON_URL)
         .then((r) => {
           if (!r.ok) throw new Error(`GeoJSON fetch failed: ${r.status}`)
           return r.json() as Promise<FeatureCollection<Geometry>>
         })
         .then((geo) => {
-          if (!cancelled) drawMap(svg, geo, width, height, colors)
+          if (!cancelled) drawMap(svg, geo, width, height, colors, interaction)
         })
         .catch((err: unknown) => {
           if (cancelled) return

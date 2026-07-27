@@ -80,6 +80,21 @@ const en = {
     and: 'and',
   },
   onboarding: {
+    map: {
+      deals: 'deals',
+      activeDeals: 'active deals',
+      inPipeline: 'COP in pipeline',
+      sectors: {
+        bogota: 'Tech and services',
+        medellin: 'Industry and fashion',
+        cali: 'Agro and consumer goods',
+        barranquilla: 'Logistics and port',
+        cartagena: 'Tourism and commerce',
+        bucaramanga: 'Manufacturing',
+        pereira: 'Coffee and retail',
+        cucuta: 'Border trade',
+      },
+    },
     branding: {
       title: 'Build your workspace,',
       titleAccent: 'grow across Colombia.',

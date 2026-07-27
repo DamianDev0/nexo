@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { useTheme } from 'next-themes'
 import { useTranslation } from 'react-i18next'
 
-import { ORB_GLOW_DARK, ORB_GLOW_LIGHT } from '@/shared/config/tokens/effects'
+import { MAP_GLOW_DARK, MAP_GLOW_LIGHT } from '@/shared/config/tokens/effects'
 
 const ColombiaMap = dynamic(() => import('./ColombiaMap').then((m) => m.ColombiaMap), {
   ssr: false,
@@ -20,7 +20,7 @@ export function OnboardingBranding() {
       <div
         className="pointer-events-none absolute left-1/2 top-2/5 z-0 size-220 -translate-x-1/2 -translate-y-1/2"
         style={{
-          background: isDark ? ORB_GLOW_DARK : ORB_GLOW_LIGHT,
+          background: isDark ? MAP_GLOW_DARK : MAP_GLOW_LIGHT,
         }}
       />
 

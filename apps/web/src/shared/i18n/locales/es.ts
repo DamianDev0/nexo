@@ -80,6 +80,21 @@ const es = {
     and: 'y',
   },
   onboarding: {
+    map: {
+      deals: 'negocios',
+      activeDeals: 'negocios activos',
+      inPipeline: 'COP en pipeline',
+      sectors: {
+        bogota: 'Tecnología y servicios',
+        medellin: 'Industria y moda',
+        cali: 'Agro y consumo',
+        barranquilla: 'Logística y puerto',
+        cartagena: 'Turismo y comercio',
+        bucaramanga: 'Manufactura',
+        pereira: 'Café y retail',
+        cucuta: 'Comercio fronterizo',
+      },
+    },
     branding: {
       title: 'Construye tu espacio,',
       titleAccent: 'crece por toda Colombia.',

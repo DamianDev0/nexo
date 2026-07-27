@@ -5,6 +5,12 @@ export const AUTH_BG_DARK = '#0E0F0C'
 export const ORB_GLOW_LIGHT =
   'radial-gradient(circle closest-side, rgba(174,240,55,0.5) 0%, rgba(154,230,60,0.22) 45%, transparent 100%)'
 
+export const MAP_GLOW_LIGHT =
+  'radial-gradient(circle closest-side, rgba(154,230,60,0.24) 0%, rgba(154,230,60,0.10) 42%, transparent 100%)'
+
+export const MAP_GLOW_DARK =
+  'radial-gradient(circle closest-side, rgba(190,242,100,0.12) 0%, rgba(190,242,100,0.06) 35%, rgba(190,242,100,0.02) 65%, transparent 95%)'
+
 export const ORB_GLOW_DARK =
   'radial-gradient(circle closest-side, rgba(190,242,100,0.14) 0%, rgba(190,242,100,0.08) 30%, rgba(190,242,100,0.04) 55%, rgba(190,242,100,0.015) 75%, transparent 95%)'
 
