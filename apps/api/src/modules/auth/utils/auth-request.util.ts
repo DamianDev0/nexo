@@ -4,7 +4,6 @@ import {
   ACCESS_COOKIE,
   REFRESH_COOKIE,
   REFRESH_COOKIE_PATH,
-  ACCESS_TOKEN_MAX_AGE_MS,
   REFRESH_TOKEN_MAX_AGE_MS,
 } from '../constants/auth-cookies.constants'
 
@@ -24,7 +23,7 @@ export function setAuthCookies(
   const isProduction = (req.app.get('env') as string) === 'production'
   const base = { httpOnly: true, sameSite: 'strict' as const, secure: isProduction }
 
-  res.cookie(ACCESS_COOKIE, accessToken, { ...base, maxAge: ACCESS_TOKEN_MAX_AGE_MS })
+  res.cookie(ACCESS_COOKIE, accessToken, { ...base, maxAge: REFRESH_TOKEN_MAX_AGE_MS })
   res.cookie(REFRESH_COOKIE, refreshToken, {
     ...base,
     maxAge: REFRESH_TOKEN_MAX_AGE_MS,

@@ -9,7 +9,6 @@ import {
   ACCESS_COOKIE,
   REFRESH_COOKIE,
   REFRESH_COOKIE_PATH,
-  ACCESS_TOKEN_MAX_AGE_MS,
   REFRESH_TOKEN_MAX_AGE_MS,
 } from '../constants/auth-cookies.constants'
 
@@ -82,7 +81,7 @@ describe('auth-request.util', () => {
         expect.objectContaining({
           httpOnly: true,
           sameSite: 'strict',
-          maxAge: ACCESS_TOKEN_MAX_AGE_MS,
+          maxAge: REFRESH_TOKEN_MAX_AGE_MS,
         }),
       )
       expect(res.cookie).toHaveBeenCalledWith(

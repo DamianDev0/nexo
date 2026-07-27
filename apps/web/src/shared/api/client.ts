@@ -3,6 +3,7 @@ import 'server-only'
 import { cookies } from 'next/headers'
 
 import { ApiError } from './api-error'
+import { relaySetCookies } from './relay-cookies'
 
 import type { ApiErrorResponse } from '@repo/shared-types'
 
@@ -32,14 +33,38 @@ async function toApiError(res: Response): Promise<ApiError> {
   return new ApiError(json ?? fallback)
 }
 
-async function requestApi<T>(
+function mergeCookieHeader(cookieHeader: string, setCookies: ReadonlyArray<string>): string {
+  const jar = new Map<string, string>()
+  for (const pair of cookieHeader.split(';')) {
+    const eq = pair.indexOf('=')
+    if (eq > 0) jar.set(pair.slice(0, eq).trim(), pair.slice(eq + 1).trim())
+  }
+  for (const header of setCookies) {
+    const [pair] = header.split(';')
+    const eq = pair?.indexOf('=') ?? -1
+    if (pair && eq > 0) jar.set(pair.slice(0, eq).trim(), pair.slice(eq + 1).trim())
+  }
+  return [...jar.entries()].map(([name, value]) => `${name}=${value}`).join('; ')
+}
+
+async function refreshServerSession(cookieHeader: string): Promise<string[] | null> {
+  const response = await fetch(`${API_BASE}/auth/refresh`, {
+    method: 'POST',
+    headers: cookieHeader ? { cookie: cookieHeader } : undefined,
+    cache: 'no-store',
+  }).catch(() => null)
+  if (!response?.ok) return null
+  return response.headers.getSetCookie()
+}
+
+function doFetch<T>(
   endpoint: string,
   options: ApiFetchOptions<T>,
-): Promise<{ data: T; response: Response }> {
-  const { tags, revalidate, parse, body, headers, ...rest } = options
-  const cookieHeader = (await cookies()).toString()
-
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  cookieHeader: string,
+): Promise<Response> {
+  const { tags, revalidate, parse: _omitted, body, headers, ...rest } = options
+  void _omitted
+  return fetch(`${API_BASE}${endpoint}`, {
     ...rest,
     headers: {
       'Content-Type': 'application/json',
@@ -51,6 +76,23 @@ async function requestApi<T>(
       ? {}
       : { next: { tags, revalidate: revalidate ?? DEFAULT_REVALIDATE_SECONDS } }),
   })
+}
+
+async function requestApi<T>(
+  endpoint: string,
+  options: ApiFetchOptions<T>,
+): Promise<{ data: T; response: Response }> {
+  const cookieHeader = (await cookies()).toString()
+
+  let response = await doFetch(endpoint, options, cookieHeader)
+
+  if (response.status === 401 && !endpoint.startsWith('/auth/')) {
+    const setCookies = await refreshServerSession(cookieHeader)
+    if (setCookies && setCookies.length > 0) {
+      await relaySetCookies(setCookies).catch(() => undefined)
+      response = await doFetch(endpoint, options, mergeCookieHeader(cookieHeader, setCookies))
+    }
+  }
 
   if (!response.ok) throw await toApiError(response)
   if (response.status === 204) return { data: undefined as T, response }
@@ -58,7 +100,7 @@ async function requestApi<T>(
   const json: unknown = await response.json()
   const payload =
     json && typeof json === 'object' && 'data' in json ? (json as { data: unknown }).data : json
-  return { data: (parse ? parse(payload) : payload) as T, response }
+  return { data: (options.parse ? options.parse(payload) : payload) as T, response }
 }
 
 export async function apiFetch<T>(endpoint: string, options: ApiFetchOptions<T> = {}): Promise<T> {
