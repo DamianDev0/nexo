@@ -2,11 +2,11 @@ export const AUTH_BG_LIGHT = '#E8EBE6'
 
 export const AUTH_BG_DARK = '#0E0F0C'
 
-export const PANEL_GLOW_LIGHT =
-  'radial-gradient(ellipse 100% 70% at 50% 50%, rgba(111,203,58,0.10) 0%, transparent 70%)'
+export const PAGE_GLOW_LIGHT =
+  'radial-gradient(circle at 58% 44%, rgba(150,226,56,0.30) 0%, rgba(139,219,58,0.13) 30%, transparent 60%)'
 
-export const PANEL_GLOW_DARK =
-  'radial-gradient(ellipse 100% 70% at 50% 50%, rgba(165,233,111,0.06) 0%, transparent 70%)'
+export const PAGE_GLOW_DARK =
+  'radial-gradient(circle at 58% 44%, rgba(165,233,111,0.12) 0%, rgba(165,233,111,0.05) 28%, transparent 58%)'
 
 export const NODE_DOT_STYLE = {
   background: 'radial-gradient(circle at 38% 35%, #F7FFE8, #C6E97A 55%, #8FC430)',

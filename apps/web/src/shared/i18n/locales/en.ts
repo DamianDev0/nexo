@@ -76,7 +76,8 @@ const en = {
     workEmail: 'Work email',
     terms: 'Terms',
     privacy: 'Privacy',
-    byContiuing: 'By continuing you accept our',
+    byContinuing: 'By continuing you accept our',
+    and: 'and',
   },
   onboarding: {
     branding: {

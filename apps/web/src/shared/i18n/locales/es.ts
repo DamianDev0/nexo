@@ -76,7 +76,8 @@ const es = {
     workEmail: 'Correo de trabajo',
     terms: 'Términos',
     privacy: 'Privacidad',
-    byContiuing: 'Al continuar aceptas nuestros',
+    byContinuing: 'Al continuar aceptas nuestros',
+    and: 'y',
   },
   onboarding: {
     branding: {

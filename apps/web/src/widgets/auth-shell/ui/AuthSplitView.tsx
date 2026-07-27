@@ -3,7 +3,7 @@
 import { motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 
-import { PANEL_GLOW_LIGHT, PANEL_GLOW_DARK } from '@/shared/config/tokens/effects'
+import { PAGE_GLOW_LIGHT, PAGE_GLOW_DARK } from '@/shared/config/tokens/effects'
 import { cn } from '@/shared/lib'
 import { fade, slideRight, smoothEase } from '@/shared/lib/animations'
 import { useMounted } from '@/shared/lib/hooks/useMounted'
@@ -35,8 +35,8 @@ export function AuthSplitView({
     <AuthLayout>
       {mounted && (
         <div
-          className="pointer-events-none absolute right-0 top-1/2 z-1 hidden h-4/5 w-96 -translate-y-1/2 lg:block"
-          style={{ background: isDark ? PANEL_GLOW_DARK : PANEL_GLOW_LIGHT }}
+          className="pointer-events-none absolute inset-0 z-1"
+          style={{ background: isDark ? PAGE_GLOW_DARK : PAGE_GLOW_LIGHT }}
         />
       )}
 

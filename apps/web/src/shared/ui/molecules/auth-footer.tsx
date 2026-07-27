@@ -1,15 +1,20 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 export function AuthFooter() {
+  const { t } = useTranslation()
+
   return (
     <p className="text-center text-xs text-muted-foreground">
-      By continuing you accept our{' '}
+      {t('auth.byContinuing')}{' '}
       <Link href="/terms" className="underline underline-offset-2 hover:text-foreground">
-        Terms
+        {t('auth.terms')}
       </Link>{' '}
-      and{' '}
+      {t('auth.and')}{' '}
       <Link href="/privacy" className="underline underline-offset-2 hover:text-foreground">
-        Privacy
+        {t('auth.privacy')}
       </Link>
     </p>
   )
