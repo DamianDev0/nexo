@@ -15,11 +15,11 @@ import type { RefObject } from 'react'
 
 function cityTooltipHtml(city: City): string {
   return `
-    <div class="min-w-36 rounded-lg border border-border bg-popover px-3 py-2 shadow-lg">
-      <p class="text-xs font-semibold text-popover-foreground">${city.name}</p>
-      <p class="mt-0.5 text-xs text-muted-foreground">${city.deals} ${t('onboarding.map.activeDeals')}</p>
-      <p class="text-xs text-muted-foreground">${city.pipelineCop} ${t('onboarding.map.inPipeline')}</p>
-      <p class="mt-1 text-xs font-medium text-primary-deep dark:text-primary">${t(`onboarding.map.sectors.${city.key}`)}</p>
+    <div class="relative rounded-md border border-border bg-popover px-3 py-2 shadow-lg">
+      <p class="text-xs font-bold tracking-tight text-popover-foreground">${city.name}</p>
+      <p class="mt-0.5 whitespace-nowrap text-[10px] leading-4 text-muted-foreground">${city.deals} ${t('onboarding.map.activeDeals')} · ${city.pipelineCop} ${t('onboarding.map.inPipeline')}</p>
+      <p class="whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide leading-4 text-primary-deep dark:text-primary">${t(`onboarding.map.sectors.${city.key}`)}</p>
+      <span class="absolute left-1/2 top-full -mt-1 size-2 -translate-x-1/2 rotate-45 border-b border-r border-border bg-popover"></span>
     </div>
   `
 }

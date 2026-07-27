@@ -2,10 +2,10 @@ import Link from 'next/link'
 import { type Control } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { LiquidButton } from '@/shared/ui/atoms/liquid-button'
 import { AuthFooter } from '@/shared/ui/molecules/auth-footer'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { PasswordField } from '@/shared/ui/molecules/password-field'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import type { OnboardingFormValues } from '../model/onboarding.schema'
 
@@ -59,7 +59,12 @@ export function OnboardingForm({
           hintFormat={(value) => `nexo.app/${value || 'your-slug'}`}
         />
 
-        <ControlledField control={control} name="ownerFullName" label={t('auth.fullName')} />
+        <ControlledField
+          control={control}
+          name="ownerFullName"
+          label={t('auth.fullName')}
+          placeholder="Acme Corporation"
+        />
 
         <ControlledField
           control={control}
@@ -80,13 +85,13 @@ export function OnboardingForm({
           onToggle={onTogglePassword}
         />
 
-        <Button
+        <LiquidButton
           type="submit"
           disabled={isPending}
           className="mt-2 h-11 w-full rounded-lg text-sm font-bold"
         >
           {isPending ? t('auth.creatingWorkspace') : t('auth.createWorkspace')}
-        </Button>
+        </LiquidButton>
       </form>
 
       <AuthFooter />

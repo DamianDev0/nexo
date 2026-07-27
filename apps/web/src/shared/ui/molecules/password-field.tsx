@@ -1,4 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -53,7 +54,18 @@ export function PasswordField<T extends FieldValues>({
               onClick={onToggle}
               aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
             >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={showPassword ? 'off' : 'on'}
+                  initial={{ opacity: 0, scale: 0.6, rotate: -30 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.6, rotate: 30 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  className="flex"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </motion.span>
+              </AnimatePresence>
             </Button>
           </div>
           <FieldError message={fieldState.error?.message} />
