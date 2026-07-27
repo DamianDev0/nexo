@@ -2,7 +2,7 @@ import { LoginOrb } from './LoginOrb'
 
 export function LoginBranding() {
   return (
-    <div className="relative z-3 flex h-full w-full items-center justify-end py-16 lg:pr-16 xl:pr-28">
+    <div className="relative z-3 flex h-full w-full items-center justify-center py-16">
       <div className="flex flex-col items-center gap-7">
         <div className="translate-x-8 shrink-0">
           <LoginOrb />

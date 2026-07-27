@@ -1,12 +1,9 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { useTheme } from 'next-themes'
 
-import { PAGE_GLOW_LIGHT, PAGE_GLOW_DARK } from '@/shared/config/tokens/effects'
 import { cn } from '@/shared/lib'
 import { fade, slideRight, smoothEase } from '@/shared/lib/animations'
-import { useMounted } from '@/shared/lib/hooks/useMounted'
 
 import { AuthLayout } from './AuthLayout'
 
@@ -27,19 +24,8 @@ export function AuthSplitView({
   contentClassName,
   innerClassName,
 }: Readonly<AuthSplitViewProps>) {
-  const mounted = useMounted()
-  const { resolvedTheme } = useTheme()
-  const isDark = mounted && resolvedTheme === 'dark'
-
   return (
     <AuthLayout>
-      {mounted && (
-        <div
-          className="pointer-events-none absolute inset-0 z-1"
-          style={{ background: isDark ? PAGE_GLOW_DARK : PAGE_GLOW_LIGHT }}
-        />
-      )}
-
       <motion.div
         initial="initial"
         animate="animate"
