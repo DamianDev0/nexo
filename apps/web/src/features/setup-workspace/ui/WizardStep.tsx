@@ -31,7 +31,7 @@ export function WizardStep({ header, nav, aside, children }: Readonly<WizardStep
   const { t } = useTranslation()
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="px-8 pt-8 lg:px-12 lg:pt-10">
         <span className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
           {header.badge}

@@ -133,17 +133,16 @@ export const CURRENCY_OPTIONS = [
 export const SECTOR_OPTIONS: ReadonlyArray<{
   id: IndustrySector
   label: string
-  icon: string
 }> = [
-  { id: IndustrySector.SALUD, label: 'Salud', icon: '🏥' },
-  { id: IndustrySector.EDUCACION, label: 'Educación', icon: '📚' },
-  { id: IndustrySector.INMOBILIARIA, label: 'Inmobiliaria', icon: '🏠' },
-  { id: IndustrySector.COMERCIO, label: 'Comercio', icon: '🏪' },
-  { id: IndustrySector.SERVICIOS, label: 'Servicios', icon: '🔧' },
-  { id: IndustrySector.RESTAURANTE, label: 'Restaurante', icon: '🍽️' },
-  { id: IndustrySector.TECNOLOGIA, label: 'Tecnología', icon: '💻' },
-  { id: IndustrySector.CONSTRUCCION, label: 'Construcción', icon: '🏗️' },
-  { id: IndustrySector.OTROS, label: 'Otro', icon: '⚡' },
+  { id: IndustrySector.SALUD, label: 'Salud' },
+  { id: IndustrySector.EDUCACION, label: 'Educación' },
+  { id: IndustrySector.INMOBILIARIA, label: 'Inmobiliaria' },
+  { id: IndustrySector.COMERCIO, label: 'Comercio' },
+  { id: IndustrySector.SERVICIOS, label: 'Servicios' },
+  { id: IndustrySector.RESTAURANTE, label: 'Restaurante' },
+  { id: IndustrySector.TECNOLOGIA, label: 'Tecnología' },
+  { id: IndustrySector.CONSTRUCCION, label: 'Construcción' },
+  { id: IndustrySector.OTROS, label: 'Otro' },
 ] as const
 
 export const BRAND_COLOR_OPTIONS = [

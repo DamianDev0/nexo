@@ -12,6 +12,7 @@ export function PipelineStep() {
         onAddStage: pipeline.handleAddStage,
         onRemoveStage: pipeline.handleRemoveStage,
         onUpdateStage: pipeline.handleUpdateStage,
+        onReorderStages: pipeline.handleReorderStages,
       }}
       nav={{ onNext: pipeline.handleSave, onBack: wizard.prevStep, isPending: pipeline.isPending }}
     />

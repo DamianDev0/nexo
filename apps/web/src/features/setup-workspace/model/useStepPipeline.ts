@@ -51,7 +51,7 @@ export function useStepPipeline(onNext: () => void) {
   } = useForm<PipelineFormValues>({
     defaultValues: DEFAULT_VALUES,
   })
-  const { fields, append, remove, update } = useFieldArray({ control, name: 'stages' })
+  const { fields, append, remove, move } = useFieldArray({ control, name: 'stages' })
   const existingPipelineId = useRef<string | null>(null)
 
   useStepHydration({
@@ -95,9 +95,23 @@ export function useStepPipeline(onNext: () => void) {
     (id: string, patch: Partial<Stage>) => {
       const index = indexOf(id)
       if (index < 0) return
-      update(index, { ...getValues(`stages.${index}`), ...patch })
+      if (patch.name !== undefined)
+        setValue(`stages.${index}.name`, patch.name, { shouldDirty: true })
+      if (patch.color !== undefined)
+        setValue(`stages.${index}.color`, patch.color, { shouldDirty: true })
+      if (patch.probability !== undefined)
+        setValue(`stages.${index}.probability`, patch.probability, { shouldDirty: true })
     },
-    [indexOf, update, getValues],
+    [indexOf, setValue],
+  )
+
+  const handleReorderStages = useCallback(
+    (activeId: string, overId: string) => {
+      const from = indexOf(activeId)
+      const to = indexOf(overId)
+      if (from >= 0 && to >= 0 && from !== to) move(from, to)
+    },
+    [indexOf, move],
   )
 
   const { handleSave, isPending } = useStepMutation({
@@ -126,6 +140,7 @@ export function useStepPipeline(onNext: () => void) {
     handleAddStage,
     handleRemoveStage,
     handleUpdateStage,
+    handleReorderStages,
     handleSave,
     isPending,
   }

@@ -1,4 +1,5 @@
-import { Check, Home, ArrowRight } from 'lucide-react'
+import { Home, ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/shared/ui/shadcn/button'
@@ -13,9 +14,15 @@ export function StepDone({ onGoToDashboard, onReviewConfig }: Readonly<StepDoneP
   const s = 'onboarding.steps.done'
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-10 text-center">
-      <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-emerald-100 shadow-lg shadow-emerald-100">
-        <Check className="size-9 text-emerald-600" />
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto p-10 text-center">
+      <div className="mb-6 flex size-24 items-center justify-center rounded-full bg-accent shadow-lg shadow-primary/15">
+        <Image
+          src="/icons/3d/trophy.png"
+          alt=""
+          width={64}
+          height={64}
+          className="size-16 drop-shadow-md"
+        />
       </div>
 
       <h1 className="text-3xl font-bold tracking-tight text-foreground">{t(`${s}.title`)}</h1>
@@ -33,7 +40,9 @@ export function StepDone({ onGoToDashboard, onReviewConfig }: Readonly<StepDoneP
       </div>
 
       <div className="mt-10 w-full max-w-md rounded-lg border border-primary/20 bg-accent p-5 text-left">
-        <p className="mb-3 text-xs font-semibold text-primary">{t(`${s}.nextSteps`)}</p>
+        <p className="mb-3 text-xs font-semibold text-primary-deep dark:text-primary">
+          {t(`${s}.nextSteps`)}
+        </p>
         <ul className="flex flex-col gap-2">
           {[t(`${s}.importContacts`), t(`${s}.createFirstDeal`), t(`${s}.connectEmail`)].map(
             (tip) => (

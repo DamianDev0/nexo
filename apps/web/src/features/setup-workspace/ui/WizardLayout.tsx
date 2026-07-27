@@ -1,8 +1,11 @@
-import { Check } from 'lucide-react'
+import { ArrowRight, Check } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 
+import { LanguageSwitcher } from '@/features/switch-language'
 import { cn } from '@/shared/lib'
+import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Progress } from '@/shared/ui/shadcn/progress'
 
@@ -80,7 +83,7 @@ export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
   })
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex h-screen overflow-hidden bg-background">
       <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-border bg-card lg:flex">
         <div className="flex h-14 items-center justify-between border-b border-border px-5">
           <Link href="/" className="flex items-center gap-2">
@@ -132,19 +135,45 @@ export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
 
         <div className="border-t border-border p-5">
           <div className="rounded-lg border border-border bg-background p-3">
-            <p className="text-xs font-semibold text-foreground">{t('onboarding.needHelp')}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{t('onboarding.helpDescription')}</p>
-            <Link href="#" className="mt-2 inline-block text-xs font-semibold text-primary">
+            <div className="flex items-start gap-2.5">
+              <Image
+                src="/icons/3d/headphone.png"
+                alt=""
+                width={28}
+                height={28}
+                className="size-7 shrink-0 drop-shadow-sm"
+              />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-foreground">{t('onboarding.needHelp')}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t('onboarding.helpDescription')}
+                </p>
+              </div>
+            </div>
+            <Link
+              href="#"
+              className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-primary-deep hover:underline dark:text-primary"
+            >
               {t('onboarding.chatSupport')}
+              <ArrowRight className="size-3" />
             </Link>
           </div>
         </div>
       </aside>
 
-      <main className="flex flex-1 flex-col overflow-hidden">
+      <main className="relative flex flex-1 flex-col overflow-hidden">
         <div className="flex h-14 items-center justify-between border-b border-border px-6 lg:hidden">
           <span className="text-xs font-bold uppercase tracking-widest text-foreground">Nexo</span>
-          <span className="text-xs text-muted-foreground">{stepOf}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{stepOf}</span>
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
+        </div>
+
+        <div className="absolute right-6 top-6 z-10 hidden items-center gap-1 rounded-full border border-border/70 bg-card/80 px-1.5 py-1 shadow-xs backdrop-blur lg:flex">
+          <LanguageSwitcher />
+          <ThemeToggle />
         </div>
 
         {children}

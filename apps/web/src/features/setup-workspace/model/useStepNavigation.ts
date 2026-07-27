@@ -6,7 +6,7 @@ import { QUERY_KEYS } from '@/shared/config/query-keys'
 
 import { saveNavigationAction } from '../api/setup-steps.actions'
 
-import { DEFAULT_MODULES } from './navigation.constants'
+import { DEFAULT_MODULES, moduleGroupKey } from './navigation.constants'
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
@@ -50,6 +50,7 @@ export function useStepNavigation(onNext: () => void) {
 
   const handleReorder = useCallback(
     (activeKey: string, overKey: string) => {
+      if (moduleGroupKey(activeKey) !== moduleGroupKey(overKey)) return
       const from = fields.findIndex((f) => f.key === activeKey)
       const to = fields.findIndex((f) => f.key === overKey)
       if (from < 0 || to < 0 || from === to) return

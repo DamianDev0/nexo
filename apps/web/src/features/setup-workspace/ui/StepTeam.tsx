@@ -44,7 +44,7 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
         {data.map((inv) => (
           <div key={inv.id} className="flex items-center gap-2">
             <Input
-              className="h-9 flex-1 border-border text-sm"
+              className="h-9 flex-1 text-sm"
               type="email"
               placeholder="colleague@company.com"
               value={inv.email}
@@ -84,7 +84,7 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
         type="button"
         variant="outline"
         onClick={actions.onAdd}
-        className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary"
+        className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
       >
         <Plus className="size-3.5" />
         {t(`${s}.addMember`)}

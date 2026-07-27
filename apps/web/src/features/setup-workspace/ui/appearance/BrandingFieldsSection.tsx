@@ -24,7 +24,7 @@ export function BrandingFieldsSection({
       <div>
         <Label className="text-xs text-muted-foreground">{t(`${s}.crmName`)}</Label>
         <Input
-          className="mt-1.5 h-9 border-border text-sm"
+          className="mt-1.5 h-9 text-sm"
           placeholder="Nexo Acme Corp"
           value={productName}
           onChange={(e) => onProductNameChange(e.target.value)}
@@ -33,7 +33,7 @@ export function BrandingFieldsSection({
       <div>
         <Label className="text-xs text-muted-foreground">{t(`${s}.loginTagline`)}</Label>
         <Input
-          className="mt-1.5 h-9 border-border text-sm"
+          className="mt-1.5 h-9 text-sm"
           placeholder="Build. Grow. Scale."
           value={tagline}
           onChange={(e) => onTaglineChange(e.target.value)}

@@ -126,7 +126,7 @@ const es = {
     skipSetup: 'Saltar configuración →',
     needHelp: '¿Necesitas ayuda?',
     helpDescription: 'Nuestro equipo puede guiarte en la configuración inicial.',
-    chatSupport: 'Chat con soporte →',
+    chatSupport: 'Chat con soporte',
     stepOf: '{{current}} de {{total}}',
     steps: {
       company: {
@@ -150,6 +150,11 @@ const es = {
         subtitle: 'Hemos cargado un pipeline estándar. Personalízalo como quieras.',
         pipelineName: 'Nombre del pipeline',
         addStage: 'Agregar etapa',
+        stageName: 'Nombre de la etapa',
+        dragToReorder: 'Arrastra para reordenar',
+        stageColor: 'Color de la etapa',
+        closeProbability: 'Probabilidad de cierre',
+        removeStage: 'Eliminar etapa',
       },
       nomenclature: {
         label: 'Nomenclatura',
@@ -162,6 +167,16 @@ const es = {
         plural: 'Plural',
         quickPresets: 'Presets rápidos',
         canChangeAnytime: 'Puedes cambiar esto en cualquier momento',
+        defaults: {
+          contact: 'Contacto',
+          contacts: 'Contactos',
+          company: 'Empresa',
+          companies: 'Empresas',
+          deal: 'Negocio',
+          deals: 'Negocios',
+          activity: 'Actividad',
+          activities: 'Actividades',
+        },
       },
       navigation: {
         label: 'Navegación',
@@ -171,6 +186,28 @@ const es = {
         subtitle:
           'Arrastra para reordenar, activa o desactiva. Los módulos requeridos no se pueden ocultar.',
         optionalNote: 'Puedes cambiar esto después en configuración',
+        dragToReorder: 'Arrastra para reordenar',
+        required: 'requerido',
+        previewTitle: 'Vista previa del sidebar',
+        modulesActive: '{{count}} módulos activos',
+        groups: {
+          overview: 'General',
+          management: 'Gestión',
+          billing: 'Facturación',
+          insights: 'Análisis',
+          system: 'Sistema',
+        },
+        modules: {
+          dashboard: 'Dashboard',
+          contacts: 'Contactos',
+          companies: 'Empresas',
+          deals: 'Negocios',
+          activities: 'Actividades',
+          invoices: 'Facturas',
+          products: 'Productos',
+          reports: 'Reportes',
+          settings: 'Ajustes',
+        },
       },
       appearance: {
         label: 'Apariencia',

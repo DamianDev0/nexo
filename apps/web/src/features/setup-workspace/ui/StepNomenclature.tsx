@@ -1,4 +1,6 @@
 import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
+import { Lightbulb } from 'lucide-react'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/shared/ui/shadcn/button'
@@ -41,7 +43,8 @@ export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatu
       header={{ badge: t(`${s}.badge`), title: t(`${s}.title`), description: t(`${s}.subtitle`) }}
       nav={{ ...nav, footerNote: t(`${s}.canChangeAnytime`) }}
     >
-      <div className="mb-6 rounded-lg border border-primary/20 bg-accent p-3 text-xs text-foreground">
+      <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-border bg-card py-2 pl-3 pr-4 text-xs text-muted-foreground shadow-xs">
+        <Lightbulb className="size-3.5 shrink-0 text-primary" />
         {t(`${s}.hint`)}
       </div>
 
@@ -63,12 +66,12 @@ export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatu
               </span>
             </div>
             <Input
-              className="h-9 border-border text-sm"
+              className="h-9 text-sm"
               value={data[entity].singular}
               onChange={(e) => actions.onUpdate(entity, 'singular', e.target.value)}
             />
             <Input
-              className="h-9 border-border text-sm"
+              className="h-9 text-sm"
               value={data[entity].plural}
               onChange={(e) => actions.onUpdate(entity, 'plural', e.target.value)}
             />
@@ -84,9 +87,10 @@ export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatu
               key={key}
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="gap-2 text-xs"
               onClick={() => actions.onPreset(key)}
             >
+              <Image src={preset.icon} alt="" width={18} height={18} className="size-4.5" />
               {preset.label}
             </Button>
           ))}

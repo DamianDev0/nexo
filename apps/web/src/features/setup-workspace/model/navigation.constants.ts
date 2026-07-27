@@ -1,5 +1,31 @@
 import type { SidebarModule } from '@repo/shared-types'
 
+export const MODULE_GROUPS: ReadonlyArray<{
+  key: string
+  moduleKeys: ReadonlyArray<string>
+}> = [
+  { key: 'overview', moduleKeys: ['dashboard'] },
+  { key: 'management', moduleKeys: ['contacts', 'companies', 'deals', 'activities'] },
+  { key: 'billing', moduleKeys: ['invoices', 'products'] },
+  { key: 'insights', moduleKeys: ['reports'] },
+  { key: 'system', moduleKeys: ['settings'] },
+]
+
+const GROUP_BY_MODULE = new Map(
+  MODULE_GROUPS.flatMap((group) => group.moduleKeys.map((key) => [key, group.key])),
+)
+
+export function moduleGroupKey(moduleKey: string): string {
+  return GROUP_BY_MODULE.get(moduleKey) ?? 'overview'
+}
+
+export function groupModules(modules: ReadonlyArray<SidebarModule>) {
+  return MODULE_GROUPS.map((group) => ({
+    key: group.key,
+    modules: modules.filter((m) => group.moduleKeys.includes(m.key)),
+  })).filter((group) => group.modules.length > 0)
+}
+
 export const DEFAULT_MODULES: ReadonlyArray<SidebarModule> = [
   {
     key: 'dashboard',
