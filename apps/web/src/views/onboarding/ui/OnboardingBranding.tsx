@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import { useTranslation } from 'react-i18next'
 
 import { MAP_GLOW_DARK, MAP_GLOW_LIGHT } from '@/shared/config/tokens/effects'
+import { StaticNoise } from '@/shared/ui/atoms/static-noise'
 
 const ColombiaMap = dynamic(() => import('./ColombiaMap').then((m) => m.ColombiaMap), {
   ssr: false,
@@ -23,6 +24,8 @@ export function OnboardingBranding() {
           background: isDark ? MAP_GLOW_DARK : MAP_GLOW_LIGHT,
         }}
       />
+
+      <StaticNoise opacity={0.05} className="z-0 hidden dark:block" />
 
       <ColombiaMap />
 

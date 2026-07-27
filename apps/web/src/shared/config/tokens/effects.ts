@@ -9,7 +9,7 @@ export const MAP_GLOW_LIGHT =
   'radial-gradient(circle closest-side, rgba(154,230,60,0.24) 0%, rgba(154,230,60,0.10) 42%, transparent 100%)'
 
 export const MAP_GLOW_DARK =
-  'radial-gradient(circle closest-side, rgba(190,242,100,0.12) 0%, rgba(190,242,100,0.06) 35%, rgba(190,242,100,0.02) 65%, transparent 95%)'
+  'radial-gradient(circle closest-side, rgba(163,230,53,0.11) 0%, rgba(163,230,53,0.055) 30%, rgba(163,230,53,0.02) 55%, transparent 80%)'
 
 export const ORB_GLOW_DARK =
   'radial-gradient(circle closest-side, rgba(190,242,100,0.14) 0%, rgba(190,242,100,0.08) 30%, rgba(190,242,100,0.04) 55%, rgba(190,242,100,0.015) 75%, transparent 95%)'
