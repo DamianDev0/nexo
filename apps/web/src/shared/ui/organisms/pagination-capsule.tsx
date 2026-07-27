@@ -52,7 +52,7 @@ function IconButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'inline-flex size-8 items-center justify-center rounded-md transition-colors duration-[120ms]',
+        'inline-flex size-8 items-center justify-center rounded-md transition-colors duration-120',
         disabled ? 'cursor-default text-disabled-fg' : 'cursor-pointer text-body hover:bg-muted',
       )}
     >
