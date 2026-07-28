@@ -129,7 +129,7 @@ function Progress({ value, label = 'Progress' }: Readonly<{ value: number; label
         {Array.from({ length: PROGRESS_SEGMENTS }, (_, i) => (
           <span
             key={`segment-${i + 1}`}
-            className={cn('h-3.5 w-1.5 rounded-[2px]', i < filled ? 'bg-primary' : 'bg-muted')}
+            className={cn('h-3.5 w-1.5 rounded-xs', i < filled ? 'bg-primary' : 'bg-muted')}
           />
         ))}
       </span>

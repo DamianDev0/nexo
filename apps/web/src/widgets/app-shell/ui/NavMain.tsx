@@ -35,9 +35,10 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
         </SidebarMenuButton>
       ) : (
         <SidebarMenuButton
-          disabled
-          tooltip={t('nav.comingSoon')}
-          className={`${BUTTON_CLASSES} cursor-default opacity-45`}
+          aria-disabled="true"
+          tabIndex={-1}
+          tooltip={`${title} — ${t('nav.comingSoon')}`}
+          className={`${BUTTON_CLASSES} cursor-default opacity-45 aria-disabled:pointer-events-auto hover:bg-transparent active:bg-transparent`}
         >
           <item.icon />
           <span>{title}</span>

@@ -43,4 +43,8 @@ export const NAV_CRM: ReadonlyArray<NavItem> = [
   navItem('settings', ROUTES.app.settings.general, Settings2),
 ]
 
+export function navItemForPath(pathname: string): NavItem | undefined {
+  return NAV_CRM.find((item) => pathname === item.url || pathname.startsWith(`${item.url}/`))
+}
+
 export const DEFAULT_TEAMS = [{ name: 'NexoCRM', logo: LayoutDashboard, plan: 'Free' }] as const

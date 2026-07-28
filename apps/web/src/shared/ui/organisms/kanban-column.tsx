@@ -41,8 +41,8 @@ export function KanbanColumn({
           cents={header.totalCents}
           variant="compact"
           className={cn(
-            '[&>span]:!text-[13px] [&>span]:!font-bold',
-            inverted ? 'text-primary [&>span]:!text-primary' : 'text-body',
+            '[&>span]:text-[13px]! [&>span]:font-bold!',
+            inverted ? 'text-primary [&>span]:text-primary!' : 'text-body',
           )}
         />
       </header>
