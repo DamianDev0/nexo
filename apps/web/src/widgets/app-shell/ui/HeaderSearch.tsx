@@ -25,9 +25,9 @@ export function HeaderSearch() {
     <>
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         onClick={() => setOpen(true)}
-        className="hidden h-8 w-64 justify-start gap-2 px-2.5 font-normal text-muted-foreground shadow-none md:flex lg:w-80"
+        className="hidden h-9 w-64 justify-start gap-2 px-2.5 font-normal text-muted-foreground hover:bg-muted/60 md:flex lg:w-80"
       >
         <Search className="size-3.5" />
         <span className="flex-1 text-left text-sm">{t('nav.search')}</span>

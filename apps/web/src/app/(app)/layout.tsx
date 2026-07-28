@@ -19,9 +19,8 @@ export default function AppLayout({ children }: Readonly<{ children: ReactNode }
             <SidebarTrigger className="-ml-1 md:hidden" />
             <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
             <HeaderTitle />
-            <div className="mx-6 hidden md:block">
-              <HeaderSearch />
-            </div>
+            <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
+            <HeaderSearch />
             <div className="flex-1" />
             <LanguageSwitcher />
             <ThemeToggle />
