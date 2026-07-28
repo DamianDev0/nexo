@@ -130,4 +130,13 @@ export default [
       'no-console': 'off',
     },
   },
+  {
+    files: ['src/shared/ui/{shadcn,smoothui,kokonutui,ruixen}/**'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      'react/no-array-index-key': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'unused-imports/no-unused-vars': 'off',
+    },
+  },
 ]
