@@ -298,6 +298,17 @@ const es = {
       emailBody: 'Las actividades se registran automáticamente en cada contacto.',
     },
   },
+  settings: {
+    title: 'Configuración',
+    subtitle: 'Preferencias de tu espacio — cambian para todo el equipo.',
+    saved: 'Cambios guardados',
+    sections: {
+      general: 'General',
+      appearance: 'Apariencia',
+      navigation: 'Navegación',
+      nomenclature: 'Nomenclatura',
+    },
+  },
   nav: {
     comingSoon: 'Próximamente',
     toggleSidebar: 'Colapsar sidebar',
@@ -322,17 +333,6 @@ const es = {
     settings: 'Configuración',
     messages: 'Mensajes',
     logout: 'Cerrar sesión',
-  },
-  settings: {
-    general: 'General',
-    branding: 'Marca',
-    pipelines: 'Pipelines',
-    users: 'Usuarios',
-    activityTypes: 'Tipos de actividad',
-    customFields: 'Campos personalizados',
-    navigation: 'Navegación',
-    theme: 'Tema',
-    nomenclature: 'Nomenclatura',
   },
   language: {
     switch: 'Cambiar idioma',

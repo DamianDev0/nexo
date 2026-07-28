@@ -5,13 +5,14 @@ import { LanguageSwitcher } from '@/features/switch-language'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
-import { AppSidebar, HeaderSearch, HeaderTitle } from '@/widgets/app-shell'
+import { AppSidebar, HeaderSearch, HeaderTitle, TenantThemeLoader } from '@/widgets/app-shell'
 
 import type { ReactNode } from 'react'
 
 export default function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <AuthGuard>
+      <TenantThemeLoader />
       <SidebarProvider style={{ '--sidebar-width': '15rem' } as React.CSSProperties}>
         <AppSidebar />
         <SidebarInset>

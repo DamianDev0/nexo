@@ -296,6 +296,17 @@ const en = {
       emailBody: 'Activities get logged automatically on every contact.',
     },
   },
+  settings: {
+    title: 'Settings',
+    subtitle: 'Workspace preferences — changes apply to your whole team.',
+    saved: 'Changes saved',
+    sections: {
+      general: 'General',
+      appearance: 'Appearance',
+      navigation: 'Navigation',
+      nomenclature: 'Nomenclature',
+    },
+  },
   nav: {
     comingSoon: 'Coming soon',
     toggleSidebar: 'Toggle sidebar',
@@ -320,17 +331,6 @@ const en = {
     settings: 'Settings',
     messages: 'Messages',
     logout: 'Log out',
-  },
-  settings: {
-    general: 'General',
-    branding: 'Branding',
-    pipelines: 'Pipelines',
-    users: 'Users',
-    activityTypes: 'Activity Types',
-    customFields: 'Custom Fields',
-    navigation: 'Navigation',
-    theme: 'Theme',
-    nomenclature: 'Nomenclature',
   },
   language: {
     switch: 'Change language',
