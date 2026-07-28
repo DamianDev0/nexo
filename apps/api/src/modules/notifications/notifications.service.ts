@@ -8,6 +8,7 @@ import type {
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { NotificationQueryDto, UpdatePreferencesDto } from './dto/notification.dto'
 import type { NotificationRow, PreferencesRow } from './interfaces/notification-row.interfaces'
+import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 
 @Injectable()
 export class NotificationsService {
@@ -20,7 +21,7 @@ export class NotificationsService {
   ): Promise<PaginatedNotifications> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedNotifications> => {
       const page = query.page ?? 1
-      const limit = query.limit ?? 25
+      const limit = query.limit ?? DEFAULT_PAGE_SIZE
       const offset = (page - 1) * limit
 
       const conditions: string[] = ['user_id = $1']

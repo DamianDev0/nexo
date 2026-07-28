@@ -24,7 +24,9 @@
     "EMAIL_FROM",
     "RUN_MIGRATIONS_ON_BOOT",
     "DB_SYNCHRONIZE",
-    "CI"
+    "CI",
+    "API_INTERNAL_URL",
+    "NEXT_PUBLIC_API_URL"
   ],
   "tasks": {
     "dev": {

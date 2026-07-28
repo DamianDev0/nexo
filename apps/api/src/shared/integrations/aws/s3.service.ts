@@ -9,6 +9,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Readable } from 'node:stream'
 import { v4 as uuidv4 } from 'uuid'
+import { slugify } from '@repo/shared-utils'
 import type { MulterFile, S3Category, UploadResult } from './s3.types'
 import { S3_CATEGORY_CONFIG } from './s3.types'
 
@@ -114,22 +115,11 @@ export class S3Service {
     const dotIdx = lower.lastIndexOf('.')
     const name = dotIdx >= 0 ? originalName.slice(0, dotIdx) : originalName
     const ext = dotIdx >= 0 ? lower.slice(dotIdx) : ''
-    return `${prefix}/${uuidv4()}-${this.normalize(name)}${ext}`
+    return `${prefix}/${uuidv4()}-${slugify(name)}${ext}`
   }
 
   private buildUrl(key: string): string {
     if (this.cdnUrl) return `${this.cdnUrl}/${key}`
     return `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`
-  }
-
-  private normalize(segment: string): string {
-    return segment
-      .toLowerCase()
-      .normalize('NFD')
-      .replaceAll(/[\u0300-\u036f]/g, '')
-      .replaceAll(/\s+/g, '-')
-      .replaceAll(/[^a-z0-9-]/g, '')
-      .replaceAll(/-+/g, '-')
-      .replaceAll(/^-|-$/g, '')
   }
 }

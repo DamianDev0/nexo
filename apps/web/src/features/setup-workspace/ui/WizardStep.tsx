@@ -24,14 +24,21 @@ interface WizardStepProps {
   readonly header: WizardStepHeader
   readonly nav: WizardStepNav
   readonly aside?: ReactNode
+  readonly asideProminent?: boolean
   readonly children: ReactNode
 }
 
-export function WizardStep({ header, nav, aside, children }: WizardStepProps) {
+export function WizardStep({
+  header,
+  nav,
+  aside,
+  asideProminent,
+  children,
+}: Readonly<WizardStepProps>) {
   const { t } = useTranslation()
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="px-8 pt-8 lg:px-12 lg:pt-10">
         <span className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
           {header.badge}
@@ -46,7 +53,14 @@ export function WizardStep({ header, nav, aside, children }: WizardStepProps) {
           aside ? 'flex flex-col gap-6 xl:flex-row xl:gap-8' : '',
         )}
       >
-        <div className={aside ? 'w-full xl:max-w-md' : 'max-w-2xl'}>{children}</div>
+        <div
+          className={cn(
+            aside ? 'w-full xl:max-w-md' : 'max-w-2xl',
+            asideProminent && 'xl:max-w-sm',
+          )}
+        >
+          {children}
+        </div>
         {aside && <div className="w-full xl:sticky xl:top-0 xl:flex-1">{aside}</div>}
       </div>
 

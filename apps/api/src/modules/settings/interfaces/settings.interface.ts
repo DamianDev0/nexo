@@ -1,61 +1,21 @@
+import type { GeneralSettings, OnboardingStatus } from '@repo/shared-types'
 import type { PipelineStagePreset } from '../constants/industry-presets'
 export type { TenantTheme } from './tenant-theme.interface'
 export type { TenantNomenclature } from './nomenclature.interface'
 export type { SidebarConfig } from './sidebar-config.interface'
 export type { CustomFieldsConfig, FieldPermissionsConfig } from './custom-field.interface'
 
-export interface SettingsAddress {
-  street?: string
-  city?: string
-  department?: string
-  zipCode?: string
-}
-
-export interface SettingsBusiness {
-  nit?: string
-  taxRegime?: string
-  address?: SettingsAddress
-  phone?: string
-  email?: string
-  website?: string
-}
-
-export interface SettingsI18n {
-  language?: string
-  timezone?: string
-  currency?: string
-  dateFormat?: string
-  numberFormat?: string
-}
-
-export interface SettingsBilling {
-  legalName?: string
-  municipalityCode?: string
-  fiscalResponsibilities?: string[]
-}
-
-export interface SettingsNomenclature {
-  contacts?: string
-  companies?: string
-  deals?: string
-}
-
-export interface SettingsIndustry {
-  sector?: string
-  nomenclature?: SettingsNomenclature
-  iconPack?: string
+export type SettingsBusiness = GeneralSettings['business']
+export type SettingsI18n = GeneralSettings['i18n']
+export type SettingsBilling = GeneralSettings['billing']
+export type SettingsIndustry = GeneralSettings['industry'] & {
   pipelinePreset?: PipelineStagePreset[]
 }
 
-export interface OnboardingConfig {
-  step: number
-  completed: boolean
-}
-
-export interface TenantConfig {
+export interface TenantSettingsRow {
   business?: SettingsBusiness
   i18n?: SettingsI18n
   billing?: SettingsBilling
   industry?: SettingsIndustry
-  onboarding?: OnboardingConfig
+  onboarding?: OnboardingStatus
 }

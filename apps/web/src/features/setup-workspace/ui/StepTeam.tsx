@@ -15,11 +15,9 @@ import {
 import { RolePermissionsMatrix } from './RolePermissionsMatrix'
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
-interface InviteRow {
-  readonly id: string
-  readonly email: string
-  readonly role: string
-}
+import type { InviteUserRequest, UserRole } from '@repo/shared-types'
+
+type InviteRow = Readonly<InviteUserRequest & { id: string }>
 
 interface TeamActions {
   readonly onAdd: () => void
@@ -33,7 +31,7 @@ interface StepTeamProps {
   readonly nav: WizardStepNav
 }
 
-export function StepTeam({ data, actions, nav }: StepTeamProps) {
+export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.team'
 
@@ -41,25 +39,29 @@ export function StepTeam({ data, actions, nav }: StepTeamProps) {
     <WizardStep
       header={{ badge: t(`${s}.badge`), title: t(`${s}.title`), description: t(`${s}.subtitle`) }}
       nav={{ ...nav, nextLabel: t(`${s}.finishSetup`), footerNote: t(`${s}.canInviteLater`) }}
+      aside={<RolePermissionsMatrix />}
     >
       <div className="flex flex-col gap-2">
         {data.map((inv) => (
           <div key={inv.id} className="flex items-center gap-2">
             <Input
-              className="h-9 flex-1 border-border text-sm"
+              className="h-9 flex-1 text-sm"
               type="email"
               placeholder="colleague@company.com"
               value={inv.email}
               onChange={(e) => actions.onUpdate(inv.id, { email: e.target.value })}
             />
-            <Select value={inv.role} onValueChange={(v) => actions.onUpdate(inv.id, { role: v })}>
+            <Select
+              value={inv.role}
+              onValueChange={(v) => actions.onUpdate(inv.id, { role: v as UserRole })}
+            >
               <SelectTrigger className="h-9 w-36 text-xs font-semibold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {INVITE_ROLE_OPTIONS.map((role) => (
                   <SelectItem key={role} value={role}>
-                    {USER_ROLE_LABELS[role]}
+                    {t(`${s}.roles.${role}`, { defaultValue: USER_ROLE_LABELS[role] })}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -83,13 +85,11 @@ export function StepTeam({ data, actions, nav }: StepTeamProps) {
         type="button"
         variant="outline"
         onClick={actions.onAdd}
-        className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary"
+        className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
       >
         <Plus className="size-3.5" />
         {t(`${s}.addMember`)}
       </Button>
-
-      <RolePermissionsMatrix />
     </WizardStep>
   )
 }

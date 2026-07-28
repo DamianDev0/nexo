@@ -1,8 +1,5 @@
 [
-  "src/features/setup-workspace/ui/StepPipeline.tsx :: <input",
+  "src/docs/ScaleTable.tsx :: <table",
   "src/features/setup-workspace/ui/WizardLayout.tsx :: <button",
-  "src/features/setup-workspace/ui/appearance/BrandColorSection.tsx :: <button",
-  "src/features/setup-workspace/ui/appearance/BrandColorSection.tsx :: <button",
-  "src/features/setup-workspace/ui/appearance/ThemeColorsSection.tsx :: <button",
-  "src/features/setup-workspace/ui/navigation/SortableModule.tsx :: <button"
+  "src/features/setup-workspace/ui/appearance/BrandColorSection.tsx :: <button"
 ]

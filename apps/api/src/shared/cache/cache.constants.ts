@@ -1,0 +1,2 @@
+export const CACHE_TTL_SHORT_SECONDS = 300
+export const CACHE_TTL_MEDIUM_SECONDS = 600

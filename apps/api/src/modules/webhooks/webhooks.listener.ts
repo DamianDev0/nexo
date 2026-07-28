@@ -7,6 +7,7 @@ interface CrmEvent {
   schemaName: string
   entityType: string
   entityId: string
+  _eventName?: WebhookEvent
   [key: string]: unknown
 }
 
@@ -21,10 +22,10 @@ export class WebhooksListener {
   @OnEvent('invoice.**')
   @OnEvent('payment.**')
   @OnEvent('product.**')
-  async handleEvent(event: CrmEvent & { _eventName?: string }): Promise<void> {
+  async handleEvent(event: CrmEvent): Promise<void> {
     if (!event.schemaName || !event._eventName) return
 
     const { schemaName, _eventName, ...payload } = event
-    await this.webhooksService.dispatch(schemaName, _eventName as WebhookEvent, payload)
+    await this.webhooksService.dispatch(schemaName, _eventName, payload)
   }
 }

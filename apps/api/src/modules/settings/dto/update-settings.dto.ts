@@ -11,7 +11,8 @@ import {
   IsIn,
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { SECTOR_KEYS } from '../constants/industry-presets'
+import { IndustrySector, TaxRegime } from '@repo/shared-types'
+import { CURRENCY_CODE } from '@repo/shared-utils'
 
 export class UpdateAddressDto {
   @ApiPropertyOptional() @IsOptional() @IsString() street?: string
@@ -29,12 +30,10 @@ export class UpdateBusinessDto {
   })
   nit?: string
 
-  @ApiPropertyOptional({
-    enum: ['responsible_iva', 'not_responsible', 'large_taxpayer', 'simple_regime'],
-  })
+  @ApiPropertyOptional({ enum: Object.values(TaxRegime) })
   @IsOptional()
-  @IsIn(['responsible_iva', 'not_responsible', 'large_taxpayer', 'simple_regime'])
-  taxRegime?: string
+  @IsIn(Object.values(TaxRegime))
+  taxRegime?: TaxRegime
 
   @ApiPropertyOptional({ type: UpdateAddressDto })
   @IsOptional()
@@ -58,7 +57,7 @@ export class UpdateI18nDto {
   @IsString()
   timezone?: string
 
-  @ApiPropertyOptional({ example: 'COP' })
+  @ApiPropertyOptional({ example: CURRENCY_CODE })
   @IsOptional()
   @IsString()
   @MaxLength(3)
@@ -87,10 +86,10 @@ export class UpdateBillingDto {
 }
 
 export class UpdateIndustryDto {
-  @ApiPropertyOptional({ enum: SECTOR_KEYS })
+  @ApiPropertyOptional({ enum: Object.values(IndustrySector) })
   @IsOptional()
-  @IsIn(SECTOR_KEYS)
-  sector?: string
+  @IsIn(Object.values(IndustrySector))
+  sector?: IndustrySector
 }
 
 export class UpdateSettingsDto {

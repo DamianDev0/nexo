@@ -15,25 +15,29 @@ export function BrandingFieldsSection({
   tagline,
   onProductNameChange,
   onTaglineChange,
-}: BrandingFieldsSectionProps) {
+}: Readonly<BrandingFieldsSectionProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.appearance'
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4 px-4 py-4">
       <div>
-        <Label className="text-xs text-muted-foreground">{t(`${s}.crmName`)}</Label>
+        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+          {t(`${s}.crmName`)}
+        </Label>
         <Input
-          className="mt-1.5 h-9 border-border text-sm"
+          className="mt-1.5 h-9 text-sm"
           placeholder="Nexo Acme Corp"
           value={productName}
           onChange={(e) => onProductNameChange(e.target.value)}
         />
       </div>
       <div>
-        <Label className="text-xs text-muted-foreground">{t(`${s}.loginTagline`)}</Label>
+        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+          {t(`${s}.loginTagline`)}
+        </Label>
         <Input
-          className="mt-1.5 h-9 border-border text-sm"
+          className="mt-1.5 h-9 text-sm"
           placeholder="Build. Grow. Scale."
           value={tagline}
           onChange={(e) => onTaglineChange(e.target.value)}

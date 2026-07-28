@@ -30,6 +30,7 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 - Zero raw `<button>/<input>/<select>/<table>/<textarea>` outside `shared/ui` (`scripts/check-html-primitives.mjs`).
 - Baselines regenerate with `node scripts/check-X.mjs --update` — only when legacy shrinks, never to add debt.
 - Zero comments in code. Names and types carry meaning. Only functional pragmas allowed.
+- No arbitrary px values where a canonical class exists: Tailwind v4 spacing is dynamic, so `h-[38px]` is `h-9.5` (n = px/4); radii use tokens (`rounded-sm/md/lg/xl` = 6/12/18/24). Arbitrary stays only for font sizes from the type scale, em tracking, deg rotation and fractional borders.
 - Zero `any`, `Readonly<Props>`, no index-as-key, no nested component definitions, `??` over `||`.
 - All user-facing strings via i18next (`shared/i18n/locales/{es,en}.ts` — keep both in sync).
 
@@ -56,7 +57,8 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 
 ## Testing
 
-- `pnpm test` — Vitest + Testing Library (jsdom). MSW mocks the NestJS API at network level (`src/test/msw/`).
+- `pnpm test` — Vitest + Testing Library (jsdom). MSW mocks the NestJS API at network level (`tests/msw/`).
+- Tests NEVER live in `src/` — they go in `tests/` mirroring the `src` structure, importing via `@/` aliases.
 - `pnpm test:e2e` — Playwright against `pnpm dev` on :3001 (requires `npx playwright install chromium` once).
 - New logic ships with tests (TDD preferred: red → green).
 
@@ -68,5 +70,5 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 ## Pending (do NOT regress)
 
 - Phase 3/4: entities + Server Actions + kill axios — happens per-feature when real domain pages (contacts, deals, invoices) get built. New mutations should prefer Server Actions with zod + `revalidateTag`.
-- i18n is client-only; `<html lang>` is fixed `es`. SSR i18n pending.
+- i18n is SSR-aware: locale = `NEXT_LOCALE` cookie > `Accept-Language` > `es`; `<html lang>` dynamic; server strings via `getT()` (`shared/i18n/server.ts`); client i18next syncs through the same cookie; switching lives in `features/switch-language`.
 - Remaining baseline debt: 10 files >200 lines, 11 raw primitives (wizard tiles), 3 color entries (dynamic hsla + vendor var()).

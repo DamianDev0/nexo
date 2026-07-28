@@ -1,6 +1,7 @@
+import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateActivityDto } from '../dto/activity.dto'
 
-export const UPDATABLE_FIELDS: [keyof UpdateActivityDto, string][] = [
+export const UPDATABLE_FIELDS: FieldMap<UpdateActivityDto> = [
   ['activityType', 'activity_type'],
   ['title', 'title'],
   ['description', 'description'],

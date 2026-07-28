@@ -11,7 +11,12 @@ interface FilePreviewProps {
   readonly className?: string
 }
 
-export function FilePreview({ preview, fileName, onRemove, className }: FilePreviewProps) {
+export function FilePreview({
+  preview,
+  fileName,
+  onRemove,
+  className,
+}: Readonly<FilePreviewProps>) {
   return (
     <div
       className={cn('mt-2 flex items-center gap-3 rounded-lg border border-border p-3', className)}

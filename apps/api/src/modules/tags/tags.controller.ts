@@ -17,6 +17,7 @@ import type { Tag, TenantContext } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TagsService } from './tags.service'
+import { CreateTagDto, TagQueryDto, UpdateTagDto } from './dto/tag.dto'
 
 @SwaggerTags('Tags')
 @Controller('tags')
@@ -26,20 +27,14 @@ export class TagsController {
   @Get()
   @Auth(UserRole.VIEWER)
   @ApiOperation({ summary: 'List all tags, optionally filtered by entity type' })
-  findAll(
-    @TenantCtx() ctx: TenantContext,
-    @Query('entityType') entityType?: string,
-  ): Promise<Tag[]> {
-    return this.tagsService.findAll(ctx.schemaName, entityType)
+  findAll(@TenantCtx() ctx: TenantContext, @Query() query: TagQueryDto): Promise<Tag[]> {
+    return this.tagsService.findAll(ctx.schemaName, query.entityType)
   }
 
   @Post()
   @Auth(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a tag for an entity type' })
-  create(
-    @Body() dto: { name: string; color?: string; entityType: string },
-    @TenantCtx() ctx: TenantContext,
-  ): Promise<Tag> {
+  create(@Body() dto: CreateTagDto, @TenantCtx() ctx: TenantContext): Promise<Tag> {
     return this.tagsService.create(ctx.schemaName, dto)
   }
 
@@ -48,7 +43,7 @@ export class TagsController {
   @ApiOperation({ summary: 'Update tag name or color' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: { name?: string; color?: string },
+    @Body() dto: UpdateTagDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<Tag> {
     return this.tagsService.update(ctx.schemaName, id, dto)

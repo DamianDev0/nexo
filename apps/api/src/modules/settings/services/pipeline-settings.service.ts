@@ -5,8 +5,7 @@ import { CacheService } from '@/shared/cache/cache.service'
 import type { Pipeline, PipelineStage, KanbanBoard, KanbanStageSummary } from '@repo/shared-types'
 import type { CreatePipelineDto, UpdatePipelineDto, ReorderStagesDto } from '../dto/pipeline.dto'
 import type { PipelineRow, StageRow, KanbanStageRow } from '../interfaces/pipeline.interface'
-
-const PIPELINE_TTL = 300
+import { CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
 
 @Injectable()
 export class PipelineSettingsService {
@@ -48,7 +47,7 @@ export class PipelineSettingsService {
       })
     })
 
-    await this.cache.set(cacheKey, result, PIPELINE_TTL)
+    await this.cache.set(cacheKey, result, CACHE_TTL_SHORT_SECONDS)
     return result
   }
 
@@ -63,7 +62,7 @@ export class PipelineSettingsService {
       return this.buildPipeline(pipeline, stages)
     })
 
-    await this.cache.set(cacheKey, result, PIPELINE_TTL)
+    await this.cache.set(cacheKey, result, CACHE_TTL_SHORT_SECONDS)
     return result
   }
 

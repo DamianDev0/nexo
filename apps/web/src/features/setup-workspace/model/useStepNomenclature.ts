@@ -1,79 +1,70 @@
-import { useState, useCallback } from 'react'
+import { t } from 'i18next'
+import { useCallback } from 'react'
+import { useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { QUERY_KEYS } from '@/shared/config/query-keys'
 
+import { saveNomenclatureAction } from '../api/setup-steps.actions'
+
+import {
+  buildDefaultNomenclature,
+  isSeedNomenclature,
+  NOMENCLATURE_PRESETS,
+} from './nomenclature.constants'
+import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
-interface EntityLabels {
-  singular: string
-  plural: string
-}
-
-interface NomenclatureState {
-  contact: EntityLabels
-  company: EntityLabels
-  deal: EntityLabels
-  activity: EntityLabels
-}
-
-const DEFAULT_NOMENCLATURE: NomenclatureState = {
-  contact: { singular: 'Contact', plural: 'Contacts' },
-  company: { singular: 'Company', plural: 'Companies' },
-  deal: { singular: 'Deal', plural: 'Deals' },
-  activity: { singular: 'Activity', plural: 'Activities' },
-}
-
-export type { NomenclatureState }
-
-export const NOMENCLATURE_PRESETS: Record<string, { label: string; values: NomenclatureState }> = {
-  b2b: {
-    label: '🏢 B2B (Accounts / Opportunities)',
-    values: {
-      contact: { singular: 'Lead', plural: 'Leads' },
-      company: { singular: 'Account', plural: 'Accounts' },
-      deal: { singular: 'Opportunity', plural: 'Opportunities' },
-      activity: { singular: 'Activity', plural: 'Activities' },
-    },
-  },
-  realestate: {
-    label: '🏠 Real Estate (Owners / Properties)',
-    values: {
-      contact: { singular: 'Owner', plural: 'Owners' },
-      company: { singular: 'Property', plural: 'Properties' },
-      deal: { singular: 'Listing', plural: 'Listings' },
-      activity: { singular: 'Showing', plural: 'Showings' },
-    },
-  },
-  saas: {
-    label: '💡 SaaS (Leads / Deals)',
-    values: {
-      contact: { singular: 'Lead', plural: 'Leads' },
-      company: { singular: 'Company', plural: 'Companies' },
-      deal: { singular: 'Deal', plural: 'Deals' },
-      activity: { singular: 'Task', plural: 'Tasks' },
-    },
-  },
-}
+import type { NomenclatureState } from './nomenclature.constants'
+import type { NomenclatureConfig } from '@repo/shared-types'
 
 export function useStepNomenclature(onNext: () => void) {
-  const [nomen, setNomen] = useState(DEFAULT_NOMENCLATURE)
+  const { watch, setValue, getValues, reset } = useForm<NomenclatureState>({
+    defaultValues: buildDefaultNomenclature(t),
+  })
+  const nomen = watch()
 
-  const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => settingsService.updateNomenclature(nomen),
-    onNext,
+  useStepHydration({
+    queryKey: QUERY_KEYS.settings.nomenclature,
+    queryFn: settingsService.getNomenclature,
+    hydrate: useCallback(
+      (config: NomenclatureConfig) => {
+        const localized = buildDefaultNomenclature(t)
+        const incoming = {
+          contact: config.contact ?? localized.contact,
+          company: config.company ?? localized.company,
+          deal: config.deal ?? localized.deal,
+          activity: config.activity ?? localized.activity,
+        }
+        reset(isSeedNomenclature(incoming) ? localized : incoming)
+      },
+      [reset],
+    ),
   })
 
   const handleUpdate = useCallback(
     (entity: keyof NomenclatureState, field: 'singular' | 'plural', value: string) => {
-      setNomen((prev) => ({ ...prev, [entity]: { ...prev[entity], [field]: value } }))
+      setValue(`${entity}.${field}`, value)
     },
-    [],
+    [setValue],
   )
 
-  const handlePreset = useCallback((presetKey: string) => {
-    const preset = NOMENCLATURE_PRESETS[presetKey]
-    if (preset) setNomen(preset.values)
-  }, [])
+  const handlePreset = useCallback(
+    (presetKey: string) => {
+      const preset = NOMENCLATURE_PRESETS[presetKey]
+      if (preset) reset(preset.values)
+    },
+    [reset],
+  )
+
+  const { handleSave, isPending } = useStepMutation({
+    mutationFn: async () => {
+      const result = await saveNomenclatureAction(getValues())
+      if (!result.ok) throw new Error(result.error)
+      return result.data
+    },
+    onNext,
+  })
 
   return { nomen, handleUpdate, handlePreset, handleSave, isPending }
 }

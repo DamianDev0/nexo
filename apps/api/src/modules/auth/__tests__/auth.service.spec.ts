@@ -7,7 +7,7 @@ import {
 import { Test } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { getLoggerToken } from 'nestjs-pino'
-import { UserRole } from '@repo/shared-types'
+import { PlanName, UserRole } from '@repo/shared-types'
 import type { TenantContext } from '@repo/shared-types'
 
 import { AuthService } from '../services/auth.service'
@@ -40,7 +40,7 @@ const mockTenantCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
   schemaName: SCHEMA,
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,
@@ -63,7 +63,7 @@ const mockTenantResponse = {
   slug: 'acme',
   name: 'Acme Corp',
   schemaName: SCHEMA,
-  plan: 'free',
+  plan: PlanName.FREE,
 }
 
 const mockMeta: RequestMeta = { ip: '127.0.0.1', userAgent: 'jest' }

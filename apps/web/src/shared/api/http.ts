@@ -2,9 +2,20 @@ import axios from 'axios'
 
 import { tenantRef } from './tenant-ref'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1'
+import type { AxiosRequestConfig } from 'axios'
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '/api/v1'
 
 const isBrowser = typeof globalThis !== 'undefined' && 'location' in globalThis
+
+const PUBLIC_AUTH_URLS = [
+  '/auth/login',
+  '/auth/refresh',
+  '/auth/logout',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/auth/resolve-tenant',
+]
 
 const apiUrl = axios.create({
   baseURL: API_BASE,
@@ -21,20 +32,52 @@ apiUrl.interceptors.request.use((config) => {
   return config
 })
 
+let refreshPromise: Promise<void> | null = null
+
+function refreshSession(): Promise<void> {
+  refreshPromise ??= apiUrl
+    .post('/auth/refresh')
+    .then(() => undefined)
+    .finally(() => {
+      refreshPromise = null
+    })
+  return refreshPromise
+}
+
+function redirectToLogin(): void {
+  const path = globalThis.location.pathname
+  const isAuthRoute = path.includes('/login') || path.includes('/onboarding')
+  if (!isAuthRoute) {
+    globalThis.location.href = '/login'
+  }
+}
+
+type RetriableConfig = AxiosRequestConfig & { _retry?: boolean }
+
+function canAttemptRefresh(config: RetriableConfig | undefined): config is RetriableConfig {
+  if (!config?.url || config._retry) return false
+  return !PUBLIC_AUTH_URLS.some((url) => config.url?.includes(url))
+}
+
 apiUrl.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (!axios.isAxiosError(error)) return Promise.reject(error)
+    if (error.response?.status !== 401 || !isBrowser) return Promise.reject(error)
 
-    if (error.response?.status === 401 && isBrowser) {
-      const path = globalThis.location.pathname
-      const isAuthRoute = path.includes('/login') || path.includes('/onboarding')
-
-      if (!isAuthRoute) {
-        globalThis.location.href = '/login'
+    const config = error.config as RetriableConfig | undefined
+    if (canAttemptRefresh(config)) {
+      try {
+        await refreshSession()
+        config._retry = true
+        return await apiUrl.request(config)
+      } catch {
+        redirectToLogin()
+        return Promise.reject(error)
       }
     }
 
+    redirectToLogin()
     return Promise.reject(error)
   },
 )

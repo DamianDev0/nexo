@@ -2,13 +2,13 @@ import { BadRequestException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { NavigationController } from '../controllers/navigation.controller'
 import { TenantConfigService } from '../services/tenant-config.service'
-import type { TenantContext, SidebarConfig } from '@repo/shared-types'
+import { PlanName, type SidebarConfig, type TenantContext } from '@repo/shared-types'
 
 const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
   schemaName: 'tenant_acme',
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

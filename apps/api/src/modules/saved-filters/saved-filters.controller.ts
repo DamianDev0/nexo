@@ -18,6 +18,11 @@ import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { SavedFiltersService } from './saved-filters.service'
+import {
+  CreateSavedFilterDto,
+  SavedFilterQueryDto,
+  UpdateSavedFilterDto,
+} from './dto/saved-filter.dto'
 
 @ApiTags('Saved Filters')
 @Controller('saved-filters')
@@ -30,22 +35,16 @@ export class SavedFiltersController {
   findAll(
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
-    @Query('entityType') entityType?: string,
+    @Query() query: SavedFilterQueryDto,
   ): Promise<SavedFilter[]> {
-    return this.service.findAll(ctx.schemaName, user.id, entityType)
+    return this.service.findAll(ctx.schemaName, user.id, query.entityType)
   }
 
   @Post()
   @Auth(UserRole.VIEWER)
   @ApiOperation({ summary: 'Save a filter view' })
   create(
-    @Body()
-    dto: {
-      entityType: string
-      name: string
-      filters: Record<string, unknown>
-      isDefault?: boolean
-    },
+    @Body() dto: CreateSavedFilterDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<SavedFilter> {
@@ -57,7 +56,7 @@ export class SavedFiltersController {
   @ApiOperation({ summary: 'Update a saved filter' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: Partial<{ name: string; filters: Record<string, unknown>; isDefault: boolean }>,
+    @Body() dto: UpdateSavedFilterDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<SavedFilter> {

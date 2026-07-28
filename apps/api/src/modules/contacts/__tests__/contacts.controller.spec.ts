@@ -2,7 +2,13 @@ import { Test } from '@nestjs/testing'
 import { ContactsController } from '../contacts.controller'
 import { ContactsService } from '../contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { ContactStatus, ContactSource, LifecycleStage, UserRole } from '@repo/shared-types'
+import {
+  ContactSource,
+  ContactStatus,
+  LifecycleStage,
+  PlanName,
+  UserRole,
+} from '@repo/shared-types'
 import type {
   TenantContext,
   AuthenticatedUser,
@@ -14,7 +20,7 @@ const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
   schemaName: 'tenant_acme',
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

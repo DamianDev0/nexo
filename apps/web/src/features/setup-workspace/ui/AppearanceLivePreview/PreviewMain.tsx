@@ -1,16 +1,21 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
 import { PREVIEW_ROW_OVERLAY } from '@/shared/config/tokens/effects'
 
-import { KPI_DATA, TABLE_ROWS, statusStyle } from './preview.constants'
+import { KPI_DATA, previewForegrounds, statusStyle, TABLE_ROWS } from './preview.constants'
 
 import type { ThemeColors } from '@repo/shared-types'
 
 interface PreviewMainProps {
   readonly colors: ThemeColors
   readonly radius: string
+  readonly surfaceRadius: string
   readonly gap: string
 }
 
-export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
+export function PreviewMain({ colors, radius, surfaceRadius, gap }: Readonly<PreviewMainProps>) {
+  const fg = previewForegrounds(colors)
+
   return (
     <div
       className="flex flex-1 flex-col overflow-hidden p-3"
@@ -18,12 +23,10 @@ export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
     >
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-xs font-bold" style={{ color: colors.sidebarForeground }}>
+          <div className="text-xs font-bold" style={{ color: fg.main }}>
             Dashboard
           </div>
-          <div style={{ fontSize: '10px', color: `${colors.sidebarForeground}60` }}>
-            Welcome back
-          </div>
+          <div style={{ fontSize: '10px', color: `${fg.main}60` }}>Welcome back</div>
         </div>
         <div
           className="px-2 py-1 text-xs font-medium"
@@ -44,18 +47,13 @@ export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
             key={kpi.label}
             className="p-2"
             style={{
-              borderRadius: radius,
+              borderRadius: surfaceRadius,
               background: colors.accent,
               border: `1px solid ${colors.primary}12`,
             }}
           >
-            <div style={{ fontSize: '9px', color: `${colors.sidebarForeground}70` }}>
-              {kpi.label}
-            </div>
-            <div
-              className="mt-0.5 font-bold"
-              style={{ fontSize: '12px', color: colors.sidebarForeground }}
-            >
+            <div style={{ fontSize: '9px', color: `${fg.card}70` }}>{kpi.label}</div>
+            <div className="mt-0.5 font-bold" style={{ fontSize: '12px', color: fg.card }}>
               {kpi.value}
             </div>
             <div className="mt-0.5 font-medium" style={{ fontSize: '9px', color: colors.primary }}>
@@ -66,15 +64,15 @@ export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
       </div>
 
       <div
-        className="flex-1 overflow-hidden"
-        style={{ borderRadius: radius, border: `1px solid ${colors.primary}10` }}
+        className="flex flex-1 flex-col overflow-hidden"
+        style={{ borderRadius: surfaceRadius, border: `1px solid ${colors.primary}10` }}
       >
         <div
           className="flex px-2.5 py-1.5"
           style={{
             fontSize: '9px',
             fontWeight: 600,
-            color: `${colors.sidebarForeground}60`,
+            color: `${fg.card}60`,
             background: colors.accent,
             borderBottom: `1px solid ${colors.primary}10`,
             letterSpacing: '0.03em',
@@ -96,7 +94,7 @@ export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
               background: PREVIEW_ROW_OVERLAY,
             }}
           >
-            <span className="w-2/5 font-medium" style={{ color: colors.sidebarForeground }}>
+            <span className="w-2/5 font-medium" style={{ color: fg.main }}>
               {row.name}
             </span>
             <span className="w-1/5">
@@ -112,7 +110,7 @@ export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
                 {row.status}
               </span>
             </span>
-            <span className="w-1/5 text-right" style={{ color: `${colors.sidebarForeground}80` }}>
+            <span className="w-1/5 text-right" style={{ color: `${fg.main}80` }}>
               {row.value}
             </span>
             <span className="w-1/5 text-right">
@@ -128,6 +126,32 @@ export function PreviewMain({ colors, radius, gap }: PreviewMainProps) {
             </span>
           </div>
         ))}
+        <div
+          className="mt-auto flex items-center justify-between px-2.5 py-1.5"
+          style={{
+            background: colors.accent,
+            borderTop: `1px solid ${colors.primary}10`,
+            fontSize: '9px',
+          }}
+        >
+          <span style={{ color: `${fg.card}60` }}>1–4 of 86</span>
+          <div className="flex items-center gap-1.5">
+            <ChevronLeft className="size-2.5" style={{ color: `${fg.card}50` }} />
+            <span className="flex items-center gap-0.5">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span
+                  key={`seg-${String(i)}`}
+                  className="h-2 w-1 rounded-[1px]"
+                  style={{ background: i < 2 ? colors.primary : `${fg.card}15` }}
+                />
+              ))}
+            </span>
+            <span className="font-bold tabular-nums" style={{ color: colors.primary }}>
+              1
+            </span>
+            <ChevronRight className="size-2.5" style={{ color: fg.card }} />
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -1,0 +1,14 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+import { MOTION_SCALE } from '../shared/config/tokens/design-scale'
+import { ScaleTable } from './ScaleTable'
+
+<Meta title="Foundations/Motion" />
+
+# Motion
+
+Motion explains where something came from. Never decorative, never longer
+than 320ms, no bounce on UI elements. The Ink badge spinner runs at 900ms
+linear. Everything collapses to opacity-only under `prefers-reduced-motion`.
+
+<ScaleTable rows={MOTION_SCALE} />

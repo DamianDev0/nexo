@@ -1,20 +1,22 @@
 import * as d3 from 'd3'
 
+import { drawCityNode } from './city-node'
 import {
   BOGOTA_COORDS,
   CITIES,
-  CITY_NODE,
   CORNER_MARK,
   DEPARTMENT_STROKE_WIDTH,
   PIPELINE_LINE,
   PROJECTION_PADDING,
 } from './constants'
 
-import type { City, MapColors } from './constants'
+import type { CityInteraction } from './city-node'
+import type { MapColors } from './constants'
 import type { FeatureCollection, Geometry } from 'geojson'
 
+export type { CityInteraction }
+
 type SvgSelection = d3.Selection<SVGSVGElement, unknown, null, undefined>
-type GroupSelection = d3.Selection<SVGGElement, unknown, null, undefined>
 
 export function drawCornerMarks(svg: SvgSelection, width: number, accent: string) {
   const { inset, length, opacity, strokeWidth } = CORNER_MARK
@@ -74,68 +76,18 @@ function drawPipelineLines(svg: SvgSelection, projection: d3.GeoProjection, colo
   }
 }
 
-function drawCityNode(g: GroupSelection, city: City, px: number, py: number, colors: MapColors) {
-  const strokeWidth = city.primary ? CITY_NODE.primaryStrokeWidth : CITY_NODE.secondaryStrokeWidth
-  const dotOpacity = city.primary ? CITY_NODE.primaryDotOpacity : CITY_NODE.secondaryDotOpacity
-
-  if (city.primary) {
-    g.append('circle')
-      .attr('cx', px)
-      .attr('cy', py)
-      .attr('r', city.r + CITY_NODE.haloOffset)
-      .attr('fill', 'none')
-      .attr('stroke', colors.accent)
-      .attr('stroke-width', CITY_NODE.haloStrokeWidth)
-      .attr('opacity', CITY_NODE.haloOpacity)
-  }
-
-  g.append('circle')
-    .attr('cx', px)
-    .attr('cy', py)
-    .attr('r', city.r)
-    .attr('fill', colors.node)
-    .attr('stroke', colors.accent)
-    .attr('stroke-width', strokeWidth)
-
-  g.append('circle')
-    .attr('cx', px)
-    .attr('cy', py)
-    .attr('r', city.r * CITY_NODE.dotRatio)
-    .attr('fill', colors.accent)
-    .attr('opacity', dotOpacity)
-
-  const isLeft = city.labelSide === 'left'
-  const anchor = isLeft ? 'end' : 'start'
-  const lx = isLeft ? px - city.r - CITY_NODE.labelGap : px + city.r + CITY_NODE.labelGap
-  const nameOpacity = city.primary ? CITY_NODE.primaryNameOpacity : CITY_NODE.secondaryNameOpacity
-
-  g.append('text')
-    .attr('x', lx)
-    .attr('y', py - 1)
-    .attr('text-anchor', anchor)
-    .attr('font-size', city.primary ? CITY_NODE.primaryFontSize : CITY_NODE.secondaryFontSize)
-    .attr('fill', colors.label)
-    .attr('opacity', nameOpacity)
-    .attr('letter-spacing', CITY_NODE.nameLetterSpacing)
-    .text(city.name)
-
-  g.append('text')
-    .attr('x', lx)
-    .attr('y', py + 9)
-    .attr('text-anchor', anchor)
-    .attr('font-size', CITY_NODE.statFontSize)
-    .attr('fill', colors.label)
-    .attr('opacity', CITY_NODE.statOpacity)
-    .attr('letter-spacing', CITY_NODE.statLetterSpacing)
-    .text(city.stat)
-}
-
-function drawCities(svg: SvgSelection, projection: d3.GeoProjection, colors: MapColors) {
+function drawCities(
+  svg: SvgSelection,
+  projection: d3.GeoProjection,
+  colors: MapColors,
+  interaction: CityInteraction,
+) {
   const cityG = svg.append('g')
   for (const c of CITIES) {
     const pt = projection([...c.coords])
     if (!pt) continue
-    drawCityNode(cityG.append('g'), c, pt[0], pt[1], colors)
+    const g = cityG.append('g').attr('class', 'city-node').style('transition', 'opacity 0.2s')
+    drawCityNode(g, c, pt[0], pt[1], colors, interaction)
   }
 }
 
@@ -145,6 +97,7 @@ export function drawMap(
   width: number,
   height: number,
   colors: MapColors,
+  interaction: CityInteraction,
 ) {
   const projection = d3.geoMercator().fitExtent(
     [
@@ -157,5 +110,5 @@ export function drawMap(
 
   drawDepartments(svg, geo, path, colors)
   drawPipelineLines(svg, projection, colors)
-  drawCities(svg, projection, colors)
+  drawCities(svg, projection, colors, interaction)
 }

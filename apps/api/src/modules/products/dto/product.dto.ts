@@ -1,5 +1,8 @@
 import { PartialType } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
+import type { DuplicateStrategy, MovementType, ProductType } from '@repo/shared-types'
+import { MAX_PAGE_SIZE } from '@repo/shared-utils'
+import { DUPLICATE_STRATEGIES, MOVEMENT_TYPES, PRODUCT_TYPES } from '../constants/product.constants'
 import {
   IsArray,
   IsIn,
@@ -62,8 +65,8 @@ export class CreateProductDto {
   ivaRate?: number
 
   @IsOptional()
-  @IsIn(['product', 'service'])
-  productType?: string
+  @IsIn(PRODUCT_TYPES)
+  productType?: ProductType
 
   @IsOptional()
   @IsString()
@@ -117,8 +120,8 @@ export class ProductQueryDto {
   brand?: string
 
   @IsOptional()
-  @IsIn(['product', 'service'])
-  productType?: string
+  @IsIn(PRODUCT_TYPES)
+  productType?: ProductType
 
   @IsOptional()
   @IsArray()
@@ -139,7 +142,7 @@ export class ProductQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(MAX_PAGE_SIZE)
   limit?: number
 }
 
@@ -152,8 +155,8 @@ export class ExecuteImportDto {
   mapping?: Record<string, string | null>
 
   @IsOptional()
-  @IsIn(['skip', 'create', 'update'])
-  duplicateStrategy?: string
+  @IsIn(DUPLICATE_STRATEGIES)
+  duplicateStrategy?: DuplicateStrategy
 }
 
 export class BulkPriceUpdateDto {
@@ -179,8 +182,8 @@ export class InventoryAdjustmentDto {
   @Type(() => Number)
   quantity: number
 
-  @IsIn(['purchase', 'sale', 'adjustment', 'return', 'transfer'])
-  movementType: string
+  @IsIn(MOVEMENT_TYPES)
+  movementType: MovementType
 
   @IsOptional()
   @IsString()

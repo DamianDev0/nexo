@@ -1,0 +1,29 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+import { TokenSwatches } from './TokenSwatches'
+
+<Meta title="Foundations/Color" />
+
+# Color
+
+One accent, two surfaces, three states. Lime is the action colour and nothing
+else — status lives in its own family so a green badge never competes with the
+button. Every swatch below reads the live CSS variable, so a token added in
+`globals.css` and registered in `theme-contract.ts` appears here without
+editing this page.
+
+## Do
+
+- Keep two surfaces: sage canvas, white cards. Elevation is contrast.
+- Spend lime once per view, on the action that advances a deal.
+- Put ink text on lime, always.
+- Check every grey against the contrast rule before shipping it.
+
+## Don't
+
+- Don't use lime as a success colour, or add a second brand accent.
+- Don't put a border or a shadow on a resting card.
+- Don't use faint or disabled-fg for readable text.
+- Don't hardcode a hex in apps/web — `scripts/check-colors.mjs` fails the build.
+
+<TokenSwatches />

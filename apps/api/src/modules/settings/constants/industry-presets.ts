@@ -1,3 +1,5 @@
+import { IndustrySector } from '@repo/shared-types'
+
 export interface PipelineStagePreset {
   name: string
   order: number
@@ -6,7 +8,7 @@ export interface PipelineStagePreset {
 }
 
 export interface IndustryPreset {
-  sector: string
+  sector: IndustrySector
   nomenclature: {
     contacts: string
     companies: string
@@ -16,9 +18,9 @@ export interface IndustryPreset {
   pipelineStages: PipelineStagePreset[]
 }
 
-export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
+export const INDUSTRY_PRESETS: Record<IndustrySector, IndustryPreset> = {
   salud: {
-    sector: 'salud',
+    sector: IndustrySector.SALUD,
     nomenclature: { contacts: 'Pacientes', companies: 'Clínicas', deals: 'Citas' },
     iconPack: 'health',
     pipelineStages: [
@@ -30,7 +32,7 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
     ],
   },
   educacion: {
-    sector: 'educacion',
+    sector: IndustrySector.EDUCACION,
     nomenclature: { contacts: 'Alumnos', companies: 'Instituciones', deals: 'Matrículas' },
     iconPack: 'education',
     pipelineStages: [
@@ -42,7 +44,7 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
     ],
   },
   inmobiliaria: {
-    sector: 'inmobiliaria',
+    sector: IndustrySector.INMOBILIARIA,
     nomenclature: { contacts: 'Clientes', companies: 'Inmobiliarias', deals: 'Propiedades' },
     iconPack: 'real_estate',
     pipelineStages: [
@@ -55,7 +57,7 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
     ],
   },
   comercio: {
-    sector: 'comercio',
+    sector: IndustrySector.COMERCIO,
     nomenclature: { contacts: 'Clientes', companies: 'Empresas', deals: 'Negocios' },
     iconPack: 'commerce',
     pipelineStages: [
@@ -67,7 +69,7 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
     ],
   },
   servicios: {
-    sector: 'servicios',
+    sector: IndustrySector.SERVICIOS,
     nomenclature: { contacts: 'Clientes', companies: 'Empresas', deals: 'Proyectos' },
     iconPack: 'services',
     pipelineStages: [
@@ -80,7 +82,7 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
     ],
   },
   restaurante: {
-    sector: 'restaurante',
+    sector: IndustrySector.RESTAURANTE,
     nomenclature: { contacts: 'Clientes', companies: 'Proveedores', deals: 'Reservas' },
     iconPack: 'restaurant',
     pipelineStages: [
@@ -90,7 +92,7 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
     ],
   },
   tecnologia: {
-    sector: 'tecnologia',
+    sector: IndustrySector.TECNOLOGIA,
     nomenclature: { contacts: 'Leads', companies: 'Empresas', deals: 'Oportunidades' },
     iconPack: 'tech',
     pipelineStages: [
@@ -103,7 +105,7 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
     ],
   },
   construccion: {
-    sector: 'construccion',
+    sector: IndustrySector.CONSTRUCCION,
     nomenclature: { contacts: 'Clientes', companies: 'Contratistas', deals: 'Obras' },
     iconPack: 'construction',
     pipelineStages: [
@@ -115,6 +117,18 @@ export const INDUSTRY_PRESETS: Record<string, IndustryPreset> = {
       { name: 'Entregado', order: 6, color: '#059669', probability: 100 },
     ],
   },
+  otros: {
+    sector: IndustrySector.OTROS,
+    nomenclature: { contacts: 'Clientes', companies: 'Empresas', deals: 'Negocios' },
+    iconPack: 'commerce',
+    pipelineStages: [
+      { name: 'Prospecto', order: 1, color: '#6366f1', probability: 10 },
+      { name: 'Contactado', order: 2, color: '#8b5cf6', probability: 25 },
+      { name: 'Propuesta enviada', order: 3, color: '#f59e0b', probability: 50 },
+      { name: 'Negociación', order: 4, color: '#f97316', probability: 75 },
+      { name: 'Cerrado ganado', order: 5, color: '#059669', probability: 100 },
+    ],
+  },
 }
 
-export const SECTOR_KEYS = Object.keys(INDUSTRY_PRESETS) as Array<keyof typeof INDUSTRY_PRESETS>
+export const SECTOR_KEYS = Object.values(IndustrySector)

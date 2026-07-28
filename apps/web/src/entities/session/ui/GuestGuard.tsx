@@ -11,7 +11,7 @@ interface GuestGuardProps {
   readonly children: React.ReactNode
 }
 
-export function GuestGuard({ children }: GuestGuardProps) {
+export function GuestGuard({ children }: Readonly<GuestGuardProps>) {
   const { data, isLoading } = useAuth()
   const router = useRouter()
 

@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 
+import { DEFAULT_LOCALE, LOCALE_COOKIE, SUPPORTED_LOCALES } from './locale'
 import en from './locales/en'
 import es from './locales/es'
 
@@ -15,12 +16,16 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'es',
+    fallbackLng: DEFAULT_LOCALE,
+    supportedLngs: [...SUPPORTED_LOCALES],
+    nonExplicitSupportedLngs: true,
     defaultNS: 'translation',
     interpolation: { escapeValue: false },
     detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
+      order: ['cookie', 'navigator'],
+      caches: ['cookie'],
+      lookupCookie: LOCALE_COOKIE,
+      cookieMinutes: 525600,
     },
   })
 

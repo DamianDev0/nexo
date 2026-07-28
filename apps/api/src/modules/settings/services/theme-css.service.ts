@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common'
+import type { ThemeTypography } from '@repo/shared-types'
 import type { TenantTheme } from '../interfaces/tenant-theme.interface'
 import type { ThemeTokens } from '../interfaces/theme-tokens.interface'
-import { isHexColor } from '@/shared/color/color.util'
+import { isHexColor } from '@repo/shared-utils'
 import { BORDER_RADIUS_MAP, FONT_FAMILY_MAP } from '../constants/default-theme'
 import { resolveThemeTokens } from './theme-token.resolver'
 
-const DENSITIES = new Set(['compact', 'comfortable', 'spacious'])
+const DENSITY_VALUES: readonly ThemeTypography['density'][] = ['compact', 'comfortable', 'spacious']
+const DENSITIES = new Set<ThemeTypography['density']>(DENSITY_VALUES)
 
 @Injectable()
 export class ThemeCssService {

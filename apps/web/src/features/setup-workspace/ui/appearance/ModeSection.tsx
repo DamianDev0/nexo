@@ -1,7 +1,9 @@
+'use client'
+
 import { THEME_MODE_OPTIONS } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
-import { OptionTile } from '@/shared/ui/molecules/option-tile'
+import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
 import { Label } from '@/shared/ui/shadcn/label'
 
 import type { ThemeMode } from '../../model/appearance.types'
@@ -11,26 +13,23 @@ interface ModeSectionProps {
   readonly onDarkModeChange: (v: ThemeMode) => void
 }
 
-export function ModeSection({ darkMode, onDarkModeChange }: ModeSectionProps) {
+export function ModeSection({ darkMode, onDarkModeChange }: Readonly<ModeSectionProps>) {
   const { t } = useTranslation()
 
   return (
-    <div className="mb-6">
-      <Label className="text-xs text-muted-foreground">
+    <div className="px-4 py-4">
+      <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
         {t('onboarding.steps.appearance.colorMode')}
       </Label>
-      <div className="mt-2 grid grid-cols-3 gap-2">
-        {THEME_MODE_OPTIONS.map((mode) => (
-          <OptionTile
-            key={mode}
-            selected={darkMode === mode}
-            onSelect={() => onDarkModeChange(mode)}
-            className="p-2.5 text-center text-xs font-semibold capitalize"
-          >
-            {mode}
-          </OptionTile>
-        ))}
-      </div>
+      <SegmentedControl
+        className="mt-2"
+        value={darkMode}
+        onValueChange={onDarkModeChange}
+        options={THEME_MODE_OPTIONS.map((mode) => ({
+          value: mode,
+          label: <span className="capitalize">{mode}</span>,
+        }))}
+      />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import {
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import type { TenantContext } from '@repo/shared-types'
+import type { PlanName, TenantContext } from '@repo/shared-types'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { UserTenantMapService } from '@/modules/tenants/services/user-tenant-map.service'
 import { CacheService } from '@/shared/cache/cache.service'
@@ -197,7 +197,7 @@ export class AuthService {
       tenantId: tenant.id,
       slug: tenant.slug,
       schemaName: tenant.schemaName,
-      plan: tenant.plan.name,
+      plan: tenant.plan.name as PlanName,
       config: tenant.config ?? {},
       productName: tenant.productName ?? 'NexoCRM',
       customDomain: tenant.customDomain ?? null,

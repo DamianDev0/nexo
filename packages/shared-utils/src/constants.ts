@@ -2,6 +2,7 @@ import {
   ContactSource,
   ContactStatus,
   DealStatus,
+  IndustrySector,
   InvoiceStatus,
   PaymentMethod,
   PaymentStatus,
@@ -13,6 +14,13 @@ export const CURRENCY_CODE = 'COP'
 export const MAX_INVOICE_ITEMS = 100
 export const VAT_RATES = [0, 5, 19] as const
 export type VATRate = (typeof VAT_RATES)[number]
+export const DEFAULT_VAT_RATE: VATRate = 19
+
+export const DEFAULT_PAGE_SIZE = 25
+export const MAX_PAGE_SIZE = 100
+
+export const TENANT_SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
+export const PASSWORD_STRENGTH_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/
 
 export const CONTACT_STATUS_LABELS: Record<ContactStatus, string> = {
   [ContactStatus.NEW]: 'Nuevo',
@@ -122,29 +130,32 @@ export const CURRENCY_OPTIONS = [
   { value: 'PEN', label: 'PEN — Peruvian Sol' },
 ] as const
 
-export const SECTOR_OPTIONS = [
-  { id: 'technology', label: 'Technology', icon: '💻' },
-  { id: 'retail', label: 'Retail', icon: '🏪' },
-  { id: 'finance', label: 'Finance', icon: '💰' },
-  { id: 'health', label: 'Health', icon: '🏥' },
-  { id: 'education', label: 'Education', icon: '📚' },
-  { id: 'construction', label: 'Construction', icon: '🏗️' },
-  { id: 'logistics', label: 'Logistics', icon: '🚚' },
-  { id: 'services', label: 'Services', icon: '🔧' },
-  { id: 'other', label: 'Other', icon: '⚡' },
+export const SECTOR_OPTIONS: ReadonlyArray<{
+  id: IndustrySector
+  label: string
+}> = [
+  { id: IndustrySector.SALUD, label: 'Salud' },
+  { id: IndustrySector.EDUCACION, label: 'Educación' },
+  { id: IndustrySector.INMOBILIARIA, label: 'Inmobiliaria' },
+  { id: IndustrySector.COMERCIO, label: 'Comercio' },
+  { id: IndustrySector.SERVICIOS, label: 'Servicios' },
+  { id: IndustrySector.RESTAURANTE, label: 'Restaurante' },
+  { id: IndustrySector.TECNOLOGIA, label: 'Tecnología' },
+  { id: IndustrySector.CONSTRUCCION, label: 'Construcción' },
+  { id: IndustrySector.OTROS, label: 'Otro' },
 ] as const
 
 export const BRAND_COLOR_OPTIONS = [
-  '#4F46E5',
-  '#7C3AED',
-  '#DB2777',
-  '#DC2626',
-  '#EA580C',
-  '#D97706',
-  '#059669',
-  '#0891B2',
-  '#1D4ED8',
-  '#0F172A',
+  { hex: '#4F46E5', label: 'Indigo' },
+  { hex: '#7C3AED', label: 'Violet' },
+  { hex: '#DB2777', label: 'Pink' },
+  { hex: '#DC2626', label: 'Red' },
+  { hex: '#EA580C', label: 'Orange' },
+  { hex: '#D97706', label: 'Amber' },
+  { hex: '#059669', label: 'Emerald' },
+  { hex: '#0891B2', label: 'Cyan' },
+  { hex: '#1D4ED8', label: 'Blue' },
+  { hex: '#0F172A', label: 'Slate' },
 ] as const
 
 export const STAGE_COLOR_OPTIONS = [

@@ -1,6 +1,8 @@
+import type { TimelineEventType } from '@repo/shared-types'
+
 export interface TimelineRow {
   id: string
-  event_type: string
+  event_type: TimelineEventType
   title: string
   description: string | null
   entity_type: string | null

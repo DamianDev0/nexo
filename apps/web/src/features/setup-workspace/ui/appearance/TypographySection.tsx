@@ -1,8 +1,17 @@
+'use client'
+
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
-import { OptionTile } from '@/shared/ui/molecules/option-tile'
+import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
 import { Label } from '@/shared/ui/shadcn/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/shadcn/select'
 
 import {
   DENSITY_OPTIONS,
@@ -30,70 +39,77 @@ interface TypographySectionProps {
   readonly actions: TypographyActions
 }
 
-export function TypographySection({ data, actions }: TypographySectionProps) {
+function fontStack(value: ThemeTypography['fontFamily']): string {
+  return value === 'system' ? 'system-ui' : `'${GOOGLE_FONT_MAP[value]}', system-ui`
+}
+
+export function TypographySection({ data, actions }: Readonly<TypographySectionProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.appearance'
 
   return (
     <>
-      <div className="mb-6">
-        <Label className="text-xs text-muted-foreground">{t(`${s}.font`, 'Font')}</Label>
-        <div className="mt-2 grid grid-cols-5 gap-1.5">
-          {FONT_OPTIONS.map((opt) => (
-            <OptionTile
-              key={opt.value}
-              selected={data.fontFamily === opt.value}
-              onSelect={() => actions.onFontFamilyChange(opt.value)}
-              className="flex flex-col items-center gap-1 px-1 py-2"
-            >
-              <span
-                className="text-lg font-semibold leading-none"
-                style={{
-                  fontFamily:
-                    opt.value === 'system'
-                      ? 'system-ui'
-                      : `'${GOOGLE_FONT_MAP[opt.value]}', system-ui`,
-                }}
+      <div className="px-4 py-4">
+        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+          {t(`${s}.font`, 'Font')}
+        </Label>
+        <Select value={data.fontFamily} onValueChange={actions.onFontFamilyChange}>
+          <SelectTrigger
+            className="mt-2 h-8 w-full text-sm"
+            style={{ fontFamily: fontStack(data.fontFamily) }}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {FONT_OPTIONS.map((opt) => (
+              <SelectItem
+                key={opt.value}
+                value={opt.value}
+                className="text-sm"
+                style={{ fontFamily: fontStack(opt.value) }}
               >
-                {opt.sample}
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="px-4 py-4">
+        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+          {t(`${s}.corners`, 'Corners')}
+        </Label>
+        <SegmentedControl
+          className="mt-2"
+          value={data.borderRadius}
+          onValueChange={actions.onBorderRadiusChange}
+          options={RADIUS_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: (
+              <span className="flex flex-col items-center gap-1">
+                <span className={cn('size-4 border-l-2 border-t-2 border-current', opt.preview)} />
+                <span className="text-[10px] leading-none">
+                  {t(`${s}.options.${opt.labelKey}`)}
+                </span>
               </span>
-              <span className="text-xs">{opt.label}</span>
-            </OptionTile>
-          ))}
-        </div>
+            ),
+          }))}
+        />
       </div>
 
-      <div className="mb-6">
-        <Label className="text-xs text-muted-foreground">{t(`${s}.corners`, 'Corners')}</Label>
-        <div className="mt-2 grid grid-cols-5 gap-1.5">
-          {RADIUS_OPTIONS.map((opt) => (
-            <OptionTile
-              key={opt.value}
-              selected={data.borderRadius === opt.value}
-              onSelect={() => actions.onBorderRadiusChange(opt.value)}
-              className="flex flex-col items-center gap-1 px-1 py-2"
-            >
-              <div className={cn('size-4 border-2 border-current', opt.preview)} />
-              <span className="text-xs leading-none">{opt.label}</span>
-            </OptionTile>
-          ))}
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <Label className="text-xs text-muted-foreground">{t(`${s}.density`, 'Density')}</Label>
-        <div className="mt-2 grid grid-cols-3 gap-1.5">
-          {DENSITY_OPTIONS.map((opt) => (
-            <OptionTile
-              key={opt.value}
-              selected={data.density === opt.value}
-              onSelect={() => actions.onDensityChange(opt.value)}
-              className="px-2 py-2 text-center text-xs"
-            >
-              {opt.label}
-            </OptionTile>
-          ))}
-        </div>
+      <div className="px-4 py-4">
+        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+          {t(`${s}.density`, 'Density')}
+        </Label>
+        <SegmentedControl
+          className="mt-2"
+          value={data.density}
+          onValueChange={actions.onDensityChange}
+          options={DENSITY_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: t(`${s}.options.${opt.labelKey}`),
+          }))}
+        />
       </div>
     </>
   )

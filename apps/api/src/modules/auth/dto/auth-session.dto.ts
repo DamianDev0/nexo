@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import type { UserRole } from '@repo/shared-types'
+import { UserRole } from '@repo/shared-types'
 
 export class SessionUserDto {
   @ApiProperty()
@@ -11,7 +11,7 @@ export class SessionUserDto {
   @ApiProperty()
   fullName: string
 
-  @ApiProperty({ enum: ['owner', 'admin', 'manager', 'sales_rep', 'viewer'] })
+  @ApiProperty({ enum: Object.values(UserRole) })
   role: UserRole
 
   @ApiProperty({ nullable: true })

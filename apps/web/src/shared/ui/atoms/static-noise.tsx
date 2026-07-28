@@ -7,7 +7,7 @@ export function StaticNoise({
   className,
   backgroundSize = '400px',
   ...props
-}: { opacity: number; backgroundSize?: string } & ComponentProps<'div'>) {
+}: Readonly<{ opacity: number; backgroundSize?: string } & ComponentProps<'div'>>) {
   return (
     <div
       className={cn(

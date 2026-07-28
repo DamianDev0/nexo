@@ -1,7 +1,9 @@
+import type { WebhookEvent } from '@repo/shared-types'
+
 export interface WebhookRow {
   id: string
   url: string
-  events: string[]
+  events: WebhookEvent[]
   secret: string
   is_active: boolean
   last_triggered_at: string | null
@@ -14,7 +16,7 @@ export interface WebhookRow {
 export interface LogRow {
   id: string
   webhook_id: string
-  event: string
+  event: WebhookEvent
   payload: Record<string, unknown>
   status_code: number | null
   response_time: number | null

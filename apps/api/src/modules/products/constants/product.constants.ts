@@ -1,6 +1,20 @@
+import type { DuplicateStrategy, MovementType, ProductType } from '@repo/shared-types'
+import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateProductDto } from '../dto/product.dto'
 
-export const UPDATABLE_FIELDS: [keyof UpdateProductDto, string][] = [
+export const PRODUCT_TYPES: readonly ProductType[] = ['product', 'service']
+
+export const DUPLICATE_STRATEGIES: readonly DuplicateStrategy[] = ['skip', 'create', 'update']
+
+export const MOVEMENT_TYPES: readonly MovementType[] = [
+  'purchase',
+  'sale',
+  'adjustment',
+  'return',
+  'transfer',
+]
+
+export const UPDATABLE_FIELDS: FieldMap<UpdateProductDto> = [
   ['name', 'name'],
   ['sku', 'sku'],
   ['barcode', 'barcode'],

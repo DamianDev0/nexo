@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing'
 import { DealsController } from '../deals.controller'
 import { DealsService } from '../deals.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { DealStatus, DealType, DealPriority } from '@repo/shared-types'
+import { DealPriority, DealStatus, DealType, PlanName } from '@repo/shared-types'
 import type {
   DealDetail,
   PaginatedDeals,
@@ -15,7 +15,7 @@ const mockCtx: TenantContext = {
   tenantId: 'tenant-1',
   schemaName: 'tenant_acme',
   slug: 'acme',
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

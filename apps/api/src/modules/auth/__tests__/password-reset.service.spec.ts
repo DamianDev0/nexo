@@ -2,7 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { getLoggerToken } from 'nestjs-pino'
 import { ConfigService } from '@nestjs/config'
-import type { TenantContext } from '@repo/shared-types'
+import { PlanName, type TenantContext } from '@repo/shared-types'
 
 import { PasswordResetService } from '../services/password-reset.service'
 import { AuthRepository } from '../repositories/auth.repository'
@@ -32,7 +32,7 @@ const mockTenantCtx: TenantContext = {
   tenantId: 'tenant-1',
   slug: 'acme',
   schemaName: SCHEMA,
-  plan: 'free',
+  plan: PlanName.FREE,
   config: {},
   productName: 'NexoCRM',
   customDomain: null,

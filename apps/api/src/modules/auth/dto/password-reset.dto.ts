@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsEmail, IsString, MinLength, MaxLength, Matches } from 'class-validator'
+import { PASSWORD_STRENGTH_REGEX } from '@repo/shared-utils'
 
 export class ForgotPasswordDto {
   @ApiProperty({ example: 'john@acme.com' })
@@ -16,7 +17,7 @@ export class ResetPasswordDto {
   @IsString()
   @MinLength(8)
   @MaxLength(72)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+  @Matches(PASSWORD_STRENGTH_REGEX, {
     message:
       'Password must contain at least one uppercase letter, one lowercase letter, and one number',
   })

@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer'
 import { IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
+import { MAX_PAGE_SIZE } from '@repo/shared-utils'
 
 export class NotificationQueryDto {
   @IsOptional()
@@ -20,7 +21,7 @@ export class NotificationQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(MAX_PAGE_SIZE)
   limit?: number
 }
 

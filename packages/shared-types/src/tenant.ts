@@ -1,10 +1,10 @@
-import type { UserRole } from './enums'
+import type { PlanName, UserRole } from './enums'
 
 export type TenantContext = {
   tenantId: string
   slug: string
   schemaName: string
-  plan: string
+  plan: PlanName
   config: Record<string, unknown>
   productName: string
   customDomain: string | null

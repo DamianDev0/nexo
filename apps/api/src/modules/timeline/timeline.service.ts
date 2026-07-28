@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import type { PaginatedTimeline, TimelineEntry, TimelineEventType } from '@repo/shared-types'
+import type { PaginatedTimeline, TimelineEntry } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { TimelineRow } from './interfaces/timeline-row.interfaces'
+import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 
 @Injectable()
 export class TimelineService {
@@ -11,7 +12,7 @@ export class TimelineService {
     schemaName: string,
     contactId: string,
     page = 1,
-    limit = 25,
+    limit = DEFAULT_PAGE_SIZE,
   ): Promise<PaginatedTimeline> {
     return this.getTimeline(schemaName, 'contact_id', contactId, page, limit)
   }
@@ -20,7 +21,7 @@ export class TimelineService {
     schemaName: string,
     dealId: string,
     page = 1,
-    limit = 25,
+    limit = DEFAULT_PAGE_SIZE,
   ): Promise<PaginatedTimeline> {
     return this.getTimeline(schemaName, 'deal_id', dealId, page, limit)
   }
@@ -29,7 +30,7 @@ export class TimelineService {
     schemaName: string,
     companyId: string,
     page = 1,
-    limit = 25,
+    limit = DEFAULT_PAGE_SIZE,
   ): Promise<PaginatedTimeline> {
     return this.getTimeline(schemaName, 'company_id', companyId, page, limit)
   }
@@ -103,7 +104,7 @@ export class TimelineService {
         data: rows.map(
           (r): TimelineEntry => ({
             id: r.id,
-            eventType: r.event_type as TimelineEventType,
+            eventType: r.event_type,
             title: r.title,
             description: r.description,
             entityType: r.entity_type,

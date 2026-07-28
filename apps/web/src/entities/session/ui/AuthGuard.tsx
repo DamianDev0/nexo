@@ -12,7 +12,7 @@ interface AuthGuardProps {
   readonly children: React.ReactNode
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
+export function AuthGuard({ children }: Readonly<AuthGuardProps>) {
   const { data, isLoading, isError } = useAuth()
   const router = useRouter()
   const pathname = usePathname()

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsEmail,
+  IsEnum,
   IsString,
   MinLength,
   MaxLength,
@@ -8,6 +9,8 @@ import {
   IsOptional,
   Length,
 } from 'class-validator'
+import { PlanName } from '@repo/shared-types'
+import { PASSWORD_STRENGTH_REGEX, TENANT_SLUG_REGEX } from '@repo/shared-utils'
 
 export class OnboardingDto {
   @ApiProperty({ example: 'Distribuidora ABC', description: 'Business name' })
@@ -22,16 +25,20 @@ export class OnboardingDto {
   })
   @IsString()
   @Length(3, 63)
-  @Matches(/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, {
+  @Matches(TENANT_SLUG_REGEX, {
     message:
       'Slug must be lowercase letters, numbers, and hyphens. Cannot start or end with a hyphen.',
   })
   slug: string
 
-  @ApiPropertyOptional({ example: 'free', description: 'Plan name (defaults to free)' })
+  @ApiPropertyOptional({
+    enum: Object.values(PlanName),
+    example: PlanName.FREE,
+    description: 'Plan name (defaults to free)',
+  })
   @IsOptional()
-  @IsString()
-  planName?: string
+  @IsEnum(PlanName)
+  planName?: PlanName
 
   @ApiProperty({ example: 'admin@distribuidora-abc.com' })
   @IsEmail()
@@ -41,7 +48,7 @@ export class OnboardingDto {
   @IsString()
   @MinLength(8)
   @MaxLength(72)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+  @Matches(PASSWORD_STRENGTH_REGEX, {
     message:
       'password must contain at least one uppercase letter, one lowercase letter, and one number',
   })

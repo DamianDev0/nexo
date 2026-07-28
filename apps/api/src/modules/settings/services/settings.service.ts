@@ -2,11 +2,12 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { UserRole } from '@repo/shared-types'
+import type { IndustrySector } from '@repo/shared-types'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import type { AuditMeta } from '@/modules/audit-log/audit-log.interfaces'
 import { INDUSTRY_PRESETS } from '../constants/industry-presets'
-import type { TenantConfig } from '../interfaces/settings.interface'
+import type { TenantSettingsRow } from '../interfaces/settings.interface'
 import type { UpdateSettingsDto } from '../dto/update-settings.dto'
 import { SettingsResponseDto } from '../dto/settings-response.dto'
 import { deepMerge } from '@/shared/utils/deep-merge'
@@ -37,7 +38,7 @@ export class SettingsService {
     this.assertFiscalPermission(dto, actorRole)
 
     const tenant = await this.findTenant(tenantId)
-    const config = (tenant.config ?? {}) as TenantConfig
+    const config = (tenant.config ?? {}) as TenantSettingsRow
 
     const updated: Partial<Tenant> = {}
 
@@ -45,17 +46,17 @@ export class SettingsService {
       updated.name = dto.businessName
     }
 
-    const patch: TenantConfig = {
+    const patch: TenantSettingsRow = {
       ...(dto.business && { business: dto.business }),
       ...(dto.i18n && { i18n: dto.i18n }),
-      ...(dto.billing && { billing: dto.billing }),
+      ...(dto.billing && { billing: { ...dto.billing } }),
       ...(dto.industry && { industry: dto.industry }),
     }
 
     const newConfig = deepMerge(
       config as Record<string, unknown>,
       patch as Record<string, unknown>,
-    ) as TenantConfig
+    ) as TenantSettingsRow
 
     if (dto.industry?.sector) {
       newConfig.industry = this.buildIndustryConfig(dto.industry.sector, newConfig)
@@ -72,12 +73,12 @@ export class SettingsService {
 
   async applyIndustryPreset(
     tenantId: string,
-    sector: string,
+    sector: IndustrySector,
     schemaName: string,
     meta?: AuditMeta,
   ): Promise<void> {
     const tenant = await this.findTenant(tenantId)
-    const config = (tenant.config ?? {}) as TenantConfig
+    const config = (tenant.config ?? {}) as TenantSettingsRow
     const newConfig = { ...config, industry: this.buildIndustryConfig(sector, config) }
     await this.tenantRepo.update(tenantId, { config: newConfig })
 
@@ -90,7 +91,10 @@ export class SettingsService {
     )
   }
 
-  private buildIndustryConfig(sector: string, config: TenantConfig): TenantConfig['industry'] {
+  private buildIndustryConfig(
+    sector: IndustrySector,
+    config: TenantSettingsRow,
+  ): TenantSettingsRow['industry'] {
     const preset = INDUSTRY_PRESETS[sector]
     if (!preset) return config.industry
 

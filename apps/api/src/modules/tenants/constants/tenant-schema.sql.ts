@@ -1,3 +1,5 @@
+import { CURRENCY_CODE } from '@repo/shared-utils'
+
 export function getTenantSchemaSQL(schema: string): string {
   return `
     -- Users within the tenant
@@ -135,7 +137,7 @@ export function getTenantSchemaSQL(schema: string): string {
       priority VARCHAR(10) DEFAULT 'medium',
       probability_override INTEGER,
       competitors TEXT[] DEFAULT '{}',
-      currency VARCHAR(3) DEFAULT 'COP',
+      currency VARCHAR(3) DEFAULT '${CURRENCY_CODE}',
       close_date_actual DATE,
       lead_source VARCHAR(50),
       custom_fields JSONB DEFAULT '{}',
@@ -168,7 +170,7 @@ export function getTenantSchemaSQL(schema: string): string {
       iva_rate INTEGER DEFAULT 19,
       product_type VARCHAR(20) DEFAULT 'product',
       unit_of_measure VARCHAR(30) DEFAULT 'unit',
-      currency VARCHAR(3) DEFAULT 'COP',
+      currency VARCHAR(3) DEFAULT '${CURRENCY_CODE}',
       stock INTEGER DEFAULT 0,
       min_stock INTEGER DEFAULT 0,
       weight_grams INTEGER,
@@ -235,7 +237,7 @@ export function getTenantSchemaSQL(schema: string): string {
       retention_cents BIGINT DEFAULT 0,
       ica_cents BIGINT DEFAULT 0,
       total_cents BIGINT DEFAULT 0,
-      currency VARCHAR(3) DEFAULT 'COP',
+      currency VARCHAR(3) DEFAULT '${CURRENCY_CODE}',
       due_date DATE,
       notes TEXT,
       cufe VARCHAR(200),

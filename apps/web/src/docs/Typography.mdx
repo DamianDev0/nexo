@@ -1,0 +1,15 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+import { TYPE_SCALE } from '../shared/config/tokens/design-scale'
+import { ScaleTable } from './ScaleTable'
+
+<Meta title="Foundations/Typography" />
+
+# Typography
+
+Satoshi carries display and UI; Geist Mono carries identifiers only. Money is
+**not** mono — it is Satoshi with `tabular-nums`. Display is always 900 with
+tight negative tracking. There is no 600 anywhere in the system. Never set
+display below 32px. `overline` is the only uppercase style.
+
+<ScaleTable rows={TYPE_SCALE} />

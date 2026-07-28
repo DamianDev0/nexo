@@ -2,12 +2,13 @@ import { useEffect } from 'react'
 
 import { GOOGLE_FONT_MAP } from '../model/appearance.constants'
 
-export function useGoogleFont(fontFamily: string) {
+import type { ThemeTypography } from '@repo/shared-types'
+
+export function useGoogleFont(fontFamily: ThemeTypography['fontFamily']) {
   useEffect(() => {
     if (fontFamily === 'system') return
 
     const fontName = GOOGLE_FONT_MAP[fontFamily]
-    if (!fontName) return
 
     const id = `google-font-${fontFamily}`
     if (document.getElementById(id)) return

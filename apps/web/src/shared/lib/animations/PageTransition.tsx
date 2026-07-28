@@ -16,7 +16,7 @@ export function PageTransition({
   className,
   variants = fadeSlideUp,
   transition = smoothEase,
-}: PageTransitionProps) {
+}: Readonly<PageTransitionProps>) {
   return (
     <motion.div
       initial="initial"

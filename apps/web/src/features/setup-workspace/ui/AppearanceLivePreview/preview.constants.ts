@@ -1,6 +1,23 @@
+import { readableForeground } from '@repo/shared-utils'
+
 import { PREVIEW_STATUS_LOST, PREVIEW_STATUS_WON } from '@/shared/config/tokens/effects'
 
+import type { ThemeColors } from '@repo/shared-types'
 import type { CSSProperties } from 'react'
+
+export interface PreviewForegrounds {
+  readonly main: string
+  readonly card: string
+  readonly sidebar: string
+}
+
+export function previewForegrounds(colors: ThemeColors): PreviewForegrounds {
+  return {
+    main: readableForeground(colors.secondary),
+    card: readableForeground(colors.accent),
+    sidebar: readableForeground(colors.sidebar),
+  }
+}
 
 export interface PreviewDensity {
   readonly px: string

@@ -19,6 +19,7 @@ export function AppearanceStep() {
         logoPreview: appearance.logoPreview,
         logoFileName: appearance.logoFileName,
         navModules: navigation.modules,
+        activePresetKey: appearance.activePresetKey,
       }}
       actions={{
         onPrimaryColorChange: appearance.handlePrimaryChange,
@@ -33,6 +34,7 @@ export function AppearanceStep() {
         onLogoUpload: appearance.handleLogoUpload,
         onLogoRemove: appearance.handleLogoRemove,
         onRestoreTheme: appearance.handleRestoreTheme,
+        onApplyPreset: appearance.handleApplyPreset,
       }}
       nav={{
         onNext: appearance.handleSave,

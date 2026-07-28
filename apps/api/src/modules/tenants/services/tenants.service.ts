@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { PlanName } from '@repo/shared-types'
 
 import { Plan } from '../entities/plan.entity'
 import { TenantsRepository } from '../repositories/tenants.repository'
@@ -25,7 +26,7 @@ export class TenantsService {
       throw new ConflictException(`Subdomain "${dto.slug}" is already taken`)
     }
 
-    const planName = dto.planName ?? 'free'
+    const planName = dto.planName ?? PlanName.FREE
     const plan = await this.planRepo.findOne({ where: { name: planName } })
     if (!plan) {
       throw new NotFoundException(`Plan "${planName}" not found`)

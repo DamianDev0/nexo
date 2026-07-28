@@ -9,6 +9,7 @@ export const ROUTES = {
     companies: { list: '/companies' },
     deals: { list: '/deals' },
     activities: '/activities',
+    invoices: { list: '/invoices' },
     reports: '/reports',
     products: { list: '/products' },
     settings: { general: '/settings/general' },

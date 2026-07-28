@@ -33,6 +33,7 @@ import {
   DEAL_LIST_FROM,
   UPDATABLE_FIELDS,
 } from './constants/deal.constants'
+import { CURRENCY_CODE, DEFAULT_PAGE_SIZE, DEFAULT_VAT_RATE } from '@repo/shared-utils'
 
 @Injectable()
 export class DealsService {
@@ -44,7 +45,7 @@ export class DealsService {
   async findAll(schemaName: string, query: DealQueryDto): Promise<PaginatedDeals> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedDeals> => {
       const page = query.page ?? 1
-      const limit = query.limit ?? 25
+      const limit = query.limit ?? DEFAULT_PAGE_SIZE
       const offset = (page - 1) * limit
 
       const { where, params } = this.buildWhereClause(query)
@@ -350,7 +351,7 @@ export class DealsService {
           dto.quantity ?? 1,
           dto.unitPriceCents,
           dto.discountPercent ?? 0,
-          dto.ivaRate ?? 19,
+          dto.ivaRate ?? DEFAULT_VAT_RATE,
           position,
         ],
       )
@@ -647,7 +648,7 @@ export class DealsService {
       priority: (r.priority ?? 'medium') as DealListItem['priority'],
       probabilityOverride: r.probability_override ?? null,
       competitors: r.competitors ?? [],
-      currency: r.currency ?? 'COP',
+      currency: r.currency ?? CURRENCY_CODE,
       leadSource: r.lead_source ?? null,
       isActive: r.is_active,
       createdById: r.created_by,

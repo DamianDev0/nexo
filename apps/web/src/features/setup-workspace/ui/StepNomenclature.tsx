@@ -1,23 +1,27 @@
 import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
+import { Lightbulb } from 'lucide-react'
+import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 
-import { NOMENCLATURE_PRESETS, type NomenclatureState } from '../model/useStepNomenclature'
+import { NOMENCLATURE_PRESETS } from '../model/nomenclature.constants'
 
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
+import type { TenantNomenclature } from '@repo/shared-types'
+
 const ENTITY_COLORS = {
-  contact: BRAND_COLOR_OPTIONS[0],
-  company: BRAND_COLOR_OPTIONS[7],
-  deal: BRAND_COLOR_OPTIONS[6],
-  activity: BRAND_COLOR_OPTIONS[5],
+  contact: BRAND_COLOR_OPTIONS[0].hex,
+  company: BRAND_COLOR_OPTIONS[7].hex,
+  deal: BRAND_COLOR_OPTIONS[6].hex,
+  activity: BRAND_COLOR_OPTIONS[5].hex,
 } as const
 
 interface NomenclatureActions {
   readonly onUpdate: (
-    entity: keyof NomenclatureState,
+    entity: keyof TenantNomenclature,
     field: 'singular' | 'plural',
     value: string,
   ) => void
@@ -25,12 +29,12 @@ interface NomenclatureActions {
 }
 
 interface StepNomenclatureProps {
-  readonly data: NomenclatureState
+  readonly data: TenantNomenclature
   readonly actions: NomenclatureActions
   readonly nav: WizardStepNav
 }
 
-export function StepNomenclature({ data, actions, nav }: StepNomenclatureProps) {
+export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatureProps>) {
   const { t } = useTranslation()
   const s = 'onboarding.steps.nomenclature'
 
@@ -39,7 +43,8 @@ export function StepNomenclature({ data, actions, nav }: StepNomenclatureProps) 
       header={{ badge: t(`${s}.badge`), title: t(`${s}.title`), description: t(`${s}.subtitle`) }}
       nav={{ ...nav, footerNote: t(`${s}.canChangeAnytime`) }}
     >
-      <div className="mb-6 rounded-lg border border-primary/20 bg-accent p-3 text-xs text-foreground">
+      <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-border bg-card py-2 pl-3 pr-4 text-xs text-muted-foreground shadow-xs">
+        <Lightbulb className="size-3.5 shrink-0 text-primary" />
         {t(`${s}.hint`)}
       </div>
 
@@ -52,7 +57,7 @@ export function StepNomenclature({ data, actions, nav }: StepNomenclatureProps) 
           {t(`${s}.plural`)}
         </span>
 
-        {(Object.keys(data) as Array<keyof NomenclatureState>).map((entity) => (
+        {(Object.keys(data) as Array<keyof TenantNomenclature>).map((entity) => (
           <div key={entity} className="contents">
             <div className="flex items-center gap-2">
               <div className="size-2 rounded-full" style={{ background: ENTITY_COLORS[entity] }} />
@@ -61,12 +66,12 @@ export function StepNomenclature({ data, actions, nav }: StepNomenclatureProps) 
               </span>
             </div>
             <Input
-              className="h-9 border-border text-sm"
+              className="h-9 text-sm"
               value={data[entity].singular}
               onChange={(e) => actions.onUpdate(entity, 'singular', e.target.value)}
             />
             <Input
-              className="h-9 border-border text-sm"
+              className="h-9 text-sm"
               value={data[entity].plural}
               onChange={(e) => actions.onUpdate(entity, 'plural', e.target.value)}
             />
@@ -82,9 +87,10 @@ export function StepNomenclature({ data, actions, nav }: StepNomenclatureProps) 
               key={key}
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="gap-2 text-xs"
               onClick={() => actions.onPreset(key)}
             >
+              <Image src={preset.icon} alt="" width={18} height={18} className="size-4.5" />
               {preset.label}
             </Button>
           ))}

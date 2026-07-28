@@ -1,120 +1,72 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { QUERY_KEYS } from '@/shared/config/query-keys'
 
+import { saveNavigationAction } from '../api/setup-steps.actions'
+
+import { DEFAULT_MODULES, moduleGroupKey } from './navigation.constants'
+import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
-import type { SidebarModule } from '@repo/shared-types'
+import type { SidebarConfig, SidebarModule } from '@repo/shared-types'
 
-const DEFAULT_MODULES: SidebarModule[] = [
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    icon: 'home',
-    enabled: true,
-    order: 1,
-    customIconUrl: null,
-    required: true,
-  },
-  {
-    key: 'contacts',
-    label: 'Contacts',
-    icon: 'users',
-    enabled: true,
-    order: 2,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'companies',
-    label: 'Companies',
-    icon: 'building',
-    enabled: true,
-    order: 3,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'deals',
-    label: 'Deals',
-    icon: 'briefcase',
-    enabled: true,
-    order: 4,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'activities',
-    label: 'Activities',
-    icon: 'calendar',
-    enabled: true,
-    order: 5,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'invoices',
-    label: 'Invoices',
-    icon: 'file-text',
-    enabled: true,
-    order: 6,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'products',
-    label: 'Products',
-    icon: 'package',
-    enabled: true,
-    order: 7,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'reports',
-    label: 'Reports',
-    icon: 'bar-chart',
-    enabled: true,
-    order: 8,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'settings',
-    label: 'Settings',
-    icon: 'settings',
-    enabled: true,
-    order: 9,
-    customIconUrl: null,
-    required: true,
-  },
-]
+interface NavigationFormValues {
+  modules: SidebarModule[]
+}
 
 export function useStepNavigation(onNext: () => void) {
-  const [modules, setModules] = useState<SidebarModule[]>(DEFAULT_MODULES)
+  const { control, watch, getValues, reset } = useForm<NavigationFormValues>({
+    defaultValues: { modules: [...DEFAULT_MODULES] },
+  })
+  const { fields, move, update } = useFieldArray({ control, name: 'modules' })
 
-  const handleToggle = useCallback((key: string) => {
-    setModules((prev) =>
-      prev.map((m) => (m.key === key && !m.required ? { ...m, enabled: !m.enabled } : m)),
-    )
-  }, [])
+  useStepHydration({
+    queryKey: QUERY_KEYS.settings.navigation,
+    queryFn: settingsService.getNavigation,
+    hydrate: useCallback(
+      (config: SidebarConfig) => {
+        if (config.modules.length === 0) return
+        reset({ modules: [...config.modules].sort((a, b) => a.order - b.order) })
+      },
+      [reset],
+    ),
+  })
+  const watchedModules = watch('modules')
 
-  const handleReorder = useCallback((activeKey: string, overKey: string) => {
-    setModules((prev) => {
-      const oldIdx = prev.findIndex((m) => m.key === activeKey)
-      const newIdx = prev.findIndex((m) => m.key === overKey)
-      if (oldIdx < 0 || newIdx < 0 || oldIdx === newIdx) return prev
+  const modules = fields.map((field, index) => watchedModules[index] ?? field)
 
-      const next = [...prev]
-      const moved = next.splice(oldIdx, 1)[0]
-      if (!moved) return prev
-      next.splice(newIdx, 0, moved)
-      return next.map((m, i) => ({ ...m, order: i + 1 }))
-    })
-  }, [])
+  const handleToggle = useCallback(
+    (key: string) => {
+      const index = fields.findIndex((f) => f.key === key)
+      if (index < 0) return
+      const current = getValues(`modules.${index}`)
+      if (current.required) return
+      update(index, { ...current, enabled: !current.enabled })
+    },
+    [fields, getValues, update],
+  )
+
+  const handleReorder = useCallback(
+    (activeKey: string, overKey: string) => {
+      if (moduleGroupKey(activeKey) !== moduleGroupKey(overKey)) return
+      const from = fields.findIndex((f) => f.key === activeKey)
+      const to = fields.findIndex((f) => f.key === overKey)
+      if (from < 0 || to < 0 || from === to) return
+      move(from, to)
+    },
+    [fields, move],
+  )
 
   const { handleSave, isPending } = useStepMutation({
-    mutationFn: () => settingsService.updateNavigation({ modules }),
+    mutationFn: async () => {
+      const result = await saveNavigationAction({
+        modules: getValues('modules').map((module, index) => ({ ...module, order: index + 1 })),
+      })
+      if (!result.ok) throw new Error(result.error)
+      return result.data
+    },
     onNext,
   })
 
