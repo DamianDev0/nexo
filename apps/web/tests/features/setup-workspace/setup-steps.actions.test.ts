@@ -1,7 +1,6 @@
 import { IndustrySector, UserRole } from '@repo/shared-types'
 import { HttpResponse, http } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
-import { ZodError } from 'zod'
 
 import { API, createMswServer } from '../../msw/test-server'
 
@@ -115,9 +114,9 @@ describe('createPipelineAction', () => {
   })
 
   it('rejects an empty stage list at the boundary', async () => {
-    await expect(createPipelineAction({ name: 'Sales', stages: [] })).rejects.toBeInstanceOf(
-      ZodError,
-    )
+    const result = await createPipelineAction({ name: 'Sales', stages: [] })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error).toContain('stages')
   })
 })
 
@@ -190,8 +189,8 @@ describe('inviteUsersAction', () => {
   })
 
   it('rejects malformed emails at the boundary', async () => {
-    await expect(
-      inviteUsersAction([{ email: 'not-an-email', role: UserRole.SALES_REP }]),
-    ).rejects.toBeInstanceOf(ZodError)
+    const result = await inviteUsersAction([{ email: 'not-an-email', role: UserRole.SALES_REP }])
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error).toContain('email')
   })
 })

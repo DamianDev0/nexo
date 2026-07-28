@@ -30,15 +30,15 @@ export function SidebarPreview({ modules, highlightKey }: Readonly<SidebarPrevie
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border shadow-sm">
-        <div className="flex items-center gap-2 border-b border-border bg-muted/60 px-4 py-2.5">
+        <div className="flex h-8 items-center justify-between border-b border-border bg-muted/40 px-3">
           <div className="flex gap-1.5">
-            <div className="size-2.5 rounded-full bg-red-400/80" />
-            <div className="size-2.5 rounded-full bg-amber-400/80" />
-            <div className="size-2.5 rounded-full bg-emerald-400/80" />
+            <div className="size-2 rounded-full bg-red-400/90" />
+            <div className="size-2 rounded-full bg-amber-400/90" />
+            <div className="size-2 rounded-full bg-emerald-400/90" />
           </div>
-          <div className="ml-4 flex-1 rounded-md bg-background/60 px-3 py-1 text-center text-xs text-muted-foreground">
+          <span className="text-[10px] font-medium tracking-wide text-muted-foreground/50">
             app.nexo.com
-          </div>
+          </span>
         </div>
 
         <div className="flex min-h-72 bg-background">
@@ -51,7 +51,7 @@ export function SidebarPreview({ modules, highlightKey }: Readonly<SidebarPrevie
             {groups.map((group, gi) => (
               <div key={group.key} className={cn(gi > 0 && 'mt-2')}>
                 <p className="mb-1 px-2 text-[10px] font-semibold tracking-wide text-muted-foreground/60">
-                  {t(`${s}.groups.${group.key}`)}
+                  {t(`nav.groups.${group.key}`)}
                 </p>
                 {group.modules.map((mod) => {
                   const Icon = SIDEBAR_ICON_MAP[mod.icon]
@@ -69,7 +69,7 @@ export function SidebarPreview({ modules, highlightKey }: Readonly<SidebarPrevie
                     >
                       {Icon ? <Icon className="size-3.5" /> : null}
                       <span className={isActive ? 'font-medium' : ''}>
-                        {t(`${s}.modules.${mod.key}`, { defaultValue: mod.label })}
+                        {t(`nav.${mod.key}`, { defaultValue: mod.label })}
                       </span>
                     </div>
                   )

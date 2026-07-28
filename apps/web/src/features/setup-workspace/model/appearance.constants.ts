@@ -1,5 +1,6 @@
 import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
 
+import type { ColorOverrides, ThemeMode } from './appearance.types'
 import type { ThemeTypography } from '@repo/shared-types'
 
 export const COLOR_NAMES: Record<string, string> = Object.fromEntries(
@@ -28,24 +29,100 @@ export const FONT_OPTIONS: ReadonlyArray<{
 
 export const RADIUS_OPTIONS: ReadonlyArray<{
   value: ThemeTypography['borderRadius']
-  label: string
+  labelKey: string
   preview: string
 }> = [
-  { value: 'none', label: 'Sharp', preview: 'rounded-none' },
-  { value: 'sm', label: 'Subtle', preview: 'rounded-sm' },
-  { value: 'md', label: 'Medium', preview: 'rounded-md' },
-  { value: 'lg', label: 'Rounded', preview: 'rounded-lg' },
-  { value: 'full', label: 'Pill', preview: 'rounded-full' },
+  { value: 'none', labelKey: 'sharp', preview: 'rounded-tl-none' },
+  { value: 'sm', labelKey: 'subtle', preview: 'rounded-tl-sm' },
+  { value: 'md', labelKey: 'medium', preview: 'rounded-tl-md' },
+  { value: 'lg', labelKey: 'rounded', preview: 'rounded-tl-lg' },
+  { value: 'full', labelKey: 'pill', preview: 'rounded-tl-full' },
 ]
 
 export const DENSITY_OPTIONS: ReadonlyArray<{
   value: ThemeTypography['density']
-  label: string
+  labelKey: string
 }> = [
-  { value: 'compact', label: 'Compact' },
-  { value: 'comfortable', label: 'Comfortable' },
-  { value: 'spacious', label: 'Spacious' },
+  { value: 'compact', labelKey: 'compact' },
+  { value: 'comfortable', labelKey: 'comfortable' },
+  { value: 'spacious', labelKey: 'spacious' },
 ]
+
+export interface ThemePreset {
+  readonly key: string
+  readonly primary: string
+  readonly overrides: ColorOverrides
+  readonly fontFamily: ThemeTypography['fontFamily']
+  readonly borderRadius: ThemeTypography['borderRadius']
+  readonly density: ThemeTypography['density']
+  readonly darkMode: ThemeMode
+  readonly recommended?: boolean
+}
+
+function brandHex(label: string): string {
+  return BRAND_COLOR_OPTIONS.find((o) => o.label === label)?.hex ?? BRAND_COLOR_OPTIONS[0].hex
+}
+
+const INDIGO = brandHex('Indigo')
+const VIOLET = brandHex('Violet')
+const EMERALD = brandHex('Emerald')
+const SLATE = brandHex('Slate')
+
+export const THEME_PRESETS: ReadonlyArray<ThemePreset> = [
+  {
+    key: 'nexo',
+    primary: INDIGO,
+    overrides: {},
+    fontFamily: 'inter',
+    borderRadius: 'lg',
+    density: 'comfortable',
+    darkMode: 'system',
+    recommended: true,
+  },
+  {
+    key: 'midnight',
+    primary: VIOLET,
+    overrides: { sidebar: SLATE },
+    fontFamily: 'poppins',
+    borderRadius: 'lg',
+    density: 'comfortable',
+    darkMode: 'dark',
+  },
+  {
+    key: 'forest',
+    primary: EMERALD,
+    overrides: {},
+    fontFamily: 'nunito',
+    borderRadius: 'full',
+    density: 'spacious',
+    darkMode: 'light',
+  },
+  {
+    key: 'carbon',
+    primary: SLATE,
+    overrides: {},
+    fontFamily: 'system',
+    borderRadius: 'sm',
+    density: 'compact',
+    darkMode: 'light',
+  },
+]
+
+export function matchingPresetKey(values: {
+  primaryColor: string
+  fontFamily: ThemeTypography['fontFamily']
+  borderRadius: ThemeTypography['borderRadius']
+  density: ThemeTypography['density']
+}): string | null {
+  const match = THEME_PRESETS.find(
+    (p) =>
+      p.primary === values.primaryColor &&
+      p.fontFamily === values.fontFamily &&
+      p.borderRadius === values.borderRadius &&
+      p.density === values.density,
+  )
+  return match?.key ?? null
+}
 
 export const RADIUS_MAP: Record<ThemeTypography['borderRadius'], string> = {
   none: '0px',
@@ -53,6 +130,14 @@ export const RADIUS_MAP: Record<ThemeTypography['borderRadius'], string> = {
   md: '6px',
   lg: '8px',
   full: '9999px',
+}
+
+export const SURFACE_RADIUS_MAP: Record<ThemeTypography['borderRadius'], string> = {
+  none: '0px',
+  sm: '4px',
+  md: '6px',
+  lg: '10px',
+  full: '16px',
 }
 
 export const DENSITY_MAP: Record<

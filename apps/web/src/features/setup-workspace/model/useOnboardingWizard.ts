@@ -29,6 +29,7 @@ export function useOnboardingWizard() {
     onSuccess: (result) => {
       queryClient.setQueryData(ONBOARDING_KEY, result)
     },
+    onError: (err) => sileo.error({ title: t('common.saveFailed'), description: err.message }),
   })
 
   const goToStep = useCallback(

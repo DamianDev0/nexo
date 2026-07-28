@@ -120,7 +120,7 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
               step={5}
               value={[stage.probability]}
               onValueChange={([v]) => actions.onUpdate(stage.id, { probability: v })}
-              className="w-24 [&_[data-slot=slider-thumb]]:cursor-grab [&_[data-slot=slider-thumb]]:active:cursor-grabbing"
+              className="w-24 **:data-[slot=slider-thumb]:cursor-grab **:data-[slot=slider-thumb]:active:cursor-grabbing"
             />
             <span className="w-9 text-right text-xs font-bold tabular-nums text-primary-deep dark:text-primary">
               {stage.probability}%

@@ -39,6 +39,7 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
     <WizardStep
       header={{ badge: t(`${s}.badge`), title: t(`${s}.title`), description: t(`${s}.subtitle`) }}
       nav={{ ...nav, nextLabel: t(`${s}.finishSetup`), footerNote: t(`${s}.canInviteLater`) }}
+      aside={<RolePermissionsMatrix />}
     >
       <div className="flex flex-col gap-2">
         {data.map((inv) => (
@@ -60,7 +61,7 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
               <SelectContent>
                 {INVITE_ROLE_OPTIONS.map((role) => (
                   <SelectItem key={role} value={role}>
-                    {USER_ROLE_LABELS[role]}
+                    {t(`${s}.roles.${role}`, { defaultValue: USER_ROLE_LABELS[role] })}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -89,8 +90,6 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
         <Plus className="size-3.5" />
         {t(`${s}.addMember`)}
       </Button>
-
-      <RolePermissionsMatrix />
     </WizardStep>
   )
 }

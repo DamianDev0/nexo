@@ -15,15 +15,14 @@ export function StepDone({ onGoToDashboard, onReviewConfig }: Readonly<StepDoneP
 
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto p-10 text-center">
-      <div className="mb-6 flex size-24 items-center justify-center rounded-full bg-accent shadow-lg shadow-primary/15">
-        <Image
-          src="/icons/3d/trophy.png"
-          alt=""
-          width={64}
-          height={64}
-          className="size-16 drop-shadow-md"
-        />
-      </div>
+      <Image
+        src="/illustrations/setup-complete.png"
+        alt=""
+        width={220}
+        height={220}
+        priority
+        className="mb-4 size-55 drop-shadow-sm"
+      />
 
       <h1 className="text-3xl font-bold tracking-tight text-foreground">{t(`${s}.title`)}</h1>
       <p className="mt-3 max-w-md text-sm text-muted-foreground">{t(`${s}.subtitle`)}</p>

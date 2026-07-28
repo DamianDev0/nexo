@@ -20,9 +20,11 @@ export function BrandingFieldsSection({
   const s = 'onboarding.steps.appearance'
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4 px-4 py-4">
       <div>
-        <Label className="text-xs text-muted-foreground">{t(`${s}.crmName`)}</Label>
+        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+          {t(`${s}.crmName`)}
+        </Label>
         <Input
           className="mt-1.5 h-9 text-sm"
           placeholder="Nexo Acme Corp"
@@ -31,7 +33,9 @@ export function BrandingFieldsSection({
         />
       </div>
       <div>
-        <Label className="text-xs text-muted-foreground">{t(`${s}.loginTagline`)}</Label>
+        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+          {t(`${s}.loginTagline`)}
+        </Label>
         <Input
           className="mt-1.5 h-9 text-sm"
           placeholder="Build. Grow. Scale."

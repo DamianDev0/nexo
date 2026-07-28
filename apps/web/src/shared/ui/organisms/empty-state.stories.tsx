@@ -27,12 +27,14 @@ export const Default: Story = {
   },
   render: (args) => (
     <EmptyState {...args} className="w-xl">
-      <PillButton size="md" onClick={onPrimary}>
-        New deal
-      </PillButton>
-      <PillButton size="md" variant="tertiary">
-        Import CSV
-      </PillButton>
+      <div className="flex gap-2.5">
+        <PillButton size="md" onClick={onPrimary}>
+          New deal
+        </PillButton>
+        <PillButton size="md" variant="tertiary">
+          Import CSV
+        </PillButton>
+      </div>
     </EmptyState>
   ),
   play: async ({ canvasElement }) => {

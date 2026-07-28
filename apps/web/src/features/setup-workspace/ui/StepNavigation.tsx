@@ -63,7 +63,7 @@ export function StepNavigation({ data, actions, nav }: Readonly<StepNavigationPr
               <div key={group.key}>
                 <div className="mb-2 flex items-center gap-3 px-1">
                   <p className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-                    {t(`${s}.groups.${group.key}`)}
+                    {t(`nav.groups.${group.key}`)}
                   </p>
                   <div className="h-px flex-1 bg-border" />
                 </div>

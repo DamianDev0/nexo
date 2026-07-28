@@ -2,6 +2,7 @@
 
 import { CO_TIMEZONE, CURRENCY_CODE } from '@repo/shared-utils'
 import { updateTag } from 'next/cache'
+import { ZodError } from 'zod'
 
 import { ApiError } from '@/shared/api/api-error'
 import { CACHE_TAGS } from '@/shared/api/cache-tags'
@@ -29,12 +30,17 @@ export type StepActionResult<T = null> =
   | { readonly ok: false; readonly error: string }
 
 function toFailure(error: unknown): { ok: false; error: string } {
-  return { ok: false, error: error instanceof ApiError ? error.message : 'unknown' }
+  if (error instanceof ApiError) return { ok: false, error: error.message }
+  if (error instanceof ZodError) {
+    const issues = error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(' · ')
+    return { ok: false, error: issues }
+  }
+  return { ok: false, error: error instanceof Error ? error.message : 'unknown' }
 }
 
 export async function saveGeneralAction(input: GeneralStepInput): Promise<StepActionResult> {
-  const values = generalStepSchema.parse(input)
   try {
+    const values = generalStepSchema.parse(input)
     await apiFetch('/settings/general', {
       method: 'PATCH',
       cache: 'no-store',
@@ -54,8 +60,8 @@ export async function saveGeneralAction(input: GeneralStepInput): Promise<StepAc
 export async function createPipelineAction(
   input: PipelineStepInput,
 ): Promise<StepActionResult<Pipeline>> {
-  const values = pipelineStepSchema.parse(input)
   try {
+    const values = pipelineStepSchema.parse(input)
     const pipeline = await apiFetch<Pipeline>('/settings/pipelines', {
       method: 'POST',
       cache: 'no-store',
@@ -70,8 +76,8 @@ export async function createPipelineAction(
 export async function saveNomenclatureAction(
   input: NomenclatureStepInput,
 ): Promise<StepActionResult> {
-  const values = nomenclatureStepSchema.parse(input)
   try {
+    const values = nomenclatureStepSchema.parse(input)
     await apiFetch('/settings/nomenclature', { method: 'PATCH', cache: 'no-store', body: values })
     return { ok: true, data: null }
   } catch (error) {
@@ -80,8 +86,8 @@ export async function saveNomenclatureAction(
 }
 
 export async function saveNavigationAction(input: NavigationStepInput): Promise<StepActionResult> {
-  const values = navigationStepSchema.parse(input)
   try {
+    const values = navigationStepSchema.parse(input)
     await apiFetch('/settings/navigation', { method: 'PATCH', cache: 'no-store', body: values })
     return { ok: true, data: null }
   } catch (error) {
@@ -90,8 +96,8 @@ export async function saveNavigationAction(input: NavigationStepInput): Promise<
 }
 
 export async function saveThemeAction(input: ThemeStepInput): Promise<StepActionResult> {
-  const values = themeStepSchema.parse(input)
   try {
+    const values = themeStepSchema.parse(input)
     await apiFetch('/settings/theme', { method: 'PATCH', cache: 'no-store', body: values })
     updateTag(CACHE_TAGS.settingsTheme)
     return { ok: true, data: null }
@@ -103,8 +109,8 @@ export async function saveThemeAction(input: ThemeStepInput): Promise<StepAction
 export async function inviteUsersAction(
   input: InvitesStepInput,
 ): Promise<StepActionResult<number>> {
-  const invites = invitesStepSchema.parse(input)
   try {
+    const invites = invitesStepSchema.parse(input)
     await Promise.all(
       invites.map((invite) =>
         apiFetch('/users/invite', { method: 'POST', cache: 'no-store', body: invite }),

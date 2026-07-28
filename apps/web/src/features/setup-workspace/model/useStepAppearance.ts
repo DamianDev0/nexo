@@ -1,4 +1,3 @@
-import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
 import { t } from 'i18next'
 import { useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
@@ -10,41 +9,17 @@ import { QUERY_KEYS } from '@/shared/config/query-keys'
 import { saveThemeAction } from '../api/setup-steps.actions'
 import { derivePalette } from '../model/palette.utils'
 
+import {
+  APPEARANCE_DEFAULT_VALUES as DEFAULT_VALUES,
+  withPreset,
+  type AppearanceFormValues,
+} from './appearance-form'
+import { matchingPresetKey, type ThemePreset } from './appearance.constants'
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
 import type { ColorOverrides, OverridableColorKey, ThemeMode } from './appearance.types'
 import type { TenantTheme, ThemeConfig, ThemeTypography } from '@repo/shared-types'
-
-interface AppearanceFormValues {
-  primaryColor: string
-  colorOverrides: ColorOverrides
-  grainIntensity: number
-  darkMode: ThemeMode
-  fontFamily: ThemeTypography['fontFamily']
-  borderRadius: ThemeTypography['borderRadius']
-  density: ThemeTypography['density']
-  productName: string
-  tagline: string
-  logoUrl: string | null
-  logoPreview: string | null
-  logoFileName: string | null
-}
-
-const DEFAULT_VALUES: AppearanceFormValues = {
-  primaryColor: BRAND_COLOR_OPTIONS[0].hex,
-  colorOverrides: {},
-  grainIntensity: 0,
-  darkMode: 'system',
-  fontFamily: 'inter',
-  borderRadius: 'lg',
-  density: 'comfortable',
-  productName: '',
-  tagline: '',
-  logoUrl: null,
-  logoPreview: null,
-  logoFileName: null,
-}
 
 export function useStepAppearance(onNext: () => void) {
   const { watch, setValue, getValues, reset } = useForm<AppearanceFormValues>({
@@ -137,6 +112,22 @@ export function useStepAppearance(onNext: () => void) {
     onNext,
   })
 
+  const handleApplyPreset = useCallback(
+    (preset: ThemePreset) => reset(withPreset(getValues(), preset)),
+    [getValues, reset],
+  )
+
+  const activePresetKey = useMemo(
+    () =>
+      matchingPresetKey({
+        primaryColor: values.primaryColor,
+        fontFamily: values.fontFamily,
+        borderRadius: values.borderRadius,
+        density: values.density,
+      }),
+    [values.primaryColor, values.fontFamily, values.borderRadius, values.density],
+  )
+
   const handleRestoreTheme = useCallback(
     (config: Partial<TenantTheme>) => {
       const current = getValues()
@@ -176,6 +167,8 @@ export function useStepAppearance(onNext: () => void) {
     setTagline: (v: string) => setValue('tagline', v),
     logoPreview: values.logoPreview,
     logoFileName: values.logoFileName,
+    activePresetKey,
+    handleApplyPreset,
     handlePrimaryChange,
     handleColorOverride,
     handleLogoUpload,

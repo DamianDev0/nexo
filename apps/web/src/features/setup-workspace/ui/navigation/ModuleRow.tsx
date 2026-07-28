@@ -36,7 +36,7 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
   const { t } = useTranslation()
   const s = 'onboarding.steps.navigation'
   const Icon = SIDEBAR_ICON_MAP[module.icon]
-  const label = t(`${s}.modules.${module.key}`, { defaultValue: module.label })
+  const label = t(`nav.${module.key}`, { defaultValue: module.label })
 
   return (
     <div

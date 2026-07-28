@@ -1,4 +1,11 @@
-import { DENSITY_MAP, GOOGLE_FONT_MAP, RADIUS_MAP } from '../../model/appearance.constants'
+import { useTranslation } from 'react-i18next'
+
+import {
+  DENSITY_MAP,
+  GOOGLE_FONT_MAP,
+  RADIUS_MAP,
+  SURFACE_RADIUS_MAP,
+} from '../../model/appearance.constants'
 import { deriveDarkPalette } from '../../model/palette.utils'
 
 import { PreviewMain } from './PreviewMain'
@@ -23,6 +30,7 @@ interface AppearanceLivePreviewProps {
 }
 
 export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewProps>) {
+  const { t } = useTranslation()
   const isDark = data.darkMode === 'dark'
   const colors = isDark ? deriveDarkPalette(data.colors) : data.colors
 
@@ -35,26 +43,30 @@ export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewPr
   return (
     <div className="hidden flex-col gap-3 lg:flex">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-foreground">Live preview</span>
-        <span className="text-xs text-muted-foreground">Updates in real time</span>
+        <span className="text-xs font-semibold text-foreground">
+          {t('onboarding.steps.appearance.livePreview')}
+        </span>
+        <span className="text-xs text-muted-foreground">
+          {t('onboarding.steps.appearance.updatesRealTime')}
+        </span>
       </div>
 
       <div
         className="overflow-hidden rounded-xl border border-border shadow-sm"
         style={{ fontFamily: `'${fontFace}', system-ui, sans-serif` }}
       >
-        <div className="flex items-center gap-2 border-b border-border bg-muted/60 px-3 py-2">
+        <div className="flex h-8 items-center justify-between border-b border-border bg-muted/40 px-3">
           <div className="flex gap-1.5">
-            <div className="size-2 rounded-full bg-red-400/80" />
-            <div className="size-2 rounded-full bg-amber-400/80" />
-            <div className="size-2 rounded-full bg-emerald-400/80" />
+            <div className="size-2 rounded-full bg-red-400/90" />
+            <div className="size-2 rounded-full bg-amber-400/90" />
+            <div className="size-2 rounded-full bg-emerald-400/90" />
           </div>
-          <div className="ml-3 flex-1 rounded bg-background/60 px-2 py-0.5 text-center text-xs text-muted-foreground/60">
+          <span className="text-[10px] font-medium tracking-wide text-muted-foreground/50">
             app.nexo.com
-          </div>
+          </span>
         </div>
 
-        <div className="flex min-h-80">
+        <div className="flex min-h-96">
           <PreviewSidebar
             colors={colors}
             radius={r}
@@ -63,7 +75,12 @@ export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewPr
             logoPreview={data.logoPreview}
             modules={enabledModules}
           />
-          <PreviewMain colors={colors} radius={r} gap={d.gap} />
+          <PreviewMain
+            colors={colors}
+            radius={r}
+            surfaceRadius={SURFACE_RADIUS_MAP[data.borderRadius]}
+            gap={d.gap}
+          />
         </div>
       </div>
     </div>

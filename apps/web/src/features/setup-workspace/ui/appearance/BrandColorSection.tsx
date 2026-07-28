@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { ArcColorPicker } from '@/shared/ui/molecules/color-picker'
+import { Button } from '@/shared/ui/shadcn/button'
 import { Label } from '@/shared/ui/shadcn/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
@@ -26,8 +27,8 @@ export function BrandColorSection({
   const colorName = COLOR_NAMES[primaryColor.toUpperCase()] ?? 'Custom'
 
   return (
-    <div className="mb-6">
-      <Label className="text-xs text-muted-foreground">
+    <div className="px-4 py-4">
+      <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
         {t('onboarding.steps.appearance.primaryColor')}
       </Label>
       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -47,17 +48,26 @@ export function BrandColorSection({
             aria-pressed={primaryColor === hex}
           />
         ))}
+      </div>
+      <div className="mt-2.5 flex items-center justify-between gap-3">
+        <span className="text-xs text-muted-foreground">{colorName}</span>
         <Popover>
           <PopoverTrigger asChild>
-            <button
+            <Button
               type="button"
-              className="flex size-7 items-center justify-center rounded-full border-2 border-border transition-transform duration-150 hover:scale-105 hover:border-foreground/50"
-              aria-label="Pick custom color"
+              variant="outline"
+              aria-label={t('onboarding.steps.appearance.customColor')}
+              className="h-8 w-32 justify-start gap-2 px-2 font-normal"
             >
-              <Paintbrush className="size-3 text-muted-foreground" />
-            </button>
+              <span
+                className="size-4.5 shrink-0 rounded-sm border border-border/60"
+                style={{ background: primaryColor }}
+              />
+              <span className="font-mono text-xs uppercase text-foreground/80">{primaryColor}</span>
+              <Paintbrush className="ml-auto size-3 text-muted-foreground" />
+            </Button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-72 p-0">
+          <PopoverContent align="end" className="w-72 p-0">
             <ArcColorPicker
               selectedColor={primaryColor}
               onColorChange={onPrimaryColorChange}
@@ -67,12 +77,6 @@ export function BrandColorSection({
             />
           </PopoverContent>
         </Popover>
-      </div>
-      <div className="mt-2 flex items-center gap-1.5">
-        <div className="size-3 rounded-sm" style={{ background: primaryColor }} />
-        <span className="text-xs text-muted-foreground">
-          {colorName} · <span className="font-mono text-xs">{primaryColor}</span>
-        </span>
       </div>
     </div>
   )

@@ -12,12 +12,12 @@ import type { ReactNode } from 'react'
 export default function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <AuthGuard>
-      <SidebarProvider>
+      <SidebarProvider style={{ '--sidebar-width': '15rem' } as React.CSSProperties}>
         <AppSidebar />
         <SidebarInset>
           <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
+            <SidebarTrigger className="-ml-1 md:hidden" />
+            <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
             <div className="flex-1" />
             <LanguageSwitcher />
             <ThemeToggle />

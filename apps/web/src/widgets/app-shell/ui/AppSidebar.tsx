@@ -1,18 +1,14 @@
 'use client'
 
 import { useAuthStore } from '@/entities/session'
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from '@/shared/ui/shadcn/sidebar'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/shared/ui/shadcn/sidebar'
 
-import { DEFAULT_TEAMS, NAV_CRM } from '../model/nav-items'
+import { DEFAULT_TEAMS } from '../model/nav-items'
+import { useSidebarModules } from '../model/useSidebarModules'
 
 import { NavMain } from './NavMain'
 import { NavUser } from './NavUser'
+import { SidebarCollapseButton } from './SidebarCollapseButton'
 import { TeamSwitcher } from './TeamSwitcher'
 
 import type { AuthenticatedUser } from '@repo/shared-types'
@@ -28,6 +24,7 @@ function toUserDisplay(user: AuthenticatedUser | null) {
 
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((s) => s.user)
+  const groups = useSidebarModules()
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -35,12 +32,12 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={[...DEFAULT_TEAMS]} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={NAV_CRM} />
+        <NavMain groups={groups} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={toUserDisplay(user)} />
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarCollapseButton />
     </Sidebar>
   )
 }

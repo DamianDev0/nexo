@@ -1,3 +1,4 @@
+import type { ThemePreset } from './appearance.constants'
 import type { SidebarModule, TenantTheme, ThemeColors, ThemeTypography } from '@repo/shared-types'
 
 export type ThemeMode = TenantTheme['darkModeDefault']
@@ -17,6 +18,7 @@ export interface AppearanceData {
   readonly logoPreview: string | null
   readonly logoFileName: string | null
   readonly navModules: ReadonlyArray<SidebarModule>
+  readonly activePresetKey: string | null
 }
 
 export interface AppearanceActions {
@@ -32,4 +34,5 @@ export interface AppearanceActions {
   readonly onLogoUpload: (file: File) => Promise<unknown>
   readonly onLogoRemove: () => void
   readonly onRestoreTheme: (config: Partial<TenantTheme>) => void
+  readonly onApplyPreset: (preset: ThemePreset) => void
 }
