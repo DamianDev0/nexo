@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
 import { useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
@@ -22,6 +23,7 @@ import type { ColorOverrides, OverridableColorKey, ThemeMode } from './appearanc
 import type { TenantTheme, ThemeConfig, ThemeTypography } from '@repo/shared-types'
 
 export function useStepAppearance(onNext: () => void) {
+  const queryClient = useQueryClient()
   const { watch, setValue, getValues, reset } = useForm<AppearanceFormValues>({
     defaultValues: DEFAULT_VALUES,
   })
@@ -110,6 +112,9 @@ export function useStepAppearance(onNext: () => void) {
       return result.data
     },
     onNext,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.settings.theme })
+    },
   })
 
   const handleApplyPreset = useCallback(
