@@ -5,6 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/shared/
 
 import { DEFAULT_TEAMS } from '../model/nav-items'
 import { useSidebarModules } from '../model/useSidebarModules'
+import { useTenantBranding } from '../model/useTenantBranding'
 
 import { NavMain } from './NavMain'
 import { NavUser } from './NavUser'
@@ -25,11 +26,17 @@ function toUserDisplay(user: AuthenticatedUser | null) {
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((s) => s.user)
   const groups = useSidebarModules()
+  const branding = useTenantBranding()
+  const team = {
+    ...DEFAULT_TEAMS[0],
+    name: branding.name,
+    plan: branding.plan ?? DEFAULT_TEAMS[0].plan,
+  }
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={[...DEFAULT_TEAMS]} />
+        <TeamSwitcher teams={[team]} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain groups={groups} />

@@ -25,7 +25,10 @@ export interface NavItem {
   readonly available: boolean
 }
 
-const BUILT_ROUTES: ReadonlySet<string> = new Set([ROUTES.app.dashboard])
+const BUILT_ROUTES: ReadonlySet<string> = new Set([
+  ROUTES.app.dashboard,
+  ROUTES.app.settings.general,
+])
 
 function navItem(key: SidebarModuleKey, url: string, icon: LucideIcon): NavItem {
   return { key, titleKey: `nav.${key}`, url, icon, available: BUILT_ROUTES.has(url) }

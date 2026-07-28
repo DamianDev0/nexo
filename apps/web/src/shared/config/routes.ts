@@ -12,7 +12,12 @@ export const ROUTES = {
     invoices: { list: '/invoices' },
     reports: '/reports',
     products: { list: '/products' },
-    settings: { general: '/settings/general' },
+    settings: {
+      general: '/settings/general',
+      appearance: '/settings/appearance',
+      navigation: '/settings/navigation',
+      nomenclature: '/settings/nomenclature',
+    },
   },
   setup: {
     onboarding: '/onboarding/setup',

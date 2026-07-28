@@ -1,0 +1,7 @@
+export { ManageSettingsProvider, useManageSettings } from './model/settings-context'
+export { SETTINGS_SECTIONS, type SettingsSectionKey } from './model/settings-sections'
+export { SettingsShell } from './ui/SettingsShell'
+export { GeneralSettings } from './ui/sections/GeneralSettings'
+export { AppearanceSettings } from './ui/sections/AppearanceSettings'
+export { NavigationSettings } from './ui/sections/NavigationSettings'
+export { NomenclatureSettings } from './ui/sections/NomenclatureSettings'
