@@ -20,6 +20,7 @@ const en = {
     or: 'or',
     and: 'and',
     saveFailed: 'Failed to save',
+    toggleTheme: 'Toggle theme',
     upload: {
       fileTooLarge: 'File too large',
       fileTooLargeDesc: 'Max size is {{max}}MB. Your file is {{size}}.',

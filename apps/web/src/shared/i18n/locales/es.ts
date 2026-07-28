@@ -20,6 +20,7 @@ const es = {
     or: 'o',
     and: 'y',
     saveFailed: 'Error al guardar',
+    toggleTheme: 'Cambiar tema',
     upload: {
       fileTooLarge: 'Archivo demasiado grande',
       fileTooLargeDesc: 'El tamaño máximo es {{max}}MB. Tu archivo pesa {{size}}.',

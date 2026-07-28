@@ -10,6 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/shadcn/dropdown-menu'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/ui/shadcn/tooltip'
 
 import { LANGUAGES } from '../model/languages'
 import { useSwitchLanguage } from '../model/use-switch-language'
@@ -20,17 +26,24 @@ export function LanguageSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label={t('language.switch')}
-          className="gap-1.5 text-foreground/60 hover:text-foreground"
-        >
-          <Languages className="size-4" />
-          <span className="text-xs font-semibold uppercase tracking-wide">{current}</span>
-        </Button>
-      </DropdownMenuTrigger>
+      <TooltipProvider delayDuration={400}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label={t('language.switch')}
+                className="gap-1.5 text-foreground/60 hover:text-foreground"
+              >
+                <Languages className="size-4" />
+                <span className="text-xs font-semibold uppercase tracking-wide">{current}</span>
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{t('language.switch')}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <DropdownMenuContent align="end" className="min-w-36">
         {LANGUAGES.map(({ locale, label }) => (
           <DropdownMenuItem

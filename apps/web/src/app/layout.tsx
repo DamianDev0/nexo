@@ -7,7 +7,7 @@ import type { ReactNode } from 'react'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
-  title: 'NexoCRM',
+  title: { default: 'NexoCRM', template: '%s · NexoCRM' },
   description: 'CRM enterprise para Colombia',
 }
 

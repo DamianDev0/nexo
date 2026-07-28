@@ -27,8 +27,20 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
   return (
     <SidebarMenuItem>
       {item.available ? (
-        <SidebarMenuButton asChild isActive={isActive} tooltip={title} className={BUTTON_CLASSES}>
+        <SidebarMenuButton
+          asChild
+          isActive={isActive}
+          tooltip={title}
+          className={`${BUTTON_CLASSES} relative data-[active=true]:bg-transparent`}
+        >
           <Link href={item.url}>
+            {isActive && (
+              <motion.span
+                layoutId="sidebar-active-pill"
+                transition={{ type: 'spring', bounce: 0.18, duration: 0.45 }}
+                className="absolute inset-0 -z-10 rounded-lg bg-sidebar-accent"
+              />
+            )}
             <item.icon />
             <span>{title}</span>
           </Link>
