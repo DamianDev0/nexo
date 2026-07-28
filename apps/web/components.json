@@ -10,6 +10,7 @@
     "cssVariables": true,
     "prefix": ""
   },
+  "iconLibrary": "lucide",
   "aliases": {
     "components": "@/shared/ui",
     "utils": "@/shared/lib",
@@ -17,5 +18,8 @@
     "lib": "@/shared/lib",
     "hooks": "@/shared/lib/hooks"
   },
-  "iconLibrary": "lucide"
+  "registries": {
+    "@smoothui": "https://smoothui.dev/r/{name}.json",
+    "@kokonutui": "https://kokonutui.com/r/{name}.json"
+  }
 }
