@@ -298,6 +298,7 @@ const en = {
   nav: {
     comingSoon: 'Coming soon',
     toggleSidebar: 'Toggle sidebar',
+    search: 'Search...',
     groups: {
       overview: 'Overview',
       management: 'Management',

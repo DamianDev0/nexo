@@ -12,5 +12,5 @@ export function HeaderTitle() {
 
   if (!item) return null
 
-  return <h1 className="text-sm font-semibold text-foreground">{t(item.titleKey)}</h1>
+  return <h1 className="text-lg font-bold tracking-tight text-foreground">{t(item.titleKey)}</h1>
 }

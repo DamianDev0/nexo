@@ -5,7 +5,7 @@ import { LanguageSwitcher } from '@/features/switch-language'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
-import { AppSidebar, HeaderTitle } from '@/widgets/app-shell'
+import { AppSidebar, HeaderSearch, HeaderTitle } from '@/widgets/app-shell'
 
 import type { ReactNode } from 'react'
 
@@ -19,6 +19,9 @@ export default function AppLayout({ children }: Readonly<{ children: ReactNode }
             <SidebarTrigger className="-ml-1 md:hidden" />
             <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
             <HeaderTitle />
+            <div className="mx-6 hidden md:block">
+              <HeaderSearch />
+            </div>
             <div className="flex-1" />
             <LanguageSwitcher />
             <ThemeToggle />

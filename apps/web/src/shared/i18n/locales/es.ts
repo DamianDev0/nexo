@@ -300,6 +300,7 @@ const es = {
   nav: {
     comingSoon: 'Próximamente',
     toggleSidebar: 'Colapsar sidebar',
+    search: 'Buscar...',
     groups: {
       overview: 'General',
       management: 'Gestión',
