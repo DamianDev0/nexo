@@ -18,7 +18,7 @@ export function useTenantBranding() {
     staleTime: BRANDING_STALE_MS,
   })
 
-  const { data: theme } = useQuery({
+  const { data: theme, dataUpdatedAt: themeUpdatedAt } = useQuery({
     queryKey: QUERY_KEYS.settings.theme,
     queryFn: settingsService.getTheme,
     staleTime: BRANDING_STALE_MS,
@@ -32,7 +32,7 @@ export function useTenantBranding() {
 
   return {
     slug,
-    themeCssHref: slug ? `${API_BASE}/tenant/${slug}/theme.css` : null,
+    themeCssHref: slug ? `${API_BASE}/tenant/${slug}/theme.css?v=${themeUpdatedAt}` : null,
     name: theme?.branding?.companyName ?? general?.name ?? 'NexoCRM',
     plan: general?.plan ?? null,
     logoUrl: theme?.branding?.logoUrl ?? null,
