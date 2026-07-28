@@ -1,13 +1,13 @@
 import {
-  Home,
-  Users,
+  Boxes,
   Building2,
-  Briefcase,
-  Calendar,
-  FileText,
-  Package,
-  BarChart3,
-  Settings,
+  CalendarClock,
+  ChartNoAxesColumn,
+  Handshake,
+  LayoutDashboard,
+  ReceiptText,
+  Settings2,
+  UsersRound,
 } from 'lucide-react'
 
 import type { DEFAULT_SIDEBAR_MODULE_KEYS } from '@repo/shared-types'
@@ -28,13 +28,13 @@ export const MODULE_ICON_NAMES: Record<SidebarModuleKey, string> = {
 }
 
 export const SIDEBAR_ICON_MAP: Record<string, LucideIcon> = {
-  home: Home,
-  users: Users,
+  home: LayoutDashboard,
+  users: UsersRound,
   building: Building2,
-  briefcase: Briefcase,
-  calendar: Calendar,
-  'file-text': FileText,
-  package: Package,
-  'bar-chart': BarChart3,
-  settings: Settings,
+  briefcase: Handshake,
+  calendar: CalendarClock,
+  'file-text': ReceiptText,
+  package: Boxes,
+  'bar-chart': ChartNoAxesColumn,
+  settings: Settings2,
 }

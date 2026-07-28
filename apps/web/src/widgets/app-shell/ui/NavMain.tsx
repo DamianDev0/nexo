@@ -31,7 +31,7 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
           asChild
           isActive={isActive}
           tooltip={title}
-          className={`${BUTTON_CLASSES} relative data-[active=true]:bg-transparent`}
+          className={`${BUTTON_CLASSES} relative isolate data-[active=true]:bg-transparent`}
         >
           <Link href={item.url}>
             {isActive && (
@@ -41,7 +41,7 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
                 className="absolute inset-0 -z-10 rounded-lg bg-sidebar-accent"
               />
             )}
-            <item.icon />
+            <item.icon strokeWidth={isActive ? 2.25 : 1.75} />
             <span>{title}</span>
           </Link>
         </SidebarMenuButton>
@@ -52,7 +52,7 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
           tooltip={`${title} — ${t('nav.comingSoon')}`}
           className={`${BUTTON_CLASSES} cursor-default opacity-45 aria-disabled:pointer-events-auto hover:bg-transparent active:bg-transparent`}
         >
-          <item.icon />
+          <item.icon strokeWidth={1.75} />
           <span>{title}</span>
         </SidebarMenuButton>
       )}

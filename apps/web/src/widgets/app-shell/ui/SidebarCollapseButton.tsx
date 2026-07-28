@@ -22,7 +22,7 @@ export function SidebarCollapseButton() {
           onClick={toggleSidebar}
           aria-label={t('nav.toggleSidebar')}
           aria-expanded={expanded}
-          className="absolute -right-3.5 top-1/2 z-20 hidden size-7 -translate-y-1/2 rounded-md border-border-strong/50 bg-card p-0 text-foreground shadow-md hover:border-border-strong hover:bg-accent md:flex"
+          className="absolute -right-3.5 top-1/2 z-20 hidden size-7 -translate-y-1/2 rounded-sm border-border-strong/50 bg-card p-0 text-foreground shadow-md hover:border-border-strong hover:bg-accent md:flex"
         >
           {expanded ? <ChevronsLeft className="size-4" /> : <ChevronsRight className="size-4" />}
         </Button>
