@@ -152,6 +152,7 @@ export class AuthController {
   ): Promise<LoginSessionDto> {
     const rawToken = extractCookie(req, REFRESH_COOKIE)
     if (!rawToken) throw new UnauthorizedException('Refresh token missing')
+    if (!tenantCtx) throw new UnauthorizedException('Tenant could not be resolved')
 
     const result = await this.authService.refresh(rawToken, tenantCtx, extractMeta(req))
     setAuthCookies(res, result.accessToken, result.refreshToken, req)
