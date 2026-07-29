@@ -33,7 +33,7 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full gap-0 sm:max-w-md">
-        <SheetHeader className="px-6 pt-6">
+        <SheetHeader className="border-b border-border px-6 pb-5 pt-6">
           <SheetTitle className="text-lg font-black tracking-[-0.02em]">
             {t(isEdit ? 'contacts.form.editTitle' : 'contacts.form.createTitle')}
           </SheetTitle>
@@ -49,7 +49,7 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
           }}
         >
           <ContactFormFields control={form.control} />
-          <SheetFooter className="mt-auto flex-row justify-end gap-2.5 px-0 pb-1 pt-6">
+          <SheetFooter className="-mx-6 mt-auto flex-row justify-end gap-2.5 border-t border-border px-6 pb-1 pt-5">
             <PillButton variant="ghost" size="md" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </PillButton>

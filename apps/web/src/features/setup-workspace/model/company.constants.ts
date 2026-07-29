@@ -7,9 +7,7 @@ export const REGIONAL_DEFAULTS = {
   currencyDisplay: CURRENCY_OPTIONS[0].label,
 } as const
 
-export const PHONE_PREFIX = '+57'
-
-export const COLOMBIA_FLAG_SRC = '/flags/co.svg'
+export { COLOMBIA_FLAG_SRC, PHONE_PREFIX } from '@/shared/config/colombia'
 
 export const SECTOR_ICON_SRC: Record<IndustrySector, string> = {
   salud: '/icons/3d/heart.png',

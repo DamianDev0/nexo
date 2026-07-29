@@ -14,6 +14,7 @@ interface ControlledFieldProps<T extends FieldValues> {
   readonly autoComplete?: string
   readonly onValueChange?: (value: string, onChange: (value: string) => void) => void
   readonly hintFormat?: (value: string) => string
+  readonly required?: boolean
 }
 
 export function ControlledField<T extends FieldValues>({
@@ -25,6 +26,7 @@ export function ControlledField<T extends FieldValues>({
   autoComplete,
   onValueChange,
   hintFormat,
+  required,
 }: Readonly<ControlledFieldProps<T>>) {
   return (
     <Controller
@@ -32,7 +34,10 @@ export function ControlledField<T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <Label className="text-xs text-muted-foreground">{label}</Label>
+          <Label className="text-xs text-muted-foreground">
+            {label}
+            {required && <span className="text-destructive">*</span>}
+          </Label>
           <Input
             type={type}
             placeholder={placeholder}

@@ -11,6 +11,7 @@ import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 
 import { buildSmartLists, listIdToStatus, statusToListId } from '../model/contact-lists'
 import { useArchiveContact } from '../model/useArchiveContact'
+import { useContactCounts } from '../model/useContactCounts'
 import { useContactsTable } from '../model/useContactsTable'
 
 import { buildContactColumns } from './contact-columns'
@@ -45,7 +46,8 @@ export function ContactsTable() {
     getRowId: (row) => row.id,
   })
   const selectedRows = instance.table.getSelectedRowModel().rows
-  const smartLists = useMemo(() => buildSmartLists(t), [t])
+  const counts = useContactCounts()
+  const smartLists = useMemo(() => buildSmartLists(t, counts), [t, counts])
   const showEmpty = !table.isPending && table.rows.length === 0
 
   return (
@@ -103,7 +105,7 @@ export function ContactsTable() {
             description={t(
               table.isFiltered ? 'contacts.noResults.description' : 'contacts.empty.description',
             )}
-            className="mx-4 mb-6"
+            className="min-h-[26rem] flex-1 justify-center rounded-none"
           >
             {!table.isFiltered && (
               <PillButton size="md" onClick={() => setSheetOpen(true)}>

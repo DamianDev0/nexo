@@ -13,10 +13,17 @@ const LIST_STATUSES: readonly ContactStatus[] = [
   ContactStatus.LOST,
 ]
 
-export function buildSmartLists(t: TFunction): ReadonlyArray<SmartListItem> {
+export function buildSmartLists(
+  t: TFunction,
+  counts: Record<string, number | undefined>,
+): ReadonlyArray<SmartListItem> {
   return [
-    { id: LIST_ALL, label: t('contacts.lists.all') },
-    ...LIST_STATUSES.map((status) => ({ id: status, label: t(`contacts.status.${status}`) })),
+    { id: LIST_ALL, label: t('contacts.lists.all'), count: counts[LIST_ALL] },
+    ...LIST_STATUSES.map((status) => ({
+      id: status,
+      label: t(`contacts.status.${status}`),
+      count: counts[status],
+    })),
   ]
 }
 
