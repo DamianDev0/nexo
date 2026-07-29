@@ -13,10 +13,12 @@ const t = ((key: string) => key) as TFunction
 
 describe('buildSmartLists', () => {
   it('returns the "all" list plus one entry per tracked status', () => {
-    const lists = buildSmartLists(t)
+    const lists = buildSmartLists(t, { all: 12, [ContactStatus.NEW]: 3 })
 
     expect(lists).toHaveLength(6)
-    expect(lists[0]).toEqual({ id: 'all', label: 'contacts.lists.all' })
+    expect(lists[0]).toEqual({ id: 'all', label: 'contacts.lists.all', count: 12 })
+    expect(lists[1]?.count).toBe(3)
+    expect(lists[2]?.count).toBeUndefined()
     expect(lists.map((l) => l.id)).toEqual([
       'all',
       ContactStatus.NEW,
