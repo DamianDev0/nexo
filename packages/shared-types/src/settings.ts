@@ -50,6 +50,10 @@ export type ThemeTokens = {
   'popover-foreground': string
   primary: string
   'primary-foreground': string
+  'primary-hover': string
+  'primary-pressed': string
+  'primary-pale': string
+  'primary-deep': string
   secondary: string
   'secondary-foreground': string
   muted: string

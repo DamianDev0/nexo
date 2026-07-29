@@ -142,6 +142,25 @@ export function blendLightness(base: string, target: string, t: number): string 
   return oklchToHex({ l: b.l + (goal.l - b.l) * t, c: b.c, h: b.h })
 }
 
+interface PrimaryScale {
+  hover: string
+  pressed: string
+  deep: string
+  paleLight: string
+  paleDark: string
+}
+
+function derivePrimaryScale(primary: string): PrimaryScale {
+  const base = hexToOklch(primary) ?? { l: 0.6, c: 0, h: 0 }
+  return {
+    hover: oklchToHex({ l: Math.min(base.l + 0.056, 0.97), c: base.c * 0.7, h: base.h }),
+    pressed: oklchToHex({ l: Math.max(base.l - 0.06, 0.15), c: base.c, h: base.h }),
+    deep: oklchToHex({ l: 0.34, c: Math.min(base.c * 0.5, 0.09), h: base.h }),
+    paleLight: oklchToHex({ l: 0.95, c: Math.min(base.c * 0.3, 0.05), h: base.h }),
+    paleDark: oklchToHex({ l: 0.27, c: Math.min(base.c * 0.25, 0.04), h: base.h }),
+  }
+}
+
 function deriveCharts(
   primary: string,
   accent: string,
@@ -155,6 +174,7 @@ function buildLight(seeds: ThemeColors): ThemeTokens {
   const fg = tintedNeutral(p, 0.18, 0.012)
   const surface = tintedNeutral(p, 0.99, 0.004)
   const border = tintedNeutral(p, 0.922, 0.012)
+  const scale = derivePrimaryScale(p)
   const [c1, c2, c3, c4, c5] = deriveCharts(p, seeds.accent, seeds.secondary)
 
   return {
@@ -166,6 +186,10 @@ function buildLight(seeds: ThemeColors): ThemeTokens {
     'popover-foreground': fg,
     primary: p,
     'primary-foreground': seeds.primaryForeground,
+    'primary-hover': scale.hover,
+    'primary-pressed': scale.pressed,
+    'primary-pale': scale.paleLight,
+    'primary-deep': scale.deep,
     secondary: seeds.secondary,
     'secondary-foreground': readableForeground(seeds.secondary),
     muted: tintedNeutral(p, 0.968, 0.012),
@@ -199,6 +223,7 @@ function buildDark(seeds: ThemeColors): ThemeTokens {
   const surface = tintedNeutral(p, 0.21, 0.012)
   const border = tintedNeutral(p, 0.3, 0.014)
   const sidebar = blendLightness(seeds.sidebar, '#000000', 0.15)
+  const scale = derivePrimaryScale(p)
   const [c1, c2, c3, c4, c5] = deriveCharts(p, seeds.accent, seeds.secondary)
 
   return {
@@ -210,6 +235,10 @@ function buildDark(seeds: ThemeColors): ThemeTokens {
     'popover-foreground': fg,
     primary: p,
     'primary-foreground': readableForeground(p),
+    'primary-hover': scale.hover,
+    'primary-pressed': scale.pressed,
+    'primary-pale': scale.paleDark,
+    'primary-deep': scale.deep,
     secondary: tintedNeutral(p, 0.27, 0.012),
     'secondary-foreground': fg,
     muted: tintedNeutral(p, 0.27, 0.014),
