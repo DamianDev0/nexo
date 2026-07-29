@@ -27,6 +27,7 @@ export interface NavItem {
 
 const BUILT_ROUTES: ReadonlySet<string> = new Set([
   ROUTES.app.dashboard,
+  ROUTES.app.contacts.list,
   ROUTES.app.settings.general,
 ])
 
