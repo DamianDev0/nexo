@@ -1,0 +1,130 @@
+'use client'
+
+import { UsersRound } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { DataTable, useDataTable } from '@/shared/ui/organisms/data-table'
+import { EmptyState } from '@/shared/ui/organisms/empty-state'
+import { Skeleton } from '@/shared/ui/shadcn/skeleton'
+
+import { buildSmartLists, listIdToStatus, statusToListId } from '../model/contact-lists'
+import { useArchiveContact } from '../model/useArchiveContact'
+import { useContactsTable } from '../model/useContactsTable'
+
+import { buildContactColumns } from './contact-columns'
+import { ContactFormSheet } from './ContactFormSheet'
+import { ContactsPagination } from './ContactsPagination'
+
+import type { ContactListItem } from '@repo/shared-types'
+
+export function ContactsTable() {
+  const { t } = useTranslation()
+  const table = useContactsTable()
+  const { archive } = useArchiveContact()
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [editing, setEditing] = useState<ContactListItem | null>(null)
+
+  const columns = useMemo(
+    () =>
+      buildContactColumns(t, {
+        onEdit: (contact) => {
+          setEditing(contact)
+          setSheetOpen(true)
+        },
+        onArchive: (contact) => archive([contact.id]),
+      }),
+    [t, archive],
+  )
+
+  const instance = useDataTable({
+    data: table.rows,
+    columns,
+    pageSize: table.limit,
+    getRowId: (row) => row.id,
+  })
+  const selectedRows = instance.table.getSelectedRowModel().rows
+  const smartLists = useMemo(() => buildSmartLists(t), [t])
+  const showEmpty = !table.isPending && table.rows.length === 0
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between pb-5">
+        <p className="text-sm text-muted-foreground">
+          {t('contacts.count', { count: table.total })}
+        </p>
+        <PillButton
+          size="md"
+          onClick={() => {
+            setEditing(null)
+            setSheetOpen(true)
+          }}
+        >
+          {t('contacts.newContact')}
+        </PillButton>
+      </div>
+      <DataTable instance={instance}>
+        <DataTable.SmartLists
+          data={{ items: smartLists, activeId: statusToListId(table.status) }}
+          onSelect={(id) => table.handleStatus(listIdToStatus(id))}
+        />
+        <DataTable.Toolbar>
+          <DataTable.Search
+            value={table.search}
+            placeholder={t('contacts.searchPlaceholder')}
+            onChange={table.handleSearch}
+          />
+        </DataTable.Toolbar>
+        {selectedRows.length > 0 && (
+          <DataTable.BulkBar label={t('contacts.bulk.selected', { count: selectedRows.length })}>
+            <DataTable.BulkAction
+              destructive
+              onClick={() => {
+                archive(selectedRows.map((row) => row.original.id))
+                instance.table.resetRowSelection()
+              }}
+            >
+              {t('contacts.bulk.archive')}
+            </DataTable.BulkAction>
+          </DataTable.BulkBar>
+        )}
+        {table.isPending && (
+          <div className="flex flex-col gap-2.5 px-4 pb-6">
+            {Array.from({ length: 6 }, (_, i) => (
+              <Skeleton key={`row-${i + 1}`} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
+        )}
+        {showEmpty && (
+          <EmptyState
+            icon={<UsersRound className="size-5" />}
+            title={t(table.isFiltered ? 'contacts.noResults.title' : 'contacts.empty.title')}
+            description={t(
+              table.isFiltered ? 'contacts.noResults.description' : 'contacts.empty.description',
+            )}
+            className="mx-4 mb-6"
+          >
+            {!table.isFiltered && (
+              <PillButton size="md" onClick={() => setSheetOpen(true)}>
+                {t('contacts.empty.cta')}
+              </PillButton>
+            )}
+          </EmptyState>
+        )}
+        {!table.isPending && table.rows.length > 0 && (
+          <>
+            <DataTable.Header />
+            <DataTable.Body />
+            <ContactsPagination
+              nav={{ page: table.page, totalPages: table.totalPages, limit: table.limit }}
+              onPageChange={table.setPage}
+              onLimitChange={table.handleLimit}
+            />
+          </>
+        )}
+      </DataTable>
+      <ContactFormSheet contact={editing} open={sheetOpen} onOpenChange={setSheetOpen} />
+    </div>
+  )
+}

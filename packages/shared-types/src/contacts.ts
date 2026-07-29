@@ -40,6 +40,37 @@ export type Contact = {
 
 export type ContactListItem = Omit<Contact, 'customFields'>
 
+export type ContactInput = {
+  firstName: string
+  lastName?: string
+  email?: string
+  phone?: string
+  whatsapp?: string
+  documentType?: DocumentType
+  documentNumber?: string
+  city?: string
+  department?: string
+  municipioCode?: string
+  status?: ContactStatus
+  source?: ContactSource
+  leadScore?: number
+  tags?: string[]
+  companyId?: string
+  assignedToId?: string
+  customFields?: Record<string, unknown>
+}
+
+export type ContactListQuery = {
+  q?: string
+  status?: ContactStatus
+  source?: ContactSource
+  tags?: string[]
+  companyId?: string
+  assignedToId?: string
+  page?: number
+  limit?: number
+}
+
 export type PaginatedContacts = {
   data: ContactListItem[]
   total: number
