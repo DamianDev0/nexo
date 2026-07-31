@@ -308,6 +308,23 @@ export function getTenantSchemaSQL(schema: string): string {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
 
+    CREATE TABLE "${schema}".contact_views (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      owner_id UUID NOT NULL REFERENCES "${schema}".users(id),
+      name VARCHAR(120) NOT NULL,
+      filters JSONB NOT NULL DEFAULT '{}',
+      advanced_filters JSONB,
+      columns JSONB NOT NULL DEFAULT '{}',
+      sort JSONB,
+      density VARCHAR(12) NOT NULL DEFAULT 'comfortable',
+      is_default BOOLEAN NOT NULL DEFAULT false,
+      is_favorite BOOLEAN NOT NULL DEFAULT false,
+      visibility VARCHAR(10) NOT NULL DEFAULT 'private',
+      position INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     CREATE TABLE "${schema}".message_templates (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(200) NOT NULL,
@@ -609,6 +626,8 @@ export function getTenantIndicesSQL(schema: string): string {
     CREATE UNIQUE INDEX idx_${schema}_tags_unique ON "${schema}".tags (entity_type, LOWER(name));
 
     CREATE INDEX idx_${schema}_saved_filters_user ON "${schema}".saved_filters (user_id, entity_type);
+    CREATE INDEX idx_${schema}_contact_views_owner ON "${schema}".contact_views (owner_id);
+    CREATE INDEX idx_${schema}_contact_views_visibility ON "${schema}".contact_views (visibility);
 
     CREATE INDEX idx_${schema}_message_templates_channel ON "${schema}".message_templates (channel)
       WHERE is_active = true;

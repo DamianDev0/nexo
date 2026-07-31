@@ -17,13 +17,14 @@ import type {
   TenantContext,
   AuthenticatedUser,
   Contact,
+  ContactCounts,
   PaginatedContacts,
   ContactTimeline,
 } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
-import { ContactsService } from './contacts.service'
+import { ContactsService } from './services/contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { CreateContactDto, UpdateContactDto, ContactQueryDto } from './dto/contact.dto'
 
@@ -55,6 +56,13 @@ export class ContactsController {
   ): Promise<Contact> {
     await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
     return this.contactsService.create(ctx.schemaName, dto, user.id)
+  }
+
+  @Get('counts')
+  @Auth(UserRole.VIEWER)
+  @ApiOperation({ summary: 'Contact totals grouped by status' })
+  counts(@TenantCtx() ctx: TenantContext): Promise<ContactCounts> {
+    return this.contactsService.counts(ctx.schemaName)
   }
 
   @Get(':id')

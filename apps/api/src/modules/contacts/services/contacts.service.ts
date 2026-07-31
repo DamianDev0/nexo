@@ -5,19 +5,21 @@ import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { AuditAction, AuditEntityType } from '@/modules/audit-log/audit-log.interfaces'
 import type {
   Contact,
+  ContactCounts,
   ContactListItem,
   PaginatedContacts,
   ContactTimeline,
   ContactActivity,
   ContactDeal,
 } from '@repo/shared-types'
-import type { CreateContactDto, UpdateContactDto, ContactQueryDto } from './dto/contact.dto'
-import type { ContactRow, ActivityRow, DealRow } from './interfaces/contact-row.interfaces'
+import type { CreateContactDto, UpdateContactDto, ContactQueryDto } from '../dto/contact.dto'
+import type { ContactRow, ActivityRow, DealRow } from '../interfaces/contact-row.interfaces'
 import {
   UPDATABLE_FIELDS,
   CONTACT_COLUMNS,
   CONTACT_LIST_COLUMNS,
-} from './constants/contact.constants'
+  SORTABLE_COLUMNS,
+} from '../constants/contact.constants'
 import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 
 @Injectable()
@@ -46,12 +48,31 @@ export class ContactsService {
         `SELECT ${CONTACT_LIST_COLUMNS}
          FROM contacts
          WHERE ${where}
-         ORDER BY created_at DESC
+         ${this.buildOrderClause(query)}
          LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length}`,
         dataParams,
       )
 
       return { data: rows.map((r) => this.mapListItem(r)), total, page, limit }
+    })
+  }
+
+  async counts(schemaName: string): Promise<ContactCounts> {
+    return this.db.query(schemaName, async (qr): Promise<ContactCounts> => {
+      const rows: Array<{ status: string; count: string }> = await qr.query(
+        `SELECT status, COUNT(*)::text AS count
+         FROM contacts
+         WHERE is_active = true
+         GROUP BY status`,
+      )
+      const byStatus: Record<string, number> = {}
+      let total = 0
+      for (const row of rows) {
+        const value = Number.parseInt(row.count, 10)
+        byStatus[row.status] = value
+        total += value
+      }
+      return { total, byStatus }
     })
   }
 
@@ -233,11 +254,23 @@ export class ContactsService {
     }
     if (query.status) push(`status = ?`, query.status)
     if (query.source) push(`source = ?`, query.source)
+    if (query.lifecycleStage) push(`lifecycle_stage = ?`, query.lifecycleStage)
     if (query.tags?.length) push(`tags @> ?::text[]`, query.tags)
     if (query.companyId) push(`company_id = ?`, query.companyId)
     if (query.assignedToId) push(`assigned_to_id = ?`, query.assignedToId)
+    if (query.city) push(`LOWER(city) = LOWER(?)`, query.city)
+    if (query.createdFrom) push(`created_at >= ?`, query.createdFrom)
+    if (query.createdTo) push(`created_at <= ?`, query.createdTo)
+    if (query.lastContactedFrom) push(`last_contacted_at >= ?`, query.lastContactedFrom)
+    if (query.lastContactedTo) push(`last_contacted_at <= ?`, query.lastContactedTo)
 
     return { where: conditions.join(' AND '), params }
+  }
+
+  private buildOrderClause(query: ContactQueryDto): string {
+    const column = query.sortBy ? SORTABLE_COLUMNS[query.sortBy] : 'created_at'
+    const direction = query.sortDir === 'asc' ? 'ASC' : 'DESC'
+    return `ORDER BY ${column} ${direction} NULLS LAST, id ASC`
   }
 
   private mapListItem(r: ContactRow): ContactListItem {

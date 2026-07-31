@@ -64,12 +64,34 @@ export type ContactListQuery = {
   q?: string
   status?: ContactStatus
   source?: ContactSource
+  lifecycleStage?: LifecycleStage
   tags?: string[]
   companyId?: string
   assignedToId?: string
+  city?: string
+  createdFrom?: string
+  createdTo?: string
+  lastContactedFrom?: string
+  lastContactedTo?: string
+  sortBy?: ContactSortField
+  sortDir?: 'asc' | 'desc'
   page?: number
   limit?: number
 }
+
+export const CONTACT_SORT_FIELDS = [
+  'createdAt',
+  'updatedAt',
+  'firstName',
+  'lastName',
+  'email',
+  'city',
+  'status',
+  'leadScore',
+  'lastContactedAt',
+] as const
+
+export type ContactSortField = (typeof CONTACT_SORT_FIELDS)[number]
 
 export type PaginatedContacts = {
   data: ContactListItem[]

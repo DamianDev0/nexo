@@ -381,4 +381,29 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".products USING GIN (custom_fields jsonb_path_ops);
     `,
   },
+  {
+    id: '0022_contact_views',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".contact_views (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        owner_id UUID NOT NULL REFERENCES "${schema}".users(id),
+        name VARCHAR(120) NOT NULL,
+        filters JSONB NOT NULL DEFAULT '{}',
+        advanced_filters JSONB,
+        columns JSONB NOT NULL DEFAULT '{}',
+        sort JSONB,
+        density VARCHAR(12) NOT NULL DEFAULT 'comfortable',
+        is_default BOOLEAN NOT NULL DEFAULT false,
+        is_favorite BOOLEAN NOT NULL DEFAULT false,
+        visibility VARCHAR(10) NOT NULL DEFAULT 'private',
+        position INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contact_views_owner"
+        ON "${schema}".contact_views(owner_id);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contact_views_visibility"
+        ON "${schema}".contact_views(visibility);
+    `,
+  },
 ]

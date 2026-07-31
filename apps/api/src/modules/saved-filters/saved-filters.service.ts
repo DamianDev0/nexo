@@ -95,10 +95,11 @@ export class SavedFiltersService {
   async remove(schemaName: string, filterId: string, userId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
       const rows: FilterRow[] = await qr.query(
-        `DELETE FROM saved_filters WHERE id = $1 AND user_id = $2 RETURNING id`,
+        `SELECT id FROM saved_filters WHERE id = $1 AND user_id = $2`,
         [filterId, userId],
       )
       if (rows.length === 0) throw new NotFoundException(`Filter ${filterId} not found`)
+      await qr.query(`DELETE FROM saved_filters WHERE id = $1 AND user_id = $2`, [filterId, userId])
     })
   }
 

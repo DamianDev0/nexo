@@ -1,7 +1,7 @@
 import { AuditLogService } from '@/modules/audit-log/audit-log.service'
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { ContactsService } from '../contacts.service'
+import { ContactsService } from '../services/contacts.service'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { PaginatedContacts } from '@repo/shared-types'
 import { ContactStatus, ContactSource } from '@repo/shared-types'

@@ -28,6 +28,18 @@ export const CONTACT_COLUMNS = `
   custom_fields, is_active, created_by, created_at, updated_at
 `
 
+export const SORTABLE_COLUMNS: Record<string, string> = {
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  firstName: 'first_name',
+  lastName: 'last_name',
+  email: 'email',
+  city: 'city',
+  status: 'status',
+  leadScore: 'lead_score',
+  lastContactedAt: 'last_contacted_at',
+}
+
 export const CONTACT_LIST_COLUMNS = `
   id, first_name, last_name, email, phone, whatsapp,
   document_type, document_number, city, department, municipio_code,

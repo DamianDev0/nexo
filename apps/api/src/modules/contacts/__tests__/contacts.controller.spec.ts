@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing'
 import { ContactsController } from '../contacts.controller'
-import { ContactsService } from '../contacts.service'
+import { ContactsService } from '../services/contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import {
   ContactSource,
