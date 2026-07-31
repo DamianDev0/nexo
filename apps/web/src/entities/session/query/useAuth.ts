@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import authService from '@/shared/api/services/auth.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
-import { useAuthStore } from './session.store'
+import { useAuthStore } from '../model/session.store'
 
 export function useAuth() {
   const { setUser } = useAuthStore()

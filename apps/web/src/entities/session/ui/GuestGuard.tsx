@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 
 import { ROUTES } from '@/shared/config/routes'
 
-import { useAuth } from '../model/useAuth'
+import { useAuth } from '../query/useAuth'
 
 interface GuestGuardProps {
   readonly children: React.ReactNode

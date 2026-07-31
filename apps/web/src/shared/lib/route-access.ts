@@ -1,6 +1,17 @@
 export type RouteDecision = 'allow' | 'redirect-login' | 'redirect-dashboard'
 
-const PROTECTED_PREFIXES = ['/dashboard', '/onboarding/setup'] as const
+const PROTECTED_PREFIXES = [
+  '/dashboard',
+  '/contacts',
+  '/companies',
+  '/deals',
+  '/activities',
+  '/invoices',
+  '/products',
+  '/reports',
+  '/settings',
+  '/onboarding/setup',
+] as const
 const GUEST_ONLY_PATHS = ['/login', '/onboarding'] as const
 
 function matchesPrefix(pathname: string, prefix: string): boolean {

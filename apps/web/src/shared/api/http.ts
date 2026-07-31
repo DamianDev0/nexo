@@ -61,9 +61,9 @@ function canAttemptRefresh(config: RetriableConfig | undefined): config is Retri
 
 apiUrl.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    if (!axios.isAxiosError(error)) return Promise.reject(error)
-    if (error.response?.status !== 401 || !isBrowser) return Promise.reject(error)
+  async (error: unknown) => {
+    if (!axios.isAxiosError(error)) throw error
+    if (error.response?.status !== 401 || !isBrowser) throw error
 
     const config = error.config as RetriableConfig | undefined
     if (canAttemptRefresh(config)) {
@@ -73,12 +73,12 @@ apiUrl.interceptors.response.use(
         return await apiUrl.request(config)
       } catch {
         redirectToLogin()
-        return Promise.reject(error)
+        throw error
       }
     }
 
     redirectToLogin()
-    return Promise.reject(error)
+    throw error
   },
 )
 

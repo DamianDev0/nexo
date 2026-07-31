@@ -5,8 +5,8 @@ import { ThemeProvider, useTheme } from 'next-themes'
 import { useState, type ReactNode } from 'react'
 import { Toaster } from 'sileo'
 
-import { createQueryClient } from '@/shared/api/query-client'
 import { TOAST_FILL_DARK, TOAST_FILL_LIGHT } from '@/shared/config/tokens/effects'
+import { createQueryClient } from '@/shared/query/query-client'
 import '@/shared/i18n/config'
 
 const LIGHT_TOAST_OPTIONS = {

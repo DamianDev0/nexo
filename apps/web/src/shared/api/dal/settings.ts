@@ -1,0 +1,28 @@
+import 'server-only'
+
+import { CACHE_TAGS } from '../cache-tags'
+import { apiFetch } from '../client'
+
+import type {
+  GeneralSettings,
+  NomenclatureConfig,
+  OnboardingStatus,
+  Pipeline,
+  SidebarConfig,
+  ThemeConfig,
+} from '@repo/shared-types'
+
+export const getGeneral = () =>
+  apiFetch<GeneralSettings>('/settings/general', { tags: [CACHE_TAGS.settingsGeneral] })
+
+export const getTheme = () =>
+  apiFetch<ThemeConfig>('/settings/theme', { tags: [CACHE_TAGS.settingsTheme] })
+
+export const getNavigation = () => apiFetch<SidebarConfig>('/settings/navigation')
+
+export const getNomenclature = () => apiFetch<NomenclatureConfig>('/settings/nomenclature')
+
+export const getPipelines = () => apiFetch<Pipeline[]>('/settings/pipelines')
+
+export const getOnboarding = () =>
+  apiFetch<OnboardingStatus>('/settings/onboarding', { cache: 'no-store' })

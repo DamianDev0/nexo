@@ -1,5 +1,3 @@
-'use client'
-
 import { GuestGuard } from '@/entities/session'
 
 import type { ReactNode } from 'react'

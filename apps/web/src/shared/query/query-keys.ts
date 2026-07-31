@@ -16,5 +16,6 @@ export const QUERY_KEYS = {
     nomenclature: ['settings', 'nomenclature'] as const,
     navigation: ['settings', 'navigation'] as const,
     theme: ['settings', 'theme'] as const,
+    onboarding: ['settings', 'onboarding'] as const,
   },
 } as const

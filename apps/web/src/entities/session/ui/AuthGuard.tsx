@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { ROUTES } from '@/shared/config/routes'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 
-import { useAuth } from '../model/useAuth'
+import { useAuth } from '../query/useAuth'
 
 interface AuthGuardProps {
   readonly children: React.ReactNode

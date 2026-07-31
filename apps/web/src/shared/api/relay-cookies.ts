@@ -15,28 +15,60 @@ interface ParsedSetCookie {
   }
 }
 
+type CookieOptions = ParsedSetCookie['options']
+
+const SAME_SITE_VALUES = new Set(['lax', 'strict', 'none'])
+
+const ATTRIBUTE_PARSERS: Readonly<
+  Record<string, (options: CookieOptions, value: string | undefined) => void>
+> = {
+  httponly: (options) => {
+    options.httpOnly = true
+  },
+  secure: (options) => {
+    options.secure = true
+  },
+  path: (options, value) => {
+    if (value) options.path = value
+  },
+  'max-age': (options, value) => {
+    const parsed = Number(value)
+    if (value && Number.isFinite(parsed)) options.maxAge = parsed
+  },
+  expires: (options, value) => {
+    const parsed = value ? new Date(value) : null
+    if (parsed && !Number.isNaN(parsed.getTime())) options.expires = parsed
+  },
+  samesite: (options, value) => {
+    const normalized = value?.toLowerCase()
+    if (normalized && SAME_SITE_VALUES.has(normalized)) {
+      options.sameSite = normalized as CookieOptions['sameSite']
+    }
+  },
+}
+
+function parseAttributes(attributes: ReadonlyArray<string>): CookieOptions {
+  const options: CookieOptions = {}
+
+  for (const attribute of attributes) {
+    const [rawKey, rawValue] = attribute.split('=')
+    const parser = ATTRIBUTE_PARSERS[rawKey?.trim().toLowerCase() ?? '']
+    parser?.(options, rawValue?.trim())
+  }
+
+  return options
+}
+
 function parseSetCookie(header: string): ParsedSetCookie | null {
   const [pair, ...attributes] = header.split(';')
   const eq = pair?.indexOf('=') ?? -1
   if (!pair || eq < 1) return null
-  const name = pair.slice(0, eq).trim()
-  const value = pair.slice(eq + 1).trim()
 
-  const options: ParsedSetCookie['options'] = {}
-  for (const attribute of attributes) {
-    const [rawKey, rawValue] = attribute.split('=')
-    const key = rawKey?.trim().toLowerCase()
-    const attrValue = rawValue?.trim()
-    if (key === 'httponly') options.httpOnly = true
-    if (key === 'secure') options.secure = true
-    if (key === 'path' && attrValue) options.path = attrValue
-    if (key === 'max-age' && attrValue) options.maxAge = Number(attrValue)
-    if (key === 'expires' && attrValue) options.expires = new Date(attrValue)
-    if (key === 'samesite' && attrValue) {
-      options.sameSite = attrValue.toLowerCase() as 'lax' | 'strict' | 'none'
-    }
+  return {
+    name: pair.slice(0, eq).trim(),
+    value: pair.slice(eq + 1).trim(),
+    options: parseAttributes(attributes),
   }
-  return { name, value, options }
 }
 
 export async function relaySetCookies(setCookieHeaders: ReadonlyArray<string>): Promise<void> {

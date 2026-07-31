@@ -63,7 +63,6 @@ function doFetch<T>(
   cookieHeader: string,
 ): Promise<Response> {
   const { tags, revalidate, parse: _omitted, body, headers, ...rest } = options
-  void _omitted
   return fetch(`${API_BASE}${endpoint}`, {
     ...rest,
     headers: {

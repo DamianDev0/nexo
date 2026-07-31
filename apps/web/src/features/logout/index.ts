@@ -1,1 +1,1 @@
-export { useLogout } from './model/useLogout'
+export { useLogout } from './query/useLogout'
