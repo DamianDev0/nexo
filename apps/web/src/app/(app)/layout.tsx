@@ -26,7 +26,7 @@ export default function AppLayout({ children }: Readonly<{ children: ReactNode }
             <LanguageSwitcher />
             <ThemeToggle />
           </header>
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main className="flex-1 overflow-y-auto [scrollbar-gutter:stable]">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </AuthGuard>
