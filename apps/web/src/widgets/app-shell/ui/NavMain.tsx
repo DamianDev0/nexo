@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 
+import { useModuleLabels } from '@/entities/nomenclature'
 import { indicatorSpring, useReducedTransition } from '@/shared/lib/animations'
 import {
   SidebarGroup,
@@ -14,18 +15,20 @@ import {
   SidebarMenuItem,
 } from '@/shared/ui/shadcn/sidebar'
 
-import { isNavItemActive, type NavItem } from '../model/nav-items'
+import { isNavItemActive } from '../lib/nav-items'
 
-import type { SidebarNavGroup } from '../model/useSidebarModules'
+import type { NavItem } from '../model/types'
+import type { SidebarNavGroup } from '../query/useSidebarModules'
 
 const BUTTON_CLASSES = 'h-9 gap-2.5 rounded-lg [&>svg]:size-4.5'
 
 function NavEntry({ item }: Readonly<{ item: NavItem }>) {
   const { t } = useTranslation()
+  const moduleLabel = useModuleLabels()
   const pathname = usePathname()
   const isActive = isNavItemActive(item, pathname)
   const pillTransition = useReducedTransition(indicatorSpring)
-  const title = t(item.titleKey)
+  const title = moduleLabel(item.key, item.titleKey)
 
   return (
     <SidebarMenuItem>

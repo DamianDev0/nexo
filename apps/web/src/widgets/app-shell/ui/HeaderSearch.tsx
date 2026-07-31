@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { useModuleLabels } from '@/entities/nomenclature'
 import { MagnifyingGlassIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
@@ -14,12 +15,13 @@ import {
 } from '@/shared/ui/shadcn/command'
 
 import { useHeaderSearch } from '../model/useHeaderSearch'
-import { useSidebarModules } from '../model/useSidebarModules'
+import { useSidebarModules } from '../query/useSidebarModules'
 
 export function HeaderSearch() {
   const { t } = useTranslation()
   const { open, setOpen, navigate } = useHeaderSearch()
   const groups = useSidebarModules()
+  const moduleLabel = useModuleLabels()
 
   return (
     <>
@@ -49,7 +51,7 @@ export function HeaderSearch() {
                   onSelect={() => navigate(item.url)}
                 >
                   <item.icon />
-                  <span>{t(item.titleKey)}</span>
+                  <span>{moduleLabel(item.key, item.titleKey)}</span>
                   {!item.available && (
                     <span className="ml-auto text-xs text-muted-foreground">
                       {t('nav.comingSoon')}

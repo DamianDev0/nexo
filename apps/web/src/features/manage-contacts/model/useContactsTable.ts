@@ -2,13 +2,12 @@ import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useContactList } from '@/entities/contact'
+import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from '@/shared/config/pagination'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
 
 import { contactsQueryString, parseListParam } from './contact-lists'
 
 import type { ContactStatus } from '@repo/shared-types'
-
-const DEFAULT_LIMIT = 25
 
 export function useContactsTable() {
   const params = useSearchParams()
@@ -16,8 +15,8 @@ export function useContactsTable() {
   const [status, setStatus] = useState<ContactStatus | null>(() =>
     parseListParam(params?.get('list') ?? null),
   )
-  const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(DEFAULT_LIMIT)
+  const [page, setPage] = useState(FIRST_PAGE)
+  const [limit, setLimit] = useState(DEFAULT_PAGE_SIZE)
   const debouncedSearch = useDebouncedValue(search)
 
   useEffect(() => {
@@ -39,17 +38,17 @@ export function useContactsTable() {
 
   const handleSearch = useCallback((value: string) => {
     setSearch(value)
-    setPage(1)
+    setPage(FIRST_PAGE)
   }, [])
 
   const handleStatus = useCallback((value: ContactStatus | null) => {
     setStatus(value)
-    setPage(1)
+    setPage(FIRST_PAGE)
   }, [])
 
   const handleLimit = useCallback((value: number) => {
     setLimit(value)
-    setPage(1)
+    setPage(FIRST_PAGE)
   }, [])
 
   const total = data?.total ?? 0

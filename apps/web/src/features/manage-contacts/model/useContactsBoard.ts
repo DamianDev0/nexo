@@ -6,10 +6,11 @@ import { useTranslation } from 'react-i18next'
 import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
+import { useArchiveContact } from '../query/useArchiveContact'
+import { useContactCounts } from '../query/useContactCounts'
+
 import { buildContactColumns } from './contact-columns'
 import { buildSmartLists, listIdToStatus, statusToListId } from './contact-lists'
-import { useArchiveContact } from './useArchiveContact'
-import { useContactCounts } from './useContactCounts'
 import { useContactsTable } from './useContactsTable'
 
 import type { ContactListItem } from '@repo/shared-types'
@@ -52,6 +53,7 @@ export function useContactsBoard() {
     columns,
     pageSize: table.limit,
     getRowId: (row) => row.id,
+    storageKey: 'contacts',
   })
 
   const selectedRows = instance.table.getSelectedRowModel().rows
