@@ -16,6 +16,8 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { cn } from '@/shared/lib'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
+import { useSmartListHotkeys } from '../model/use-smart-list-hotkeys'
+
 import { SmartListTab, SmartListTabGhost } from './smart-list-tab'
 
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
@@ -69,6 +71,7 @@ interface SmartListsProps {
   readonly data: SmartListsData
   readonly onSelect: (id: string) => void
   readonly onReorder?: (ids: readonly string[]) => void
+  readonly hotkeys?: boolean
   readonly children?: ReactNode
   readonly className?: string
 }
@@ -77,6 +80,7 @@ export function DataTableSmartLists({
   data,
   onSelect,
   onReorder,
+  hotkeys = false,
   children,
   className,
 }: Readonly<SmartListsProps>) {
@@ -86,6 +90,12 @@ export function DataTableSmartLists({
   const draggingItem = data.items.find((item) => item.id === draggingId)
   const { ref: scrollRef, maskImage } = useScrollFade()
   const layoutGroupId = useId()
+
+  useSmartListHotkeys(
+    data.items.map((item) => item.id),
+    onSelect,
+    hotkeys,
+  )
 
   const handleDragStart = ({ active }: DragStartEvent) => setDraggingId(String(active.id))
 
@@ -121,12 +131,13 @@ export function DataTableSmartLists({
             >
               <LayoutGroup id={layoutGroupId}>
                 <span className="flex w-max items-center divide-x divide-border">
-                  {data.items.map((item) => (
+                  {data.items.map((item, index) => (
                     <SmartListTab
                       key={item.id}
                       item={item}
                       active={item.id === data.activeId}
                       sortable={sortable}
+                      hotkey={hotkeys && index < 9 ? index + 1 : undefined}
                       onSelect={onSelect}
                     />
                   ))}

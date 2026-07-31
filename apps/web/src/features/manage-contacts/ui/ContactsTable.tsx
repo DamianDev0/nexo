@@ -4,6 +4,7 @@ import { Plus, UsersRound } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { DataTable, useDataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
@@ -47,7 +48,10 @@ export function ContactsTable() {
   })
   const selectedRows = instance.table.getSelectedRowModel().rows
   const counts = useContactCounts()
-  const [listOrder, setListOrder] = useState<readonly string[] | null>(null)
+  const [listOrder, setListOrder] = useLocalStorageState<readonly string[] | null>(
+    'contacts.list-order',
+    null,
+  )
   const smartLists = useMemo(() => {
     const built = buildSmartLists(t, counts)
     if (!listOrder) return built
@@ -62,6 +66,7 @@ export function ContactsTable() {
           data={{ items: smartLists, activeId: statusToListId(table.status) }}
           onSelect={(id) => table.handleStatus(listIdToStatus(id))}
           onReorder={setListOrder}
+          hotkeys
         >
           <PillButton
             size="sm"

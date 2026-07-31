@@ -28,10 +28,17 @@ interface SmartListTabProps {
   readonly item: SmartListItem
   readonly active: boolean
   readonly sortable: boolean
+  readonly hotkey?: number
   readonly onSelect: (id: string) => void
 }
 
-export function SmartListTab({ item, active, sortable, onSelect }: Readonly<SmartListTabProps>) {
+export function SmartListTab({
+  item,
+  active,
+  sortable,
+  hotkey,
+  onSelect,
+}: Readonly<SmartListTabProps>) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !sortable,
@@ -93,7 +100,14 @@ export function SmartListTab({ item, active, sortable, onSelect }: Readonly<Smar
     <Tooltip delayDuration={500}>
       <TooltipTrigger asChild>{tab}</TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-44 px-2.5 py-1.5">
-        <p className="text-xs font-medium">{item.label}</p>
+        <p className="flex items-center justify-between gap-3 text-xs font-medium">
+          {item.label}
+          {hotkey !== undefined && (
+            <kbd className="rounded-sm bg-background/20 px-1 font-sans text-[10px] tabular-nums">
+              {hotkey}
+            </kbd>
+          )}
+        </p>
         <p className="text-xs leading-snug opacity-70">{item.description}</p>
       </TooltipContent>
     </Tooltip>

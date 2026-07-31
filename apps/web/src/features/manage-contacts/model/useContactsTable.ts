@@ -1,18 +1,29 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useContactList } from '@/entities/contact'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
+
+import { contactsQueryString, parseListParam } from './contact-lists'
 
 import type { ContactStatus } from '@repo/shared-types'
 
 const DEFAULT_LIMIT = 25
 
 export function useContactsTable() {
-  const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<ContactStatus | null>(null)
+  const params = useSearchParams()
+  const [search, setSearch] = useState(() => params?.get('q') ?? '')
+  const [status, setStatus] = useState<ContactStatus | null>(() =>
+    parseListParam(params?.get('list') ?? null),
+  )
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(DEFAULT_LIMIT)
   const debouncedSearch = useDebouncedValue(search)
+
+  useEffect(() => {
+    const query = contactsQueryString({ status, search: debouncedSearch })
+    globalThis.history.replaceState(null, '', `${globalThis.location.pathname}${query}`)
+  }, [status, debouncedSearch])
 
   const query = useMemo(
     () => ({

@@ -37,6 +37,22 @@ export function listIdToStatus(id: string): ContactStatus | null {
   return id === LIST_ALL ? null : (id as ContactStatus)
 }
 
+export function parseListParam(value: string | null): ContactStatus | null {
+  if (!value || value === LIST_ALL) return null
+  return (LIST_STATUSES as readonly string[]).includes(value) ? (value as ContactStatus) : null
+}
+
+export function contactsQueryString(state: {
+  status: ContactStatus | null
+  search: string
+}): string {
+  const params = new URLSearchParams()
+  if (state.status) params.set('list', state.status)
+  if (state.search.trim()) params.set('q', state.search.trim())
+  const qs = params.toString()
+  return qs ? `?${qs}` : ''
+}
+
 export function statusToListId(status: ContactStatus | null): string {
   return status ?? LIST_ALL
 }
