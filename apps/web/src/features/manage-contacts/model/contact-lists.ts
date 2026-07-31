@@ -23,6 +23,7 @@ export function buildSmartLists(
       label: t('contacts.lists.all'),
       count: counts[LIST_ALL],
       description: t('contacts.lists.descriptions.all'),
+      pinned: true,
     },
     ...LIST_STATUSES.map((status) => ({
       id: status,
@@ -45,10 +46,14 @@ export function parseListParam(value: string | null): ContactStatus | null {
 export function contactsQueryString(state: {
   status: ContactStatus | null
   search: string
+  filters?: Readonly<Record<string, ReadonlyArray<string>>>
 }): string {
   const params = new URLSearchParams()
   if (state.status) params.set('list', state.status)
   if (state.search.trim()) params.set('q', state.search.trim())
+  for (const [key, values] of Object.entries(state.filters ?? {})) {
+    if (values.length > 0) params.set(key, values.join(','))
+  }
   const qs = params.toString()
   return qs ? `?${qs}` : ''
 }

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
+import { buildQuickFilterDefs } from '../lib/quick-filters'
 import { useArchiveContact } from '../query/useArchiveContact'
 import { useContactCounts } from '../query/useContactCounts'
 
@@ -66,7 +67,10 @@ export function useContactsBoard() {
   const items = useMemo(() => {
     const built = buildSmartLists(t, counts)
     if (!listOrder) return built
-    return [...built].sort((a, b) => listOrder.indexOf(a.id) - listOrder.indexOf(b.id))
+    return [...built].sort((a, b) => {
+      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
+      return listOrder.indexOf(a.id) - listOrder.indexOf(b.id)
+    })
   }, [t, counts, listOrder])
 
   const { handleStatus } = table
@@ -85,6 +89,7 @@ export function useContactsBoard() {
       isFiltered: table.isFiltered,
       isEmpty: !table.isPending && table.rows.length === 0,
       selectedCount: selectedRows.length,
+      quickFilters: buildQuickFilterDefs(t, table.filters),
     },
     actions: {
       onSelectList: selectList,
@@ -94,6 +99,8 @@ export function useContactsBoard() {
       onLimitChange: table.handleLimit,
       onCreate: openCreate,
       onArchiveSelected: archiveSelected,
+      onToggleFilter: table.handleToggleFilter,
+      onClearFilters: table.handleClearFilters,
     },
     sheet: { contact: sheetContact, open: sheetOpen, onOpenChange: setSheetOpen },
   }

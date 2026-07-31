@@ -28,6 +28,7 @@ export interface SmartListItem {
   readonly label: string
   readonly count?: number
   readonly description?: string
+  readonly pinned?: boolean
 }
 
 interface SmartListsData {
@@ -84,12 +85,14 @@ export function DataTableSmartLists({
   children,
   className,
 }: Readonly<SmartListsProps>) {
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
   const sortable = onReorder !== undefined
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const draggingItem = data.items.find((item) => item.id === draggingId)
   const { ref: scrollRef, maskImage } = useScrollFade()
   const layoutGroupId = useId()
+  const pinnedIds = data.items.filter((item) => item.pinned).map((item) => item.id)
+  const movableIds = data.items.filter((item) => !item.pinned).map((item) => item.id)
 
   useSmartListHotkeys(
     data.items.map((item) => item.id),
@@ -102,15 +105,17 @@ export function DataTableSmartLists({
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     setDraggingId(null)
     if (!over || active.id === over.id) return
-    const ids = data.items.map((item) => item.id)
-    onReorder?.(arrayMove(ids, ids.indexOf(String(active.id)), ids.indexOf(String(over.id))))
+    const from = movableIds.indexOf(String(active.id))
+    const to = movableIds.indexOf(String(over.id))
+    if (from < 0 || to < 0) return
+    onReorder?.([...pinnedIds, ...arrayMove(movableIds, from, to)])
   }
 
   return (
     <TooltipProvider>
       <div
         data-slot="table-smart-lists"
-        className={cn('flex items-center gap-1 border-b border-border px-4', className)}
+        className={cn('flex items-center gap-1 border-b border-border pl-5 pr-4', className)}
       >
         <div
           ref={scrollRef}
@@ -125,18 +130,15 @@ export function DataTableSmartLists({
             onDragEnd={handleDragEnd}
             onDragCancel={() => setDraggingId(null)}
           >
-            <SortableContext
-              items={data.items.map((item) => item.id)}
-              strategy={horizontalListSortingStrategy}
-            >
+            <SortableContext items={movableIds} strategy={horizontalListSortingStrategy}>
               <LayoutGroup id={layoutGroupId}>
-                <span className="flex w-max items-center divide-x divide-border">
+                <span className="flex w-max items-center">
                   {data.items.map((item, index) => (
                     <SmartListTab
                       key={item.id}
                       item={item}
                       active={item.id === data.activeId}
-                      sortable={sortable}
+                      sortable={sortable && !item.pinned}
                       hotkey={hotkeys && index < 9 ? index + 1 : undefined}
                       onSelect={onSelect}
                     />
@@ -144,7 +146,7 @@ export function DataTableSmartLists({
                 </span>
               </LayoutGroup>
             </SortableContext>
-            <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
+            <DragOverlay dropAnimation={{ duration: 220, easing: 'cubic-bezier(0.2, 0, 0, 1)' }}>
               {draggingItem ? <SmartListTabGhost item={draggingItem} /> : null}
             </DragOverlay>
           </DndContext>

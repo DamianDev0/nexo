@@ -29,6 +29,11 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
           {t('contacts.lists.new')}
         </PillButton>
       </DataTable.SmartLists>
+      <DataTable.QuickFilters
+        filters={state.quickFilters}
+        onToggle={actions.onToggleFilter}
+        onClear={actions.onClearFilters}
+      />
       <DataTable.Toolbar>
         <DataTable.Search
           value={state.search}
