@@ -10,7 +10,8 @@ import {
 } from '@dnd-kit/core'
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable'
-import { useEffect, useRef, useState } from 'react'
+import { LayoutGroup } from 'motion/react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { cn } from '@/shared/lib'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
@@ -84,6 +85,7 @@ export function DataTableSmartLists({
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const draggingItem = data.items.find((item) => item.id === draggingId)
   const { ref: scrollRef, maskImage } = useScrollFade()
+  const layoutGroupId = useId()
 
   const handleDragStart = ({ active }: DragStartEvent) => setDraggingId(String(active.id))
 
@@ -117,17 +119,19 @@ export function DataTableSmartLists({
               items={data.items.map((item) => item.id)}
               strategy={horizontalListSortingStrategy}
             >
-              <span className="flex w-max items-center divide-x divide-border">
-                {data.items.map((item) => (
-                  <SmartListTab
-                    key={item.id}
-                    item={item}
-                    active={item.id === data.activeId}
-                    sortable={sortable}
-                    onSelect={onSelect}
-                  />
-                ))}
-              </span>
+              <LayoutGroup id={layoutGroupId}>
+                <span className="flex w-max items-center divide-x divide-border">
+                  {data.items.map((item) => (
+                    <SmartListTab
+                      key={item.id}
+                      item={item}
+                      active={item.id === data.activeId}
+                      sortable={sortable}
+                      onSelect={onSelect}
+                    />
+                  ))}
+                </span>
+              </LayoutGroup>
             </SortableContext>
             <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
               {draggingItem ? <SmartListTabGhost item={draggingItem} /> : null}

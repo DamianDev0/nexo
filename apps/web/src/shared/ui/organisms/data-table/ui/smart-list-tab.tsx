@@ -3,6 +3,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical } from 'lucide-react'
+import { motion } from 'motion/react'
 
 import { cn } from '@/shared/lib'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
@@ -46,14 +47,19 @@ export function SmartListTab({ item, active, sortable, onSelect }: Readonly<Smar
       className={cn(
         'group relative inline-flex h-12 shrink-0 items-center gap-2 whitespace-nowrap px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
         active ? 'font-bold text-foreground' : 'font-medium text-muted-foreground hover:text-body',
-        active &&
-          'after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-foreground',
         sortable && !isDragging && 'hover:cursor-grab',
-        isDragging && 'opacity-30 after:hidden',
+        isDragging && 'opacity-30',
       )}
       {...attributes}
       {...listeners}
     >
+      {active && !isDragging && (
+        <motion.span
+          layoutId="smart-list-underline"
+          className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-foreground"
+          transition={{ type: 'spring', stiffness: 550, damping: 45 }}
+        />
+      )}
       {sortable && (
         <GripVertical
           aria-hidden
@@ -64,11 +70,18 @@ export function SmartListTab({ item, active, sortable, onSelect }: Readonly<Smar
       {item.count !== undefined && (
         <span
           className={cn(
-            'inline-flex h-5.5 min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-semibold tabular-nums',
+            'inline-flex h-5.5 min-w-6 items-center justify-center overflow-hidden rounded-md px-1.5 text-xs font-semibold tabular-nums',
             active ? 'bg-primary-pale text-primary-deep' : 'bg-muted text-muted-foreground',
           )}
         >
-          {item.count}
+          <motion.span
+            key={item.count}
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 600, damping: 30 }}
+          >
+            {item.count}
+          </motion.span>
         </span>
       )}
     </button>

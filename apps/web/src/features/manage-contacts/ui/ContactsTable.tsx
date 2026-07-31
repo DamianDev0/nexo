@@ -65,6 +65,7 @@ export function ContactsTable() {
         >
           <PillButton
             size="sm"
+            className="h-9.5 gap-1 rounded-md px-3.5"
             onClick={() => {
               setEditing(null)
               setSheetOpen(true)
