@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/shadcn/tooltip'
 
-import { LANGUAGES } from '../model/languages'
+import { LANGUAGES } from '../config/languages'
 import { useSwitchLanguage } from '../model/use-switch-language'
 
 export function LanguageSwitcher() {

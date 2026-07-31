@@ -3,14 +3,13 @@ import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { saveNomenclatureAction } from '../api/setup-steps.actions'
 import { NOMENCLATURE_PRESETS } from '../config/nomenclature.constants'
 import { buildDefaultNomenclature, isSeedNomenclature } from '../lib/nomenclature'
-
-import { useStepHydration } from './useStepHydration'
-import { useStepMutation } from './useStepMutation'
+import { useStepHydration } from '../query/useStepHydration'
+import { useStepMutation } from '../query/useStepMutation'
 
 import type { NomenclatureState } from './types'
 import type { NomenclatureConfig } from '@repo/shared-types'

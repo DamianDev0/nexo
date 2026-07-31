@@ -4,7 +4,7 @@ import { ApiError } from '@/shared/api/api-error'
 import { apiFetch, apiFetchWithCookies } from '@/shared/api/client'
 import { relaySetCookies } from '@/shared/api/relay-cookies'
 
-import { loginSchema, type LoginFormValues } from '../model/login.schema'
+import { loginSchema, type LoginFormValues } from '../lib/login.schema'
 
 import type { LoginResponse } from '@repo/shared-types'
 

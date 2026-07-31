@@ -3,8 +3,8 @@ import { useEffect } from 'react'
 
 import { useAuthStore } from '@/entities/session'
 import settingsService from '@/shared/api/services/settings.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
 import { rememberTenantSlug, safeTenantSlug, tenantThemeHref } from '@/shared/config/tenant-cookie'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 const BRANDING_STALE_MS = 5 * 60 * 1000
 

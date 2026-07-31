@@ -5,15 +5,14 @@ import { useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { saveThemeAction } from '../api/setup-steps.actions'
 import { APPEARANCE_DEFAULT_VALUES as DEFAULT_VALUES } from '../config/appearance.constants'
 import { matchingPresetKey, withPreset } from '../lib/appearance'
 import { derivePalette } from '../lib/palette'
-
-import { useStepHydration } from './useStepHydration'
-import { useStepMutation } from './useStepMutation'
+import { useStepHydration } from '../query/useStepHydration'
+import { useStepMutation } from '../query/useStepMutation'
 
 import type {
   AppearanceFormValues,

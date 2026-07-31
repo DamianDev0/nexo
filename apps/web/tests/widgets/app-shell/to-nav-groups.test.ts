@@ -5,7 +5,7 @@ import type { SidebarModule } from '@repo/shared-types'
 vi.mock('server-only', () => ({}))
 vi.mock('next/cache', () => ({ updateTag: vi.fn() }))
 
-const { toNavGroups } = await import('@/widgets/app-shell/model/useSidebarModules')
+const { toNavGroups } = await import('@/widgets/app-shell/query/useSidebarModules')
 
 function mod(key: string, order: number, enabled = true): SidebarModule {
   return { key, label: key, icon: key, enabled, order, customIconUrl: null, required: false }

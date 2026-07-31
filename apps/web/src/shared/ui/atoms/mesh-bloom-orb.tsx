@@ -1,5 +1,3 @@
-'use client'
-
 import { MESH_BLOOM } from '@/shared/config/tokens/effects'
 import { cn } from '@/shared/lib'
 

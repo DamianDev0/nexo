@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 
 import { groupModules } from '@/features/setup-workspace'
 import settingsService from '@/shared/api/services/settings.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
-import { NAV_CRM, type NavItem } from './nav-items'
+import { NAV_CRM } from '../lib/nav-items'
 
+import type { NavItem } from '../model/types'
 import type { SidebarModule } from '@repo/shared-types'
 
 export interface SidebarNavGroup {

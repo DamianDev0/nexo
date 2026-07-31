@@ -9,21 +9,8 @@ import { ArrowRightIcon, CheckIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Progress } from '@/shared/ui/shadcn/progress'
 
+import type { StepDef, WizardRail } from '../model/types'
 import type { ReactNode } from 'react'
-
-export interface StepDef {
-  readonly label: string
-  readonly description: string
-  readonly optional?: boolean
-}
-
-export interface WizardRail {
-  readonly steps: ReadonlyArray<StepDef>
-  readonly currentStep: number
-  readonly progressPercent: number
-  readonly onStepClick: (step: number) => void
-  readonly onSkip: () => void
-}
 
 interface StepItemProps {
   readonly index: number
@@ -50,7 +37,7 @@ function StepItem({ index, step, currentStep, onClick }: Readonly<StepItemProps>
       <div
         className={cn(
           'flex size-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors',
-          isDone && 'border-emerald-500 bg-emerald-500 text-white',
+          isDone && 'border-primary bg-primary text-primary-foreground',
           isActive && 'border-primary bg-primary text-primary-foreground',
           !isDone && !isActive && 'border-border text-muted-foreground',
         )}

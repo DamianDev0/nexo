@@ -5,4 +5,4 @@ export {
   contactInitials,
 } from './model/contact-display'
 export type { AvatarTone, StatusTone } from './model/contact-display'
-export { useContactList } from './model/useContactList'
+export { useContactList } from './query/useContactList'

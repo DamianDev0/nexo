@@ -3,7 +3,7 @@
 import { apiFetchWithCookies } from '@/shared/api/client'
 import { relaySetCookies } from '@/shared/api/relay-cookies'
 
-import { onboardingSchema, type OnboardingFormValues } from '../model/onboarding.schema'
+import { onboardingSchema, type OnboardingFormValues } from '../lib/onboarding.schema'
 
 import type { OnboardingResponse } from '@repo/shared-types'
 

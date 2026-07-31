@@ -1,2 +1,2 @@
-export { useForgotPassword } from './model/useForgotPassword'
-export { useResetPassword } from './model/useResetPassword'
+export { useForgotPassword } from './query/useForgotPassword'
+export { useResetPassword } from './query/useResetPassword'

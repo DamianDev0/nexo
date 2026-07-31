@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { sileo } from 'sileo'
 
 import contactsService from '@/shared/api/services/contacts.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import {
   CONTACT_FORM_DEFAULTS,

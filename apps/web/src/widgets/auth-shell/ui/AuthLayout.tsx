@@ -1,5 +1,3 @@
-'use client'
-
 import { LanguageSwitcher } from '@/features/switch-language'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 

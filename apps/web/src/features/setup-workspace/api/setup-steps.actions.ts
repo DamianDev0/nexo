@@ -21,7 +21,7 @@ import {
   type NomenclatureStepInput,
   type PipelineStepInput,
   type ThemeStepInput,
-} from '../model/step-schemas'
+} from '../lib/step-schemas'
 
 import type { Pipeline } from '@repo/shared-types'
 

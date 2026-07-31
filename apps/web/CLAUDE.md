@@ -17,9 +17,24 @@ app → views → widgets → features → entities → shared
 - `src/app/` — Next.js routing only. Pages are re-exports of views. `src/proxy.ts` (Next 16 renamed middleware) guards routes at edge via `access_token` cookie.
 - `src/views/<page>/` — page orchestrators (`login`, `onboarding`, `onboarding-setup`, `dashboard`).
 - `src/widgets/<block>/` — composite blocks reused across pages (`app-shell`, `auth-shell`).
-- `src/features/<verb>/` — ONE user action per slice, named as a verb: `login`, `logout`, `register-workspace`, `recover-password`, `setup-workspace`. Segments: `ui/`, `model/`, `api/`.
-- `src/entities/<noun>/` — domain mirror (`session`). Segments: `model/`, `ui/`.
-- `src/shared/` — domain-free: `api/` (axios http, request<T>, services, tenant-ref), `config/` (routes, query-keys, tokens/), `i18n/`, `lib/` (cn, hooks, animations), `ui/` (`shadcn/` vendor — never modify; `atoms/`, `molecules/` custom).
+- `src/features/<verb>/` — ONE user action per slice, named as a verb: `login`, `logout`, `register-workspace`, `recover-password`, `setup-workspace`.
+- `src/entities/<noun>/` — domain mirror (`session`, `contact`, `nomenclature`).
+- `src/shared/` — domain-free: `api/` (axios http, `request<T>`, services, `dal/` server-only fetchers), `query/` (query-keys, query-client, server-query, prefetch-\*), `config/` (routes, pagination, tokens/), `i18n/`, `lib/` (cn, hooks, animations), `ui/` (`shadcn/` vendor — never modify; `atoms/`, `molecules/` custom).
+
+### Slice segments (same in features, entities, widgets, views)
+
+| Segment        | Holds                                                                                                           | Never                                         |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `config/`      | constants, static maps, option lists                                                                            | React, hooks, functions with logic            |
+| `lib/`         | pure functions: builders, schemas, formatters, derivations                                                      | React state, hooks                            |
+| `model/`       | React hooks, stores, contexts                                                                                   | constants, pure helpers                       |
+| `model/types/` | the slice's TypeScript types                                                                                    | runtime values                                |
+| `query/`       | everything TanStack Query: `useQuery`/`useMutation` wrappers, query-arg builders, `prefetch-*.ts` (server-only) | UI                                            |
+| `api/`         | Server Actions (`'use server'`)                                                                                 | reads — those are `query/` + `shared/api/dal` |
+| `ui/`          | components                                                                                                      | fetching, business logic                      |
+
+`ui/` imports types from `model/types` and constants from `config/` — never reaches into `model/` for them.
+`lib/` must never import from `ui/`. Types live in `model/types/` precisely so it doesn't have to.
 
 Every slice exposes `index.ts`. Never import another slice's internals.
 
@@ -36,7 +51,7 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 
 ## Component patterns (mandatory)
 
-- Constants NEVER inline in components/views — slice `model/` or `shared/config`. Builders that need `t()` are pure functions in `model/` (e.g. `buildStepDefs(t)`).
+- Constants NEVER inline in components/views — slice `config/` or `shared/config`. Builders that need `t()` are pure functions in slice `lib/` (e.g. `buildStepDefs(t)`).
 - Max 5 props per component. Beyond that: object-as-props grouped by cohesion (`data` / `actions` / `nav`).
 - Dumb components: `ui/` renders props only — no fetch, no stores, no business logic. Logic lives in `model/` hooks.
 - Container/Presentational: thin containers in `ui/containers/` connect context/hooks and build prop objects.

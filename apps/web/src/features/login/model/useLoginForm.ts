@@ -8,12 +8,11 @@ import { useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import { useAuthStore } from '@/entities/session'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
 import { ROUTES } from '@/shared/config/routes'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { loginAction } from '../api/login.action'
-
-import { loginSchema, type LoginFormValues } from './login.schema'
+import { loginSchema, type LoginFormValues } from '../lib/login.schema'
 
 const ERROR_TOAST_KEYS = {
   workspace_not_found: {

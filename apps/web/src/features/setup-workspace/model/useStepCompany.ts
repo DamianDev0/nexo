@@ -3,12 +3,11 @@ import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { saveGeneralAction } from '../api/setup-steps.actions'
-
-import { useStepHydration } from './useStepHydration'
-import { useStepMutation } from './useStepMutation'
+import { useStepHydration } from '../query/useStepHydration'
+import { useStepMutation } from '../query/useStepMutation'
 
 import type { GeneralSettings } from '@repo/shared-types'
 

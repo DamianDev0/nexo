@@ -11,12 +11,11 @@ import { useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import { useAuthStore } from '@/entities/session'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
 import { ROUTES } from '@/shared/config/routes'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { registerWorkspaceAction } from '../api/register-workspace.action'
-
-import { onboardingSchema, type OnboardingFormValues } from './onboarding.schema'
+import { onboardingSchema, type OnboardingFormValues } from '../lib/onboarding.schema'
 
 export function useOnboardingForm() {
   const router = useRouter()

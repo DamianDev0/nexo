@@ -1,7 +1,7 @@
 'use client'
 
-import { useTenantBranding } from '../model/useTenantBranding'
 import { useTenantThemeDefault } from '../model/useTenantThemeDefault'
+import { useTenantBranding } from '../query/useTenantBranding'
 
 export function TenantThemeLoader() {
   const { slug, themeCssHref, darkModeDefault } = useTenantBranding()

@@ -30,6 +30,12 @@ const es = {
     },
   },
   auth: {
+    meta: {
+      loginTitle: 'Iniciar sesión',
+      loginDescription: 'Entra a tu espacio de trabajo en NexoCRM.',
+      onboardingTitle: 'Crea tu espacio de trabajo',
+      onboardingDescription: 'Configura NexoCRM para tu equipo en pocos minutos.',
+    },
     emailPlaceholder: 'tu@email.com',
     passwordPlaceholder: 'Ingresa tu contraseña',
     passwordMinPlaceholder: 'Mín. 8 caracteres',

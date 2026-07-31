@@ -3,9 +3,9 @@
 import { useAuthStore } from '@/entities/session'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/shared/ui/shadcn/sidebar'
 
-import { DEFAULT_TEAMS } from '../model/nav-items'
-import { useSidebarModules } from '../model/useSidebarModules'
-import { useTenantBranding } from '../model/useTenantBranding'
+import { DEFAULT_TEAMS } from '../lib/nav-items'
+import { useSidebarModules } from '../query/useSidebarModules'
+import { useTenantBranding } from '../query/useTenantBranding'
 
 import { NavMain } from './NavMain'
 import { NavUser } from './NavUser'

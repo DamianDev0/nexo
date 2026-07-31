@@ -8,14 +8,14 @@ import { useTranslation } from 'react-i18next'
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { useScrollTopOnChange } from '@/shared/lib/hooks/useScrollTopOnChange'
 
+import { sectionKeyForPath } from '../config/settings-sections'
 import { useManageSettings } from '../model/settings-context'
-import { sectionKeyForPath } from '../model/settings-sections'
 
 import { SaveBar } from './SaveBar'
 import { SettingsNav } from './SettingsNav'
 
+import type { SettingsSectionKey } from '../config/settings-sections'
 import type { SettingsSectionController } from '../model/settings-context'
-import type { SettingsSectionKey } from '../model/settings-sections'
 import type { ReactNode } from 'react'
 
 export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {

@@ -7,7 +7,7 @@ import { AuthFooter } from '@/shared/ui/molecules/auth-footer'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { PasswordField } from '@/shared/ui/molecules/password-field'
 
-import type { OnboardingFormValues } from '../model/onboarding.schema'
+import type { OnboardingFormValues } from '../lib/onboarding.schema'
 
 interface OnboardingFormProps {
   readonly control: Control<OnboardingFormValues>

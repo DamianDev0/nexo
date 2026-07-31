@@ -1,5 +1,3 @@
-'use client'
-
 import { SIRI_ORB } from '@/shared/config/tokens/effects'
 import { cn } from '@/shared/lib'
 

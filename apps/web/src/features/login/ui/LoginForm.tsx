@@ -9,7 +9,7 @@ import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { PasswordField } from '@/shared/ui/molecules/password-field'
 import { Label } from '@/shared/ui/shadcn/label'
 
-import type { LoginFormValues } from '../model/login.schema'
+import type { LoginFormValues } from '../lib/login.schema'
 
 interface LoginFormProps {
   readonly control: Control<LoginFormValues>

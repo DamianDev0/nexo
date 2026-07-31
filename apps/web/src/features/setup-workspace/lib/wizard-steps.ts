@@ -1,6 +1,6 @@
 import { OPTIONAL_STEPS, STEP_KEYS } from '../config/wizard.constants'
 
-import type { StepDef } from '../ui/WizardLayout'
+import type { StepDef } from '../model/types'
 
 export function buildStepDefs(t: (key: string) => string): StepDef[] {
   return STEP_KEYS.map((key) => ({

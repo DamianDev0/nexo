@@ -4,7 +4,7 @@ import { CheckIcon, TrayIcon } from '@/shared/ui/icons'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 
 import { getDashboard } from '../api/get-dashboard'
-import { DASHBOARD_TIP_KEYS } from '../model/dashboard.constants'
+import { DASHBOARD_TIP_KEYS } from '../config/dashboard.constants'
 
 export async function DashboardView() {
   const [t, { user }] = await Promise.all([getT(), getDashboard()])

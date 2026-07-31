@@ -5,8 +5,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import { inviteUsersAction } from '../api/setup-steps.actions'
-
-import { useStepMutation } from './useStepMutation'
+import { useStepMutation } from '../query/useStepMutation'
 
 interface InviteRow {
   email: string

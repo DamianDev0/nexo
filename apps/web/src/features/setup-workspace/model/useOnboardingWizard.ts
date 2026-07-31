@@ -5,20 +5,19 @@ import { useCallback } from 'react'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
-import { QUERY_KEYS } from '@/shared/config/query-keys'
 import { ROUTES } from '@/shared/config/routes'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { STEP_KEYS } from '../config/wizard.constants'
 
 const TOTAL_STEPS = STEP_KEYS.length
-const ONBOARDING_KEY = ['settings', 'onboarding'] as const
 
 export function useOnboardingWizard() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
   const { data } = useQuery({
-    queryKey: ONBOARDING_KEY,
+    queryKey: QUERY_KEYS.settings.onboarding,
     queryFn: () => settingsService.getOnboarding(),
   })
 
@@ -27,7 +26,7 @@ export function useOnboardingWizard() {
   const { mutate: persistStep } = useMutation({
     mutationFn: (step: number) => settingsService.updateOnboarding({ step }),
     onSuccess: (result) => {
-      queryClient.setQueryData(ONBOARDING_KEY, result)
+      queryClient.setQueryData(QUERY_KEYS.settings.onboarding, result)
     },
     onError: (err) => sileo.error({ title: t('common.saveFailed'), description: err.message }),
   })

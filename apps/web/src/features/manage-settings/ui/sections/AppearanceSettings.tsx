@@ -17,7 +17,7 @@ import { FileUpload } from '@/shared/ui/molecules/file-upload'
 import { SectionTabs } from '@/shared/ui/molecules/section-tabs'
 import { Label } from '@/shared/ui/shadcn/label'
 
-import { buildAppearanceTabs, type AppearanceTabKey } from '../../model/appearance-tabs'
+import { buildAppearanceTabs, type AppearanceTabKey } from '../../config/appearance-tabs'
 import { useManageSettings } from '../../model/settings-context'
 
 export function AppearanceSettings() {

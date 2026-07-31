@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { indicatorSpring, useReducedTransition } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
 
-import { SETTINGS_GROUPS } from '../model/settings-sections'
+import { SETTINGS_GROUPS } from '../config/settings-sections'
 
 export function SettingsNav() {
   const { t } = useTranslation()
