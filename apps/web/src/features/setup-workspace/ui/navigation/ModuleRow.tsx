@@ -1,14 +1,13 @@
 'use client'
 
-import { GripVertical, Lock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
-import { Button } from '@/shared/ui/shadcn/button'
+import { DotsSixVerticalIcon, LockIcon } from '@/shared/ui/icons'
 import { Switch } from '@/shared/ui/shadcn/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
-import { SIDEBAR_ICON_MAP } from '../../model/icon-map.constants'
+import { SIDEBAR_ICON_MAP } from '../../config/module-icons.constants'
 
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
@@ -43,25 +42,23 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
       onMouseEnter={() => actions.onHover?.(module.key)}
       onMouseLeave={() => actions.onLeave?.()}
       className={cn(
-        'flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-[box-shadow,border-color]',
+        'group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-[box-shadow,border-color]',
+        handle && 'cursor-grab touch-none active:cursor-grabbing',
         !ghost && 'hover:border-input/70 hover:shadow-xs',
-        ghost && 'scale-[1.02] shadow-xl ring-1 ring-primary/40',
+        ghost && 'scale-[1.02] cursor-grabbing shadow-xl ring-1 ring-primary/40',
         !module.enabled && 'opacity-50',
       )}
+      {...handle?.attributes}
+      {...handle?.listeners}
     >
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-6 shrink-0 cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
+          <span
+            className="flex size-6 shrink-0 items-center justify-center text-muted-foreground/50 transition-colors group-hover:text-muted-foreground"
             aria-label={t(`${s}.dragToReorder`)}
-            {...handle?.attributes}
-            {...handle?.listeners}
           >
-            <GripVertical className="size-4" />
-          </Button>
+            <DotsSixVerticalIcon className="size-4" />
+          </span>
         </TooltipTrigger>
         <TooltipContent side="top">{t(`${s}.dragToReorder`)}</TooltipContent>
       </Tooltip>
@@ -83,7 +80,7 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
       </div>
 
       {module.required ? (
-        <Lock className="size-3.5 text-muted-foreground/50" />
+        <LockIcon className="size-3.5 text-muted-foreground/50" />
       ) : (
         <Switch
           checked={module.enabled}

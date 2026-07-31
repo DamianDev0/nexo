@@ -14,7 +14,7 @@ import { TypographySection } from './appearance/TypographySection'
 import { AppearanceLivePreview } from './AppearanceLivePreview'
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
-import type { AppearanceActions, AppearanceData } from '../model/appearance.types'
+import type { AppearanceActions, AppearanceData } from '../model/types'
 
 interface StepAppearanceProps {
   readonly data: AppearanceData

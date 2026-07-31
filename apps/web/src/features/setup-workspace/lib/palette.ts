@@ -1,6 +1,6 @@
 import { readableForeground, resolveThemeTokens, tintedNeutral } from '@repo/shared-utils'
 
-import type { ColorOverrides } from './appearance.types'
+import type { ColorOverrides } from '../model/types'
 import type { ThemeColors } from '@repo/shared-types'
 
 export function derivePalette(primary: string, overrides?: ColorOverrides): ThemeColors {

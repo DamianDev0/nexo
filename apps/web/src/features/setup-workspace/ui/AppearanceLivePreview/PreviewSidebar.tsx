@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
-import { SIDEBAR_ICON_MAP } from '../../model/icon-map.constants'
-import { groupModules } from '../../model/navigation.constants'
+import { SIDEBAR_ICON_MAP } from '../../config/module-icons.constants'
+import { groupModules } from '../../lib/navigation'
 
 import { previewForegrounds, type PreviewDensity } from './preview.constants'
 

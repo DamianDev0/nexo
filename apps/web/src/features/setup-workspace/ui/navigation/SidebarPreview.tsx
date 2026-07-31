@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 
-import { SIDEBAR_ICON_MAP } from '../../model/icon-map.constants'
-import { groupModules } from '../../model/navigation.constants'
+import { SIDEBAR_ICON_MAP } from '../../config/module-icons.constants'
+import { groupModules } from '../../lib/navigation'
 
 import type { SidebarModule } from '@repo/shared-types'
 

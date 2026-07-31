@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { API, createMswServer } from '../../msw/test-server'
 import { queryWrapper as wrapper } from '../../query-wrapper'
 
+import { STEP_KEYS } from '@/features/setup-workspace/config/wizard.constants'
 import { useOnboardingWizard } from '@/features/setup-workspace/model/useOnboardingWizard'
-import { STEP_KEYS } from '@/features/setup-workspace/model/wizard-steps'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),

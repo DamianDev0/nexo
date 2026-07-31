@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
 import { Label } from '@/shared/ui/shadcn/label'
 
-import type { ThemeMode } from '../../model/appearance.types'
+import type { ThemeMode } from '../../model/types'
 
 interface ModeSectionProps {
   readonly darkMode: ThemeMode

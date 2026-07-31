@@ -5,8 +5,9 @@ import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 
 import { saveNavigationAction } from '../api/setup-steps.actions'
+import { DEFAULT_MODULES } from '../config/navigation.constants'
+import { moduleGroupKey } from '../lib/navigation'
 
-import { DEFAULT_MODULES, moduleGroupKey } from './navigation.constants'
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
@@ -17,9 +18,13 @@ interface NavigationFormValues {
 }
 
 export function useStepNavigation(onNext: () => void) {
-  const { control, watch, getValues, reset } = useForm<NavigationFormValues>({
-    defaultValues: { modules: [...DEFAULT_MODULES] },
-  })
+  const {
+    control,
+    watch,
+    getValues,
+    reset,
+    formState: { isDirty },
+  } = useForm<NavigationFormValues>({ defaultValues: { modules: [...DEFAULT_MODULES] } })
   const { fields, move, update } = useFieldArray({ control, name: 'modules' })
 
   useStepHydration({
@@ -75,6 +80,8 @@ export function useStepNavigation(onNext: () => void) {
     handleToggle,
     handleReorder,
     handleSave,
+    handleReset: () => reset(),
+    isDirty,
     isPending,
   }
 }

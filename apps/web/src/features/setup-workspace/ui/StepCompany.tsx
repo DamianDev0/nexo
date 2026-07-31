@@ -1,24 +1,19 @@
-import { SECTOR_OPTIONS } from '@repo/shared-utils'
-import { Clock3, Landmark, Lock } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
-import { OptionTile } from '@/shared/ui/molecules/option-tile'
+import { COLOMBIA_FLAG_SRC, PHONE_PREFIX } from '@/shared/config/colombia'
+import { BankIcon, ClockIcon, LockIcon } from '@/shared/ui/icons'
 import { Input } from '@/shared/ui/shadcn/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/shadcn/input-group'
 import { Label } from '@/shared/ui/shadcn/label'
 
-import {
-  COLOMBIA_FLAG_SRC,
-  PHONE_PREFIX,
-  REGIONAL_DEFAULTS,
-  SECTOR_ICON_SRC,
-} from '../model/company.constants'
+import { REGIONAL_DEFAULTS } from '../config/company.constants'
 
+import { SectorPicker } from './SectorPicker'
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
+import type { AppIcon } from '@/shared/ui/icons'
 import type { IndustrySector } from '@repo/shared-types'
-import type { LucideIcon } from 'lucide-react'
 
 interface CompanyData {
   readonly phone: string
@@ -41,7 +36,7 @@ interface StepCompanyProps {
 interface ReadonlyFieldProps {
   readonly label: string
   readonly value: string
-  readonly icon: LucideIcon
+  readonly icon: AppIcon
 }
 
 function ReadonlyField({ label, value, icon: Icon }: Readonly<ReadonlyFieldProps>) {
@@ -51,7 +46,7 @@ function ReadonlyField({ label, value, icon: Icon }: Readonly<ReadonlyFieldProps
       <div className="mt-1.5 flex h-9 items-center gap-2.5 rounded-md border border-border/70 bg-muted/40 px-3">
         <Icon className="size-4 shrink-0 text-muted-foreground/70" />
         <span className="flex-1 truncate text-sm text-foreground/80">{value}</span>
-        <Lock className="size-3 shrink-0 text-muted-foreground/50" />
+        <LockIcon className="size-3 shrink-0 text-muted-foreground/50" />
       </div>
     </div>
   )
@@ -101,37 +96,16 @@ export function StepCompany({ data, actions, nav }: Readonly<StepCompanyProps>) 
         <ReadonlyField
           label={t(`${s}.timezone`)}
           value={REGIONAL_DEFAULTS.timezoneDisplay}
-          icon={Clock3}
+          icon={ClockIcon}
         />
         <ReadonlyField
           label={t(`${s}.currency`)}
           value={REGIONAL_DEFAULTS.currencyDisplay}
-          icon={Landmark}
+          icon={BankIcon}
         />
       </div>
 
-      <div className="mt-6">
-        <Label className="text-xs text-muted-foreground">{t(`${s}.sector`)}</Label>
-        <div className="mt-3 grid grid-cols-4 gap-2">
-          {SECTOR_OPTIONS.map((opt) => (
-            <OptionTile
-              key={opt.id}
-              selected={data.sector === opt.id}
-              onSelect={() => actions.onSectorChange(opt.id)}
-              className="flex flex-col items-center p-3 text-center"
-            >
-              <Image
-                src={SECTOR_ICON_SRC[opt.id]}
-                alt=""
-                width={36}
-                height={36}
-                className="size-9 drop-shadow-sm"
-              />
-              <div className="mt-1.5 text-xs font-semibold">{opt.label}</div>
-            </OptionTile>
-          ))}
-        </div>
-      </div>
+      <SectorPicker value={data.sector} onSelect={actions.onSectorChange} />
     </WizardStep>
   )
 }

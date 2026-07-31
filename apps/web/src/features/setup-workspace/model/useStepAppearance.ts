@@ -8,25 +8,31 @@ import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 
 import { saveThemeAction } from '../api/setup-steps.actions'
-import { derivePalette } from '../model/palette.utils'
+import { APPEARANCE_DEFAULT_VALUES as DEFAULT_VALUES } from '../config/appearance.constants'
+import { matchingPresetKey, withPreset } from '../lib/appearance'
+import { derivePalette } from '../lib/palette'
 
-import {
-  APPEARANCE_DEFAULT_VALUES as DEFAULT_VALUES,
-  withPreset,
-  type AppearanceFormValues,
-} from './appearance-form'
-import { matchingPresetKey, type ThemePreset } from './appearance.constants'
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
-import type { ColorOverrides, OverridableColorKey, ThemeMode } from './appearance.types'
+import type {
+  AppearanceFormValues,
+  ColorOverrides,
+  OverridableColorKey,
+  ThemeMode,
+  ThemePreset,
+} from './types'
 import type { TenantTheme, ThemeConfig, ThemeTypography } from '@repo/shared-types'
 
 export function useStepAppearance(onNext: () => void) {
   const queryClient = useQueryClient()
-  const { watch, setValue, getValues, reset } = useForm<AppearanceFormValues>({
-    defaultValues: DEFAULT_VALUES,
-  })
+  const {
+    watch,
+    setValue,
+    getValues,
+    reset,
+    formState: { isDirty },
+  } = useForm<AppearanceFormValues>({ defaultValues: DEFAULT_VALUES })
   const values = watch()
 
   useStepHydration({
@@ -59,33 +65,37 @@ export function useStepAppearance(onNext: () => void) {
 
   const handlePrimaryChange = useCallback(
     (value: string) => {
-      setValue('primaryColor', value)
-      setValue('colorOverrides', {})
+      setValue('primaryColor', value, { shouldDirty: true })
+      setValue('colorOverrides', {}, { shouldDirty: true })
     },
     [setValue],
   )
 
   const handleColorOverride = useCallback(
     (key: OverridableColorKey, value: string) => {
-      setValue('colorOverrides', { ...getValues('colorOverrides'), [key]: value })
+      setValue(
+        'colorOverrides',
+        { ...getValues('colorOverrides'), [key]: value },
+        { shouldDirty: true },
+      )
     },
     [setValue, getValues],
   )
 
   const handleLogoUpload = useCallback(
     async (file: File) => {
-      setValue('logoPreview', URL.createObjectURL(file))
-      setValue('logoFileName', file.name)
+      setValue('logoPreview', URL.createObjectURL(file), { shouldDirty: true })
+      setValue('logoFileName', file.name, { shouldDirty: true })
       const data = await settingsService.uploadLogo(file)
-      setValue('logoUrl', data.url)
+      setValue('logoUrl', data.url, { shouldDirty: true })
     },
     [setValue],
   )
 
   const handleLogoRemove = useCallback(() => {
-    setValue('logoUrl', null)
-    setValue('logoPreview', null)
-    setValue('logoFileName', null)
+    setValue('logoUrl', null, { shouldDirty: true })
+    setValue('logoPreview', null, { shouldDirty: true })
+    setValue('logoFileName', null, { shouldDirty: true })
   }, [setValue])
 
   const { handleSave, isPending } = useStepMutation({
@@ -118,7 +128,7 @@ export function useStepAppearance(onNext: () => void) {
   })
 
   const handleApplyPreset = useCallback(
-    (preset: ThemePreset) => reset(withPreset(getValues(), preset)),
+    (preset: ThemePreset) => reset(withPreset(getValues(), preset), { keepDefaultValues: true }),
     [getValues, reset],
   )
 
@@ -157,19 +167,21 @@ export function useStepAppearance(onNext: () => void) {
     primaryColor: values.primaryColor,
     colors,
     grainIntensity: values.grainIntensity,
-    setGrainIntensity: (v: number) => setValue('grainIntensity', v),
+    setGrainIntensity: (v: number) => setValue('grainIntensity', v, { shouldDirty: true }),
     darkMode: values.darkMode,
-    setDarkMode: (v: ThemeMode) => setValue('darkMode', v),
+    setDarkMode: (v: ThemeMode) => setValue('darkMode', v, { shouldDirty: true }),
     fontFamily: values.fontFamily,
-    setFontFamily: (v: ThemeTypography['fontFamily']) => setValue('fontFamily', v),
+    setFontFamily: (v: ThemeTypography['fontFamily']) =>
+      setValue('fontFamily', v, { shouldDirty: true }),
     borderRadius: values.borderRadius,
-    setBorderRadius: (v: ThemeTypography['borderRadius']) => setValue('borderRadius', v),
+    setBorderRadius: (v: ThemeTypography['borderRadius']) =>
+      setValue('borderRadius', v, { shouldDirty: true }),
     density: values.density,
-    setDensity: (v: ThemeTypography['density']) => setValue('density', v),
+    setDensity: (v: ThemeTypography['density']) => setValue('density', v, { shouldDirty: true }),
     productName: values.productName,
-    setProductName: (v: string) => setValue('productName', v),
+    setProductName: (v: string) => setValue('productName', v, { shouldDirty: true }),
     tagline: values.tagline,
-    setTagline: (v: string) => setValue('tagline', v),
+    setTagline: (v: string) => setValue('tagline', v, { shouldDirty: true }),
     logoPreview: values.logoPreview,
     logoFileName: values.logoFileName,
     activePresetKey,
@@ -180,6 +192,8 @@ export function useStepAppearance(onNext: () => void) {
     handleLogoRemove,
     handleRestoreTheme,
     handleSave,
+    handleReset: () => reset(),
+    isDirty,
     isPending,
   }
 }

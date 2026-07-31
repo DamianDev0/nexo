@@ -1,14 +1,6 @@
-export interface EntityLabels {
-  singular: string
-  plural: string
-}
+import { BuildingsIcon, CalendarCheckIcon, HandshakeIcon, UserIcon } from '@/shared/ui/icons'
 
-export interface NomenclatureState {
-  contact: EntityLabels
-  company: EntityLabels
-  deal: EntityLabels
-  activity: EntityLabels
-}
+import type { NomenclatureEntity, NomenclaturePreset, NomenclatureState } from '../model/types'
 
 export const DEFAULT_NOMENCLATURE: NomenclatureState = {
   contact: { singular: 'Contact', plural: 'Contacts' },
@@ -17,7 +9,14 @@ export const DEFAULT_NOMENCLATURE: NomenclatureState = {
   activity: { singular: 'Activity', plural: 'Activities' },
 }
 
-const SEED_NOMENCLATURES: ReadonlyArray<NomenclatureState> = [
+export const NOMENCLATURE_ENTITIES: ReadonlyArray<NomenclatureEntity> = [
+  { key: 'contact', icon: UserIcon },
+  { key: 'company', icon: BuildingsIcon },
+  { key: 'deal', icon: HandshakeIcon },
+  { key: 'activity', icon: CalendarCheckIcon },
+]
+
+export const SEED_NOMENCLATURES: ReadonlyArray<NomenclatureState> = [
   DEFAULT_NOMENCLATURE,
   {
     contact: { singular: 'Contacto', plural: 'Contactos' },
@@ -27,42 +26,7 @@ const SEED_NOMENCLATURES: ReadonlyArray<NomenclatureState> = [
   },
 ]
 
-export function isSeedNomenclature(config: NomenclatureState): boolean {
-  return SEED_NOMENCLATURES.some((seed) => JSON.stringify(seed) === JSON.stringify(config))
-}
-
-type TranslateFn = (key: string) => string | undefined
-
-export function buildDefaultNomenclature(t: TranslateFn): NomenclatureState {
-  const s = 'onboarding.steps.nomenclature.defaults'
-  const tr = (key: string, fallback: string) => {
-    const value = t(`${s}.${key}`)
-    return value && value !== `${s}.${key}` ? value : fallback
-  }
-  return {
-    contact: {
-      singular: tr('contact', DEFAULT_NOMENCLATURE.contact.singular),
-      plural: tr('contacts', DEFAULT_NOMENCLATURE.contact.plural),
-    },
-    company: {
-      singular: tr('company', DEFAULT_NOMENCLATURE.company.singular),
-      plural: tr('companies', DEFAULT_NOMENCLATURE.company.plural),
-    },
-    deal: {
-      singular: tr('deal', DEFAULT_NOMENCLATURE.deal.singular),
-      plural: tr('deals', DEFAULT_NOMENCLATURE.deal.plural),
-    },
-    activity: {
-      singular: tr('activity', DEFAULT_NOMENCLATURE.activity.singular),
-      plural: tr('activities', DEFAULT_NOMENCLATURE.activity.plural),
-    },
-  }
-}
-
-export const NOMENCLATURE_PRESETS: Record<
-  string,
-  { label: string; icon: string; values: NomenclatureState }
-> = {
+export const NOMENCLATURE_PRESETS: Record<string, NomenclaturePreset> = {
   b2b: {
     label: 'B2B (Accounts / Opportunities)',
     icon: '/icons/3d/target.png',

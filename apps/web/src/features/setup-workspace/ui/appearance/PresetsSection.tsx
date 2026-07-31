@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next'
 import { OptionTile } from '@/shared/ui/molecules/option-tile'
 import { Label } from '@/shared/ui/shadcn/label'
 
-import { GOOGLE_FONT_MAP, THEME_PRESETS, type ThemePreset } from '../../model/appearance.constants'
-import { derivePalette } from '../../model/palette.utils'
+import { GOOGLE_FONT_MAP, THEME_PRESETS } from '../../config/appearance.constants'
+import { derivePalette } from '../../lib/palette'
+
+import type { ThemePreset } from '../../model/types'
 
 interface PresetsSectionProps {
   readonly activePresetKey: string | null

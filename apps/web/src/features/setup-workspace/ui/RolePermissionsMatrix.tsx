@@ -1,10 +1,11 @@
 'use client'
 
 import { INVITE_ROLE_OPTIONS, USER_ROLE_LABELS, hasPermission } from '@repo/shared-utils'
-import { Check, Minus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { PERMISSION_COLUMNS } from '../model/team.constants'
+import { CheckIcon, MinusIcon } from '@/shared/ui/icons'
+
+import { PERMISSION_COLUMNS } from '../config/team.constants'
 
 export function RolePermissionsMatrix() {
   const { t } = useTranslation()
@@ -47,10 +48,10 @@ export function RolePermissionsMatrix() {
                 <span key={col.labelKey} className="flex justify-center">
                   {allowed ? (
                     <span className="flex size-5 items-center justify-center rounded-full bg-positive-surface">
-                      <Check className="size-3 text-positive-text dark:text-positive" />
+                      <CheckIcon className="size-3 text-positive-text dark:text-positive" />
                     </span>
                   ) : (
-                    <Minus className="size-3 text-muted-foreground/40" />
+                    <MinusIcon className="size-3 text-muted-foreground/40" />
                   )}
                 </span>
               )

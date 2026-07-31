@@ -6,22 +6,23 @@ import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 
 import { saveNomenclatureAction } from '../api/setup-steps.actions'
+import { NOMENCLATURE_PRESETS } from '../config/nomenclature.constants'
+import { buildDefaultNomenclature, isSeedNomenclature } from '../lib/nomenclature'
 
-import {
-  buildDefaultNomenclature,
-  isSeedNomenclature,
-  NOMENCLATURE_PRESETS,
-} from './nomenclature.constants'
 import { useStepHydration } from './useStepHydration'
 import { useStepMutation } from './useStepMutation'
 
-import type { NomenclatureState } from './nomenclature.constants'
+import type { NomenclatureState } from './types'
 import type { NomenclatureConfig } from '@repo/shared-types'
 
 export function useStepNomenclature(onNext: () => void) {
-  const { watch, setValue, getValues, reset } = useForm<NomenclatureState>({
-    defaultValues: buildDefaultNomenclature(t),
-  })
+  const {
+    watch,
+    setValue,
+    getValues,
+    reset,
+    formState: { isDirty },
+  } = useForm<NomenclatureState>({ defaultValues: buildDefaultNomenclature(t) })
   const nomen = watch()
 
   useStepHydration({
@@ -44,7 +45,7 @@ export function useStepNomenclature(onNext: () => void) {
 
   const handleUpdate = useCallback(
     (entity: keyof NomenclatureState, field: 'singular' | 'plural', value: string) => {
-      setValue(`${entity}.${field}`, value)
+      setValue(`${entity}.${field}`, value, { shouldDirty: true })
     },
     [setValue],
   )
@@ -52,7 +53,7 @@ export function useStepNomenclature(onNext: () => void) {
   const handlePreset = useCallback(
     (presetKey: string) => {
       const preset = NOMENCLATURE_PRESETS[presetKey]
-      if (preset) reset(preset.values)
+      if (preset) reset(preset.values, { keepDefaultValues: true })
     },
     [reset],
   )
@@ -66,5 +67,13 @@ export function useStepNomenclature(onNext: () => void) {
     onNext,
   })
 
-  return { nomen, handleUpdate, handlePreset, handleSave, isPending }
+  return {
+    nomen,
+    handleUpdate,
+    handlePreset,
+    handleSave,
+    handleReset: () => reset(),
+    isDirty,
+    isPending,
+  }
 }

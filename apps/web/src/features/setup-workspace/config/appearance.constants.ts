@@ -1,6 +1,6 @@
 import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
 
-import type { ColorOverrides, ThemeMode } from './appearance.types'
+import type { AppearanceFormValues, ThemePreset } from '../model/types'
 import type { ThemeTypography } from '@repo/shared-types'
 
 export const COLOR_NAMES: Record<string, string> = Object.fromEntries(
@@ -47,17 +47,6 @@ export const DENSITY_OPTIONS: ReadonlyArray<{
   { value: 'comfortable', labelKey: 'comfortable' },
   { value: 'spacious', labelKey: 'spacious' },
 ]
-
-export interface ThemePreset {
-  readonly key: string
-  readonly primary: string
-  readonly overrides: ColorOverrides
-  readonly fontFamily: ThemeTypography['fontFamily']
-  readonly borderRadius: ThemeTypography['borderRadius']
-  readonly density: ThemeTypography['density']
-  readonly darkMode: ThemeMode
-  readonly recommended?: boolean
-}
 
 function brandHex(label: string): string {
   return BRAND_COLOR_OPTIONS.find((o) => o.label === label)?.hex ?? BRAND_COLOR_OPTIONS[0].hex
@@ -108,22 +97,6 @@ export const THEME_PRESETS: ReadonlyArray<ThemePreset> = [
   },
 ]
 
-export function matchingPresetKey(values: {
-  primaryColor: string
-  fontFamily: ThemeTypography['fontFamily']
-  borderRadius: ThemeTypography['borderRadius']
-  density: ThemeTypography['density']
-}): string | null {
-  const match = THEME_PRESETS.find(
-    (p) =>
-      p.primary === values.primaryColor &&
-      p.fontFamily === values.fontFamily &&
-      p.borderRadius === values.borderRadius &&
-      p.density === values.density,
-  )
-  return match?.key ?? null
-}
-
 export const RADIUS_MAP: Record<ThemeTypography['borderRadius'], string> = {
   none: '0px',
   sm: '4px',
@@ -147,4 +120,19 @@ export const DENSITY_MAP: Record<
   compact: { px: '8px', py: '4px', gap: '4px' },
   comfortable: { px: '12px', py: '6px', gap: '8px' },
   spacious: { px: '16px', py: '10px', gap: '12px' },
+}
+
+export const APPEARANCE_DEFAULT_VALUES: AppearanceFormValues = {
+  primaryColor: BRAND_COLOR_OPTIONS[0].hex,
+  colorOverrides: {},
+  grainIntensity: 0,
+  darkMode: 'system',
+  fontFamily: 'inter',
+  borderRadius: 'lg',
+  density: 'comfortable',
+  productName: '',
+  tagline: '',
+  logoUrl: null,
+  logoPreview: null,
+  logoFileName: null,
 }

@@ -5,13 +5,13 @@ import {
   GOOGLE_FONT_MAP,
   RADIUS_MAP,
   SURFACE_RADIUS_MAP,
-} from '../../model/appearance.constants'
-import { deriveDarkPalette } from '../../model/palette.utils'
+} from '../../config/appearance.constants'
+import { deriveDarkPalette } from '../../lib/palette'
 
 import { PreviewMain } from './PreviewMain'
 import { PreviewSidebar } from './PreviewSidebar'
 
-import type { ThemeMode } from '../../model/appearance.types'
+import type { ThemeMode } from '../../model/types'
 import type { SidebarModule, ThemeColors, ThemeTypography } from '@repo/shared-types'
 
 export interface LivePreviewData {

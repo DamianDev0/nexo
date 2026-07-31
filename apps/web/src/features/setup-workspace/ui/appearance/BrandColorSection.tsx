@@ -1,14 +1,14 @@
 import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
-import { Paintbrush } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { PaletteIcon } from '@/shared/ui/icons'
 import { ArcColorPicker } from '@/shared/ui/molecules/color-picker'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Label } from '@/shared/ui/shadcn/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
-import { COLOR_NAMES } from '../../model/appearance.constants'
+import { COLOR_NAMES } from '../../config/appearance.constants'
 
 interface BrandColorSectionProps {
   readonly primaryColor: string
@@ -64,7 +64,7 @@ export function BrandColorSection({
                 style={{ background: primaryColor }}
               />
               <span className="font-mono text-xs uppercase text-foreground/80">{primaryColor}</span>
-              <Paintbrush className="ml-auto size-3 text-muted-foreground" />
+              <PaletteIcon className="ml-auto size-3 text-muted-foreground" />
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 p-0">

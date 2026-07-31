@@ -6,7 +6,7 @@ import { Label } from '@/shared/ui/shadcn/label'
 
 import { ColorField } from './ColorField'
 
-import type { OverridableColorKey } from '../../model/appearance.types'
+import type { OverridableColorKey } from '../../model/types'
 import type { ThemeColors } from '@repo/shared-types'
 
 const OVERRIDE_ITEMS: ReadonlyArray<{ key: OverridableColorKey; labelKey: string }> = [

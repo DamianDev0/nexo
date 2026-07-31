@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { GOOGLE_FONT_MAP } from '../model/appearance.constants'
+import { GOOGLE_FONT_MAP } from '../config/appearance.constants'
 
 import type { ThemeTypography } from '@repo/shared-types'
 

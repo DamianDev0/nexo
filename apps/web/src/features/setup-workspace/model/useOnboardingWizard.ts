@@ -8,7 +8,7 @@ import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
 import { ROUTES } from '@/shared/config/routes'
 
-import { STEP_KEYS } from './wizard-steps'
+import { STEP_KEYS } from '../config/wizard.constants'
 
 const TOTAL_STEPS = STEP_KEYS.length
 const ONBOARDING_KEY = ['settings', 'onboarding'] as const

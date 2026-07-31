@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
-import { groupModules } from '../model/navigation.constants'
+import { groupModules } from '../lib/navigation'
 import { useDndReorder } from '../model/useDndReorder'
 import { useHighlightKey } from '../model/useHighlightKey'
 

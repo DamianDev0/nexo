@@ -1,23 +1,15 @@
-import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
-import { Lightbulb } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
+import { LightbulbIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 
-import { NOMENCLATURE_PRESETS } from '../model/nomenclature.constants'
+import { NOMENCLATURE_ENTITIES, NOMENCLATURE_PRESETS } from '../config/nomenclature.constants'
 
 import { WizardStep, type WizardStepNav } from './WizardStep'
 
 import type { TenantNomenclature } from '@repo/shared-types'
-
-const ENTITY_COLORS = {
-  contact: BRAND_COLOR_OPTIONS[0].hex,
-  company: BRAND_COLOR_OPTIONS[7].hex,
-  deal: BRAND_COLOR_OPTIONS[6].hex,
-  activity: BRAND_COLOR_OPTIONS[5].hex,
-} as const
 
 interface NomenclatureActions {
   readonly onUpdate: (
@@ -44,7 +36,7 @@ export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatu
       nav={{ ...nav, footerNote: t(`${s}.canChangeAnytime`) }}
     >
       <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-border bg-card py-2 pl-3 pr-4 text-xs text-muted-foreground shadow-xs">
-        <Lightbulb className="size-3.5 shrink-0 text-primary" />
+        <LightbulbIcon className="size-3.5 shrink-0 text-primary" />
         {t(`${s}.hint`)}
       </div>
 
@@ -57,23 +49,21 @@ export function StepNomenclature({ data, actions, nav }: Readonly<StepNomenclatu
           {t(`${s}.plural`)}
         </span>
 
-        {(Object.keys(data) as Array<keyof TenantNomenclature>).map((entity) => (
-          <div key={entity} className="contents">
+        {NOMENCLATURE_ENTITIES.map(({ key, icon: Icon }) => (
+          <div key={key} className="contents">
             <div className="flex items-center gap-2">
-              <div className="size-2 rounded-full" style={{ background: ENTITY_COLORS[entity] }} />
-              <span className="text-xs font-semibold capitalize text-muted-foreground">
-                {entity}
-              </span>
+              <Icon className="size-4 shrink-0 text-muted-foreground" />
+              <span className="text-xs font-semibold capitalize text-muted-foreground">{key}</span>
             </div>
             <Input
               className="h-9 text-sm"
-              value={data[entity].singular}
-              onChange={(e) => actions.onUpdate(entity, 'singular', e.target.value)}
+              value={data[key].singular}
+              onChange={(e) => actions.onUpdate(key, 'singular', e.target.value)}
             />
             <Input
               className="h-9 text-sm"
-              value={data[entity].plural}
-              onChange={(e) => actions.onUpdate(entity, 'plural', e.target.value)}
+              value={data[key].plural}
+              onChange={(e) => actions.onUpdate(key, 'plural', e.target.value)}
             />
           </div>
         ))}

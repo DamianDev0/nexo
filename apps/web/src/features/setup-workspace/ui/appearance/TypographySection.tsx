@@ -18,7 +18,7 @@ import {
   FONT_OPTIONS,
   GOOGLE_FONT_MAP,
   RADIUS_OPTIONS,
-} from '../../model/appearance.constants'
+} from '../../config/appearance.constants'
 
 import type { ThemeTypography } from '@repo/shared-types'
 

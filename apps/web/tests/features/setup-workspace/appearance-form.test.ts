@@ -2,12 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   APPEARANCE_DEFAULT_VALUES,
-  withPreset,
-} from '@/features/setup-workspace/model/appearance-form'
-import {
-  matchingPresetKey,
   THEME_PRESETS,
-} from '@/features/setup-workspace/model/appearance.constants'
+} from '@/features/setup-workspace/config/appearance.constants'
+import { matchingPresetKey, withPreset } from '@/features/setup-workspace/lib/appearance'
 
 describe('withPreset', () => {
   it('applies preset visuals while preserving branding fields', () => {

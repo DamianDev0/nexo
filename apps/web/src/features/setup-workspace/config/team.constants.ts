@@ -1,10 +1,4 @@
-import type { Action, Resource } from '@repo/shared-utils'
-
-type PermissionColumn = {
-  readonly labelKey: 'colView' | 'colCreate' | 'colEdit' | 'colConfig'
-  readonly resource: Resource
-  readonly action: Action
-}
+import type { PermissionColumn } from '../model/types'
 
 export const PERMISSION_COLUMNS: ReadonlyArray<PermissionColumn> = [
   { labelKey: 'colView', resource: 'deals', action: 'read' },
