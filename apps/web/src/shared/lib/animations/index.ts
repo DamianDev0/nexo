@@ -15,5 +15,7 @@ export {
   smoothEase,
   quickEase,
   indicatorSpring,
+  gooeyPopover,
+  gooeySpring,
   instant,
 } from './variants'

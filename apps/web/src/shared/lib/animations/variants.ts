@@ -77,3 +77,15 @@ export const indicatorSpring = {
 }
 
 export const instant = { duration: 0 }
+
+export const gooeyPopover: Variants = {
+  initial: { opacity: 0, scale: 0.94, y: -8, filter: 'blur(8px)' },
+  animate: { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' },
+  exit: { opacity: 0, scale: 0.94, y: -8, filter: 'blur(8px)' },
+}
+
+export const gooeySpring = {
+  type: 'spring' as const,
+  bounce: 0.24,
+  duration: 0.36,
+}
