@@ -11,6 +11,13 @@ import {
   useStepNomenclature,
 } from '@/features/setup-workspace'
 
+export interface SettingsSectionController {
+  readonly handleSave: () => void
+  readonly handleReset: () => void
+  readonly isDirty: boolean
+  readonly isPending: boolean
+}
+
 interface ManageSettingsContextValue {
   readonly company: ReturnType<typeof useStepCompany>
   readonly nomenclature: ReturnType<typeof useStepNomenclature>

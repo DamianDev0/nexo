@@ -1,9 +1,9 @@
 import { cva } from 'class-variance-authority'
-import { ChevronDownIcon } from 'lucide-react'
 import { NavigationMenu as NavigationMenuPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib'
+import { CaretDownIcon } from '@/shared/ui/icons'
 
 function NavigationMenu({
   className,
@@ -73,7 +73,7 @@ function NavigationMenuTrigger({
       {...props}
     >
       {children}{' '}
-      <ChevronDownIcon
+      <CaretDownIcon
         className="relative top-0.25 ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180"
         aria-hidden="true"
       />

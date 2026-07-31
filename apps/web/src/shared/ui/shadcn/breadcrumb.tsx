@@ -1,8 +1,8 @@
-import { ChevronRight, MoreHorizontal } from 'lucide-react'
 import { Slot } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib'
+import { CaretRightIcon, DotsThreeIcon } from '@/shared/ui/icons'
 
 function Breadcrumb({ ...props }: Readonly<React.ComponentProps<'nav'>>) {
   return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
@@ -77,7 +77,7 @@ function BreadcrumbSeparator({
       className={cn('[&>svg]:size-3.5', className)}
       {...props}
     >
-      {children ?? <ChevronRight />}
+      {children ?? <CaretRightIcon />}
     </li>
   )
 }
@@ -91,7 +91,7 @@ function BreadcrumbEllipsis({ className, ...props }: Readonly<React.ComponentPro
       className={cn('flex size-9 items-center justify-center', className)}
       {...props}
     >
-      <MoreHorizontal className="size-4" />
+      <DotsThreeIcon className="size-4" />
       <span className="sr-only">More</span>
     </span>
   )

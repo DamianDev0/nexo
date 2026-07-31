@@ -1,9 +1,9 @@
 'use client'
 
-import { CloudOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { CloudSlashIcon } from '@/shared/ui/icons'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 
 interface ErrorPageProps {
@@ -17,7 +17,7 @@ export default function ErrorPage({ reset }: Readonly<ErrorPageProps>) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <EmptyState
-        icon={<CloudOff className="size-5" />}
+        icon={<CloudSlashIcon className="size-5" />}
         title={t('errors.serverTitle')}
         description={t('errors.serverDescription')}
       >

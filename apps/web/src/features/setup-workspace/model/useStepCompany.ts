@@ -25,9 +25,13 @@ const DEFAULT_VALUES: CompanyFormValues = {
 }
 
 export function useStepCompany(onNext: () => void) {
-  const { watch, setValue, getValues, reset } = useForm<CompanyFormValues>({
-    defaultValues: DEFAULT_VALUES,
-  })
+  const {
+    watch,
+    setValue,
+    getValues,
+    reset,
+    formState: { isDirty },
+  } = useForm<CompanyFormValues>({ defaultValues: DEFAULT_VALUES })
   const values = watch()
 
   useStepHydration({
@@ -55,12 +59,14 @@ export function useStepCompany(onNext: () => void) {
 
   return {
     phone: values.phone,
-    setPhone: (v: string) => setValue('phone', v),
+    setPhone: (v: string) => setValue('phone', v, { shouldDirty: true }),
     website: values.website,
-    setWebsite: (v: string) => setValue('website', v),
+    setWebsite: (v: string) => setValue('website', v, { shouldDirty: true }),
     sector: values.sector,
-    setSector: (v: IndustrySector) => setValue('sector', v),
+    setSector: (v: IndustrySector) => setValue('sector', v, { shouldDirty: true }),
     handleSave,
+    handleReset: () => reset(),
+    isDirty,
     isPending,
   }
 }

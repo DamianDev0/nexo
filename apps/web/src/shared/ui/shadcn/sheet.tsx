@@ -1,10 +1,10 @@
 'use client'
 
-import { XIcon } from 'lucide-react'
 import { Dialog as SheetPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib'
+import { XIcon } from '@/shared/ui/icons'
 
 function Sheet({ ...props }: Readonly<React.ComponentProps<typeof SheetPrimitive.Root>>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />

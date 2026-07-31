@@ -1,11 +1,11 @@
 'use client'
 
-import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback } from 'react'
 import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
+import { MoonIcon, SunIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Tooltip,
@@ -40,8 +40,8 @@ export function ThemeToggle() {
             aria-label={t('common.toggleTheme')}
             className="relative text-foreground/60 hover:text-foreground"
           >
-            <Sun className="size-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute size-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+            <SunIcon className="size-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
+            <MoonIcon className="absolute size-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">{t('common.toggleTheme')}</TooltipContent>

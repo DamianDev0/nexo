@@ -1,9 +1,11 @@
 'use client'
 
-import { Home, type LucideIcon } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib/index'
+import { HouseIcon } from '@/shared/ui/icons'
+
+import type { AppIcon } from '@/shared/ui/icons'
 
 /* ═══════════════════════════════════════════════════════════
    Breadcrumb Icon — Magnetic pill-tracking breadcrumb.
@@ -26,7 +28,7 @@ import { cn } from '@/shared/lib/index'
 export interface BreadcrumbIconItem {
   label: string
   href?: string
-  icon?: LucideIcon
+  icon?: AppIcon
 }
 
 export interface BreadcrumbIconProps {
@@ -50,7 +52,7 @@ export function BreadcrumbIcon({
 
   const itemsWithIcons = items.map((item, index) => ({
     ...item,
-    icon: item.icon || (index === 0 && showHomeIcon ? Home : undefined),
+    icon: item.icon || (index === 0 && showHomeIcon ? HouseIcon : undefined),
   }))
 
   const handleHover = React.useCallback((index: number) => {

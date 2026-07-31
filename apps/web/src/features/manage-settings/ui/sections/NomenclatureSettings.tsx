@@ -3,14 +3,11 @@
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
-import { NOMENCLATURE_PRESETS } from '@/features/setup-workspace'
+import { NOMENCLATURE_ENTITIES, NOMENCLATURE_PRESETS } from '@/features/setup-workspace'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 
 import { useManageSettings } from '../../model/settings-context'
-import { SaveBar } from '../SaveBar'
-
-import type { TenantNomenclature } from '@repo/shared-types'
 
 export function NomenclatureSettings() {
   const { t } = useTranslation()
@@ -18,7 +15,7 @@ export function NomenclatureSettings() {
   const { nomenclature } = useManageSettings()
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-x-4 gap-y-3">
         <div />
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -28,18 +25,21 @@ export function NomenclatureSettings() {
           {t(`${s}.plural`)}
         </span>
 
-        {(Object.keys(nomenclature.nomen) as Array<keyof TenantNomenclature>).map((entity) => (
-          <div key={entity} className="contents">
-            <span className="text-xs font-semibold capitalize text-muted-foreground">{entity}</span>
+        {NOMENCLATURE_ENTITIES.map(({ key, icon: Icon }) => (
+          <div key={key} className="contents">
+            <div className="flex items-center gap-2">
+              <Icon className="size-4 shrink-0 text-muted-foreground" />
+              <span className="text-xs font-semibold capitalize text-muted-foreground">{key}</span>
+            </div>
             <Input
               className="h-9 text-sm"
-              value={nomenclature.nomen[entity].singular}
-              onChange={(e) => nomenclature.handleUpdate(entity, 'singular', e.target.value)}
+              value={nomenclature.nomen[key].singular}
+              onChange={(e) => nomenclature.handleUpdate(key, 'singular', e.target.value)}
             />
             <Input
               className="h-9 text-sm"
-              value={nomenclature.nomen[entity].plural}
-              onChange={(e) => nomenclature.handleUpdate(entity, 'plural', e.target.value)}
+              value={nomenclature.nomen[key].plural}
+              onChange={(e) => nomenclature.handleUpdate(key, 'plural', e.target.value)}
             />
           </div>
         ))}
@@ -62,8 +62,6 @@ export function NomenclatureSettings() {
           ))}
         </div>
       </div>
-
-      <SaveBar onSave={nomenclature.handleSave} isPending={nomenclature.isPending} />
     </div>
   )
 }

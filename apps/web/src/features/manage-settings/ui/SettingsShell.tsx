@@ -1,49 +1,68 @@
 'use client'
 
-import Link from 'next/link'
+import { motion } from 'motion/react'
 import { usePathname } from 'next/navigation'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { cn } from '@/shared/lib'
+import { quickEase, useReducedTransition } from '@/shared/lib/animations'
+import { useScrollTopOnChange } from '@/shared/lib/hooks/useScrollTopOnChange'
 
-import { SETTINGS_SECTIONS } from '../model/settings-sections'
+import { useManageSettings } from '../model/settings-context'
+import { sectionKeyForPath } from '../model/settings-sections'
 
+import { SaveBar } from './SaveBar'
+import { SettingsNav } from './SettingsNav'
+
+import type { SettingsSectionController } from '../model/settings-context'
+import type { SettingsSectionKey } from '../model/settings-sections'
 import type { ReactNode } from 'react'
 
 export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
   const { t } = useTranslation()
   const pathname = usePathname()
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const contentTransition = useReducedTransition(quickEase)
+  const { company, appearance, navigation, nomenclature } = useManageSettings()
+
+  useScrollTopOnChange(pathname, scrollRef)
+
+  const controllers: Record<SettingsSectionKey, SettingsSectionController> = {
+    general: company,
+    appearance,
+    navigation,
+    nomenclature,
+  }
+  const active = controllers[sectionKeyForPath(pathname)]
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-9 py-8">
-      <header>
-        <h1 className="text-3xl font-black tracking-tight text-foreground">
-          {t('settings.title')}
-        </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">{t('settings.subtitle')}</p>
-      </header>
+    <div className="flex h-full">
+      <aside className="w-52 shrink-0 overflow-y-auto border-r border-border px-3 py-6">
+        <SettingsNav />
+      </aside>
 
-      <nav className="flex gap-1 border-b border-border">
-        {SETTINGS_SECTIONS.map((section) => {
-          const isActive = pathname === section.href
-          return (
-            <Link
-              key={section.key}
-              href={section.href}
-              className={cn(
-                'relative -mb-px border-b-2 px-3.5 py-2.5 text-sm transition-colors',
-                isActive
-                  ? 'border-primary font-semibold text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground',
-              )}
-            >
-              {t(`settings.sections.${section.key}`)}
-            </Link>
-          )
-        })}
-      </nav>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-8 py-6">
+          <p className="text-sm text-muted-foreground">{t('settings.subtitle')}</p>
 
-      <div>{children}</div>
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={contentTransition}
+            className="mt-6"
+          >
+            {children}
+          </motion.div>
+        </div>
+
+        <SaveBar
+          onSave={active.handleSave}
+          onReset={active.handleReset}
+          isDirty={active.isDirty}
+          isPending={active.isPending}
+        />
+      </div>
     </div>
   )
 }

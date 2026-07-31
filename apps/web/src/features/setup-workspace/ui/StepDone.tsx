@@ -1,7 +1,7 @@
-import { Home, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
+import { ArrowRightIcon, HouseIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 
 interface StepDoneProps {
@@ -29,12 +29,12 @@ export function StepDone({ onGoToDashboard, onReviewConfig }: Readonly<StepDoneP
 
       <div className="mt-8 flex gap-3">
         <Button size="lg" onClick={onGoToDashboard} className="gap-2">
-          <Home className="size-4" />
+          <HouseIcon className="size-4" />
           {t(`${s}.goToDashboard`)}
         </Button>
         <Button variant="outline" size="lg" onClick={onReviewConfig} className="gap-2">
           {t(`${s}.reviewConfig`)}
-          <ArrowRight className="size-4" />
+          <ArrowRightIcon className="size-4" />
         </Button>
       </div>
 

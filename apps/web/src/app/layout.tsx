@@ -1,4 +1,7 @@
+import { cookies } from 'next/headers'
+
 import { Providers } from '@/app/providers'
+import { safeTenantSlug, TENANT_COOKIE, tenantThemeHref } from '@/shared/config/tenant-cookie'
 import { getLocale } from '@/shared/i18n/server'
 
 import type { Metadata } from 'next'
@@ -13,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const locale = await getLocale()
+  const tenantSlug = safeTenantSlug((await cookies()).get(TENANT_COOKIE)?.value)
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -25,6 +29,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
+        {tenantSlug && <link href={tenantThemeHref(tenantSlug)} rel="stylesheet" />}
       </head>
       <body>
         <Providers>{children}</Providers>

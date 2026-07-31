@@ -3,10 +3,10 @@
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core'
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { Plus } from 'lucide-react'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { PlusIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
@@ -93,7 +93,7 @@ export function StepPipeline({ data, actions, nav }: Readonly<StepPipelineProps>
         onClick={actions.onAddStage}
         className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
       >
-        <Plus className="size-3.5" />
+        <PlusIcon className="size-3.5" />
         {t(`${s}.addStage`)}
       </Button>
     </WizardStep>

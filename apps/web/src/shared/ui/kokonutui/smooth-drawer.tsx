@@ -10,11 +10,11 @@
  * @github: https://github.com/kokonut-labs/kokonutui
  */
 
-import { Fingerprint } from 'lucide-react'
 import { motion } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { FingerprintIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Drawer,
@@ -197,7 +197,7 @@ export default function SmoothDrawer({
                         repeatDelay: 1,
                       }}
                     >
-                      <Fingerprint className="h-4 w-4" />
+                      <FingerprintIcon className="h-4 w-4" />
                     </motion.div>
                   </motion.div>
                 </Link>

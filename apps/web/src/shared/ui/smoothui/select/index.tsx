@@ -1,11 +1,11 @@
 'use client'
 
-import { Check, ChevronDown } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { cn } from '@/shared/lib/index'
+import { CaretDownIcon, CheckIcon } from '@/shared/ui/icons'
 import { DURATION_INSTANT, SPRING_DEFAULT, SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
 
 // ---------------------------------------------------------------------------
@@ -324,7 +324,7 @@ export default function Select({
                         }
                   }
                 >
-                  <Check className="size-4" />
+                  <CheckIcon className="size-4" />
                 </motion.span>
               )}
             </AnimatePresence>
@@ -385,22 +385,22 @@ export default function Select({
 
               {/* Grouped options */}
               {groups?.map((group, groupIdx) => {
-                  const groupItems = group.options.map((opt) => {
-                    const idx = globalIndex
-                    globalIndex += 1
-                    return renderItem(opt, idx)
-                  })
+                const groupItems = group.options.map((opt) => {
+                  const idx = globalIndex
+                  globalIndex += 1
+                  return renderItem(opt, idx)
+                })
 
-                  return (
-                    <div key={group.label}>
-                      {groupIdx > 0 && (
-                        <div className="pointer-events-none -mx-1 my-1 h-px bg-border" />
-                      )}
-                      <div className="px-2 py-1.5 text-muted-foreground text-xs">{group.label}</div>
-                      {groupItems}
-                    </div>
-                  )
-                })}
+                return (
+                  <div key={group.label}>
+                    {groupIdx > 0 && (
+                      <div className="pointer-events-none -mx-1 my-1 h-px bg-border" />
+                    )}
+                    <div className="px-2 py-1.5 text-muted-foreground text-xs">{group.label}</div>
+                    {groupItems}
+                  </div>
+                )
+              })}
             </div>
           </motion.div>
         </div>
@@ -464,7 +464,7 @@ export default function Select({
                 : { type: 'spring' as const, duration: 0.25, bounce: 0.05 }
             }
           >
-            <ChevronDown className="size-4 opacity-50" />
+            <CaretDownIcon className="size-4 opacity-50" />
           </motion.div>
         </button>
       </div>

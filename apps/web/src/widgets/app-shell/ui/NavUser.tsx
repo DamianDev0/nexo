@@ -1,8 +1,7 @@
 'use client'
 
-import { ChevronsUpDown, LogOut, Settings, Bell } from 'lucide-react'
-
 import { useLogout } from '@/features/logout'
+import { BellIcon, CaretUpDownIcon, GearIcon, SignOutIcon } from '@/shared/ui/icons'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/shadcn/avatar'
 import {
   DropdownMenu,
@@ -51,7 +50,7 @@ export function NavUser({ user }: Readonly<NavUserProps>) {
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <CaretUpDownIcon className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -75,17 +74,17 @@ export function NavUser({ user }: Readonly<NavUserProps>) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Settings />
+                <GearIcon />
                 Settings
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Bell />
+                <BellIcon />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => logout()}>
-              <LogOut />
+              <SignOutIcon />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

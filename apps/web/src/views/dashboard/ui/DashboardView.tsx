@@ -1,7 +1,6 @@
-import { Check, Inbox } from 'lucide-react'
-
 import { getT } from '@/shared/i18n/server'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { CheckIcon, TrayIcon } from '@/shared/ui/icons'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 
 import { getDashboard } from '../api/get-dashboard'
@@ -21,7 +20,7 @@ export async function DashboardView() {
       </header>
 
       <EmptyState
-        icon={<Inbox className="size-5" />}
+        icon={<TrayIcon className="size-5" />}
         title={t('dashboard.emptyTitle')}
         description={t('dashboard.emptyDescription')}
       >
@@ -36,7 +35,7 @@ export async function DashboardView() {
           {DASHBOARD_TIP_KEYS.map((key) => (
             <li key={key} className="flex items-start gap-3">
               <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
-                <Check className="size-3" />
+                <CheckIcon className="size-3" />
               </span>
               <div>
                 <p className="text-sm font-semibold leading-snug text-foreground">

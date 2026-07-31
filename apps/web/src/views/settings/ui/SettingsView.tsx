@@ -3,10 +3,8 @@
 import {
   AppearanceSettings,
   GeneralSettings,
-  ManageSettingsProvider,
   NavigationSettings,
   NomenclatureSettings,
-  SettingsShell,
   type SettingsSectionKey,
 } from '@/features/manage-settings'
 
@@ -20,11 +18,5 @@ const SECTION_CONTENT: Record<SettingsSectionKey, () => React.JSX.Element> = {
 export function SettingsView({ section }: Readonly<{ section: SettingsSectionKey }>) {
   const Section = SECTION_CONTENT[section]
 
-  return (
-    <ManageSettingsProvider>
-      <SettingsShell>
-        <Section />
-      </SettingsShell>
-    </ManageSettingsProvider>
-  )
+  return <Section />
 }

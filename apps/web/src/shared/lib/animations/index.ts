@@ -1,6 +1,9 @@
 export { PageTransition } from './PageTransition'
 export { StaggerGroup, StaggerItem } from './StaggerGroup'
+export { useReducedTransition } from './useReducedTransition'
 export {
+  DURATION,
+  EASE_SMOOTH,
   fade,
   fadeSlideUp,
   slideRight,
@@ -10,4 +13,7 @@ export {
   staggerChild,
   smoothSpring,
   smoothEase,
+  quickEase,
+  indicatorSpring,
+  instant,
 } from './variants'

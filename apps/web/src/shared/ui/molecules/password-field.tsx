@@ -1,8 +1,8 @@
-import { Eye, EyeOff } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { EyeIcon, EyeSlashIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 import { Label } from '@/shared/ui/shadcn/label'
@@ -71,7 +71,11 @@ export function PasswordField<T extends FieldValues>({
                   transition={{ duration: 0.15, ease: 'easeOut' }}
                   className="flex"
                 >
-                  {visibility.shown ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  {visibility.shown ? (
+                    <EyeSlashIcon className="size-4" />
+                  ) : (
+                    <EyeIcon className="size-4" />
+                  )}
                 </motion.span>
               </AnimatePresence>
             </Button>

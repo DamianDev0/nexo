@@ -1,9 +1,10 @@
 'use client'
 
-import { ChevronDown, Search, X } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+
+import { CaretDownIcon, MagnifyingGlassIcon, XIcon } from '@/shared/ui/icons'
 
 const ROTATION_ANGLE_OPEN = 180
 
@@ -233,7 +234,6 @@ export default function SearchableDropdown({
                   }
             }
           >
-            {/* Search Input */}
             <div className="relative border-b p-2">
               <motion.div
                 animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
@@ -251,7 +251,7 @@ export default function SearchableDropdown({
                       }
                 }
               >
-                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   aria-autocomplete="list"
                   aria-controls="dropdown-items"
@@ -284,7 +284,7 @@ export default function SearchableDropdown({
                       }}
                       type="button"
                     >
-                      <X aria-hidden="true" className="h-4 w-4" />
+                      <XIcon aria-hidden="true" className="h-4 w-4" />
                     </motion.button>
                   )}
                 </AnimatePresence>
@@ -443,7 +443,7 @@ export default function SearchableDropdown({
                   }
             }
           >
-            <ChevronDown className="h-4 w-4" />
+            <CaretDownIcon className="h-4 w-4" />
           </motion.div>
         </button>
       </div>

@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 import { useAuthStore } from '@/entities/session'
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/config/query-keys'
+import { rememberTenantSlug, safeTenantSlug, tenantThemeHref } from '@/shared/config/tenant-cookie'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '/api/v1'
 const BRANDING_STALE_MS = 5 * 60 * 1000
 
 export function useTenantBranding() {
@@ -28,11 +28,15 @@ export function useTenantBranding() {
     if (!tenantSlug && general?.slug) setTenantSlug(general.slug)
   }, [tenantSlug, general?.slug, setTenantSlug])
 
-  const slug = tenantSlug ?? general?.slug ?? null
+  const slug = safeTenantSlug(tenantSlug ?? general?.slug)
+
+  useEffect(() => {
+    if (slug) rememberTenantSlug(slug)
+  }, [slug])
 
   return {
     slug,
-    themeCssHref: slug ? `${API_BASE}/tenant/${slug}/theme.css?v=${themeUpdatedAt}` : null,
+    themeCssHref: slug ? tenantThemeHref(slug, themeUpdatedAt) : null,
     name: theme?.branding?.companyName ?? general?.name ?? 'NexoCRM',
     plan: general?.plan ?? null,
     logoUrl: theme?.branding?.logoUrl ?? null,

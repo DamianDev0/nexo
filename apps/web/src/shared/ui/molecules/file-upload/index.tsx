@@ -1,8 +1,7 @@
 'use client'
 
-import { CloudUpload } from 'lucide-react'
-
 import { cn } from '@/shared/lib'
+import { CloudArrowUpIcon } from '@/shared/ui/icons'
 
 import { DEFAULT_ACCEPT, DEFAULT_MAX_SIZE_MB } from './constants'
 import { FilePreview } from './file-preview'
@@ -73,7 +72,7 @@ export function FileUpload({
           progress !== null && 'pointer-events-none border-primary/30',
         )}
       >
-        <CloudUpload
+        <CloudArrowUpIcon
           className={cn('size-6 transition-transform', isDragging && '-translate-y-1')}
         />
         <div className="flex flex-col items-center gap-0.5">

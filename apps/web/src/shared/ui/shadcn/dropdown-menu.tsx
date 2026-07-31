@@ -1,10 +1,10 @@
 'use client'
 
-import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react'
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib'
+import { CaretRightIcon, CheckIcon, CircleIcon } from '@/shared/ui/icons'
 
 function DropdownMenu({
   ...props
@@ -200,7 +200,7 @@ function DropdownMenuSubTrigger({
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto size-4" />
+      <CaretRightIcon className="ml-auto size-4" />
     </DropdownMenuPrimitive.SubTrigger>
   )
 }

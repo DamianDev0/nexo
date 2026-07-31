@@ -1,6 +1,5 @@
-import { Command } from 'lucide-react'
-
 import { cn } from '@/shared/lib/index'
+import { CommandIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 
 /**
@@ -37,7 +36,7 @@ export default function CommandButton({
         className,
       )}
     >
-      <Command
+      <CommandIcon
         className={cn(
           'h-4 w-4',
           'text-zinc-600 dark:text-zinc-400',

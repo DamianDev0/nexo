@@ -1,7 +1,7 @@
 import { INVITE_ROLE_OPTIONS, USER_ROLE_LABELS } from '@repo/shared-utils'
-import { Plus, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { PlusIcon, XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 import {
@@ -74,7 +74,7 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
                 onClick={() => actions.onRemove(inv.id)}
                 className="size-9 shrink-0 text-muted-foreground hover:border-destructive/50 hover:text-destructive"
               >
-                <X className="size-3.5" />
+                <XIcon className="size-3.5" />
               </Button>
             )}
           </div>
@@ -87,7 +87,7 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
         onClick={actions.onAdd}
         className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
       >
-        <Plus className="size-3.5" />
+        <PlusIcon className="size-3.5" />
         {t(`${s}.addMember`)}
       </Button>
     </WizardStep>

@@ -1,7 +1,7 @@
-import { Check, X } from 'lucide-react'
 import Image from 'next/image'
 
 import { cn } from '@/shared/lib'
+import { CheckIcon, XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 
 interface FilePreviewProps {
@@ -35,7 +35,7 @@ export function FilePreview({
           {fileName ?? 'Uploaded file'}
         </span>
         <span className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Check className="size-3" />
+          <CheckIcon className="size-3" />
           Uploaded
         </span>
       </div>
@@ -46,7 +46,7 @@ export function FilePreview({
         onClick={onRemove}
         className="shrink-0 text-muted-foreground hover:text-destructive"
       >
-        <X className="size-4" />
+        <XIcon className="size-4" />
       </Button>
     </div>
   )

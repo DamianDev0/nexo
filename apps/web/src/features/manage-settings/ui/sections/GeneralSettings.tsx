@@ -1,16 +1,12 @@
 'use client'
 
-import { SECTOR_OPTIONS } from '@repo/shared-utils'
-import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
-import { SECTOR_ICON_SRC } from '@/features/setup-workspace'
-import { OptionTile } from '@/shared/ui/molecules/option-tile'
+import { SectorPicker } from '@/features/setup-workspace'
 import { Input } from '@/shared/ui/shadcn/input'
 import { Label } from '@/shared/ui/shadcn/label'
 
 import { useManageSettings } from '../../model/settings-context'
-import { SaveBar } from '../SaveBar'
 
 export function GeneralSettings() {
   const { t } = useTranslation()
@@ -18,8 +14,8 @@ export function GeneralSettings() {
   const { company } = useManageSettings()
 
   return (
-    <div className="max-w-2xl">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="max-w-5xl">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label className="text-xs text-muted-foreground">{t(`${s}.phone`)}</Label>
           <Input
@@ -41,30 +37,7 @@ export function GeneralSettings() {
         </div>
       </div>
 
-      <div className="mt-6">
-        <Label className="text-xs text-muted-foreground">{t(`${s}.sector`)}</Label>
-        <div className="mt-3 grid grid-cols-4 gap-2">
-          {SECTOR_OPTIONS.map((opt) => (
-            <OptionTile
-              key={opt.id}
-              selected={company.sector === opt.id}
-              onSelect={() => company.setSector(opt.id)}
-              className="flex flex-col items-center p-3 text-center"
-            >
-              <Image
-                src={SECTOR_ICON_SRC[opt.id]}
-                alt=""
-                width={36}
-                height={36}
-                className="size-9 drop-shadow-sm"
-              />
-              <div className="mt-1.5 text-xs font-semibold">{opt.label}</div>
-            </OptionTile>
-          ))}
-        </div>
-      </div>
-
-      <SaveBar onSave={company.handleSave} isPending={company.isPending} />
+      <SectorPicker value={company.sector} onSelect={company.setSector} />
     </div>
   )
 }

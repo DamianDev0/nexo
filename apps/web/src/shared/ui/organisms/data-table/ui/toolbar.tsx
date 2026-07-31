@@ -1,8 +1,7 @@
 'use client'
 
-import { Search, SlidersHorizontal, X } from 'lucide-react'
-
 import { cn } from '@/shared/lib'
+import { MagnifyingGlassIcon, SlidersHorizontalIcon, XIcon } from '@/shared/ui/icons'
 
 import type { ReactNode } from 'react'
 
@@ -40,7 +39,7 @@ export function DataTableSearch({
         className,
       )}
     >
-      <Search className="size-4 shrink-0 text-faint" />
+      <MagnifyingGlassIcon className="size-4 shrink-0 text-faint" />
       <input
         type="search"
         value={value}
@@ -73,7 +72,7 @@ export function DataTableFilter({ label, active, onClick, onClear }: Readonly<Fi
             onClick={onClear}
             className="inline-flex size-6.5 cursor-pointer items-center justify-center rounded-full bg-sidebar-foreground/15"
           >
-            <X className="size-3" />
+            <XIcon className="size-3" />
           </button>
         )}
       </span>
@@ -100,7 +99,7 @@ export function DataTableEditColumns({
       onClick={onClick}
       className="ml-auto inline-flex h-10.5 cursor-pointer items-center gap-2 rounded-full border border-border-strong px-4.5 text-[15px] font-medium text-body hover:border-foreground"
     >
-      <SlidersHorizontal className="size-4" />
+      <SlidersHorizontalIcon className="size-4" />
       {label}
     </button>
   )

@@ -1,8 +1,12 @@
 'use client'
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react'
-
 import { cn } from '@/shared/lib'
+import {
+  CaretDoubleRightIcon,
+  CaretDownIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+} from '@/shared/ui/icons'
 
 import type { ReactNode } from 'react'
 
@@ -72,7 +76,7 @@ function Nav({ page, totalPages, onPageChange, labels = DEFAULT_LABELS }: Readon
   return (
     <span className="inline-flex items-center gap-1.5">
       <IconButton label={labels.prev} disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-        <ChevronLeft className="size-4.5" />
+        <CaretLeftIcon className="size-4.5" />
       </IconButton>
       <span aria-current="page" className="text-[15px] font-medium tabular-nums text-body">
         {page} / {totalPages}
@@ -82,7 +86,7 @@ function Nav({ page, totalPages, onPageChange, labels = DEFAULT_LABELS }: Readon
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
       >
-        <ChevronRight className="size-4.5" />
+        <CaretRightIcon className="size-4.5" />
       </IconButton>
     </span>
   )
@@ -110,7 +114,7 @@ function PageSize({ value, options, onChange, label = 'Rows per page' }: Readonl
           </option>
         ))}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-1.5 size-4 text-primary-deep" />
+      <CaretDownIcon className="pointer-events-none absolute right-1.5 size-4 text-primary-deep" />
     </span>
   )
 }
@@ -143,7 +147,7 @@ function JumpEnd({
 }: Readonly<{ onClick: () => void; label?: string }>) {
   return (
     <IconButton label={label} onClick={onClick}>
-      <ChevronsRight className="size-4.5" />
+      <CaretDoubleRightIcon className="size-4.5" />
     </IconButton>
   )
 }

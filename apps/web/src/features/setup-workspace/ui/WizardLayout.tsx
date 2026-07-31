@@ -1,4 +1,3 @@
-import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '@/features/switch-language'
 import { cn } from '@/shared/lib'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
+import { ArrowRightIcon, CheckIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Progress } from '@/shared/ui/shadcn/progress'
 
@@ -55,7 +55,7 @@ function StepItem({ index, step, currentStep, onClick }: Readonly<StepItemProps>
           !isDone && !isActive && 'border-border text-muted-foreground',
         )}
       >
-        {isDone ? <Check className="size-3.5" /> : stepNumber}
+        {isDone ? <CheckIcon className="size-3.5" /> : stepNumber}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold text-foreground">{step.label}</p>
@@ -155,7 +155,7 @@ export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
               className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-primary-deep hover:underline dark:text-primary"
             >
               {t('onboarding.chatSupport')}
-              <ArrowRight className="size-3" />
+              <ArrowRightIcon className="size-3" />
             </Link>
           </div>
         </div>

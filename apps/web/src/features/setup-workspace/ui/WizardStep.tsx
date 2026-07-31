@@ -1,7 +1,8 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { CaretLeftIcon, CaretRightIcon } from '@/shared/ui/icons'
+import { SubmitButton } from '@/shared/ui/molecules/submit-button'
 import { Button } from '@/shared/ui/shadcn/button'
 
 import type { ReactNode } from 'react'
@@ -69,14 +70,14 @@ export function WizardStep({
         <div className="flex items-center gap-2">
           {nav.onBack && (
             <Button variant="ghost" size="sm" onClick={nav.onBack}>
-              <ChevronLeft />
+              <CaretLeftIcon />
               {t('common.back')}
             </Button>
           )}
-          <Button size="sm" onClick={nav.onNext} disabled={nav.isPending}>
+          <SubmitButton size="sm" onSubmit={nav.onNext} isPending={nav.isPending}>
             {nav.isPending ? t('common.saving') : (nav.nextLabel ?? t('common.continue'))}
-            <ChevronRight />
-          </Button>
+            {!nav.isPending && <CaretRightIcon />}
+          </SubmitButton>
         </div>
       </div>
     </div>

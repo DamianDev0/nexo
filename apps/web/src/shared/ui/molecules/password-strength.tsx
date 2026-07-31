@@ -1,11 +1,11 @@
 'use client'
 
-import { Check, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { assessPassword } from '@/shared/lib/password-strength'
+import { CheckIcon, XIcon } from '@/shared/ui/icons'
 
 const BAR_COLORS: readonly [
   { min: number; className: string },
@@ -83,9 +83,9 @@ export function PasswordStrengthMeter({ value }: Readonly<PasswordStrengthMeterP
                     className="flex"
                   >
                     {req.met ? (
-                      <Check className="size-3.5 text-positive" />
+                      <CheckIcon className="size-3.5 text-positive" />
                     ) : (
-                      <X className="size-3.5 text-muted-foreground/60" />
+                      <XIcon className="size-3.5 text-muted-foreground/60" />
                     )}
                   </motion.span>
                 </AnimatePresence>

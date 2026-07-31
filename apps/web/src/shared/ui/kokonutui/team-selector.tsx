@@ -10,10 +10,11 @@
  * @github: https://github.com/kokonut-labs/kokonutui
  */
 
-import { Minus, Plus } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'motion/react'
 import Image from 'next/image'
 import { useRef, useState } from 'react'
+
+import { MinusIcon, PlusIcon } from '@/shared/ui/icons'
 
 const AVATAR_OVERLAP = 12
 const DICEBEAR_STYLE = 'notionists-neutral'
@@ -175,7 +176,7 @@ export default function TeamSelector({
               onKeyDown={(e) => handleKeyDown(e, 'decrement')}
               type="button"
             >
-              <Minus aria-hidden="true" className="size-3.5" strokeWidth={2} />
+              <MinusIcon aria-hidden="true" className="size-3.5" />
             </button>
 
             <div className="flex min-w-16 flex-col items-center">
@@ -214,7 +215,7 @@ export default function TeamSelector({
               onKeyDown={(e) => handleKeyDown(e, 'increment')}
               type="button"
             >
-              <Plus aria-hidden="true" className="size-3.5" strokeWidth={2} />
+              <PlusIcon aria-hidden="true" className="size-3.5" />
             </button>
           </motion.div>
         </fieldset>

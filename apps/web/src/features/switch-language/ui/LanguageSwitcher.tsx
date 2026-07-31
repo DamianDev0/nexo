@@ -1,8 +1,8 @@
 'use client'
 
-import { Check, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { CheckIcon, TranslateIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   DropdownMenu,
@@ -36,7 +36,7 @@ export function LanguageSwitcher() {
                 aria-label={t('language.switch')}
                 className="gap-1.5 text-foreground/60 hover:text-foreground"
               >
-                <Languages className="size-4" />
+                <TranslateIcon className="size-4" />
                 <span className="text-xs font-semibold uppercase tracking-wide">{current}</span>
               </Button>
             </DropdownMenuTrigger>
@@ -52,7 +52,7 @@ export function LanguageSwitcher() {
             className="justify-between"
           >
             {label}
-            {locale === current ? <Check className="size-4 text-primary-deep" /> : null}
+            {locale === current ? <CheckIcon className="size-4 text-primary-deep" /> : null}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

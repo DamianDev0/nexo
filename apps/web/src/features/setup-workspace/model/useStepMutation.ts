@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { t } from 'i18next'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { sileo } from 'sileo'
 
 interface StepMutationOptions<T> {
@@ -16,6 +16,8 @@ export function useStepMutation<T>({
   errorTitle,
   onSuccess,
 }: StepMutationOptions<T>) {
+  const inFlight = useRef(false)
+
   const { mutate, isPending } = useMutation({
     mutationFn,
     onSuccess: (result) => {
@@ -24,9 +26,16 @@ export function useStepMutation<T>({
     },
     onError: (err) =>
       sileo.error({ title: errorTitle ?? t('common.saveFailed'), description: err.message }),
+    onSettled: () => {
+      inFlight.current = false
+    },
   })
 
-  const handleSave = useCallback(() => mutate(), [mutate])
+  const handleSave = useCallback(() => {
+    if (inFlight.current) return
+    inFlight.current = true
+    mutate()
+  }, [mutate])
 
   return { handleSave, isPending }
 }

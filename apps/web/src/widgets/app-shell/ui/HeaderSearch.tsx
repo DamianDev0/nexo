@@ -1,8 +1,8 @@
 'use client'
 
-import { Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { MagnifyingGlassIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   CommandDialog,
@@ -29,7 +29,7 @@ export function HeaderSearch() {
         onClick={() => setOpen(true)}
         className="hidden h-9 w-64 justify-start gap-2 px-2.5 font-normal text-muted-foreground hover:bg-muted/60 md:flex lg:w-80"
       >
-        <Search className="size-3.5" />
+        <MagnifyingGlassIcon className="size-3.5" />
         <span className="flex-1 text-left text-sm">{t('nav.search')}</span>
         <kbd className="pointer-events-none rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground">
           ⌘K

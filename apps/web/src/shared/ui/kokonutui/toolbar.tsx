@@ -10,31 +10,32 @@
  * @github: https://github.com/kokonut-labs/kokonutui
  */
 
-import {
-  Bell,
-  CircleUserRound,
-  Edit2,
-  FileDown,
-  Frame,
-  Layers,
-  Lock,
-  type LucideIcon,
-  MousePointer2,
-  Move,
-  Palette,
-  Shapes,
-  Share2,
-  SlidersHorizontal,
-} from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib/index'
+import {
+  ArrowsOutCardinalIcon,
+  BellIcon,
+  CursorIcon,
+  FileArrowDownIcon,
+  FrameCornersIcon,
+  LockIcon,
+  PaletteIcon,
+  PencilSimpleIcon,
+  ShapesIcon,
+  ShareNetworkIcon,
+  SlidersHorizontalIcon,
+  StackIcon,
+  UserCircleIcon,
+} from '@/shared/ui/icons'
+
+import type { AppIcon } from '@/shared/ui/icons'
 
 interface ToolbarItem {
   id: string
   title: string
-  icon: LucideIcon
+  icon: AppIcon
   type?: never
 }
 
@@ -47,17 +48,17 @@ interface ToolbarProps {
 }
 
 const DEFAULT_TOOLBAR_ITEMS: ToolbarItem[] = [
-  { id: 'select', title: 'Select', icon: MousePointer2 },
-  { id: 'move', title: 'Move', icon: Move },
-  { id: 'shapes', title: 'Shapes', icon: Shapes },
-  { id: 'layers', title: 'Layers', icon: Layers },
-  { id: 'frame', title: 'Frame', icon: Frame },
-  { id: 'properties', title: 'Properties', icon: SlidersHorizontal },
-  { id: 'export', title: 'Export', icon: FileDown },
-  { id: 'share', title: 'Share', icon: Share2 },
-  { id: 'notifications', title: 'Notifications', icon: Bell },
-  { id: 'profile', title: 'Profile', icon: CircleUserRound },
-  { id: 'appearance', title: 'Appearance', icon: Palette },
+  { id: 'select', title: 'Select', icon: CursorIcon },
+  { id: 'move', title: 'Move', icon: ArrowsOutCardinalIcon },
+  { id: 'shapes', title: 'Shapes', icon: ShapesIcon },
+  { id: 'layers', title: 'Layers', icon: StackIcon },
+  { id: 'frame', title: 'Frame', icon: FrameCornersIcon },
+  { id: 'properties', title: 'Properties', icon: SlidersHorizontalIcon },
+  { id: 'export', title: 'Export', icon: FileArrowDownIcon },
+  { id: 'share', title: 'Share', icon: ShareNetworkIcon },
+  { id: 'notifications', title: 'Notifications', icon: BellIcon },
+  { id: 'profile', title: 'Profile', icon: UserCircleIcon },
+  { id: 'appearance', title: 'Appearance', icon: PaletteIcon },
 ]
 
 const buttonVariants = {
@@ -216,7 +217,11 @@ export function Toolbar({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            {isToggled ? <Edit2 className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+            {isToggled ? (
+              <PencilSimpleIcon className="h-3.5 w-3.5" />
+            ) : (
+              <LockIcon className="h-3.5 w-3.5" />
+            )}
             <span className="font-medium text-sm">{isToggled ? 'On' : 'Off'}</span>
           </motion.button>
         </div>

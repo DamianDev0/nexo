@@ -2,10 +2,10 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical } from 'lucide-react'
 import { motion } from 'motion/react'
 
 import { cn } from '@/shared/lib'
+import { DotsSixVerticalIcon } from '@/shared/ui/icons'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
 import type { SmartListItem } from './smart-lists'
@@ -13,7 +13,7 @@ import type { SmartListItem } from './smart-lists'
 export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
   return (
     <span className="inline-flex h-10 rotate-1 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-card px-3.5 text-sm font-medium text-foreground shadow-e3">
-      <GripVertical className="-ml-1 size-3.5 text-primary" />
+      <DotsSixVerticalIcon className="-ml-1 size-3.5 text-primary" />
       {item.label}
       {item.count !== undefined && (
         <span className="inline-flex h-5.5 min-w-6 items-center justify-center rounded-md bg-muted px-1.5 text-xs font-semibold tabular-nums text-muted-foreground">
@@ -68,7 +68,7 @@ export function SmartListTab({
         />
       )}
       {sortable && (
-        <GripVertical
+        <DotsSixVerticalIcon
           aria-hidden
           className="-ml-1.5 -mr-0.5 size-3.5 shrink-0 text-primary opacity-0 transition-opacity duration-150 group-hover:opacity-100"
         />

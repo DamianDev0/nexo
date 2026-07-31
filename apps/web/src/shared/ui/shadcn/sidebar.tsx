@@ -1,12 +1,12 @@
 'use client'
 
 import { cva, type VariantProps } from 'class-variance-authority'
-import { PanelLeftIcon } from 'lucide-react'
 import { Slot } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib'
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile'
+import { SidebarSimpleIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 import { Separator } from '@/shared/ui/shadcn/separator'
@@ -266,7 +266,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <SidebarSimpleIcon />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

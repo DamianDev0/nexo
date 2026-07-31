@@ -13,6 +13,7 @@ export const ROUTES = {
     reports: '/reports',
     products: { list: '/products' },
     settings: {
+      root: '/settings',
       general: '/settings/general',
       appearance: '/settings/appearance',
       navigation: '/settings/navigation',

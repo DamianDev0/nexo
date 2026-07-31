@@ -1,10 +1,10 @@
 'use client'
 
 import { STAGE_COLOR_OPTIONS } from '@repo/shared-utils'
-import { GripVertical, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { DotsSixVerticalIcon, XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
@@ -56,7 +56,7 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
             {...handle?.attributes}
             {...handle?.listeners}
           >
-            <GripVertical className="size-4" />
+            <DotsSixVerticalIcon className="size-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="top">{t(`${s}.dragToReorder`)}</TooltipContent>
@@ -140,7 +140,7 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
             aria-label={t(`${s}.removeStage`)}
             className="size-6 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
           >
-            <X className="size-3.5" />
+            <XIcon className="size-3.5" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="top">{t(`${s}.removeStage`)}</TooltipContent>

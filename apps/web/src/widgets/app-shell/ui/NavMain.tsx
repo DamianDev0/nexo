@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 
+import { indicatorSpring, useReducedTransition } from '@/shared/lib/animations'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -13,7 +14,8 @@ import {
   SidebarMenuItem,
 } from '@/shared/ui/shadcn/sidebar'
 
-import type { NavItem } from '../model/nav-items'
+import { isNavItemActive, type NavItem } from '../model/nav-items'
+
 import type { SidebarNavGroup } from '../model/useSidebarModules'
 
 const BUTTON_CLASSES = 'h-9 gap-2.5 rounded-lg [&>svg]:size-4.5'
@@ -21,7 +23,8 @@ const BUTTON_CLASSES = 'h-9 gap-2.5 rounded-lg [&>svg]:size-4.5'
 function NavEntry({ item }: Readonly<{ item: NavItem }>) {
   const { t } = useTranslation()
   const pathname = usePathname()
-  const isActive = pathname === item.url || pathname.startsWith(`${item.url}/`)
+  const isActive = isNavItemActive(item, pathname)
+  const pillTransition = useReducedTransition(indicatorSpring)
   const title = t(item.titleKey)
 
   return (
@@ -37,11 +40,11 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
             {isActive && (
               <motion.span
                 layoutId="sidebar-active-pill"
-                transition={{ type: 'spring', bounce: 0.18, duration: 0.45 }}
+                transition={pillTransition}
                 className="absolute inset-0 -z-10 rounded-lg bg-sidebar-accent"
               />
             )}
-            <item.icon strokeWidth={isActive ? 2.25 : 1.75} />
+            <item.icon />
             <span>{title}</span>
           </Link>
         </SidebarMenuButton>
@@ -52,7 +55,7 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
           tooltip={`${title} — ${t('nav.comingSoon')}`}
           className={`${BUTTON_CLASSES} cursor-default opacity-45 aria-disabled:pointer-events-auto hover:bg-transparent active:bg-transparent`}
         >
-          <item.icon strokeWidth={1.75} />
+          <item.icon />
           <span>{title}</span>
         </SidebarMenuButton>
       )}

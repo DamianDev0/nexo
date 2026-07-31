@@ -1,6 +1,5 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-
 import { PREVIEW_ROW_OVERLAY } from '@/shared/config/tokens/effects'
+import { CaretLeftIcon, CaretRightIcon } from '@/shared/ui/icons'
 
 import { KPI_DATA, previewForegrounds, statusStyle, TABLE_ROWS } from './preview.constants'
 
@@ -136,7 +135,7 @@ export function PreviewMain({ colors, radius, surfaceRadius, gap }: Readonly<Pre
         >
           <span style={{ color: `${fg.card}60` }}>1–4 of 86</span>
           <div className="flex items-center gap-1.5">
-            <ChevronLeft className="size-2.5" style={{ color: `${fg.card}50` }} />
+            <CaretLeftIcon className="size-2.5" style={{ color: `${fg.card}50` }} />
             <span className="flex items-center gap-0.5">
               {Array.from({ length: 5 }, (_, i) => (
                 <span
@@ -149,7 +148,7 @@ export function PreviewMain({ colors, radius, surfaceRadius, gap }: Readonly<Pre
             <span className="font-bold tabular-nums" style={{ color: colors.primary }}>
               1
             </span>
-            <ChevronRight className="size-2.5" style={{ color: fg.card }} />
+            <CaretRightIcon className="size-2.5" style={{ color: fg.card }} />
           </div>
         </div>
       </div>

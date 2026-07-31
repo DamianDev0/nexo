@@ -17,7 +17,6 @@ import {
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { useManageSettings } from '../../model/settings-context'
-import { SaveBar } from '../SaveBar'
 
 export function NavigationSettings() {
   const { t } = useTranslation()
@@ -71,8 +70,6 @@ export function NavigationSettings() {
             </DragOverlay>
           </DndContext>
         </TooltipProvider>
-
-        <SaveBar onSave={navigation.handleSave} isPending={navigation.isPending} />
       </div>
 
       <div className="w-full xl:sticky xl:top-6 xl:flex-1 xl:self-start">

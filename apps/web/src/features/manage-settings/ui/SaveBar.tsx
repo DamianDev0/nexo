@@ -1,22 +1,69 @@
 'use client'
 
+import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
+import { quickEase, useReducedTransition } from '@/shared/lib/animations'
+import { SubmitButton } from '@/shared/ui/molecules/submit-button'
 import { Button } from '@/shared/ui/shadcn/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/ui/shadcn/tooltip'
 
 interface SaveBarProps {
   readonly onSave: () => void
+  readonly onReset: () => void
+  readonly isDirty: boolean
   readonly isPending: boolean
 }
 
-export function SaveBar({ onSave, isPending }: Readonly<SaveBarProps>) {
+export function SaveBar({ onSave, onReset, isDirty, isPending }: Readonly<SaveBarProps>) {
   const { t } = useTranslation()
+  const transition = useReducedTransition(quickEase)
+  const canSave = isDirty && !isPending
+
+  const saveButton = (
+    <SubmitButton size="sm" onSubmit={onSave} isPending={isPending} disabled={!isDirty}>
+      {isPending ? t('common.saving') : t('common.save')}
+    </SubmitButton>
+  )
 
   return (
-    <div className="mt-6 flex justify-end">
-      <Button onClick={onSave} disabled={isPending} className="min-w-28">
-        {isPending ? t('common.saving') : t('common.save')}
-      </Button>
+    <div className="flex shrink-0 items-center justify-end gap-4 border-t border-border bg-background px-8 py-3">
+      <span className="mr-auto text-sm text-muted-foreground">
+        {isDirty ? t('settings.unsavedChanges') : t('settings.noChanges')}
+      </span>
+
+      <div className="flex items-center gap-2">
+        <AnimatePresence initial={false}>
+          {isDirty && (
+            <motion.div
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 8 }}
+              transition={transition}
+            >
+              <Button variant="ghost" size="sm" onClick={onReset} disabled={isPending}>
+                {t('settings.discard')}
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {canSave ? (
+          saveButton
+        ) : (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>{saveButton}</TooltipTrigger>
+              <TooltipContent side="top">{t('settings.noChangesHint')}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,5 +1,13 @@
 import type { Variants } from 'motion/react'
 
+export const DURATION = {
+  fast: 0.18,
+  base: 0.25,
+  slow: 0.35,
+} as const
+
+export const EASE_SMOOTH = [0.25, 0.1, 0.25, 1] as const
+
 export const fadeSlideUp: Variants = {
   initial: { opacity: 0, y: 16 },
   animate: { opacity: 1, y: 0 },
@@ -53,6 +61,19 @@ export const smoothSpring = {
 }
 
 export const smoothEase = {
-  duration: 0.35,
-  ease: [0.25, 0.1, 0.25, 1] as const,
+  duration: DURATION.slow,
+  ease: EASE_SMOOTH,
 }
+
+export const quickEase = {
+  duration: DURATION.fast,
+  ease: EASE_SMOOTH,
+}
+
+export const indicatorSpring = {
+  type: 'spring' as const,
+  bounce: 0.18,
+  duration: 0.45,
+}
+
+export const instant = { duration: 0 }

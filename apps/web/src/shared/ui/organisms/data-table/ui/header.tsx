@@ -11,16 +11,16 @@ import {
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { flexRender, type Header } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '@/shared/lib'
+import { ArrowDownIcon, ArrowUpIcon, CaretUpDownIcon } from '@/shared/ui/icons'
 
 import { useDataTableContext } from './context'
 
 function SortIndicator({ direction }: Readonly<{ direction: false | 'asc' | 'desc' }>) {
-  if (direction === 'asc') return <ArrowUp className="size-3.5" />
-  if (direction === 'desc') return <ArrowDown className="size-3.5" />
-  return <ChevronsUpDown className="size-3.5 opacity-40" />
+  if (direction === 'asc') return <ArrowUpIcon className="size-3.5" />
+  if (direction === 'desc') return <ArrowDownIcon className="size-3.5" />
+  return <CaretUpDownIcon className="size-3.5 opacity-40" />
 }
 
 function HeaderCell({ header }: Readonly<{ header: Header<unknown, unknown> }>) {

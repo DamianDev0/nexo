@@ -1,7 +1,10 @@
 'use client'
 
+import { MotionConfig } from 'motion/react'
+
 import { AuthGuard } from '@/entities/session'
 import { LanguageSwitcher } from '@/features/switch-language'
+import { APP_SCROLL_ID } from '@/shared/lib/hooks/useScrollTopOnChange'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
@@ -13,22 +16,32 @@ export default function AppLayout({ children }: Readonly<{ children: ReactNode }
   return (
     <AuthGuard>
       <TenantThemeLoader />
-      <SidebarProvider style={{ '--sidebar-width': '15rem' } as React.CSSProperties}>
-        <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
-            <SidebarTrigger className="-ml-1 md:hidden" />
-            <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
-            <HeaderTitle />
-            <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
-            <HeaderSearch />
-            <div className="flex-1" />
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </header>
-          <main className="flex-1 overflow-y-auto [scrollbar-gutter:stable]">{children}</main>
-        </SidebarInset>
-      </SidebarProvider>
+      <MotionConfig reducedMotion="user">
+        <SidebarProvider
+          className="h-svh overflow-hidden"
+          style={{ '--sidebar-width': '15rem' } as React.CSSProperties}
+        >
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+              <SidebarTrigger className="-ml-1 md:hidden" />
+              <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
+              <HeaderTitle />
+              <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
+              <HeaderSearch />
+              <div className="flex-1" />
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </header>
+            <div
+              id={APP_SCROLL_ID}
+              className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]"
+            >
+              {children}
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
+      </MotionConfig>
     </AuthGuard>
   )
 }
