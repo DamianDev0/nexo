@@ -51,8 +51,8 @@ export function ContactsTable() {
   const showEmpty = !table.isPending && table.rows.length === 0
 
   return (
-    <div className="flex flex-col">
-      <DataTable instance={instance}>
+    <div className="flex min-h-full flex-1 flex-col">
+      <DataTable instance={instance} className="flex flex-1 flex-col rounded-none bg-transparent">
         <DataTable.SmartLists
           data={{ items: smartLists, activeId: statusToListId(table.status) }}
           onSelect={(id) => table.handleStatus(listIdToStatus(id))}
