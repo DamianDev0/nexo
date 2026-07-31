@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
@@ -25,6 +26,7 @@ export function useStepNavigation(onNext: () => void) {
     formState: { isDirty },
   } = useForm<NavigationFormValues>({ defaultValues: { modules: [...DEFAULT_MODULES] } })
   const { fields, move, update } = useFieldArray({ control, name: 'modules' })
+  const queryClient = useQueryClient()
 
   useStepHydration({
     queryKey: QUERY_KEYS.settings.navigation,
@@ -72,6 +74,10 @@ export function useStepNavigation(onNext: () => void) {
       return result.data
     },
     onNext,
+    onSuccess: () => {
+      reset(getValues(), { keepValues: true })
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.settings.navigation })
+    },
   })
 
   return {

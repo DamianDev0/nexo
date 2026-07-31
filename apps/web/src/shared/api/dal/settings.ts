@@ -18,9 +18,11 @@ export const getGeneral = () =>
 export const getTheme = () =>
   apiFetch<ThemeConfig>('/settings/theme', { tags: [CACHE_TAGS.settingsTheme] })
 
-export const getNavigation = () => apiFetch<SidebarConfig>('/settings/navigation')
+export const getNavigation = () =>
+  apiFetch<SidebarConfig>('/settings/navigation', { cache: 'no-store' })
 
-export const getNomenclature = () => apiFetch<NomenclatureConfig>('/settings/nomenclature')
+export const getNomenclature = () =>
+  apiFetch<NomenclatureConfig>('/settings/nomenclature', { cache: 'no-store' })
 
 export const getPipelines = () => apiFetch<Pipeline[]>('/settings/pipelines')
 

@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
@@ -23,6 +24,7 @@ export function useStepNomenclature(onNext: () => void) {
     formState: { isDirty },
   } = useForm<NomenclatureState>({ defaultValues: buildDefaultNomenclature(t) })
   const nomen = watch()
+  const queryClient = useQueryClient()
 
   useStepHydration({
     queryKey: QUERY_KEYS.settings.nomenclature,
@@ -64,6 +66,10 @@ export function useStepNomenclature(onNext: () => void) {
       return result.data
     },
     onNext,
+    onSuccess: () => {
+      reset(getValues(), { keepValues: true })
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.settings.nomenclature })
+    },
   })
 
   return {

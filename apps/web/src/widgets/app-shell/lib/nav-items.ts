@@ -6,7 +6,7 @@ import type { NavItem, SidebarModuleKey } from '../model/types'
 const BUILT_ROUTES: ReadonlySet<string> = new Set([
   ROUTES.app.dashboard,
   ROUTES.app.contacts.list,
-  ROUTES.app.settings.general,
+  ROUTES.app.settings.company,
 ])
 
 function navItem(key: SidebarModuleKey, url: string, basePath: string = url): NavItem {
@@ -29,7 +29,7 @@ export const NAV_CRM: ReadonlyArray<NavItem> = [
   navItem('invoices', ROUTES.app.invoices.list),
   navItem('products', ROUTES.app.products.list),
   navItem('reports', ROUTES.app.reports),
-  navItem('settings', ROUTES.app.settings.general, ROUTES.app.settings.root),
+  navItem('settings', ROUTES.app.settings.company, ROUTES.app.settings.root),
 ]
 
 export function isNavItemActive(item: NavItem, pathname: string): boolean {

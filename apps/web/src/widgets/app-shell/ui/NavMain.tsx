@@ -20,7 +20,7 @@ import { isNavItemActive } from '../lib/nav-items'
 import type { NavItem } from '../model/types'
 import type { SidebarNavGroup } from '../query/useSidebarModules'
 
-const BUTTON_CLASSES = 'h-9 gap-2.5 rounded-lg [&>svg]:size-4.5'
+const BUTTON_CLASSES = 'h-9 gap-2.5 rounded-lg [&_svg]:size-4.5 [&_svg]:shrink-0'
 
 function NavEntry({ item }: Readonly<{ item: NavItem }>) {
   const { t } = useTranslation()
@@ -31,23 +31,29 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
   const title = moduleLabel(item.key, item.titleKey)
 
   return (
-    <SidebarMenuItem>
+    <SidebarMenuItem data-nav-key={item.key}>
       {item.available ? (
         <SidebarMenuButton
           asChild
           isActive={isActive}
           tooltip={title}
-          className={`${BUTTON_CLASSES} relative isolate data-[active=true]:bg-transparent`}
+          className={`${BUTTON_CLASSES} relative isolate transition-colors data-[active=true]:bg-transparent data-[active=true]:font-medium data-[active=true]:text-foreground data-[active=true]:[&_svg]:text-primary`}
         >
           <Link href={item.url}>
             {isActive && (
               <motion.span
-                layoutId="sidebar-active-pill"
+                layoutId="sidebar-active-rail"
                 transition={pillTransition}
-                className="absolute inset-0 -z-10 rounded-lg bg-sidebar-accent"
+                className="absolute -left-2 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary"
               />
             )}
-            <item.icon />
+            <motion.span
+              animate={{ scale: isActive ? 1.08 : 1 }}
+              transition={pillTransition}
+              className="flex shrink-0 items-center"
+            >
+              <item.icon />
+            </motion.span>
             <span>{title}</span>
           </Link>
         </SidebarMenuButton>

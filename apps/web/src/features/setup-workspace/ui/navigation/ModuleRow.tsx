@@ -39,6 +39,8 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
 
   return (
     <div
+      data-slot="module-row"
+      data-module={module.key}
       onMouseEnter={() => actions.onHover?.(module.key)}
       onMouseLeave={() => actions.onLeave?.()}
       className={cn(

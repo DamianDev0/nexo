@@ -3,6 +3,7 @@
   "globalEnv": [
     "NODE_ENV",
     "PORT",
+    "E2E_API_URL",
     "FRONTEND_URL",
     "DATABASE_HOST",
     "DATABASE_PORT",
