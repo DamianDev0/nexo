@@ -1,6 +1,6 @@
 'use client'
 
-import { UsersRound } from 'lucide-react'
+import { Plus, UsersRound } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -47,7 +47,12 @@ export function ContactsTable() {
   })
   const selectedRows = instance.table.getSelectedRowModel().rows
   const counts = useContactCounts()
-  const smartLists = useMemo(() => buildSmartLists(t, counts), [t, counts])
+  const [listOrder, setListOrder] = useState<readonly string[] | null>(null)
+  const smartLists = useMemo(() => {
+    const built = buildSmartLists(t, counts)
+    if (!listOrder) return built
+    return [...built].sort((a, b) => listOrder.indexOf(a.id) - listOrder.indexOf(b.id))
+  }, [t, counts, listOrder])
   const showEmpty = !table.isPending && table.rows.length === 0
 
   return (
@@ -56,15 +61,17 @@ export function ContactsTable() {
         <DataTable.SmartLists
           data={{ items: smartLists, activeId: statusToListId(table.status) }}
           onSelect={(id) => table.handleStatus(listIdToStatus(id))}
+          onReorder={setListOrder}
         >
           <PillButton
-            size="md"
+            size="sm"
             onClick={() => {
               setEditing(null)
               setSheetOpen(true)
             }}
           >
-            {t('contacts.newContact')}
+            <Plus className="size-4" />
+            {t('contacts.lists.new')}
           </PillButton>
         </DataTable.SmartLists>
         <DataTable.Toolbar>

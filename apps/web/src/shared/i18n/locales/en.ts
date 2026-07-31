@@ -301,7 +301,18 @@ const en = {
     count_other: '{{count}} contacts',
     newContact: 'New contact',
     searchPlaceholder: 'Name, email, phone or document',
-    lists: { all: 'All' },
+    lists: {
+      all: 'All',
+      new: 'New',
+      descriptions: {
+        all: 'Every contact in your workspace.',
+        new: 'Recently created contacts not yet worked.',
+        in_contact: 'Active conversations in progress.',
+        qualified: 'Validated contacts with buying potential.',
+        client: 'Contacts converted into customers.',
+        lost: 'Discarded or lost opportunities.',
+      },
+    },
     columns: {
       name: 'Name',
       status: 'Status',

@@ -303,7 +303,18 @@ const es = {
     count_other: '{{count}} contactos',
     newContact: 'Nuevo contacto',
     searchPlaceholder: 'Nombre, email, teléfono o documento',
-    lists: { all: 'Todos' },
+    lists: {
+      all: 'Todos',
+      new: 'Nuevo',
+      descriptions: {
+        all: 'Todos los contactos de tu workspace.',
+        new: 'Contactos recién creados sin gestión todavía.',
+        in_contact: 'Conversaciones activas en curso.',
+        qualified: 'Contactos validados con potencial de compra.',
+        client: 'Contactos convertidos en clientes.',
+        lost: 'Oportunidades descartadas o perdidas.',
+      },
+    },
     columns: {
       name: 'Nombre',
       status: 'Estado',

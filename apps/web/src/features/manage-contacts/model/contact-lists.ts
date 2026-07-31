@@ -18,11 +18,17 @@ export function buildSmartLists(
   counts: Record<string, number | undefined>,
 ): ReadonlyArray<SmartListItem> {
   return [
-    { id: LIST_ALL, label: t('contacts.lists.all'), count: counts[LIST_ALL] },
+    {
+      id: LIST_ALL,
+      label: t('contacts.lists.all'),
+      count: counts[LIST_ALL],
+      description: t('contacts.lists.descriptions.all'),
+    },
     ...LIST_STATUSES.map((status) => ({
       id: status,
       label: t(`contacts.status.${status}`),
       count: counts[status],
+      description: t(`contacts.lists.descriptions.${status}`),
     })),
   ]
 }
