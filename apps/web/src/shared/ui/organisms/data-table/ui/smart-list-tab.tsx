@@ -11,11 +11,11 @@ import type { SmartListItem } from './smart-lists'
 
 export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
   return (
-    <span className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-lg bg-card px-4 text-sm font-semibold text-foreground shadow-lg ring-2 ring-primary">
-      <GripVertical className="size-3.5 text-primary" />
+    <span className="inline-flex h-10 rotate-1 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-card px-3.5 text-sm font-medium text-foreground shadow-e3">
+      <GripVertical className="-ml-1 size-3.5 text-primary" />
       {item.label}
       {item.count !== undefined && (
-        <span className="inline-flex h-5.5 min-w-6 items-center justify-center rounded-md bg-primary-pale px-1.5 text-xs font-semibold tabular-nums text-primary-deep">
+        <span className="inline-flex h-5.5 min-w-6 items-center justify-center rounded-md bg-muted px-1.5 text-xs font-semibold tabular-nums text-muted-foreground">
           {item.count}
         </span>
       )}
