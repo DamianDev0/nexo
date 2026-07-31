@@ -63,7 +63,7 @@ export function readableForeground(
   light = '#fafafa',
   dark = '#0a0a0a',
 ): string {
-  return contrastRatio(background, dark) >= contrastRatio(background, light) ? dark : light
+  return relativeLuminance(background) > 0.4 ? dark : light
 }
 
 export interface Oklch {

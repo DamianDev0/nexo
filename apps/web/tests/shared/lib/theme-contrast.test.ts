@@ -29,6 +29,12 @@ describe('resolveThemeTokens primary contrast', () => {
     expect(contrastRatio(light.primary, light['primary-foreground'])).toBeGreaterThanOrEqual(4.5)
   })
 
+  it('prefers a white foreground on mid-tone primaries where WCAG math favors black', () => {
+    const { light } = resolveThemeTokens(seeds('#4e97b5'))
+
+    expect(light['primary-foreground']).toBe('#fafafa')
+  })
+
   it('meets contrast in dark mode regardless of the stored seed foreground', () => {
     const { dark } = resolveThemeTokens(seeds('#3d6a7d'))
 
