@@ -63,7 +63,7 @@ export function SmartListTab({
       {active && !isDragging && (
         <motion.span
           layoutId="smart-list-underline"
-          className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-foreground"
+          className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-primary"
           transition={{ type: 'spring', stiffness: 550, damping: 45 }}
         />
       )}

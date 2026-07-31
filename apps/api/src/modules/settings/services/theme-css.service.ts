@@ -33,7 +33,14 @@ export class ThemeCssService {
     const density = DENSITIES.has(theme.typography.density)
       ? theme.typography.density
       : 'comfortable'
-    return [`  --font-family: ${font};`, `  --radius: ${radius};`, `  --density: ${density};`]
+    return [
+      `  --font-ui: ${font};`,
+      `  --radius-sm: ${radius};`,
+      `  --radius-md: calc(${radius} * 2);`,
+      `  --radius-lg: calc(${radius} * 3);`,
+      `  --radius-xl: calc(${radius} * 4);`,
+      `  --density: ${density};`,
+    ]
   }
 
   private renderBlock(selector: string, lines: string[]): string {

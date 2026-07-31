@@ -214,6 +214,18 @@ function buildLight(seeds: ThemeColors): ThemeTokens {
     'sidebar-accent-foreground': seeds.sidebarForeground,
     'sidebar-border': blendLightness(seeds.sidebar, seeds.sidebarForeground, 0.18),
     'sidebar-ring': p,
+    body: tintedNeutral(p, 0.35, 0.016),
+    faint: tintedNeutral(p, 0.62, 0.018),
+    'disabled-fg': tintedNeutral(p, 0.72, 0.012),
+    'border-strong': tintedNeutral(p, 0.72, 0.016),
+    'row-divider': tintedNeutral(p, 0.965, 0.008),
+    'row-hover': tintedNeutral(p, 0.985, 0.008),
+    'row-selected': scale.paleLight,
+    'mesh-base': scale.paleLight,
+    'map-accent': scale.deep,
+    'map-grid': tintedNeutral(p, 0.9, 0.012),
+    'map-label': tintedNeutral(p, 0.28, 0.018),
+    'map-node': tintedNeutral(p, 0.99, 0.02),
   }
 }
 
@@ -263,6 +275,18 @@ function buildDark(seeds: ThemeColors): ThemeTokens {
     'sidebar-accent-foreground': seeds.sidebarForeground,
     'sidebar-border': blendLightness(sidebar, seeds.sidebarForeground, 0.2),
     'sidebar-ring': p,
+    body: tintedNeutral(p, 0.86, 0.012),
+    faint: tintedNeutral(p, 0.62, 0.016),
+    'disabled-fg': tintedNeutral(p, 0.45, 0.01),
+    'border-strong': tintedNeutral(p, 0.42, 0.016),
+    'row-divider': tintedNeutral(p, 0.24, 0.01),
+    'row-hover': tintedNeutral(p, 0.23, 0.012),
+    'row-selected': scale.paleDark,
+    'mesh-base': scale.paleDark,
+    'map-accent': p,
+    'map-grid': tintedNeutral(p, 0.3, 0.012),
+    'map-label': tintedNeutral(p, 0.8, 0.016),
+    'map-node': scale.paleDark,
   }
 }
 

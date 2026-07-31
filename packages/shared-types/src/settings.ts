@@ -78,6 +78,18 @@ export type ThemeTokens = {
   'sidebar-accent-foreground': string
   'sidebar-border': string
   'sidebar-ring': string
+  body: string
+  faint: string
+  'disabled-fg': string
+  'border-strong': string
+  'row-divider': string
+  'row-hover': string
+  'row-selected': string
+  'mesh-base': string
+  'map-accent': string
+  'map-grid': string
+  'map-label': string
+  'map-node': string
 }
 
 export type ResolvedThemeTokens = {

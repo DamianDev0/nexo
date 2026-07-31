@@ -55,10 +55,34 @@ describe('ThemeCssService', () => {
     expect(css).toContain('--ring: #1B4FD8;')
   })
 
+  it('emits every token the web app declares, in both schemes', () => {
+    const css = service.build(buildTheme())
+    const [root, dark] = css.split('.dark {')
+
+    for (const token of [
+      '--row-selected',
+      '--row-hover',
+      '--row-divider',
+      '--border-strong',
+      '--body',
+      '--faint',
+      '--disabled-fg',
+      '--mesh-base',
+      '--map-accent',
+      '--map-grid',
+      '--map-label',
+      '--map-node',
+    ]) {
+      expect(root).toContain(`${token}:`)
+      expect(dark).toContain(`${token}:`)
+    }
+  })
+
   it('emits validated typography vars', () => {
     const css = service.build(buildTheme())
-    expect(css).toContain('--font-family:')
-    expect(css).toContain('--radius:')
+    expect(css).toContain('--font-ui:')
+    expect(css).toContain('--radius-sm:')
+    expect(css).toContain('--radius-xl:')
     expect(css).toContain('--density: comfortable;')
   })
 

@@ -1,28 +1,28 @@
-export const AUTH_BG_LIGHT = '#E8EBE6'
+function primaryMix(percent: number): string {
+  return `color-mix(in srgb, var(--primary) ${percent}%, transparent)`
+}
 
-export const AUTH_BG_DARK = '#0E0F0C'
+export const AUTH_BG_LIGHT = 'var(--muted)'
 
-export const ORB_GLOW_LIGHT =
-  'radial-gradient(circle closest-side, rgba(174,240,55,0.5) 0%, rgba(154,230,60,0.22) 45%, transparent 100%)'
+export const AUTH_BG_DARK = 'var(--background)'
 
-export const MAP_GLOW_LIGHT =
-  'radial-gradient(circle closest-side, rgba(154,230,60,0.24) 0%, rgba(154,230,60,0.10) 42%, transparent 100%)'
+export const ORB_GLOW_LIGHT = `radial-gradient(circle closest-side, ${primaryMix(50)} 0%, ${primaryMix(22)} 45%, transparent 100%)`
 
-export const MAP_GLOW_DARK =
-  'radial-gradient(circle closest-side, rgba(163,230,53,0.11) 0%, rgba(163,230,53,0.055) 30%, rgba(163,230,53,0.02) 55%, transparent 80%)'
+export const MAP_GLOW_LIGHT = `radial-gradient(circle closest-side, ${primaryMix(24)} 0%, ${primaryMix(10)} 42%, transparent 100%)`
 
-export const ORB_GLOW_DARK =
-  'radial-gradient(circle closest-side, rgba(190,242,100,0.14) 0%, rgba(190,242,100,0.08) 30%, rgba(190,242,100,0.04) 55%, rgba(190,242,100,0.015) 75%, transparent 95%)'
+export const MAP_GLOW_DARK = `radial-gradient(circle closest-side, ${primaryMix(11)} 0%, ${primaryMix(6)} 30%, ${primaryMix(2)} 55%, transparent 80%)`
+
+export const ORB_GLOW_DARK = `radial-gradient(circle closest-side, ${primaryMix(14)} 0%, ${primaryMix(8)} 30%, ${primaryMix(4)} 55%, ${primaryMix(2)} 75%, transparent 95%)`
 
 export const NODE_DOT_STYLE = {
-  background: 'radial-gradient(circle at 38% 35%, #F7FFE8, #C6E97A 55%, #8FC430)',
-  boxShadow: '0 2px 14px rgba(120,200,0,0.25), inset 0 1px 3px rgba(245,255,224,0.65)',
-  border: '0.5px solid rgba(160,212,48,0.3)',
+  background: `radial-gradient(circle at 38% 35%, var(--map-node), ${primaryMix(70)} 55%, var(--map-accent))`,
+  boxShadow: `0 2px 14px ${primaryMix(25)}, inset 0 1px 3px color-mix(in srgb, var(--map-node) 65%, transparent)`,
+  border: `0.5px solid ${primaryMix(30)}`,
 } as const
 
-export const CONNECTOR_LINE_LIGHT = 'rgba(95,169,43,0.22)'
-export const ORB_LABEL_LIGHT = 'rgba(30,33,21,0.45)'
-export const ORB_GRID_LIGHT = '#DFE4DB'
+export const CONNECTOR_LINE_LIGHT = primaryMix(22)
+export const ORB_LABEL_LIGHT = 'color-mix(in srgb, var(--map-label) 45%, transparent)'
+export const ORB_GRID_LIGHT = 'var(--map-grid)'
 
 export const TOAST_FILL_LIGHT = '#FFFFFF'
 export const TOAST_FILL_DARK = '#171915'
@@ -45,16 +45,26 @@ export const SWATCH_PRESETS = [
 ] as const
 
 export const MESH_BLOOM = {
-  base: '#DFF3C6',
-  baseDark: '#1E2A16',
-  blobA: '#A5E96F',
-  blobB: '#7FD6C2',
-  blobC: '#F2FFDA',
-  dotInk: 'rgba(14,15,12,0.16)',
-  dotInkDark: 'rgba(255,255,255,0.12)',
+  base: 'var(--mesh-base)',
+  baseDark: 'var(--mesh-base)',
+  blobA: 'var(--primary)',
+  blobB: 'var(--chart-3)',
+  blobC: 'var(--primary-pale)',
+  dotInk: 'color-mix(in srgb, var(--foreground) 16%, transparent)',
+  dotInkDark: 'color-mix(in srgb, var(--foreground) 12%, transparent)',
 } as const
 
 export const SIRI_ORB = {
-  light: { bg: '#DFF3C6', c1: '#6FCB3A', c2: '#5BC4AC', c3: '#A5E96F' },
-  dark: { bg: '#1E2A16', c1: '#A5E96F', c2: '#7FD6C2', c3: '#F2FFDA' },
+  light: {
+    bg: 'var(--mesh-base)',
+    c1: 'var(--primary-deep)',
+    c2: 'var(--chart-3)',
+    c3: 'var(--primary)',
+  },
+  dark: {
+    bg: 'var(--mesh-base)',
+    c1: 'var(--primary)',
+    c2: 'var(--chart-3)',
+    c3: 'var(--primary-pale)',
+  },
 } as const
