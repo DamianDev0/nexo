@@ -1,15 +1,23 @@
 'use client'
 
-import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable'
+import { useState } from 'react'
 
 import { cn } from '@/shared/lib'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
-import { SmartListTab } from './smart-list-tab'
+import { SmartListTab, SmartListTabGhost } from './smart-list-tab'
 
-import type { DragEndEvent } from '@dnd-kit/core'
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import type { ReactNode } from 'react'
 
 export interface SmartListItem {
@@ -41,8 +49,13 @@ export function DataTableSmartLists({
 }: Readonly<SmartListsProps>) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
   const sortable = onReorder !== undefined
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+  const draggingItem = data.items.find((item) => item.id === draggingId)
+
+  const handleDragStart = ({ active }: DragStartEvent) => setDraggingId(String(active.id))
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    setDraggingId(null)
     if (!over || active.id === over.id) return
     const ids = data.items.map((item) => item.id)
     onReorder?.(arrayMove(ids, ids.indexOf(String(active.id)), ids.indexOf(String(over.id))))
@@ -61,7 +74,9 @@ export function DataTableSmartLists({
           sensors={sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToHorizontalAxis]}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
+          onDragCancel={() => setDraggingId(null)}
         >
           <SortableContext
             items={data.items.map((item) => item.id)}
@@ -79,6 +94,9 @@ export function DataTableSmartLists({
               ))}
             </span>
           </SortableContext>
+          <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
+            {draggingItem ? <SmartListTabGhost item={draggingItem} /> : null}
+          </DragOverlay>
         </DndContext>
         {children && (
           <span className="ml-auto flex items-center gap-2 py-1.5 pl-3">{children}</span>
