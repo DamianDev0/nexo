@@ -21,12 +21,40 @@ const en = {
     and: 'and',
     saveFailed: 'Failed to save',
     toggleTheme: 'Toggle theme',
+    filters: {
+      removeOne: 'Remove {{value}}',
+      hints: {
+        lifecycleStage: {
+          subscriber: 'Opted in to hear from you, not qualified yet.',
+          lead: 'Showed interest but has not been evaluated.',
+          mql: 'Marketing decided this contact is worth a sales look.',
+          sql: 'Sales accepted the contact and is working it.',
+          opportunity: 'Has an open deal attached.',
+          customer: 'Closed at least one deal.',
+          evangelist: 'Customer who actively refers others.',
+        },
+        source: {
+          manual: 'Created by hand inside the CRM.',
+          whatsapp: 'Came in through a WhatsApp conversation.',
+          web_form: 'Submitted a form on your site.',
+          referral: 'Introduced by another contact.',
+          import: 'Loaded from a bulk import.',
+          email_campaign: 'Replied to or clicked an email campaign.',
+          social_media: 'Reached you through a social channel.',
+          paid_ad: 'Arrived from a paid campaign.',
+        },
+      },
+      clearOne: 'Clear this filter',
+      clearAll: 'Clear {{count}} filter',
+      clearAll_other: 'Clear {{count}} filters',
+    },
     upload: {
       fileTooLarge: 'File too large',
       fileTooLargeDesc: 'Max size is {{max}}MB. Your file is {{size}}.',
       uploading: 'Uploading to cloud',
       uploaded: 'Uploaded',
       failed: 'Upload failed',
+      failedUnknown: 'The server gave no reason. Check the API logs.',
     },
   },
   auth: {
@@ -303,6 +331,10 @@ const en = {
     },
   },
   contacts: {
+    filters: {
+      lifecycleStage: 'Lifecycle',
+      source: 'Source',
+    },
     count_one: '{{count}} contact',
     count_other: '{{count}} contacts',
     newContact: 'New contact',
@@ -400,19 +432,35 @@ const en = {
     noChanges: 'No changes yet',
     noChangesHint: 'Make a change to enable saving',
     discard: 'Discard',
+    back: 'Back',
+    comingSoon: 'This section is on the way. We are still building it.',
     groups: {
+      personal: 'Personal',
+      account: 'Account',
       workspace: 'Workspace',
     },
-    appearanceTabs: {
-      brand: 'Brand',
-      theme: 'Theme',
-      typography: 'Typography',
-    },
     sections: {
-      general: 'General',
+      profile: 'My profile',
+      notifications: 'Notifications',
+      company: 'Company',
+      team: 'Team members',
       appearance: 'Appearance',
       navigation: 'Navigation',
       nomenclature: 'Nomenclature',
+      pipelines: 'Pipelines & stages',
+      contacts: 'Contacts',
+    },
+    children: {
+      appearance: {
+        brand: 'Brand',
+        theme: 'Theme',
+        typography: 'Typography',
+      },
+      contacts: {
+        status: 'Status',
+        sources: 'Sources',
+        tags: 'Tags',
+      },
     },
   },
   sectors: {

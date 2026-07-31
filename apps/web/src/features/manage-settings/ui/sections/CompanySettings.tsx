@@ -8,7 +8,7 @@ import { Label } from '@/shared/ui/shadcn/label'
 
 import { useManageSettings } from '../../model/settings-context'
 
-export function GeneralSettings() {
+export function CompanySettings() {
   const { t } = useTranslation()
   const s = 'onboarding.steps.company'
   const { company } = useManageSettings()

@@ -21,12 +21,40 @@ const es = {
     and: 'y',
     saveFailed: 'Error al guardar',
     toggleTheme: 'Cambiar tema',
+    filters: {
+      removeOne: 'Quitar {{value}}',
+      hints: {
+        lifecycleStage: {
+          subscriber: 'Aceptó recibir tus comunicaciones, todavía sin calificar.',
+          lead: 'Mostró interés pero aún no se evalúa.',
+          mql: 'Marketing decidió que vale la pena que ventas lo mire.',
+          sql: 'Ventas lo aceptó y lo está trabajando.',
+          opportunity: 'Tiene un negocio abierto asociado.',
+          customer: 'Cerró al menos un negocio.',
+          evangelist: 'Cliente que recomienda activamente.',
+        },
+        source: {
+          manual: 'Creado a mano dentro del CRM.',
+          whatsapp: 'Llegó por una conversación de WhatsApp.',
+          web_form: 'Envió un formulario en tu sitio.',
+          referral: 'Lo presentó otro contacto.',
+          import: 'Cargado desde una importación masiva.',
+          email_campaign: 'Respondió o hizo clic en una campaña de correo.',
+          social_media: 'Te encontró por una red social.',
+          paid_ad: 'Llegó desde una campaña paga.',
+        },
+      },
+      clearOne: 'Quitar este filtro',
+      clearAll: 'Quitar {{count}} filtro',
+      clearAll_other: 'Quitar {{count}} filtros',
+    },
     upload: {
       fileTooLarge: 'Archivo demasiado grande',
       fileTooLargeDesc: 'El tamaño máximo es {{max}}MB. Tu archivo pesa {{size}}.',
       uploading: 'Subiendo a la nube',
       uploaded: 'Subido',
       failed: 'Error al subir',
+      failedUnknown: 'El servidor no explicó el motivo. Revisa los logs de la API.',
     },
   },
   auth: {
@@ -305,6 +333,10 @@ const es = {
     },
   },
   contacts: {
+    filters: {
+      lifecycleStage: 'Ciclo de vida',
+      source: 'Origen',
+    },
     count_one: '{{count}} contacto',
     count_other: '{{count}} contactos',
     newContact: 'Nuevo contacto',
@@ -403,19 +435,35 @@ const es = {
     noChanges: 'Sin cambios',
     noChangesHint: 'Haz un cambio para poder guardar',
     discard: 'Descartar',
+    back: 'Volver',
+    comingSoon: 'Esta sección llega pronto. Estamos construyéndola.',
     groups: {
+      personal: 'Personal',
+      account: 'Cuenta',
       workspace: 'Espacio de trabajo',
     },
-    appearanceTabs: {
-      brand: 'Marca',
-      theme: 'Tema',
-      typography: 'Tipografía',
-    },
     sections: {
-      general: 'General',
+      profile: 'Mi perfil',
+      notifications: 'Notificaciones',
+      company: 'Empresa',
+      team: 'Equipo',
       appearance: 'Apariencia',
       navigation: 'Navegación',
       nomenclature: 'Nomenclatura',
+      pipelines: 'Embudos y etapas',
+      contacts: 'Contactos',
+    },
+    children: {
+      appearance: {
+        brand: 'Marca',
+        theme: 'Tema',
+        typography: 'Tipografía',
+      },
+      contacts: {
+        status: 'Estados',
+        sources: 'Fuentes',
+        tags: 'Etiquetas',
+      },
     },
   },
   sectors: {

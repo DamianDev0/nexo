@@ -14,10 +14,25 @@ export const ROUTES = {
     products: { list: '/products' },
     settings: {
       root: '/settings',
-      general: '/settings/general',
-      appearance: '/settings/appearance',
+      profile: '/settings/profile',
+      notifications: '/settings/notifications',
+      company: '/settings/company',
+      team: '/settings/team',
+      appearance: {
+        root: '/settings/appearance',
+        brand: '/settings/appearance/brand',
+        theme: '/settings/appearance/theme',
+        typography: '/settings/appearance/typography',
+      },
       navigation: '/settings/navigation',
       nomenclature: '/settings/nomenclature',
+      pipelines: '/settings/pipelines',
+      contacts: {
+        root: '/settings/contacts',
+        status: '/settings/contacts/status',
+        sources: '/settings/contacts/sources',
+        tags: '/settings/contacts/tags',
+      },
     },
   },
   setup: {

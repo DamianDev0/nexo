@@ -5,9 +5,9 @@ import type { Metadata } from 'next'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT()
-  return { title: t('nav.settings') }
+  return { title: t('settings.sections.navigation') }
 }
 
-export default function SettingsPage() {
-  return <SettingsView section="navigation" />
+export default function Page() {
+  return <SettingsView pane="navigation" />
 }

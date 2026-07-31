@@ -1,13 +1,7 @@
-import { getT } from '@/shared/i18n/server'
-import { SettingsView } from '@/views/settings'
+import { redirect } from 'next/navigation'
 
-import type { Metadata } from 'next'
+import { ROUTES } from '@/shared/config/routes'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getT()
-  return { title: t('nav.settings') }
-}
-
-export default function SettingsPage() {
-  return <SettingsView section="appearance" />
+export default function Page() {
+  redirect(ROUTES.app.settings.appearance.brand)
 }

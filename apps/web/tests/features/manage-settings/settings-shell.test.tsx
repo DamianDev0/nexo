@@ -13,7 +13,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ toString: (): string => '' })),
 }))
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/settings/general',
+  usePathname: () => '/settings/company',
 }))
 
 createMswServer()

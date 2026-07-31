@@ -1,20 +1,24 @@
 import {
-  AppearanceSettings,
-  GeneralSettings,
+  BrandPane,
+  CompanySettings,
   NavigationSettings,
   NomenclatureSettings,
-  type SettingsSectionKey,
+  ThemePane,
+  TypographyPane,
 } from '@/features/manage-settings'
 
-const SECTION_CONTENT: Record<SettingsSectionKey, () => React.JSX.Element> = {
-  general: GeneralSettings,
-  appearance: AppearanceSettings,
+const PANES = {
+  company: CompanySettings,
   navigation: NavigationSettings,
   nomenclature: NomenclatureSettings,
-}
+  brand: BrandPane,
+  theme: ThemePane,
+  typography: TypographyPane,
+} as const
 
-export function SettingsView({ section }: Readonly<{ section: SettingsSectionKey }>) {
-  const Section = SECTION_CONTENT[section]
+export type SettingsPaneKey = keyof typeof PANES
 
-  return <Section />
+export function SettingsView({ pane }: Readonly<{ pane: SettingsPaneKey }>) {
+  const Pane = PANES[pane]
+  return <Pane />
 }

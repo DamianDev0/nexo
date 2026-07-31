@@ -1,6 +1,7 @@
 export type { Icon as AppIcon, IconProps, IconWeight } from '@phosphor-icons/react'
 
 export {
+  AddressBookIcon,
   ArrowDownIcon,
   ArrowRightIcon,
   ArrowUpIcon,
@@ -18,6 +19,7 @@ export {
   CaretUpIcon,
   ChalkboardTeacherIcon,
   ChartBarIcon,
+  ChartLineUpIcon,
   CheckIcon,
   ChefHatIcon,
   CircleIcon,
@@ -66,5 +68,6 @@ export {
   UserCircleIcon,
   UserIcon,
   UsersThreeIcon,
+  WrenchIcon,
   XIcon,
 } from '@phosphor-icons/react/ssr'
