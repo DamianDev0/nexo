@@ -1,5 +1,4 @@
 import { formatDateCO } from '@repo/shared-utils'
-import { MoreHorizontal } from 'lucide-react'
 
 import {
   CONTACT_STATUS_TONE,
@@ -10,6 +9,7 @@ import {
 import { AvatarSquircle } from '@/shared/ui/atoms/avatar-squircle'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { DotsThreeIcon } from '@/shared/ui/icons'
 import { DataTable, selectionColumn } from '@/shared/ui/organisms/data-table'
 import {
   DropdownMenu,
@@ -88,7 +88,7 @@ export function buildContactColumns(
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <PillButton variant="ghost" size="sm" aria-label={t('contacts.actions.open')}>
-              <MoreHorizontal className="size-4" />
+              <DotsThreeIcon className="size-4" />
             </PillButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

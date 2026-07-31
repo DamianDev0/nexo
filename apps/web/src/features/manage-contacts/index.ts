@@ -1,1 +1,1 @@
-export { ContactsTable } from './ui/ContactsTable'
+export { ContactsBoard } from './ui/containers/ContactsBoard'

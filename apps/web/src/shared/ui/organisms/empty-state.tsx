@@ -7,6 +7,7 @@ interface EmptyStateProps {
   readonly title: string
   readonly description: string
   readonly children?: ReactNode
+  readonly fill?: boolean
   readonly className?: string
 }
 
@@ -15,13 +16,15 @@ export function EmptyState({
   title,
   description,
   children,
+  fill = false,
   className,
 }: Readonly<EmptyStateProps>) {
   return (
     <section
       data-slot="empty-state"
       className={cn(
-        'relative flex flex-col items-center overflow-hidden rounded-xl bg-card px-7 py-11 text-center',
+        'relative flex flex-col items-center justify-center overflow-hidden rounded-xl bg-card px-7 py-11 text-center',
+        fill && 'min-h-104 flex-1 rounded-none',
         className,
       )}
     >

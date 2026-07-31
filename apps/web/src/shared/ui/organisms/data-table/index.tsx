@@ -5,6 +5,7 @@ import { DataTableBulkAction, DataTableBulkBar } from './ui/bulk-bar'
 import { DataTableHeader } from './ui/header'
 import { DataTableRoot } from './ui/root'
 import { selectionColumn } from './ui/selection'
+import { DataTableSkeleton } from './ui/skeleton'
 import { DataTableSmartLists } from './ui/smart-lists'
 import {
   DataTableEditColumns,
@@ -27,6 +28,7 @@ export const DataTable = Object.assign(DataTableRoot, {
   BulkAction: DataTableBulkAction,
   Header: DataTableHeader,
   Body: DataTableBody,
+  Skeleton: DataTableSkeleton,
   RowTitle: DataTableRowTitle,
   Pagination: PaginationCapsule,
 })
