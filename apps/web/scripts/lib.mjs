@@ -3,7 +3,7 @@ import { join, relative } from 'node:path'
 
 const SRC = new URL('../src', import.meta.url).pathname
 
-const VENDOR_DIRS = new Set(['shadcn', 'smoothui', 'kokonutui', 'ruixen'])
+const VENDOR_DIRS = new Set(['shadcn', 'smoothui', 'kokonutui', 'ruixen', 'vuesax'])
 
 function isVendorDir(dir, entry) {
   return dir.endsWith(join('shared', 'ui')) && VENDOR_DIRS.has(entry)

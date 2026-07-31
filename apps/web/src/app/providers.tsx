@@ -7,6 +7,7 @@ import { Toaster } from 'sileo'
 
 import { createQueryClient } from '@/shared/api/query-client'
 import { TOAST_FILL_DARK, TOAST_FILL_LIGHT } from '@/shared/config/tokens/effects'
+import { VsTooltipRegistry } from '@/shared/ui/vuesax/vs-tooltip-registry'
 import '@/shared/i18n/config'
 
 const LIGHT_TOAST_OPTIONS = {
@@ -50,6 +51,7 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
       <QueryClientProvider client={queryClient}>
         {children}
         <SileoToaster />
+        <VsTooltipRegistry />
       </QueryClientProvider>
     </ThemeProvider>
   )
