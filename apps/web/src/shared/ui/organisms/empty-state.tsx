@@ -27,7 +27,7 @@ export function EmptyState({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-3xl dark:bg-primary/15"
+        className="pointer-events-none absolute left-1/2 top-1/2 size-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/8 blur-2xl dark:bg-primary/6"
       />
       <div className="relative flex size-11 items-center justify-center rounded-xl bg-primary-pale text-primary-deep ring-1 ring-primary/25 dark:text-primary">
         {icon}

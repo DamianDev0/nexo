@@ -52,31 +52,30 @@ export function ContactsTable() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center justify-between pb-5">
-        <p className="text-sm text-muted-foreground">
-          {t('contacts.count', { count: table.total })}
-        </p>
-        <PillButton
-          size="md"
-          onClick={() => {
-            setEditing(null)
-            setSheetOpen(true)
-          }}
-        >
-          {t('contacts.newContact')}
-        </PillButton>
-      </div>
       <DataTable instance={instance}>
         <DataTable.SmartLists
           data={{ items: smartLists, activeId: statusToListId(table.status) }}
           onSelect={(id) => table.handleStatus(listIdToStatus(id))}
-        />
+        >
+          <PillButton
+            size="md"
+            onClick={() => {
+              setEditing(null)
+              setSheetOpen(true)
+            }}
+          >
+            {t('contacts.newContact')}
+          </PillButton>
+        </DataTable.SmartLists>
         <DataTable.Toolbar>
           <DataTable.Search
             value={table.search}
             placeholder={t('contacts.searchPlaceholder')}
             onChange={table.handleSearch}
           />
+          <span className="ml-auto text-sm tabular-nums text-muted-foreground">
+            {t('contacts.count', { count: table.total })}
+          </span>
         </DataTable.Toolbar>
         {selectedRows.length > 0 && (
           <DataTable.BulkBar label={t('contacts.bulk.selected', { count: selectedRows.length })}>

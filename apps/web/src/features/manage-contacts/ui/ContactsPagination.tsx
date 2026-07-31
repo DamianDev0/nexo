@@ -14,7 +14,7 @@ export function ContactsPagination({ nav, onPageChange, onLimitChange }: Contact
   const { t } = useTranslation()
 
   return (
-    <div className="flex justify-center py-5">
+    <div className="flex justify-end px-4 py-4">
       <DataTable.Pagination>
         <DataTable.Pagination.Nav
           page={nav.page}
