@@ -6,14 +6,9 @@ import { GripVertical } from 'lucide-react'
 import { motion } from 'motion/react'
 
 import { cn } from '@/shared/lib'
-import { escapeHtml } from '@/shared/lib/escape-html'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
 import type { SmartListItem } from './smart-lists'
-
-function tabTooltipHtml(item: SmartListItem, hotkey: number | undefined): string {
-  const title = `<b>${escapeHtml(item.label)}</b>${hotkey === undefined ? '' : ` <kbd>${hotkey}</kbd>`}`
-  return `${title}<br>${escapeHtml(item.description ?? '')}`
-}
 
 export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
   return (
@@ -102,8 +97,19 @@ export function SmartListTab({
   if (!item.description) return tab
 
   return (
-    <vs-tooltip content={tabTooltipHtml(item, hotkey)} placement="bottom" delay="450">
-      {tab}
-    </vs-tooltip>
+    <Tooltip delayDuration={500}>
+      <TooltipTrigger asChild>{tab}</TooltipTrigger>
+      <TooltipContent side="bottom" className="max-w-44 px-2.5 py-1.5">
+        <p className="flex items-center justify-between gap-3 text-xs font-medium">
+          {item.label}
+          {hotkey !== undefined && (
+            <kbd className="rounded-sm bg-background/20 px-1 font-sans text-[10px] tabular-nums">
+              {hotkey}
+            </kbd>
+          )}
+        </p>
+        <p className="text-xs leading-snug opacity-70">{item.description}</p>
+      </TooltipContent>
+    </Tooltip>
   )
 }

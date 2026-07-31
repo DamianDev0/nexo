@@ -131,33 +131,12 @@ export default [
     },
   },
   {
-    files: ['src/shared/ui/{shadcn,smoothui,kokonutui,ruixen,vuesax}/**'],
+    files: ['src/shared/ui/{shadcn,smoothui,kokonutui,ruixen}/**'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'react/no-array-index-key': 'off',
       'react-hooks/exhaustive-deps': 'off',
       'unused-imports/no-unused-vars': 'off',
-    },
-  },
-  {
-    files: ['src/shared/ui/vuesax/**/*.js'],
-    languageOptions: {
-      globals: {
-        matchMedia: 'readonly',
-        HTMLElement: 'readonly',
-        customElements: 'readonly',
-        document: 'readonly',
-        innerWidth: 'readonly',
-        innerHeight: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        addEventListener: 'readonly',
-        removeEventListener: 'readonly',
-        CustomEvent: 'readonly',
-      },
-    },
-    rules: {
-      'no-unused-private-class-members': 'off',
     },
   },
 ]

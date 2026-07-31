@@ -14,6 +14,7 @@ import { LayoutGroup } from 'motion/react'
 import { useEffect, useId, useRef, useState } from 'react'
 
 import { cn } from '@/shared/lib'
+import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { useSmartListHotkeys } from '../model/use-smart-list-hotkeys'
 
@@ -106,50 +107,52 @@ export function DataTableSmartLists({
   }
 
   return (
-    <div
-      data-slot="table-smart-lists"
-      className={cn('flex items-center gap-1 border-b border-border px-4', className)}
-    >
+    <TooltipProvider>
       <div
-        ref={scrollRef}
-        className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        style={{ maskImage, WebkitMaskImage: maskImage }}
+        data-slot="table-smart-lists"
+        className={cn('flex items-center gap-1 border-b border-border px-4', className)}
       >
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToHorizontalAxis]}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={() => setDraggingId(null)}
+        <div
+          ref={scrollRef}
+          className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={{ maskImage, WebkitMaskImage: maskImage }}
         >
-          <SortableContext
-            items={data.items.map((item) => item.id)}
-            strategy={horizontalListSortingStrategy}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToHorizontalAxis]}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={() => setDraggingId(null)}
           >
-            <LayoutGroup id={layoutGroupId}>
-              <span className="flex w-max items-center divide-x divide-border">
-                {data.items.map((item, index) => (
-                  <SmartListTab
-                    key={item.id}
-                    item={item}
-                    active={item.id === data.activeId}
-                    sortable={sortable}
-                    hotkey={hotkeys && index < 9 ? index + 1 : undefined}
-                    onSelect={onSelect}
-                  />
-                ))}
-              </span>
-            </LayoutGroup>
-          </SortableContext>
-          <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
-            {draggingItem ? <SmartListTabGhost item={draggingItem} /> : null}
-          </DragOverlay>
-        </DndContext>
+            <SortableContext
+              items={data.items.map((item) => item.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              <LayoutGroup id={layoutGroupId}>
+                <span className="flex w-max items-center divide-x divide-border">
+                  {data.items.map((item, index) => (
+                    <SmartListTab
+                      key={item.id}
+                      item={item}
+                      active={item.id === data.activeId}
+                      sortable={sortable}
+                      hotkey={hotkeys && index < 9 ? index + 1 : undefined}
+                      onSelect={onSelect}
+                    />
+                  ))}
+                </span>
+              </LayoutGroup>
+            </SortableContext>
+            <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
+              {draggingItem ? <SmartListTabGhost item={draggingItem} /> : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+        {children && (
+          <span className="ml-auto flex shrink-0 items-center gap-2 py-1.5 pl-3">{children}</span>
+        )}
       </div>
-      {children && (
-        <span className="ml-auto flex shrink-0 items-center gap-2 py-1.5 pl-3">{children}</span>
-      )}
-    </div>
+    </TooltipProvider>
   )
 }
