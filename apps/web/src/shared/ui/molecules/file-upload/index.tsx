@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
+
 import { cn } from '@/shared/lib'
 import { CloudArrowUpIcon } from '@/shared/ui/icons'
 
@@ -26,10 +28,12 @@ export function FileUpload({
   onRemove,
   className,
 }: Readonly<FileUploadProps>) {
+  const { t } = useTranslation()
   const {
     inputRef,
     isDragging,
     progress,
+    error,
     handleInputChange,
     handleDrop,
     handleDragOver,
@@ -93,6 +97,12 @@ export function FileUpload({
           </div>
         )}
       </button>
+
+      {error && (
+        <p role="alert" data-slot="upload-error" className="mt-2 text-xs text-destructive">
+          {t('common.upload.failed')} — {error}
+        </p>
+      )}
     </div>
   )
 }

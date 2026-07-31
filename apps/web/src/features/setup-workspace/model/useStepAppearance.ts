@@ -14,6 +14,8 @@ import { derivePalette } from '../lib/palette'
 import { useStepHydration } from '../query/useStepHydration'
 import { useStepMutation } from '../query/useStepMutation'
 
+import { useLogoField } from './useLogoField'
+
 import type {
   AppearanceFormValues,
   ColorOverrides,
@@ -81,21 +83,7 @@ export function useStepAppearance(onNext: () => void) {
     [setValue, getValues],
   )
 
-  const handleLogoUpload = useCallback(
-    async (file: File) => {
-      setValue('logoPreview', URL.createObjectURL(file), { shouldDirty: true })
-      setValue('logoFileName', file.name, { shouldDirty: true })
-      const data = await settingsService.uploadLogo(file)
-      setValue('logoUrl', data.url, { shouldDirty: true })
-    },
-    [setValue],
-  )
-
-  const handleLogoRemove = useCallback(() => {
-    setValue('logoUrl', null, { shouldDirty: true })
-    setValue('logoPreview', null, { shouldDirty: true })
-    setValue('logoFileName', null, { shouldDirty: true })
-  }, [setValue])
+  const { handleLogoUpload, handleLogoRemove } = useLogoField({ setValue, getValues })
 
   const { handleSave, isPending } = useStepMutation({
     mutationFn: async () => {

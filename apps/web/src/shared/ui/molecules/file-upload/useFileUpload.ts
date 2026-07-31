@@ -8,7 +8,7 @@ import {
   PROGRESS_STEP_MAX,
   PROGRESS_TICK_MS,
 } from './constants'
-import { notifyFileTooLarge, notifyUploadProgress } from './upload-toasts'
+import { notifyFileTooLarge, notifyUploadProgress, uploadErrorMessage } from './upload-toasts'
 
 import type { ChangeEvent, DragEvent } from 'react'
 
@@ -21,6 +21,7 @@ export function useFileUpload({ maxSizeMb, onUpload }: UseFileUploadOptions) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [progress, setProgress] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const processFile = useCallback(
     (file: File) => {
@@ -30,6 +31,7 @@ export function useFileUpload({ maxSizeMb, onUpload }: UseFileUploadOptions) {
       }
 
       setProgress(0)
+      setError(null)
 
       const progressInterval = globalThis.setInterval(() => {
         setProgress((prev) => {
@@ -38,16 +40,20 @@ export function useFileUpload({ maxSizeMb, onUpload }: UseFileUploadOptions) {
         })
       }, PROGRESS_TICK_MS)
 
-      const uploadPromise = onUpload(file)
-        .then(() => {
+      const upload = async () => {
+        try {
+          await onUpload(file)
           setProgress(PROGRESS_COMPLETE)
-        })
-        .finally(() => {
+        } catch (cause) {
+          setError(uploadErrorMessage(cause))
+          throw cause
+        } finally {
           globalThis.clearInterval(progressInterval)
           globalThis.setTimeout(() => setProgress(null), PROGRESS_RESET_DELAY_MS)
-        })
+        }
+      }
 
-      notifyUploadProgress(uploadPromise, file)
+      void notifyUploadProgress(upload(), file)
     },
     [onUpload, maxSizeMb],
   )
@@ -83,6 +89,7 @@ export function useFileUpload({ maxSizeMb, onUpload }: UseFileUploadOptions) {
     inputRef,
     isDragging,
     progress,
+    error,
     handleInputChange,
     handleDrop,
     handleDragOver,
