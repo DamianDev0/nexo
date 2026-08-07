@@ -1,4 +1,9 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common'
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  ServiceUnavailableException,
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import {
   DeleteObjectCommand,
@@ -48,14 +53,21 @@ export class S3Service {
 
     const key = this.buildKey(file.originalname, cfg.pathPrefix(tenantSlug))
 
-    await this.client.send(
-      new PutObjectCommand({
-        Bucket: this.bucket,
-        Key: key,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      }),
-    )
+    try {
+      await this.client.send(
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        }),
+      )
+    } catch (error) {
+      this.logger.error(
+        `Upload to s3://${this.bucket}/${key} failed: ${error instanceof Error ? `${error.name} — ${error.message}` : String(error)}`,
+      )
+      throw new ServiceUnavailableException('File storage is unavailable, nothing was saved')
+    }
 
     const url = this.buildUrl(key)
     this.logger.log(`Uploaded [${category}] → ${url}`)
