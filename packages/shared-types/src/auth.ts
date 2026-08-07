@@ -21,6 +21,8 @@ export type AuthUser = {
 export type MeResponse = {
   id: string
   email: string
+  fullName: string
+  avatarUrl: string | null
   role: UserRole
   tenantId: string
   schemaName: string

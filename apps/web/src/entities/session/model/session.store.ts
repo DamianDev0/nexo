@@ -3,13 +3,13 @@ import { persist } from 'zustand/middleware'
 
 import { tenantRef } from '@/shared/api/tenant-ref'
 
-import type { AuthenticatedUser } from '@repo/shared-types'
+import type { SessionUser } from './types/session.types'
 
 interface AuthState {
-  user: AuthenticatedUser | null
+  user: SessionUser | null
   tenantSlug: string | null
   isAuthenticated: boolean
-  setUser: (user: AuthenticatedUser) => void
+  setUser: (user: SessionUser) => void
   setTenantSlug: (slug: string) => void
   clearUser: () => void
 }

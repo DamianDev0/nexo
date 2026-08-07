@@ -69,6 +69,15 @@ export class AuthService {
     return onboarding?.completed ?? false
   }
 
+  async getProfile(
+    schemaName: string,
+    userId: string,
+  ): Promise<{ fullName: string; avatarUrl: string | null }> {
+    const user = await this.authRepo.findUserById(schemaName, userId)
+    if (!user) throw new NotFoundException('User not found or disabled')
+    return { fullName: user.full_name, avatarUrl: user.avatar_url }
+  }
+
   async registerUserTenantMapping(email: string, tenantId: string): Promise<void> {
     await this.userTenantMap.register(email, tenantId)
   }

@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import type { Request, Response } from 'express'
-import type { TenantContext, AuthenticatedUser } from '@repo/shared-types'
+import type { TenantContext, AuthenticatedUser, MeResponse } from '@repo/shared-types'
 import { Public } from '@/shared/decorators/public.decorator'
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
@@ -221,8 +221,11 @@ export class AuthController {
   async me(
     @CurrentUser() user: AuthenticatedUser,
     @TenantCtx() tenantCtx: TenantContext,
-  ): Promise<AuthenticatedUser & { onboardingCompleted: boolean }> {
-    const tenant = await this.authService.getTenantOnboardingStatus(tenantCtx.tenantId)
-    return { ...user, onboardingCompleted: tenant }
+  ): Promise<MeResponse> {
+    const [onboardingCompleted, profile] = await Promise.all([
+      this.authService.getTenantOnboardingStatus(tenantCtx.tenantId),
+      this.authService.getProfile(user.schemaName, user.id),
+    ])
+    return { ...user, ...profile, onboardingCompleted }
   }
 }
