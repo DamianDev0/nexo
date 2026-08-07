@@ -20,7 +20,8 @@ import { isNavItemActive } from '../lib/nav-items'
 import type { NavItem } from '../model/types'
 import type { SidebarNavGroup } from '../query/useSidebarModules'
 
-const BUTTON_CLASSES = 'h-9 gap-2.5 rounded-lg [&_svg]:size-4.5 [&_svg]:shrink-0'
+const BUTTON_CLASSES =
+  'h-9 gap-2.5 rounded-sm text-[13px] [&_svg]:size-4.5 [&_svg]:shrink-0 [&_svg]:text-faint hover:bg-transparent hover:text-foreground hover:[&_svg]:text-primary-deep active:bg-transparent dark:hover:[&_svg]:text-primary'
 
 function NavEntry({ item }: Readonly<{ item: NavItem }>) {
   const { t } = useTranslation()
@@ -37,7 +38,7 @@ function NavEntry({ item }: Readonly<{ item: NavItem }>) {
           asChild
           isActive={isActive}
           tooltip={title}
-          className={`${BUTTON_CLASSES} relative isolate transition-colors data-[active=true]:bg-transparent data-[active=true]:font-medium data-[active=true]:text-foreground data-[active=true]:[&_svg]:text-primary`}
+          className={`${BUTTON_CLASSES} relative isolate transition-colors duration-150 data-[active=true]:bg-transparent data-[active=true]:font-semibold data-[active=true]:text-foreground data-[active=true]:[&_svg]:text-primary-deep dark:data-[active=true]:[&_svg]:text-primary`}
         >
           <Link href={item.url}>
             {isActive && (

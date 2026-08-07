@@ -26,7 +26,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
         <AppMotionProvider>
           <SidebarProvider
             className="h-svh overflow-hidden"
-            style={{ '--sidebar-width': '15rem' } as React.CSSProperties}
+            style={{ '--sidebar-width': '13.5rem' } as React.CSSProperties}
           >
             <AppSidebar />
             <SidebarInset>

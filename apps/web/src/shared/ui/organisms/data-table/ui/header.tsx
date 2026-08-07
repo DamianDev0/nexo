@@ -11,6 +11,7 @@ import {
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { flexRender, type Header } from '@tanstack/react-table'
+import { useId } from 'react'
 
 import { cn } from '@/shared/lib'
 import { ArrowDownIcon, ArrowUpIcon, CaretUpDownIcon } from '@/shared/ui/icons'
@@ -63,6 +64,7 @@ function HeaderCell({ header }: Readonly<{ header: Header<unknown, unknown> }>) 
 export function DataTableHeader({ className }: Readonly<{ className?: string }>) {
   const { table, reorderColumn } = useDataTableContext()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+  const dndId = useId()
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -73,7 +75,12 @@ export function DataTableHeader({ className }: Readonly<{ className?: string }>)
   if (!headerGroup) return null
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      id={dndId}
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
       <SortableContext
         items={headerGroup.headers.map((header) => header.column.id)}
         strategy={horizontalListSortingStrategy}

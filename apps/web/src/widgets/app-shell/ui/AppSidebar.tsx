@@ -3,7 +3,7 @@
 import { useAuthStore } from '@/entities/session'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/shared/ui/shadcn/sidebar'
 
-import { DEFAULT_TEAMS } from '../lib/nav-items'
+import { toSidebarTeam, toSidebarUser } from '../lib/sidebar-identity'
 import { useSidebarModules } from '../query/useSidebarModules'
 import { useTenantBranding } from '../query/useTenantBranding'
 
@@ -12,37 +12,23 @@ import { NavUser } from './NavUser'
 import { SidebarCollapseButton } from './SidebarCollapseButton'
 import { TeamSwitcher } from './TeamSwitcher'
 
-import type { AuthenticatedUser } from '@repo/shared-types'
 import type { ComponentProps } from 'react'
-
-function toUserDisplay(user: AuthenticatedUser | null) {
-  return {
-    name: user?.email?.split('@')[0] ?? 'User',
-    email: user?.email ?? '',
-    avatar: '',
-  }
-}
 
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((s) => s.user)
   const groups = useSidebarModules()
   const branding = useTenantBranding()
-  const team = {
-    ...DEFAULT_TEAMS[0],
-    name: branding.name,
-    plan: branding.plan ?? DEFAULT_TEAMS[0].plan,
-  }
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={[team]} />
+        <TeamSwitcher team={toSidebarTeam(branding)} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain groups={groups} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={toUserDisplay(user)} />
+        <NavUser user={toSidebarUser(user)} />
       </SidebarFooter>
       <SidebarCollapseButton />
     </Sidebar>

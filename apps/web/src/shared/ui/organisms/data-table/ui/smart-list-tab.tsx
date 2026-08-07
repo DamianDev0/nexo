@@ -60,7 +60,7 @@ export function SmartListTab({
       aria-current={active || undefined}
       onClick={() => onSelect(item.id)}
       className={cn(
-        'relative inline-flex h-12 items-center gap-2 whitespace-nowrap px-4 text-sm outline-none transition-[padding] duration-200 ease-out focus-visible:ring-2 focus-visible:ring-ring/50',
+        'relative inline-flex h-14 items-center gap-2 whitespace-nowrap px-4 text-sm outline-none transition-[padding] duration-200 ease-out focus-visible:ring-2 focus-visible:ring-ring/50',
         sortable && 'group-hover:pl-7 group-hover:pr-5',
         sortable && isDragging && 'pl-7 pr-5',
         active

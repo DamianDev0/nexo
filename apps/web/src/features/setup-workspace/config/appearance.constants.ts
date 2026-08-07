@@ -1,4 +1,4 @@
-import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
+import { BRAND_COLOR_OPTIONS, NEXO_BRAND_PALETTE } from '@repo/shared-utils'
 
 import type { AppearanceFormValues, ThemePreset } from '../model/types'
 import type { ThemeTypography } from '@repo/shared-types'
@@ -52,22 +52,28 @@ function brandHex(label: string): string {
   return BRAND_COLOR_OPTIONS.find((o) => o.label === label)?.hex ?? BRAND_COLOR_OPTIONS[0].hex
 }
 
-const INDIGO = brandHex('Indigo')
 const VIOLET = brandHex('Violet')
 const EMERALD = brandHex('Emerald')
 const SLATE = brandHex('Slate')
 
-export const THEME_PRESETS: ReadonlyArray<ThemePreset> = [
-  {
-    key: 'nexo',
-    primary: INDIGO,
-    overrides: {},
-    fontFamily: 'inter',
-    borderRadius: 'lg',
-    density: 'comfortable',
-    darkMode: 'system',
-    recommended: true,
+export const NEXO_PRESET: ThemePreset = {
+  key: 'nexo',
+  primary: NEXO_BRAND_PALETTE.primary,
+  overrides: {
+    accent: NEXO_BRAND_PALETTE.accent,
+    secondary: NEXO_BRAND_PALETTE.secondary,
+    sidebar: NEXO_BRAND_PALETTE.sidebar,
+    sidebarForeground: NEXO_BRAND_PALETTE.sidebarForeground,
   },
+  fontFamily: 'inter',
+  borderRadius: 'sm',
+  density: 'comfortable',
+  darkMode: 'system',
+  recommended: true,
+}
+
+export const THEME_PRESETS: ReadonlyArray<ThemePreset> = [
+  NEXO_PRESET,
   {
     key: 'midnight',
     primary: VIOLET,
@@ -123,13 +129,13 @@ export const DENSITY_MAP: Record<
 }
 
 export const APPEARANCE_DEFAULT_VALUES: AppearanceFormValues = {
-  primaryColor: BRAND_COLOR_OPTIONS[0].hex,
-  colorOverrides: {},
+  primaryColor: NEXO_PRESET.primary,
+  colorOverrides: NEXO_PRESET.overrides,
   grainIntensity: 0,
-  darkMode: 'system',
-  fontFamily: 'inter',
-  borderRadius: 'lg',
-  density: 'comfortable',
+  darkMode: NEXO_PRESET.darkMode,
+  fontFamily: NEXO_PRESET.fontFamily,
+  borderRadius: NEXO_PRESET.borderRadius,
+  density: NEXO_PRESET.density,
   productName: '',
   tagline: '',
   logoUrl: null,

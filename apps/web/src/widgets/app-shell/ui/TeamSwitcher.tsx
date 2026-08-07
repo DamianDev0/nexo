@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { CaretUpDownIcon, PlusIcon } from '@/shared/ui/icons'
@@ -10,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/shared/ui/shadcn/dropdown-menu'
 import {
@@ -20,22 +18,11 @@ import {
   useSidebar,
 } from '@/shared/ui/shadcn/sidebar'
 
-export function TeamSwitcher({
-  teams,
-}: Readonly<{
-  teams: {
-    name: string
-    logo: React.ElementType
-    plan: string
-  }[]
-}>) {
+import type { SidebarTeam } from '../model/types'
+
+export function TeamSwitcher({ team }: Readonly<{ team: SidebarTeam }>) {
   const { t } = useTranslation()
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
-
-  if (!activeTeam) {
-    return null
-  }
 
   return (
     <SidebarMenu>
@@ -44,16 +31,17 @@ export function TeamSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="h-13 rounded-md px-2.5 transition-colors hover:bg-sidebar-hover hover:text-sidebar-foreground data-[state=open]:bg-sidebar-hover data-[state=open]:text-sidebar-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeTeam.logo className="size-4" />
+              <div className="grid flex-1 text-left leading-tight">
+                <span className="truncate text-base font-black tracking-[-0.02em] text-foreground">
+                  {team.name}
+                </span>
+                <span className="truncate text-[11px] font-medium text-muted-foreground">
+                  {team.plan}
+                </span>
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
-              </div>
-              <CaretUpDownIcon className="ml-auto" />
+              <CaretUpDownIcon className="ml-auto size-4 text-faint" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -65,25 +53,13 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               {t('nav.teams')}
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-3.5 shrink-0" />
-                </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuItem className="gap-2 p-2">
+              <span className="truncate font-medium">{team.name}</span>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <PlusIcon className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">{t('nav.addTeam')}</div>
+              <PlusIcon className="size-4" />
+              <span className="font-medium text-muted-foreground">{t('nav.addTeam')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

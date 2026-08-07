@@ -39,7 +39,3 @@ export function isNavItemActive(item: NavItem, pathname: string): boolean {
 export function navItemForPath(pathname: string): NavItem | undefined {
   return NAV_CRM.find((item) => isNavItemActive(item, pathname))
 }
-
-export const DEFAULT_TEAMS = [
-  { name: 'NexoCRM', logo: moduleIcon('dashboard'), plan: 'Free' },
-] as const

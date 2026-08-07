@@ -90,7 +90,7 @@ export function DataTableSmartLists({
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const draggingItem = data.items.find((item) => item.id === draggingId)
   const { ref: scrollRef, maskImage } = useScrollFade()
-  const layoutGroupId = useId()
+  const instanceId = useId()
   const pinnedIds = data.items.filter((item) => item.pinned).map((item) => item.id)
   const movableIds = data.items.filter((item) => !item.pinned).map((item) => item.id)
 
@@ -123,6 +123,7 @@ export function DataTableSmartLists({
           style={{ maskImage, WebkitMaskImage: maskImage }}
         >
           <DndContext
+            id={instanceId}
             sensors={sensors}
             collisionDetection={closestCenter}
             modifiers={[restrictToHorizontalAxis]}
@@ -131,7 +132,7 @@ export function DataTableSmartLists({
             onDragCancel={() => setDraggingId(null)}
           >
             <SortableContext items={movableIds} strategy={horizontalListSortingStrategy}>
-              <LayoutGroup id={layoutGroupId}>
+              <LayoutGroup id={instanceId}>
                 <span className="flex w-max items-center">
                   {data.items.map((item, index) => (
                     <SmartListTab

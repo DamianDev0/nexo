@@ -91,6 +91,7 @@ export function useDataTable<TData>({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageSize } },
+    autoResetPageIndex: false,
     enableRowSelection: true,
   })
 

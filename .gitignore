@@ -66,3 +66,6 @@ pnpm-debug.log*
 .DS_Store
 *.pem
 apps/web/storybook-static
+
+# playwright mcp session artifacts
+.playwright-mcp/

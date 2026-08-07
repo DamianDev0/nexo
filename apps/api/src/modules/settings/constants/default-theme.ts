@@ -1,17 +1,11 @@
+import { NEXO_BRAND_PALETTE } from '@repo/shared-utils'
 import type { TenantTheme } from '../interfaces/tenant-theme.interface'
 
 export const DEFAULT_THEME: TenantTheme = {
-  colors: {
-    primary: '#1B4FD8',
-    primaryForeground: '#FFFFFF',
-    secondary: '#6366F1',
-    accent: '#818CF8',
-    sidebar: '#0F172A',
-    sidebarForeground: '#F8FAFC',
-  },
+  colors: { ...NEXO_BRAND_PALETTE },
   typography: {
     fontFamily: 'inter',
-    borderRadius: 'md',
+    borderRadius: 'sm',
     density: 'comfortable',
   },
   branding: {

@@ -1,17 +1,19 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export function useLocalStorageState<T>(key: string, initial: T) {
-  const [value, setValue] = useState<T>(() => {
-    if (typeof window === 'undefined') return initial
+  const [value, setValue] = useState<T>(initial)
+  const fallback = useRef(initial)
+
+  useEffect(() => {
     try {
       const stored = window.localStorage.getItem(key)
-      return stored === null ? initial : (JSON.parse(stored) as T)
+      setValue(stored === null ? fallback.current : (JSON.parse(stored) as T))
     } catch {
-      return initial
+      setValue(fallback.current)
     }
-  })
+  }, [key])
 
   const update = useCallback(
     (next: T) => {
