@@ -48,12 +48,12 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
             void handleSubmit(event)
           }}
         >
-          <ContactFormFields control={form.control} />
-          <SheetFooter className="-mx-6 mt-auto flex-row justify-end gap-2.5 border-t border-border px-6 pb-1 pt-5">
-            <PillButton variant="ghost" size="md" onClick={() => onOpenChange(false)}>
+          <ContactFormFields control={form.control} setValue={form.setValue} />
+          <SheetFooter className="-mx-6 mt-auto flex-row justify-end gap-2 border-t border-border px-6 py-3">
+            <PillButton variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </PillButton>
-            <PillButton type="submit" size="md" disabled={isPending}>
+            <PillButton type="submit" size="sm" disabled={isPending}>
               {t(isEdit ? 'contacts.form.submitEdit' : 'contacts.form.submitCreate')}
             </PillButton>
           </SheetFooter>

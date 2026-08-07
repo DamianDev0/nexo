@@ -36,9 +36,26 @@ const dotVariants = cva('size-1.5 rounded-full', {
 interface BadgeSoftProps extends VariantProps<typeof badgeSoftVariants> {
   readonly children: React.ReactNode
   readonly className?: string
+  readonly color?: string
 }
 
-export function BadgeSoft({ tone, children, className }: Readonly<BadgeSoftProps>) {
+export function BadgeSoft({ tone, color, children, className }: Readonly<BadgeSoftProps>) {
+  if (color) {
+    return (
+      <span
+        data-slot="badge-soft"
+        className={cn(badgeSoftVariants({ tone: 'neutral' }), className)}
+        style={{
+          backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)`,
+          color: `color-mix(in srgb, ${color} 62%, var(--foreground))`,
+        }}
+      >
+        <span className={dotVariants({ tone: 'neutral' })} style={{ backgroundColor: color }} />
+        {children}
+      </span>
+    )
+  }
+
   return (
     <span data-slot="badge-soft" className={cn(badgeSoftVariants({ tone }), className)}>
       <span className={dotVariants({ tone })} />

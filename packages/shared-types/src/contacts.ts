@@ -1,4 +1,4 @@
-import type { ContactSource, ContactStatus, DocumentType, LifecycleStage } from './enums'
+import type { DocumentType, LifecycleStage } from './enums'
 
 export type Contact = {
   id: string
@@ -17,9 +17,9 @@ export type Contact = {
   department: string | null
   municipioCode: string | null
   country: string
-  status: ContactStatus
+  status: string
   lifecycleStage: LifecycleStage
-  source: ContactSource | null
+  source: string | null
   leadScore: number
   dataConsent: boolean
   consentDate: string | null
@@ -48,11 +48,12 @@ export type ContactInput = {
   whatsapp?: string
   documentType?: DocumentType
   documentNumber?: string
+  address?: string
   city?: string
   department?: string
   municipioCode?: string
-  status?: ContactStatus
-  source?: ContactSource
+  status?: string
+  source?: string
   leadScore?: number
   tags?: string[]
   companyId?: string
@@ -62,8 +63,8 @@ export type ContactInput = {
 
 export type ContactListQuery = {
   q?: string
-  status?: ContactStatus
-  source?: ContactSource
+  status?: string
+  source?: string
   lifecycleStage?: LifecycleStage
   tags?: string[]
   companyId?: string

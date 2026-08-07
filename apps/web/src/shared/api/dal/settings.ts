@@ -4,6 +4,7 @@ import { CACHE_TAGS } from '../cache-tags'
 import { apiFetch } from '../client'
 
 import type {
+  ContactTaxonomy,
   GeneralSettings,
   NomenclatureConfig,
   OnboardingStatus,
@@ -17,6 +18,9 @@ export const getGeneral = () =>
 
 export const getTheme = () =>
   apiFetch<ThemeConfig>('/settings/theme', { tags: [CACHE_TAGS.settingsTheme] })
+
+export const getContactTaxonomy = () =>
+  apiFetch<ContactTaxonomy>('/settings/contact-taxonomy', { cache: 'no-store' })
 
 export const getNavigation = () =>
   apiFetch<SidebarConfig>('/settings/navigation', { cache: 'no-store' })

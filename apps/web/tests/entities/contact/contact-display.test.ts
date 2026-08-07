@@ -1,8 +1,6 @@
-import { ContactStatus } from '@repo/shared-types'
 import { describe, expect, it } from 'vitest'
 
 import {
-  CONTACT_STATUS_TONE,
   contactAvatarTone,
   contactFullName,
   contactInitials,
@@ -38,16 +36,6 @@ describe('contactAvatarTone', () => {
   it('always returns one of the 4 known tones', () => {
     for (const id of ['contact-1', 'contact-2', 'a', 'zzzzzzzz', '']) {
       expect(tones).toContain(contactAvatarTone(id))
-    }
-  })
-})
-
-describe('CONTACT_STATUS_TONE', () => {
-  it('covers all ContactStatus values', () => {
-    const statuses = Object.values(ContactStatus)
-    expect(Object.keys(CONTACT_STATUS_TONE)).toHaveLength(statuses.length)
-    for (const status of statuses) {
-      expect(CONTACT_STATUS_TONE[status]).toBeDefined()
     }
   })
 })

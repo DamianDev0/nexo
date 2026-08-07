@@ -24,7 +24,7 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
         onReorder={actions.onReorderLists}
         hotkeys
       >
-        <PillButton size="sm" className="h-9.5 gap-1.5 rounded-md px-6" onClick={actions.onCreate}>
+        <PillButton size="sm" className="gap-1.5 rounded-md" onClick={actions.onCreate}>
           <PlusIcon className="size-4" />
           {t('contacts.lists.new')}
         </PillButton>

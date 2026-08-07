@@ -1,6 +1,6 @@
+import { NEXO_BRAND_PALETTE } from './brand-palette.generated'
+
 import {
-  ContactSource,
-  ContactStatus,
   DealStatus,
   IndustrySector,
   InvoiceStatus,
@@ -21,33 +21,6 @@ export const MAX_PAGE_SIZE = 100
 
 export const TENANT_SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
 export const PASSWORD_STRENGTH_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/
-
-export const CONTACT_STATUS_LABELS: Record<ContactStatus, string> = {
-  [ContactStatus.NEW]: 'Nuevo',
-  [ContactStatus.IN_CONTACT]: 'En contacto',
-  [ContactStatus.QUALIFIED]: 'Calificado',
-  [ContactStatus.UNQUALIFIED]: 'No calificado',
-  [ContactStatus.NURTURING]: 'En nurturing',
-  [ContactStatus.CLIENT]: 'Cliente',
-  [ContactStatus.INACTIVE]: 'Inactivo',
-  [ContactStatus.LOST]: 'Perdido',
-}
-
-export const CONTACT_SOURCE_LABELS: Record<ContactSource, string> = {
-  [ContactSource.MANUAL]: 'Manual',
-  [ContactSource.WHATSAPP]: 'WhatsApp',
-  [ContactSource.WEB_FORM]: 'Formulario web',
-  [ContactSource.REFERRAL]: 'Referido',
-  [ContactSource.IMPORT]: 'Importación',
-  [ContactSource.EMAIL_CAMPAIGN]: 'Campaña email',
-  [ContactSource.SOCIAL_MEDIA]: 'Redes sociales',
-  [ContactSource.PAID_AD]: 'Anuncio pagado',
-  [ContactSource.ORGANIC_SEARCH]: 'Búsqueda orgánica',
-  [ContactSource.EVENT]: 'Evento',
-  [ContactSource.COLD_CALL]: 'Llamada fría',
-  [ContactSource.PARTNER]: 'Partner',
-  [ContactSource.CHAT]: 'Chat',
-}
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
   [InvoiceStatus.DRAFT]: 'Borrador',
@@ -146,6 +119,7 @@ export const SECTOR_OPTIONS: ReadonlyArray<{
 ] as const
 
 export const BRAND_COLOR_OPTIONS = [
+  { hex: NEXO_BRAND_PALETTE.primary, label: 'Lime' },
   { hex: '#4F46E5', label: 'Indigo' },
   { hex: '#7C3AED', label: 'Violet' },
   { hex: '#DB2777', label: 'Pink' },

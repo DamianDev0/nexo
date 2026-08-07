@@ -14,8 +14,8 @@ import type {
   CustomFieldsConfig,
   FieldPermissionsConfig,
 } from '../interfaces/custom-field.interface'
-import { DEFAULT_ACTIVITY_TYPES } from '@repo/shared-types'
-import type { ActivityTypeDef } from '@repo/shared-types'
+import { DEFAULT_ACTIVITY_TYPES, DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
+import type { ActivityTypeDef, ContactTaxonomy } from '@repo/shared-types'
 import { deepMerge } from '@/shared/utils/deep-merge'
 import type { ThemePatch, TenantFullConfig } from '../interfaces/tenant-config.interface'
 import { CACHE_TTL_MEDIUM_SECONDS, CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
@@ -180,6 +180,33 @@ export class TenantConfigService {
     return types
   }
 
+  async getContactTaxonomy(tenantId: string): Promise<ContactTaxonomy> {
+    const cached = await this.cache.get<ContactTaxonomy>(this.contactTaxonomyKey(tenantId))
+    if (cached) return cached
+
+    const config = await this.getRawConfig(tenantId)
+    const stored = config.contactTaxonomy
+    const taxonomy: ContactTaxonomy = {
+      statuses: stored?.statuses?.length ? stored.statuses : DEFAULT_CONTACT_TAXONOMY.statuses,
+      sources: stored?.sources?.length ? stored.sources : DEFAULT_CONTACT_TAXONOMY.sources,
+    }
+    await this.cache.set(this.contactTaxonomyKey(tenantId), taxonomy, CACHE_TTL_MEDIUM_SECONDS)
+    return taxonomy
+  }
+
+  async updateContactTaxonomy(
+    tenantId: string,
+    taxonomy: ContactTaxonomy,
+    slug: string,
+  ): Promise<ContactTaxonomy> {
+    await this.saveConfigSection(tenantId, 'contactTaxonomy', taxonomy)
+    await Promise.all([
+      this.cache.del(this.contactTaxonomyKey(tenantId)),
+      this.cache.del(`tenant:slug:${slug}`),
+    ])
+    return taxonomy
+  }
+
   async getFieldPermissions(tenantId: string): Promise<FieldPermissionsConfig> {
     const config = await this.getRawConfig(tenantId)
     const raw = config.fieldPermissions
@@ -256,6 +283,9 @@ export class TenantConfigService {
   }
   private activityTypesKey(tenantId: string): string {
     return `tenant:activity-types:${tenantId}`
+  }
+  private contactTaxonomyKey(tenantId: string): string {
+    return `tenant:contact-taxonomy:${tenantId}`
   }
 }
 

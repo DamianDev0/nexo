@@ -1,26 +1,27 @@
 'use client'
 
-import { ContactStatus } from '@repo/shared-types'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { useContactTaxonomy } from '@/entities/contact-taxonomy'
+import { AddressField, MunicipalityCombobox } from '@/entities/geo'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { Label } from '@/shared/ui/shadcn/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/shadcn/select'
 
-import { ContactPhoneField } from './ContactPhoneField'
+import { ContactPhoneFields } from './ContactPhoneFields'
+import { TaxonomySelectField } from './TaxonomySelectField'
 
 import type { ContactFormValues } from '../model/contact-form.schema'
-import type { Control } from 'react-hook-form'
+import type { Control, UseFormSetValue } from 'react-hook-form'
 
-export function ContactFormFields({ control }: Readonly<{ control: Control<ContactFormValues> }>) {
+interface ContactFormFieldsProps {
+  readonly control: Control<ContactFormValues>
+  readonly setValue: UseFormSetValue<ContactFormValues>
+}
+
+export function ContactFormFields({ control, setValue }: Readonly<ContactFormFieldsProps>) {
   const { t } = useTranslation()
+  const { statuses, sources } = useContactTaxonomy()
 
   return (
     <div className="flex flex-col gap-3.5">
@@ -46,39 +47,58 @@ export function ContactFormFields({ control }: Readonly<{ control: Control<Conta
         label={t('contacts.form.email')}
         placeholder={t('contacts.form.emailPlaceholder')}
       />
+      <ContactPhoneFields control={control} />
+      <Controller
+        control={control}
+        name="address"
+        render={({ field }) => (
+          <div>
+            <Label className="text-xs text-muted-foreground">{t('contacts.form.address')}</Label>
+            <div className="mt-1.5">
+              <AddressField
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={t('contacts.form.addressPlaceholder')}
+              />
+            </div>
+          </div>
+        )}
+      />
+
       <div className="grid grid-cols-2 gap-3.5">
-        <ContactPhoneField control={control} name="phone" label={t('contacts.form.phone')} />
-        <ContactPhoneField control={control} name="whatsapp" label={t('contacts.form.whatsapp')} />
-      </div>
-      <div className="grid grid-cols-2 gap-3.5">
-        <ControlledField
-          control={control}
-          name="city"
-          label={t('contacts.form.city')}
-          placeholder={t('contacts.form.cityPlaceholder')}
-        />
         <Controller
           control={control}
-          name="status"
+          name="city"
           render={({ field }) => (
             <div>
-              <Label className="text-xs text-muted-foreground">{t('contacts.form.status')}</Label>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="mt-1.5 h-10! w-full border-border bg-surface-input text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(ContactStatus).map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {t(`contacts.status.${status}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-xs text-muted-foreground">{t('contacts.form.city')}</Label>
+              <div className="mt-1.5">
+                <MunicipalityCombobox
+                  value={field.value}
+                  placeholder={t('contacts.form.cityPlaceholder')}
+                  onSelect={(municipality) => {
+                    field.onChange(municipality.name)
+                    setValue('municipioCode', municipality.code, { shouldDirty: true })
+                  }}
+                />
+              </div>
             </div>
           )}
         />
+        <TaxonomySelectField
+          control={control}
+          name="status"
+          label={t('contacts.form.status')}
+          choices={statuses}
+        />
       </div>
+      <TaxonomySelectField
+        control={control}
+        name="source"
+        label={t('contacts.form.source')}
+        placeholder={t('contacts.form.sourcePlaceholder')}
+        choices={sources}
+      />
     </div>
   )
 }

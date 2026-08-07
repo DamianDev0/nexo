@@ -8,17 +8,6 @@ export enum DocumentType {
   PPT = 'ppt',
 }
 
-export enum ContactStatus {
-  NEW = 'new',
-  IN_CONTACT = 'in_contact',
-  QUALIFIED = 'qualified',
-  UNQUALIFIED = 'unqualified',
-  NURTURING = 'nurturing',
-  CLIENT = 'client',
-  INACTIVE = 'inactive',
-  LOST = 'lost',
-}
-
 export enum LifecycleStage {
   SUBSCRIBER = 'subscriber',
   LEAD = 'lead',
@@ -27,22 +16,6 @@ export enum LifecycleStage {
   OPPORTUNITY = 'opportunity',
   CUSTOMER = 'customer',
   EVANGELIST = 'evangelist',
-}
-
-export enum ContactSource {
-  MANUAL = 'manual',
-  WHATSAPP = 'whatsapp',
-  WEB_FORM = 'web_form',
-  REFERRAL = 'referral',
-  IMPORT = 'import',
-  EMAIL_CAMPAIGN = 'email_campaign',
-  SOCIAL_MEDIA = 'social_media',
-  PAID_AD = 'paid_ad',
-  ORGANIC_SEARCH = 'organic_search',
-  EVENT = 'event',
-  COLD_CALL = 'cold_call',
-  PARTNER = 'partner',
-  CHAT = 'chat',
 }
 
 export enum InvoiceStatus {

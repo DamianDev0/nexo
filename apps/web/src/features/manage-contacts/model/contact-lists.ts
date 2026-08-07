@@ -1,21 +1,15 @@
-import { ContactStatus } from '@repo/shared-types'
+import { TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
 
+import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { SmartListItem } from '@/shared/ui/organisms/data-table'
 import type { TFunction } from 'i18next'
 
 const LIST_ALL = 'all'
 
-const LIST_STATUSES: readonly ContactStatus[] = [
-  ContactStatus.NEW,
-  ContactStatus.IN_CONTACT,
-  ContactStatus.QUALIFIED,
-  ContactStatus.CLIENT,
-  ContactStatus.LOST,
-]
-
 export function buildSmartLists(
   t: TFunction,
   counts: Record<string, number | undefined>,
+  statuses: ReadonlyArray<TaxonomyChoice>,
 ): ReadonlyArray<SmartListItem> {
   return [
     {
@@ -25,26 +19,27 @@ export function buildSmartLists(
       description: t('contacts.lists.descriptions.all'),
       pinned: true,
     },
-    ...LIST_STATUSES.map((status) => ({
-      id: status,
-      label: t(`contacts.status.${status}`),
-      count: counts[status],
-      description: t(`contacts.lists.descriptions.${status}`),
+    ...statuses.map((status) => ({
+      id: status.key,
+      label: status.label,
+      count: counts[status.key] ?? 0,
+      description:
+        t(`contacts.lists.descriptions.${status.key}`, { defaultValue: '' }) || undefined,
     })),
   ]
 }
 
-export function listIdToStatus(id: string): ContactStatus | null {
-  return id === LIST_ALL ? null : (id as ContactStatus)
+export function listIdToStatus(id: string): string | null {
+  return id === LIST_ALL ? null : id
 }
 
-export function parseListParam(value: string | null): ContactStatus | null {
+export function parseListParam(value: string | null): string | null {
   if (!value || value === LIST_ALL) return null
-  return (LIST_STATUSES as readonly string[]).includes(value) ? (value as ContactStatus) : null
+  return TAXONOMY_KEY_PATTERN.test(value) ? value : null
 }
 
 export function contactsQueryString(state: {
-  status: ContactStatus | null
+  status: string | null
   search: string
   filters?: Readonly<Record<string, ReadonlyArray<string>>>
 }): string {
@@ -58,6 +53,6 @@ export function contactsQueryString(state: {
   return qs ? `?${qs}` : ''
 }
 
-export function statusToListId(status: ContactStatus | null): string {
+export function statusToListId(status: string | null): string {
   return status ?? LIST_ALL
 }

@@ -2,6 +2,7 @@ import { request } from '@/shared/api/request'
 
 import type {
   Contact,
+  ContactCounts,
   ContactInput,
   ContactListQuery,
   ContactTimeline,
@@ -11,6 +12,8 @@ import type {
 const contactsService = {
   list: (params: ContactListQuery) =>
     request<PaginatedContacts>({ method: 'get', url: '/contacts', params }),
+
+  counts: () => request<ContactCounts>({ method: 'get', url: '/contacts/counts' }),
 
   getById: (id: string) => request<Contact>({ method: 'get', url: `/contacts/${id}` }),
 

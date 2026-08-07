@@ -1,4 +1,3 @@
-import { ContactStatus } from '@repo/shared-types'
 import { describe, expect, it } from 'vitest'
 
 import type { TFunction } from 'i18next'
@@ -15,8 +14,12 @@ describe('buildContactSchema', () => {
       email: '',
       phone: '',
       whatsapp: '',
+      whatsappSameAsPhone: false,
+      address: '',
       city: '',
-      status: ContactStatus.NEW,
+      municipioCode: '',
+      source: '',
+      status: 'new',
     })
 
     expect(result.success).toBe(false)
@@ -32,8 +35,12 @@ describe('buildContactSchema', () => {
       email: 'not-an-email',
       phone: '',
       whatsapp: '',
+      whatsappSameAsPhone: false,
+      address: '',
       city: '',
-      status: ContactStatus.NEW,
+      municipioCode: '',
+      source: '',
+      status: 'new',
     })
 
     expect(result.success).toBe(false)
@@ -49,8 +56,12 @@ describe('buildContactSchema', () => {
       email: '',
       phone: '',
       whatsapp: '',
+      whatsappSameAsPhone: false,
+      address: '',
       city: '',
-      status: ContactStatus.NEW,
+      municipioCode: '',
+      source: '',
+      status: 'new',
     })
 
     expect(result.success).toBe(true)
@@ -63,8 +74,12 @@ describe('buildContactSchema', () => {
       email: 'maria@nexo.test',
       phone: '+57 300 000 0000',
       whatsapp: '+57 300 000 0000',
+      whatsappSameAsPhone: false,
+      address: 'Calle 100 #7-21',
       city: 'Bogota',
-      status: ContactStatus.QUALIFIED,
+      municipioCode: '11001',
+      source: '',
+      status: 'qualified',
     })
 
     expect(result.success).toBe(true)

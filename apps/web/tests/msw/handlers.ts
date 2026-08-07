@@ -1,6 +1,4 @@
 import {
-  ContactSource,
-  ContactStatus,
   DocumentType,
   IndustrySector,
   LifecycleStage,
@@ -39,9 +37,9 @@ function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
     department: null,
     municipioCode: null,
     country: 'CO',
-    status: ContactStatus.NEW,
+    status: 'new',
     lifecycleStage: LifecycleStage.LEAD,
-    source: ContactSource.MANUAL,
+    source: 'manual',
     leadScore: 0,
     dataConsent: true,
     consentDate: null,
@@ -67,7 +65,7 @@ export const CONTACTS_FIXTURE: ContactListItem[] = [
     id: 'contact-2',
     firstName: 'Carlos',
     lastName: 'Perez',
-    status: ContactStatus.CLIENT,
+    status: 'client',
   }),
 ]
 
@@ -95,6 +93,8 @@ export const handlers = [
       data: {
         id: 'user-1',
         email: 'damian@nexo.test',
+        fullName: 'Damian Garcia',
+        avatarUrl: null,
         role: UserRole.OWNER,
         tenantId: 'tenant-1',
         schemaName: 'tenant_nexo',

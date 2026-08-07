@@ -1,4 +1,4 @@
-import { ContactSource, LifecycleStage } from '@repo/shared-types'
+import { LifecycleStage } from '@repo/shared-types'
 
 import { ChartLineUpIcon, ShareNetworkIcon } from '@/shared/ui/icons'
 
@@ -8,10 +8,7 @@ export const QUICK_FILTER_IDS = ['lifecycleStage', 'source'] as const
 
 export type QuickFilterId = (typeof QUICK_FILTER_IDS)[number]
 
-export const QUICK_FILTER_OPTIONS: Readonly<Record<QuickFilterId, ReadonlyArray<string>>> = {
-  lifecycleStage: Object.values(LifecycleStage),
-  source: Object.values(ContactSource),
-}
+export const LIFECYCLE_STAGE_OPTIONS: ReadonlyArray<string> = Object.values(LifecycleStage)
 
 export type QuickFilterState = Readonly<Record<QuickFilterId, ReadonlyArray<string>>>
 

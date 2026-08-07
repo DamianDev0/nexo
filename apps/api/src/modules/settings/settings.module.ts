@@ -6,6 +6,7 @@ import { TenantThemeHistory } from './entities/tenant-theme-history.entity'
 import { SettingsController } from './controllers/settings.controller'
 import { ThemeController } from './controllers/theme.controller'
 import { NomenclatureController } from './controllers/nomenclature.controller'
+import { ContactTaxonomyController } from './controllers/contact-taxonomy.controller'
 import { NavigationController } from './controllers/navigation.controller'
 import { CustomFieldsController } from './controllers/custom-fields.controller'
 import { TenantPublicController } from './controllers/tenant-public.controller'
@@ -30,6 +31,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     ThemeController,
     NomenclatureController,
     NavigationController,
+    ContactTaxonomyController,
     CustomFieldsController,
     TenantPublicController,
     PipelineController,

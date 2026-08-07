@@ -336,3 +336,77 @@ export type TenantEmailConfig = {
   provider: 'resend' | 'sendgrid' | null
   sendgridApiKey: string | null
 }
+
+export const TAXONOMY_KEY_PATTERN = /^[a-z][a-z0-9_]{0,39}$/
+
+export const TAXONOMY_COLOR_PALETTE = [
+  '#3B82F6',
+  '#8B5CF6',
+  '#06B6D4',
+  '#22C55E',
+  '#14B8A6',
+  '#F59E0B',
+  '#F97316',
+  '#EF4444',
+  '#EC4899',
+  '#A855F7',
+  '#6366F1',
+  '#0EA5E9',
+  '#64748B',
+  '#94A3B8',
+] as const
+
+export function taxonomyColorAt(index: number): string {
+  return TAXONOMY_COLOR_PALETTE[index % TAXONOMY_COLOR_PALETTE.length] as string
+}
+
+export const DEFAULT_CONTACT_STATUS_KEY = 'new'
+
+export type TaxonomyOption = {
+  key: string
+  label: string | null
+  color: string
+  order: number
+  isSystem: boolean
+}
+
+export type ContactTaxonomy = {
+  statuses: TaxonomyOption[]
+  sources: TaxonomyOption[]
+}
+
+function systemOption(key: string, color: string, order: number): TaxonomyOption {
+  return { key, label: null, color, order, isSystem: true }
+}
+
+export const DEFAULT_CONTACT_STATUSES: TaxonomyOption[] = [
+  systemOption('new', '#3B82F6', 1),
+  systemOption('in_contact', '#8B5CF6', 2),
+  systemOption('qualified', '#06B6D4', 3),
+  systemOption('unqualified', '#94A3B8', 4),
+  systemOption('nurturing', '#F59E0B', 5),
+  systemOption('client', '#22C55E', 6),
+  systemOption('inactive', '#64748B', 7),
+  systemOption('lost', '#EF4444', 8),
+]
+
+export const DEFAULT_CONTACT_SOURCES: TaxonomyOption[] = [
+  systemOption('manual', '#64748B', 1),
+  systemOption('whatsapp', '#22C55E', 2),
+  systemOption('web_form', '#3B82F6', 3),
+  systemOption('referral', '#8B5CF6', 4),
+  systemOption('import', '#94A3B8', 5),
+  systemOption('email_campaign', '#F59E0B', 6),
+  systemOption('social_media', '#EC4899', 7),
+  systemOption('paid_ad', '#F97316', 8),
+  systemOption('organic_search', '#06B6D4', 9),
+  systemOption('event', '#A855F7', 10),
+  systemOption('cold_call', '#0EA5E9', 11),
+  systemOption('partner', '#14B8A6', 12),
+  systemOption('chat', '#6366F1', 13),
+]
+
+export const DEFAULT_CONTACT_TAXONOMY: ContactTaxonomy = {
+  statuses: DEFAULT_CONTACT_STATUSES,
+  sources: DEFAULT_CONTACT_SOURCES,
+}

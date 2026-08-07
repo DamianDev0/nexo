@@ -1,14 +1,8 @@
 import { Test } from '@nestjs/testing'
-import { ContactsController } from '../contacts.controller'
+import { ContactsController } from '../controllers/contacts.controller'
 import { ContactsService } from '../services/contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import {
-  ContactSource,
-  ContactStatus,
-  LifecycleStage,
-  PlanName,
-  UserRole,
-} from '@repo/shared-types'
+import { LifecycleStage, PlanName, UserRole } from '@repo/shared-types'
 import type {
   TenantContext,
   AuthenticatedUser,
@@ -51,9 +45,9 @@ const mockContact: Contact = {
   department: null,
   municipioCode: null,
   country: 'Colombia',
-  status: ContactStatus.NEW,
+  status: 'new',
   lifecycleStage: LifecycleStage.LEAD,
-  source: ContactSource.MANUAL,
+  source: 'manual',
   leadScore: 0,
   dataConsent: false,
   consentDate: null,
@@ -122,10 +116,10 @@ describe('ContactsController', () => {
     it('passes query filters through to service', async () => {
       service.findAll.mockResolvedValue({ ...mockPaginated, data: [] })
 
-      await controller.findAll(mockCtx, { status: ContactStatus.QUALIFIED, q: 'john' })
+      await controller.findAll(mockCtx, { status: 'qualified', q: 'john' })
 
       expect(service.findAll).toHaveBeenCalledWith(mockCtx.schemaName, {
-        status: ContactStatus.QUALIFIED,
+        status: 'qualified',
         q: 'john',
       })
     })

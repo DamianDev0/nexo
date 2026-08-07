@@ -10,6 +10,7 @@ import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import {
   CONTACT_FORM_DEFAULTS,
+  resolveWhatsapp,
   buildContactSchema,
   type ContactFormValues,
 } from './contact-form.schema'
@@ -22,9 +23,12 @@ function toInput(values: ContactFormValues): ContactInput {
     lastName: values.lastName || undefined,
     email: values.email || undefined,
     phone: values.phone || undefined,
-    whatsapp: values.whatsapp || undefined,
+    whatsapp: resolveWhatsapp(values) || undefined,
+    address: values.address || undefined,
     city: values.city || undefined,
+    municipioCode: values.municipioCode || undefined,
     status: values.status,
+    source: values.source || undefined,
   }
 }
 
@@ -35,8 +39,12 @@ function toFormValues(contact: ContactListItem): ContactFormValues {
     email: contact.email ?? '',
     phone: contact.phone ?? '',
     whatsapp: contact.whatsapp ?? '',
+    whatsappSameAsPhone: Boolean(contact.phone) && contact.phone === contact.whatsapp,
+    address: contact.address ?? '',
     city: contact.city ?? '',
+    municipioCode: contact.municipioCode ?? '',
     status: contact.status,
+    source: contact.source ?? '',
   }
 }
 

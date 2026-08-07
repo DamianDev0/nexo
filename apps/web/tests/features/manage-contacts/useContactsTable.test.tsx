@@ -1,4 +1,3 @@
-import { ContactStatus } from '@repo/shared-types'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
 import { describe, expect, it } from 'vitest'
@@ -65,9 +64,9 @@ describe('useContactsTable', () => {
     act(() => result.current.setPage(2))
     expect(result.current.page).toBe(2)
 
-    act(() => result.current.handleStatus(ContactStatus.QUALIFIED))
+    act(() => result.current.handleStatus('qualified'))
     expect(result.current.page).toBe(1)
-    expect(result.current.status).toBe(ContactStatus.QUALIFIED)
+    expect(result.current.status).toBe('qualified')
   })
 
   it('debounces the search value before it reaches the query', async () => {

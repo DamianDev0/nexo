@@ -1,11 +1,6 @@
 import { formatDateCO } from '@repo/shared-utils'
 
-import {
-  CONTACT_STATUS_TONE,
-  contactAvatarTone,
-  contactFullName,
-  contactInitials,
-} from '@/entities/contact'
+import { contactAvatarTone, contactFullName, contactInitials } from '@/entities/contact'
 import { AvatarSquircle } from '@/shared/ui/atoms/avatar-squircle'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
@@ -18,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/shadcn/dropdown-menu'
 
+import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { TFunction } from 'i18next'
@@ -30,6 +26,7 @@ export interface ContactRowHandlers {
 export function buildContactColumns(
   t: TFunction,
   handlers: ContactRowHandlers,
+  statusByKey: ReadonlyMap<string, TaxonomyChoice>,
 ): ReadonlyArray<ColumnDef<ContactListItem, unknown>> {
   return [
     selectionColumn<ContactListItem>(),
@@ -56,11 +53,10 @@ export function buildContactColumns(
       accessorKey: 'status',
       header: t('contacts.columns.status'),
       size: 140,
-      cell: ({ row }) => (
-        <BadgeSoft tone={CONTACT_STATUS_TONE[row.original.status]}>
-          {t(`contacts.status.${row.original.status}`)}
-        </BadgeSoft>
-      ),
+      cell: ({ row }) => {
+        const choice = statusByKey.get(row.original.status)
+        return <BadgeSoft color={choice?.color}>{choice?.label ?? row.original.status}</BadgeSoft>
+      },
     },
     {
       id: 'phone',

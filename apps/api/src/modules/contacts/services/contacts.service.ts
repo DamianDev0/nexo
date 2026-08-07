@@ -87,10 +87,10 @@ export class ContactsService {
       const rows: ContactRow[] = await qr.query(
         `INSERT INTO contacts (
            first_name, last_name, email, phone, whatsapp,
-           document_type, document_number, city, department, municipio_code,
+           document_type, document_number, address, city, department, municipio_code,
            status, source, lead_score, tags, company_id, assigned_to_id,
            custom_fields, created_by
-         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
          RETURNING ${CONTACT_COLUMNS}`,
         [
           dto.firstName,
@@ -100,6 +100,7 @@ export class ContactsService {
           dto.whatsapp ?? null,
           dto.documentType ?? null,
           dto.documentNumber ?? null,
+          dto.address ?? null,
           dto.city ?? null,
           dto.department ?? null,
           dto.municipioCode ?? null,

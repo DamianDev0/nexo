@@ -3,4 +3,5 @@ export const CACHE_TAGS = {
   settingsGeneral: 'settings:general',
   settingsTheme: 'settings:theme',
   contacts: 'contacts',
+  tags: 'tags',
 } as const

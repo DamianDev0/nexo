@@ -15,12 +15,14 @@ import {
 
 import { contactsQueryString, parseListParam } from './contact-lists'
 
-import type { ContactListQuery, ContactStatus } from '@repo/shared-types'
+import type { ContactListItem, ContactListQuery } from '@repo/shared-types'
+
+const NO_ROWS: readonly ContactListItem[] = []
 
 export function useContactsTable() {
   const params = useSearchParams()
   const [search, setSearch] = useState(() => params?.get('q') ?? '')
-  const [status, setStatus] = useState<ContactStatus | null>(() =>
+  const [status, setStatus] = useState<string | null>(() =>
     parseListParam(params?.get('list') ?? null),
   )
   const [filters, setFilters] = useState<QuickFilterState>(() =>
@@ -40,7 +42,7 @@ export function useContactsTable() {
       q: debouncedSearch.trim() || undefined,
       status: status ?? undefined,
       lifecycleStage: filters.lifecycleStage[0] as ContactListQuery['lifecycleStage'],
-      source: filters.source[0] as ContactListQuery['source'],
+      source: filters.source[0],
       page,
       limit,
     }),
@@ -54,7 +56,7 @@ export function useContactsTable() {
     setPage(FIRST_PAGE)
   }, [])
 
-  const handleStatus = useCallback((value: ContactStatus | null) => {
+  const handleStatus = useCallback((value: string | null) => {
     setStatus(value)
     setPage(FIRST_PAGE)
   }, [])
@@ -77,7 +79,7 @@ export function useContactsTable() {
   const total = data?.total ?? 0
 
   return {
-    rows: data?.data ?? [],
+    rows: data?.data ?? NO_ROWS,
     total,
     totalPages: Math.max(1, Math.ceil(total / limit)),
     page,

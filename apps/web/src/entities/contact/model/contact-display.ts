@@ -1,19 +1,4 @@
-import { ContactStatus } from '@repo/shared-types'
-
 import type { ContactListItem } from '@repo/shared-types'
-
-export type StatusTone = 'neutral' | 'info' | 'warning' | 'positive' | 'negative' | 'outline'
-
-export const CONTACT_STATUS_TONE: Record<ContactStatus, StatusTone> = {
-  [ContactStatus.NEW]: 'info',
-  [ContactStatus.IN_CONTACT]: 'warning',
-  [ContactStatus.QUALIFIED]: 'positive',
-  [ContactStatus.UNQUALIFIED]: 'negative',
-  [ContactStatus.NURTURING]: 'outline',
-  [ContactStatus.CLIENT]: 'positive',
-  [ContactStatus.INACTIVE]: 'neutral',
-  [ContactStatus.LOST]: 'negative',
-}
 
 export type AvatarTone = 'lime' | 'warning' | 'info' | 'neutral'
 

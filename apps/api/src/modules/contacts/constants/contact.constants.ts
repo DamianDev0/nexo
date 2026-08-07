@@ -7,6 +7,7 @@ export const UPDATABLE_FIELDS: FieldMap<UpdateContactDto> = [
   ['email', 'email'],
   ['phone', 'phone'],
   ['whatsapp', 'whatsapp'],
+  ['address', 'address'],
   ['documentType', 'document_type'],
   ['documentNumber', 'document_number'],
   ['city', 'city'],
@@ -23,7 +24,7 @@ export const UPDATABLE_FIELDS: FieldMap<UpdateContactDto> = [
 
 export const CONTACT_COLUMNS = `
   id, first_name, last_name, email, phone, whatsapp,
-  document_type, document_number, city, department, municipio_code,
+  document_type, document_number, address, city, department, municipio_code,
   status, source, lead_score, tags, company_id, assigned_to_id,
   custom_fields, is_active, created_by, created_at, updated_at
 `
@@ -42,7 +43,7 @@ export const SORTABLE_COLUMNS: Record<string, string> = {
 
 export const CONTACT_LIST_COLUMNS = `
   id, first_name, last_name, email, phone, whatsapp,
-  document_type, document_number, city, department, municipio_code,
+  document_type, document_number, address, city, department, municipio_code,
   status, source, lead_score, tags, company_id, assigned_to_id,
   is_active, created_by, created_at, updated_at
 `

@@ -7,6 +7,7 @@ import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { getMe } from '../api/dal/auth'
 import {
+  getContactTaxonomy,
   getGeneral,
   getNavigation,
   getNomenclature,
@@ -31,6 +32,7 @@ export async function prefetchAppShell(): Promise<QueryClient> {
     prefetch(client, QUERY_KEYS.settings.general, getGeneral),
     prefetch(client, QUERY_KEYS.settings.theme, getTheme),
     prefetch(client, QUERY_KEYS.settings.navigation, getNavigation),
+    prefetch(client, QUERY_KEYS.settings.contactTaxonomy, getContactTaxonomy),
     prefetch(client, QUERY_KEYS.settings.nomenclature, getNomenclature),
   ])
 

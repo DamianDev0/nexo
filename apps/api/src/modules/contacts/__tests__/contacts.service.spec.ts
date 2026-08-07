@@ -4,7 +4,6 @@ import { Test } from '@nestjs/testing'
 import { ContactsService } from '../services/contacts.service'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { PaginatedContacts } from '@repo/shared-types'
-import { ContactStatus, ContactSource } from '@repo/shared-types'
 
 const SCHEMA = 'tenant_acme'
 
@@ -99,12 +98,12 @@ describe('ContactsService', () => {
         .mockResolvedValueOnce([{ count: '1' }])
         .mockResolvedValueOnce([makeContactRow({ status: 'qualified' })])
 
-      await service.findAll(SCHEMA, { status: ContactStatus.QUALIFIED })
+      await service.findAll(SCHEMA, { status: 'qualified' })
 
       const countQuery: string = qr.query.mock.calls[0][0] as string
       expect(countQuery).toContain('status = $')
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params).toContain(ContactStatus.QUALIFIED)
+      expect(params).toContain('qualified')
     })
 
     it('applies full-text search filter', async () => {
@@ -121,7 +120,7 @@ describe('ContactsService', () => {
     it('returns empty data when no contacts match', async () => {
       qr.query.mockResolvedValueOnce([{ count: '0' }]).mockResolvedValueOnce([])
 
-      const result = await service.findAll(SCHEMA, { status: ContactStatus.LOST })
+      const result = await service.findAll(SCHEMA, { status: 'lost' })
 
       expect(result.total).toBe(0)
       expect(result.data).toHaveLength(0)
@@ -337,10 +336,10 @@ describe('ContactsService', () => {
         .mockResolvedValueOnce([{ count: '0' }])
         .mockResolvedValueOnce([])
 
-      await service.findAll(SCHEMA, { source: ContactSource.WHATSAPP })
+      await service.findAll(SCHEMA, { source: 'whatsapp' })
 
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params).toContain(ContactSource.WHATSAPP)
+      expect(params).toContain('whatsapp')
     })
 
     it('filters by companyId', async () => {

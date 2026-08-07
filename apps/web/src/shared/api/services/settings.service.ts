@@ -1,6 +1,7 @@
 import { request } from '@/shared/api/request'
 
 import type {
+  ContactTaxonomy,
   GeneralSettings,
   OnboardingStatus,
   Pipeline,
@@ -16,6 +17,12 @@ function fileForm(file: File): FormData {
 }
 
 const settingsService = {
+  getContactTaxonomy: () =>
+    request<ContactTaxonomy>({ method: 'get', url: '/settings/contact-taxonomy' }),
+
+  updateContactTaxonomy: (data: ContactTaxonomy) =>
+    request<ContactTaxonomy>({ method: 'patch', url: '/settings/contact-taxonomy', data }),
+
   getGeneral: () => request<GeneralSettings>({ method: 'get', url: '/settings/general' }),
 
   getOnboarding: () => request<OnboardingStatus>({ method: 'get', url: '/settings/onboarding' }),

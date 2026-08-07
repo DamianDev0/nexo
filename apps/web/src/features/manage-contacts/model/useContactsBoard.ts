@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
@@ -22,6 +23,7 @@ export function useContactsBoard() {
   const { t } = useTranslation()
   const table = useContactsTable()
   const counts = useContactCounts()
+  const taxonomy = useContactTaxonomy()
   const { archive } = useArchiveContact()
   const [sheetContact, setSheetContact] = useState<ContactListItem | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -42,11 +44,15 @@ export function useContactsBoard() {
 
   const columns = useMemo(
     () =>
-      buildContactColumns(t, {
-        onEdit: openEdit,
-        onArchive: (contact) => archive([contact.id]),
-      }),
-    [t, openEdit, archive],
+      buildContactColumns(
+        t,
+        {
+          onEdit: openEdit,
+          onArchive: (contact) => archive([contact.id]),
+        },
+        taxonomy.statusByKey,
+      ),
+    [t, openEdit, archive, taxonomy.statusByKey],
   )
 
   const instance = useDataTable({
@@ -65,13 +71,13 @@ export function useContactsBoard() {
   }, [archive, selectedRows, instance])
 
   const items = useMemo(() => {
-    const built = buildSmartLists(t, counts)
+    const built = buildSmartLists(t, counts, taxonomy.statuses)
     if (!listOrder) return built
     return [...built].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
       return listOrder.indexOf(a.id) - listOrder.indexOf(b.id)
     })
-  }, [t, counts, listOrder])
+  }, [t, counts, taxonomy.statuses, listOrder])
 
   const { handleStatus } = table
   const selectList = useCallback((id: string) => handleStatus(listIdToStatus(id)), [handleStatus])
@@ -89,7 +95,7 @@ export function useContactsBoard() {
       isFiltered: table.isFiltered,
       isEmpty: !table.isPending && table.rows.length === 0,
       selectedCount: selectedRows.length,
-      quickFilters: buildQuickFilterDefs(t, table.filters),
+      quickFilters: buildQuickFilterDefs(t, table.filters, taxonomy.sources),
     },
     actions: {
       onSelectList: selectList,

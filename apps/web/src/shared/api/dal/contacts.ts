@@ -3,7 +3,7 @@ import 'server-only'
 import { CACHE_TAGS } from '../cache-tags'
 import { apiFetch } from '../client'
 
-import type { ContactListQuery, PaginatedContacts } from '@repo/shared-types'
+import type { ContactCounts, ContactListQuery, PaginatedContacts } from '@repo/shared-types'
 
 function appendParam(params: URLSearchParams, key: string, value: unknown): void {
   if (Array.isArray(value)) {
@@ -31,3 +31,6 @@ export const listContacts = (query: ContactListQuery) =>
   apiFetch<PaginatedContacts>(`/contacts${toSearchParams(query)}`, {
     tags: [CACHE_TAGS.contacts],
   })
+
+export const getContactCounts = () =>
+  apiFetch<ContactCounts>('/contacts/counts', { tags: [CACHE_TAGS.contacts] })

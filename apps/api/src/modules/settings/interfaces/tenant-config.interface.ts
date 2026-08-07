@@ -5,6 +5,7 @@ import type {
   TenantThemeTypography,
   TenantThemeBranding,
 } from './tenant-theme.interface'
+import type { ContactTaxonomy } from '@repo/shared-types'
 import type { TenantNomenclature } from './nomenclature.interface'
 import type { SidebarConfig } from './sidebar-config.interface'
 import type { CustomFieldsConfig, FieldPermissionsConfig } from './custom-field.interface'
@@ -24,5 +25,6 @@ export interface TenantFullConfig {
   customFields?: CustomFieldsConfig
   fieldPermissions?: FieldPermissionsConfig
   activityTypes?: ActivityTypeDef[]
+  contactTaxonomy?: ContactTaxonomy
   [key: string]: unknown
 }

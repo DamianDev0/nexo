@@ -19,10 +19,9 @@ import { PartialType } from '@nestjs/mapped-types'
 import { Transform, Type } from 'class-transformer'
 import {
   DocumentType,
-  ContactStatus,
-  ContactSource,
   LifecycleStage,
   CONTACT_SORT_FIELDS,
+  TAXONOMY_KEY_PATTERN,
 } from '@repo/shared-types'
 import type { ContactSortField } from '@repo/shared-types'
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@repo/shared-utils'
@@ -73,6 +72,12 @@ export class CreateContactDto {
   @Length(1, 100)
   city?: string
 
+  @ApiPropertyOptional({ description: 'Street address, canonicalized on the client' })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  address?: string
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
@@ -85,15 +90,17 @@ export class CreateContactDto {
   @Matches(/^\d{5}$/)
   municipioCode?: string
 
-  @ApiPropertyOptional({ enum: ContactStatus })
+  @ApiPropertyOptional({ description: 'Tenant taxonomy status key' })
   @IsOptional()
-  @IsEnum(ContactStatus)
-  status?: ContactStatus
+  @IsString()
+  @Matches(TAXONOMY_KEY_PATTERN)
+  status?: string
 
-  @ApiPropertyOptional({ enum: ContactSource })
+  @ApiPropertyOptional({ description: 'Tenant taxonomy source key' })
   @IsOptional()
-  @IsEnum(ContactSource)
-  source?: ContactSource
+  @IsString()
+  @Matches(TAXONOMY_KEY_PATTERN)
+  source?: string
 
   @ApiPropertyOptional({ minimum: 0, maximum: 100 })
   @IsOptional()
@@ -134,15 +141,17 @@ export class ContactQueryDto {
   @IsString()
   q?: string
 
-  @ApiPropertyOptional({ enum: ContactStatus })
+  @ApiPropertyOptional({ description: 'Tenant taxonomy status key' })
   @IsOptional()
-  @IsEnum(ContactStatus)
-  status?: ContactStatus
+  @IsString()
+  @Matches(TAXONOMY_KEY_PATTERN)
+  status?: string
 
-  @ApiPropertyOptional({ enum: ContactSource })
+  @ApiPropertyOptional({ description: 'Tenant taxonomy source key' })
   @IsOptional()
-  @IsEnum(ContactSource)
-  source?: ContactSource
+  @IsString()
+  @Matches(TAXONOMY_KEY_PATTERN)
+  source?: string
 
   @ApiPropertyOptional({ type: [String], description: 'Filter by tags (ALL must match)' })
   @IsOptional()

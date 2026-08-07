@@ -133,6 +133,10 @@ const es = {
     serverDescription: 'Revisa tu conexión o inténtalo de nuevo en unos segundos.',
     retry: 'Reintentar',
   },
+  geo: {
+    typeToSearch: 'Escribe para buscar un municipio',
+    noMatches: 'Sin municipios que coincidan',
+  },
   onboarding: {
     map: {
       deals: 'negocios',
@@ -370,6 +374,30 @@ const es = {
       inactive: 'Inactivo',
       lost: 'Perdido',
     },
+    source: {
+      manual: 'Manual',
+      whatsapp: 'WhatsApp',
+      web_form: 'Formulario web',
+      referral: 'Referido',
+      import: 'Importación',
+      email_campaign: 'Campaña de email',
+      social_media: 'Redes sociales',
+      paid_ad: 'Publicidad paga',
+      organic_search: 'Búsqueda orgánica',
+      event: 'Evento',
+      cold_call: 'Llamada en frío',
+      partner: 'Aliado',
+      chat: 'Chat',
+    },
+    lifecycleStage: {
+      subscriber: 'Suscriptor',
+      lead: 'Lead',
+      mql: 'MQL',
+      sql: 'SQL',
+      opportunity: 'Oportunidad',
+      customer: 'Cliente',
+      evangelist: 'Promotor',
+    },
     actions: {
       open: 'Abrir acciones',
       edit: 'Editar',
@@ -404,9 +432,14 @@ const es = {
       emailPlaceholder: 'valentina@empresa.com',
       phone: 'Teléfono',
       whatsapp: 'WhatsApp',
+      whatsappSameAsPhone: 'Este número también tiene WhatsApp',
+      address: 'Dirección',
+      addressPlaceholder: 'Calle 100 #7-21',
       city: 'Ciudad',
       cityPlaceholder: 'Medellín',
       status: 'Estado',
+      source: 'Origen',
+      sourcePlaceholder: '¿De dónde llegó este contacto?',
       submitCreate: 'Crear contacto',
       submitEdit: 'Guardar cambios',
     },
@@ -419,6 +452,7 @@ const es = {
     errors: {
       firstNameRequired: 'El nombre es obligatorio',
       emailInvalid: 'Ingresa un email válido',
+      phoneInvalid: 'Número inválido: 10 dígitos, celular 3XX o fijo 60X',
     },
     pagination: {
       pages: 'Paginación',
@@ -465,6 +499,30 @@ const es = {
         tags: 'Etiquetas',
       },
     },
+    taxonomy: {
+      statusDescription:
+        'Los estados describen en qué punto está cada contacto. Renómbralos, cámbiales el color, reordénalos o crea los tuyos.',
+      sourceDescription:
+        'Las fuentes registran de dónde llegan los contactos. Renómbralas, cámbiales el color, reordénalas o crea las tuyas.',
+      statusAddPlaceholder: 'Nombre del nuevo estado',
+      sourceAddPlaceholder: 'Nombre de la nueva fuente',
+      add: 'Agregar',
+      remove: 'Eliminar opción',
+      reorder: 'Arrastra para reordenar',
+      pickColor: 'Elegir color',
+      systemHint: 'Opción por defecto — puedes renombrarla o recolorearla, pero no eliminarla.',
+    },
+    tags: {
+      description:
+        'Las etiquetas son marcas libres para tus contactos. Eliminar una la quita de todos los contactos.',
+      addPlaceholder: 'Nombre de la nueva etiqueta',
+      add: 'Agregar',
+      remove: 'Eliminar etiqueta',
+      created: 'Etiqueta creada',
+      deleted: 'Etiqueta eliminada',
+      emptyTitle: 'Aún no hay etiquetas',
+      emptyDescription: 'Crea tu primera etiqueta para agrupar contactos a tu manera.',
+    },
   },
   sectors: {
     salud: 'Salud',
@@ -500,6 +558,7 @@ const es = {
     reports: 'Reportes',
     settings: 'Configuración',
     messages: 'Mensajes',
+    notifications: 'Notificaciones',
     logout: 'Cerrar sesión',
   },
   language: {

@@ -6,6 +6,7 @@ export const QUERY_KEYS = {
   },
   contacts: {
     all: ['contacts'] as const,
+    counts: ['contacts', 'counts'] as const,
     list: (query: ContactListQuery) => ['contacts', 'list', query] as const,
     detail: (id: string) => ['contacts', 'detail', id] as const,
     timeline: (id: string) => ['contacts', 'timeline', id] as const,
@@ -17,5 +18,15 @@ export const QUERY_KEYS = {
     navigation: ['settings', 'navigation'] as const,
     theme: ['settings', 'theme'] as const,
     onboarding: ['settings', 'onboarding'] as const,
+    contactTaxonomy: ['settings', 'contact-taxonomy'] as const,
+  },
+  tags: {
+    all: ['tags'] as const,
+    byEntity: (entityType: string) => ['tags', entityType] as const,
+  },
+  geo: {
+    departments: ['geo', 'departments'] as const,
+    municipalities: (q: string, department?: string) =>
+      ['geo', 'municipalities', q, department ?? null] as const,
   },
 } as const
