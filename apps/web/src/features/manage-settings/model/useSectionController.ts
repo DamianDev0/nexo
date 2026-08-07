@@ -7,7 +7,7 @@ import type { SettingsSectionKey } from './types'
 export function useSectionController(
   key: SettingsSectionKey | undefined,
 ): SettingsSectionController | null {
-  const { company, appearance, navigation, nomenclature } = useManageSettings()
+  const { company, appearance, navigation, nomenclature, contacts } = useManageSettings()
 
   switch (key) {
     case 'company':
@@ -18,6 +18,8 @@ export function useSectionController(
       return navigation
     case 'nomenclature':
       return nomenclature
+    case 'contacts':
+      return contacts
     default:
       return null
   }

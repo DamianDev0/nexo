@@ -11,6 +11,8 @@ import {
   useStepNomenclature,
 } from '@/features/setup-workspace'
 
+import { useContactTaxonomySection } from './useContactTaxonomySection'
+
 export interface SettingsSectionController {
   readonly handleSave: () => void
   readonly handleReset: () => void
@@ -23,6 +25,7 @@ interface ManageSettingsContextValue {
   readonly nomenclature: ReturnType<typeof useStepNomenclature>
   readonly navigation: ReturnType<typeof useStepNavigation>
   readonly appearance: ReturnType<typeof useStepAppearance>
+  readonly contacts: ReturnType<typeof useContactTaxonomySection>
 }
 
 const ManageSettingsContext = createContext<ManageSettingsContextValue | null>(null)
@@ -36,10 +39,11 @@ export function ManageSettingsProvider({ children }: Readonly<{ children: ReactN
   const nomenclature = useStepNomenclature(onSaved)
   const navigation = useStepNavigation(onSaved)
   const appearance = useStepAppearance(onSaved)
+  const contacts = useContactTaxonomySection(onSaved)
 
   const value = useMemo(
-    () => ({ company, nomenclature, navigation, appearance }),
-    [company, nomenclature, navigation, appearance],
+    () => ({ company, nomenclature, navigation, appearance, contacts }),
+    [company, nomenclature, navigation, appearance, contacts],
   )
 
   return <ManageSettingsContext.Provider value={value}>{children}</ManageSettingsContext.Provider>

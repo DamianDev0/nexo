@@ -1,0 +1,56 @@
+'use client'
+
+import { useState } from 'react'
+
+import { cn } from '@/shared/lib/cn'
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
+
+interface ColorSwatchPickerProps {
+  readonly color: string
+  readonly colors: ReadonlyArray<string>
+  readonly onChange: (color: string) => void
+  readonly label: string
+}
+
+export function ColorSwatchPicker({
+  color,
+  colors,
+  onChange,
+  label,
+}: Readonly<ColorSwatchPickerProps>) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={label}
+          className="flex size-7 shrink-0 items-center justify-center rounded-md border border-border transition-colors hover:bg-muted"
+        >
+          <span className="size-3.5 rounded-full" style={{ backgroundColor: color }} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-auto p-2">
+        <div className="grid grid-cols-7 gap-1.5">
+          {colors.map((swatch) => (
+            <button
+              key={swatch}
+              type="button"
+              aria-label={swatch}
+              className={cn(
+                'size-6 rounded-full transition-transform hover:scale-110',
+                swatch === color && 'ring-2 ring-ring ring-offset-2 ring-offset-popover',
+              )}
+              style={{ backgroundColor: swatch }}
+              onClick={() => {
+                onChange(swatch)
+                setOpen(false)
+              }}
+            />
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}

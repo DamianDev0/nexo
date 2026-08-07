@@ -57,7 +57,17 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
         available: true,
       },
       { key: 'pipelines', href: SETTINGS.pipelines, icon: StackIcon, available: false },
-      { key: 'contacts', href: SETTINGS.contacts.status, icon: AddressBookIcon, available: false },
+      {
+        key: 'contacts',
+        href: SETTINGS.contacts.status,
+        icon: AddressBookIcon,
+        available: true,
+        children: [
+          { key: 'status', href: SETTINGS.contacts.status },
+          { key: 'sources', href: SETTINGS.contacts.sources },
+          { key: 'tags', href: SETTINGS.contacts.tags },
+        ],
+      },
     ],
   },
 ]

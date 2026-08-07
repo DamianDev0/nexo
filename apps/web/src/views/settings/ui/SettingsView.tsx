@@ -3,6 +3,9 @@ import {
   CompanySettings,
   NavigationSettings,
   NomenclatureSettings,
+  SourcesPane,
+  StatusPane,
+  TagsPane,
   ThemePane,
   TypographyPane,
 } from '@/features/manage-settings'
@@ -14,6 +17,9 @@ const PANES = {
   brand: BrandPane,
   theme: ThemePane,
   typography: TypographyPane,
+  contactStatus: StatusPane,
+  contactSources: SourcesPane,
+  contactTags: TagsPane,
 } as const
 
 export type SettingsPaneKey = keyof typeof PANES
