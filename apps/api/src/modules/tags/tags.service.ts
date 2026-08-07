@@ -73,20 +73,28 @@ export class TagsService {
       }
 
       params.push(tagId)
-      const rows: TagRow[] = await qr.query(
+      const result: unknown = await qr.query(
         `UPDATE tags SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING *`,
         params,
       )
 
-      if (!rows[0]) throw new NotFoundException(`Tag ${tagId} not found`)
-      return this.map(rows[0])
+      const row = firstReturnedRow<TagRow>(result)
+      if (!row) throw new NotFoundException(`Tag ${tagId} not found`)
+      return this.map(row)
     })
   }
 
   async remove(schemaName: string, tagId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
-      const rows: TagRow[] = await qr.query(`DELETE FROM tags WHERE id = $1 RETURNING id`, [tagId])
-      if (rows.length === 0) throw new NotFoundException(`Tag ${tagId} not found`)
+      const result: unknown = await qr.query(`DELETE FROM tags WHERE id = $1 RETURNING name`, [
+        tagId,
+      ])
+      const row = firstReturnedRow<{ name: string }>(result)
+      if (!row) throw new NotFoundException(`Tag ${tagId} not found`)
+
+      await qr.query(`UPDATE contacts SET tags = array_remove(tags, $1) WHERE $1 = ANY(tags)`, [
+        row.name,
+      ])
     })
   }
 
@@ -99,4 +107,10 @@ export class TagsService {
       createdAt: r.created_at,
     }
   }
+}
+
+function firstReturnedRow<T>(result: unknown): T | undefined {
+  if (!Array.isArray(result)) return undefined
+  const [head] = result as unknown[]
+  return (Array.isArray(head) ? (head[0] as T | undefined) : (head as T | undefined)) ?? undefined
 }
