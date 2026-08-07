@@ -25,6 +25,7 @@ import { ActivitiesModule } from '@/modules/activities/activities.module'
 import { ProductsModule } from '@/modules/products/products.module'
 import { NotificationsModule } from '@/modules/notifications/notifications.module'
 import { DashboardModule } from '@/modules/dashboard/dashboard.module'
+import { GeoModule } from '@/modules/geo/geo.module'
 import { TagsModule } from '@/modules/tags/tags.module'
 import { MessageTemplatesModule } from '@/modules/message-templates/message-templates.module'
 import { SavedFiltersModule } from '@/modules/saved-filters/saved-filters.module'
@@ -62,6 +63,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     NotificationsModule,
     DashboardModule,
     TagsModule,
+    GeoModule,
     MessageTemplatesModule,
     SavedFiltersModule,
     TimelineModule,

@@ -11,6 +11,8 @@ const PREFETCH_RE = /QUERY_KEYS\.([\w.]+?)(?:\(|,|\s|\))/g
 
 const CACHE_MUTATORS = /invalidateQueries|removeQueries|cancelQueries|refetchQueries|setQueryData/
 
+const SEARCH_AS_YOU_TYPE_KEYS = new Set(['geo.municipalities'])
+
 function read(patterns: string[]): string {
   return globSync(patterns, { cwd: SRC, absolute: true })
     .map((file) => readFileSync(file, 'utf8'))
@@ -36,7 +38,9 @@ describe('SSR coverage', () => {
       PREFETCH_RE,
     )
 
-    const missing = [...consumed].filter((key) => !prefetched.has(key))
+    const missing = [...consumed].filter(
+      (key) => !prefetched.has(key) && !SEARCH_AS_YOU_TYPE_KEYS.has(key),
+    )
 
     expect(missing).toEqual([])
   })

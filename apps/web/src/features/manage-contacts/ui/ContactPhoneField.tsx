@@ -1,5 +1,6 @@
 'use client'
 
+import { formatCOPhone, phoneDigits } from '@repo/shared-utils'
 import Image from 'next/image'
 import { Controller } from 'react-hook-form'
 
@@ -15,9 +16,15 @@ interface ContactPhoneFieldProps {
   readonly control: Control<ContactFormValues>
   readonly name: 'phone' | 'whatsapp'
   readonly label: string
+  readonly disabled?: boolean
 }
 
-export function ContactPhoneField({ control, name, label }: Readonly<ContactPhoneFieldProps>) {
+export function ContactPhoneField({
+  control,
+  name,
+  label,
+  disabled = false,
+}: Readonly<ContactPhoneFieldProps>) {
   const isWhatsapp = name === 'whatsapp'
 
   return (
@@ -27,7 +34,10 @@ export function ContactPhoneField({ control, name, label }: Readonly<ContactPhon
       render={({ field, fieldState }) => (
         <div>
           <Label className="text-xs text-muted-foreground">{label}</Label>
-          <InputGroup className="mt-1.5 bg-surface-input">
+          <InputGroup
+            className="mt-1.5 bg-surface-input aria-disabled:opacity-60"
+            aria-disabled={disabled}
+          >
             <InputGroupAddon className="gap-2 border-r border-border/70 pr-2.5">
               <Image
                 src={isWhatsapp ? WHATSAPP_ICON_SRC : COLOMBIA_FLAG_SRC}
@@ -39,11 +49,13 @@ export function ContactPhoneField({ control, name, label }: Readonly<ContactPhon
               <span className="text-xs font-semibold text-foreground/70">{PHONE_PREFIX}</span>
             </InputGroupAddon>
             <InputGroupInput
-              className="text-sm"
+              className="text-sm tabular-nums"
               placeholder="300 123 4567"
               inputMode="tel"
-              value={field.value}
-              onChange={field.onChange}
+              autoComplete="tel-national"
+              disabled={disabled}
+              value={formatCOPhone(field.value)}
+              onChange={(event) => field.onChange(phoneDigits(event.target.value))}
               onBlur={field.onBlur}
             />
           </InputGroup>

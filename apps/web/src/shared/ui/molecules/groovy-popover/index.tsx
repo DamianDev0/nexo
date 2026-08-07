@@ -58,8 +58,9 @@ function GroovyPopoverContent({
   className,
   children,
   sideOffset = GROOVY_SIDE_OFFSET,
+  autoFocusContent = false,
   ...props
-}: Readonly<ComponentProps<typeof PopoverContent>>) {
+}: Readonly<ComponentProps<typeof PopoverContent> & { autoFocusContent?: boolean }>) {
   const { open } = useGroovyPopover()
   const transition = useReducedTransition(gooeySpring)
 
@@ -70,7 +71,7 @@ function GroovyPopoverContent({
           asChild
           forceMount
           sideOffset={sideOffset}
-          onOpenAutoFocus={(event) => event.preventDefault()}
+          onOpenAutoFocus={autoFocusContent ? undefined : (event) => event.preventDefault()}
           className={cn(GROOVY_SURFACE, className)}
           {...props}
         >

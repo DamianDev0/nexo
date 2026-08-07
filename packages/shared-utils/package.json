@@ -20,7 +20,8 @@
     "dev": "tsc --watch",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "jest",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "prebuild": "node ../../scripts/gen-brand-palette.mjs"
   },
   "dependencies": {
     "@repo/shared-types": "workspace:*"
