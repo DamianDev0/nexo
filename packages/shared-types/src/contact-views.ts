@@ -56,3 +56,56 @@ export type ContactCounts = {
   total: number
   byStatus: Record<string, number>
 }
+
+export type ContactColumnType = 'name' | 'text' | 'badge' | 'tags' | 'number' | 'date' | 'user'
+
+export type ContactColumnDef = {
+  key: string
+  labelKey: string
+  type: ContactColumnType
+  sortable: boolean
+  editable: boolean
+  defaultVisible: boolean
+  defaultWidth: number
+  minWidth: number
+}
+
+export type ContactQuickFilterOptions = {
+  statuses: string[]
+  sources: string[]
+  lifecycleStages: string[]
+}
+
+export type ContactTableState = Record<string, unknown>
+
+export type ContactWorkspace = {
+  views: ContactView[]
+  activeViewId: string | null
+  tableState: ContactTableState
+  columns: ContactColumnDef[]
+  quickFilters: ContactQuickFilterOptions
+  counts: ContactCounts
+}
+
+export type ContactWorkspaceStateInput = {
+  activeViewId?: string | null
+  tableState?: ContactTableState
+}
+
+export type ContactDuplicateSeverity = 'hard' | 'soft'
+
+export type ContactDuplicateMatch = {
+  id: string
+  firstName: string
+  lastName: string | null
+  email: string | null
+  phone: string | null
+  documentNumber: string | null
+  field: 'email' | 'documentNumber' | 'phone' | 'name'
+}
+
+export type ContactDuplicatePayload = {
+  severity: ContactDuplicateSeverity
+  field: ContactDuplicateMatch['field']
+  matches: ContactDuplicateMatch[]
+}

@@ -16,13 +16,13 @@ import type { TenantContext, AuthenticatedUser, ContactView } from '@repo/shared
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
-import { ContactViewsService } from './services/contact-views.service'
+import { ContactViewsService } from '../services/contact-views.service'
 import {
   CreateContactViewDto,
   DuplicateContactViewDto,
   ReorderContactViewsDto,
   UpdateContactViewDto,
-} from './dto/contact-view.dto'
+} from '../dto/contact-view.dto'
 
 @ApiTags('Contact Views')
 @Controller('contacts/views')

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
 import { SettingsModule } from '@/modules/settings/settings.module'
-import { ContactsController } from './contacts.controller'
+import { ContactsController } from './controllers/contacts.controller'
 import { ContactsService } from './services/contacts.service'
-import { ContactViewsController } from './contact-views.controller'
+import { ContactViewsController } from './controllers/contact-views.controller'
 import { ContactViewsService } from './services/contact-views.service'
 
 @Module({

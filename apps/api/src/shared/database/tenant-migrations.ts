@@ -381,6 +381,7 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".products USING GIN (custom_fields jsonb_path_ops);
     `,
   },
+
   {
     id: '0022_contact_views',
     up: (schema) => `
@@ -404,6 +405,19 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".contact_views(owner_id);
       CREATE INDEX IF NOT EXISTS "idx_${schema}_contact_views_visibility"
         ON "${schema}".contact_views(visibility);
+    `,
+  },
+  {
+    id: '0023_contact_workspace_states',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".contact_workspace_states (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES "${schema}".users(id) UNIQUE,
+        active_view_id UUID REFERENCES "${schema}".contact_views(id) ON DELETE SET NULL,
+        table_state JSONB NOT NULL DEFAULT '{}',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
     `,
   },
 ]

@@ -325,6 +325,15 @@ export function getTenantSchemaSQL(schema: string): string {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
 
+    CREATE TABLE "${schema}".contact_workspace_states (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES "${schema}".users(id) UNIQUE,
+      active_view_id UUID REFERENCES "${schema}".contact_views(id) ON DELETE SET NULL,
+      table_state JSONB NOT NULL DEFAULT '{}',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     CREATE TABLE "${schema}".message_templates (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(200) NOT NULL,

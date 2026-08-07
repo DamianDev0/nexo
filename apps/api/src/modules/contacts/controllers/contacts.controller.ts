@@ -24,9 +24,9 @@ import type {
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
-import { ContactsService } from './services/contacts.service'
+import { ContactsService } from '../services/contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { CreateContactDto, UpdateContactDto, ContactQueryDto } from './dto/contact.dto'
+import { CreateContactDto, UpdateContactDto, ContactQueryDto } from '../dto/contact.dto'
 
 @ApiTags('Contacts')
 @Controller('contacts')
