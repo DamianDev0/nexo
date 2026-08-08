@@ -11,6 +11,7 @@
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
+    "check:arch": "node scripts/check-api-architecture.mjs --all",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky"
   },
@@ -27,6 +28,9 @@
     "node": ">=18"
   },
   "lint-staged": {
+    "apps/api/src/modules/**/*.ts": [
+      "node scripts/check-api-architecture.mjs"
+    ],
     "**/*.{ts,tsx}": [
       "prettier --write",
       "eslint --fix --no-error-on-unmatched-pattern"
