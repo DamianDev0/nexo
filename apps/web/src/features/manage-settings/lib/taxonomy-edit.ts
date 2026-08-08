@@ -7,18 +7,28 @@ export type TaxonomyKind = keyof ContactTaxonomy
 
 const MAX_KEY_LENGTH = 40
 
-export function slugifyTaxonomyKey(label: string, taken: ReadonlySet<string>): string {
-  const base = normalizeText(label)
-    .replaceAll(/[^a-z0-9]+/g, '_')
-    .replace(/^[^a-z]+/, '')
-    .replace(/_+$/, '')
-    .slice(0, MAX_KEY_LENGTH)
+function trimEdges(value: string): string {
+  let start = 0
+  while (start < value.length && !/[a-z]/.test(value[start]!)) start += 1
+  let end = value.length
+  while (end > start && value[end - 1] === '_') end -= 1
+  return value.slice(start, end)
+}
 
-  const root = TAXONOMY_KEY_PATTERN.test(base) ? base : `option_${base}`.slice(0, MAX_KEY_LENGTH)
+export function slugifyTaxonomyKey(label: string, taken: ReadonlySet<string>): string {
+  const base = trimEdges(normalizeText(label).replaceAll(/[^a-z0-9]+/g, '_')).slice(
+    0,
+    MAX_KEY_LENGTH,
+  )
+
+  const root = TAXONOMY_KEY_PATTERN.test(base)
+    ? base
+    : trimEdges(`option_${base}`.slice(0, MAX_KEY_LENGTH))
   if (!taken.has(root)) return root
 
   for (let suffix = 2; ; suffix += 1) {
-    const candidate = `${root.slice(0, MAX_KEY_LENGTH - String(suffix).length - 1)}_${suffix}`
+    const stem = trimEdges(root.slice(0, MAX_KEY_LENGTH - String(suffix).length - 1))
+    const candidate = `${stem}_${suffix}`
     if (!taken.has(candidate)) return candidate
   }
 }
@@ -57,6 +67,28 @@ export function removeOption(
   key: string,
 ): TaxonomyOption[] {
   return reindexOptions(options.filter((option) => option.key !== key || option.isSystem))
+}
+
+function sameOption(a: TaxonomyOption, b: TaxonomyOption): boolean {
+  return (
+    a.key === b.key &&
+    a.label === b.label &&
+    a.color === b.color &&
+    a.order === b.order &&
+    a.isSystem === b.isSystem
+  )
+}
+
+function sameOptions(a: ReadonlyArray<TaxonomyOption>, b: ReadonlyArray<TaxonomyOption>): boolean {
+  return a.length === b.length && a.every((option, index) => sameOption(option, b[index]!))
+}
+
+export function sameTaxonomy(
+  a: ContactTaxonomy | null | undefined,
+  b: ContactTaxonomy | null | undefined,
+): boolean {
+  if (!a || !b) return a === b
+  return sameOptions(a.statuses, b.statuses) && sameOptions(a.sources, b.sources)
 }
 
 export function reorderOptions(

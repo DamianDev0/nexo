@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { TrashIcon } from '@/shared/ui/icons'
-import { ColorSwatchPicker } from '@/shared/ui/molecules/color-swatch-picker'
-import { Input } from '@/shared/ui/shadcn/input'
+import { EditableSwatchRow } from '@/shared/ui/molecules/editable-swatch-row'
 
 import { useEditableName } from '../../../model/useEditableName'
 
@@ -18,30 +17,24 @@ export function TagRow({ tag, actions }: Readonly<{ tag: Tag; actions: TagRowAct
   const editable = useEditableName(tag.name, (name) => actions.onUpdate({ id: tag.id, name }))
 
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-2 py-1.5">
-      <ColorSwatchPicker
-        color={tag.color}
-        colors={TAXONOMY_COLOR_PALETTE}
-        onChange={(color) => actions.onUpdate({ id: tag.id, color })}
-        label={t('settings.taxonomy.pickColor')}
-      />
-      <Input
-        className="h-8 flex-1 border-transparent bg-transparent text-sm shadow-none focus-visible:border-border"
-        value={editable.name}
-        onChange={(e) => editable.setName(e.target.value)}
-        onBlur={editable.commit}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') e.currentTarget.blur()
-        }}
-      />
-      <PillButton
-        variant="ghost"
-        size="sm"
-        aria-label={t('settings.tags.remove')}
-        onClick={() => actions.onRemove(tag)}
-      >
-        <TrashIcon className="size-3.5" />
-      </PillButton>
-    </div>
+    <EditableSwatchRow
+      swatch={{
+        color: tag.color,
+        colors: TAXONOMY_COLOR_PALETTE,
+        onChange: (color) => actions.onUpdate({ id: tag.id, color }),
+        label: t('settings.taxonomy.pickColor'),
+      }}
+      name={{ value: editable.name, onChange: editable.setName, onBlur: editable.commit }}
+      trailing={
+        <PillButton
+          variant="ghost"
+          size="sm"
+          aria-label={t('settings.tags.remove')}
+          onClick={() => actions.onRemove(tag)}
+        >
+          <TrashIcon className="size-3.5" />
+        </PillButton>
+      }
+    />
   )
 }

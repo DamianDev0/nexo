@@ -15,17 +15,18 @@ interface OptionRowProps {
 export function OptionRow({ option, checked, onToggle }: Readonly<OptionRowProps>) {
   const row = (
     <GroovyPopover.Item
-      label={option.label}
-      icon={option.icon ?? CheckIcon}
       active={checked}
       onSelect={onToggle}
-      trailing={
-        option.count === undefined ? undefined : (
-          <span className="shrink-0 rounded-md bg-background/70 px-1.5 py-0.5 text-xs tabular-nums text-muted-foreground">
-            {option.count}
-          </span>
-        )
-      }
+      content={{
+        label: option.label,
+        icon: option.icon ?? CheckIcon,
+        trailing:
+          option.count === undefined ? undefined : (
+            <span className="shrink-0 rounded-md bg-background/70 px-1.5 py-0.5 text-xs tabular-nums text-muted-foreground">
+              {option.count}
+            </span>
+          ),
+      }}
     />
   )
 

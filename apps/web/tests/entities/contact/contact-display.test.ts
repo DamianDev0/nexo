@@ -4,7 +4,7 @@ import {
   contactAvatarTone,
   contactFullName,
   contactInitials,
-} from '@/entities/contact/model/contact-display'
+} from '@/entities/contact/lib/contact-display'
 
 describe('contactFullName', () => {
   it('joins firstName and lastName', () => {

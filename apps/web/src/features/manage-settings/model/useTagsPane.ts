@@ -25,5 +25,3 @@ export function useTagsPane() {
 
   return { tags, isPending, actions, newName, setNewName, handleAdd }
 }
-
-export type TagsPaneModel = ReturnType<typeof useTagsPane>

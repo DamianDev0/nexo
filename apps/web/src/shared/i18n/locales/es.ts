@@ -440,6 +440,8 @@ const es = {
       status: 'Estado',
       source: 'Origen',
       sourcePlaceholder: '¿De dónde llegó este contacto?',
+      whatsappAlt: 'Logo de WhatsApp',
+      countryAlt: 'Bandera de Colombia',
       submitCreate: 'Crear contacto',
       submitEdit: 'Guardar cambios',
     },

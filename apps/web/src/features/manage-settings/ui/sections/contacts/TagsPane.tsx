@@ -2,12 +2,11 @@
 
 import { useTranslation } from 'react-i18next'
 
-import { PlusIcon, TagIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
+import { TagIcon } from '@/shared/ui/icons'
 
 import { useTagsPane } from '../../../model/useTagsPane'
 
+import { AddOptionInput } from './AddOptionInput'
 import { TagRow } from './TagRow'
 
 export function TagsPane() {
@@ -34,24 +33,12 @@ export function TagsPane() {
         ))}
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
-        <Input
-          className="h-9 max-w-xs text-sm"
-          value={pane.newName}
-          placeholder={t('settings.tags.addPlaceholder')}
-          onChange={(e) => pane.setNewName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              pane.handleAdd()
-            }
-          }}
-        />
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={pane.handleAdd}>
-          <PlusIcon className="size-3.5" />
-          {t('settings.tags.add')}
-        </Button>
-      </div>
+      <AddOptionInput
+        form={{ value: pane.newName, onChange: pane.setNewName, onSubmit: pane.handleAdd }}
+        placeholder={t('settings.tags.addPlaceholder')}
+        label={t('settings.tags.add')}
+        disabled={pane.isPending}
+      />
     </div>
   )
 }

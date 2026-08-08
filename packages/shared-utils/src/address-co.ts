@@ -1,3 +1,5 @@
+import { normalizeText } from './text'
+
 export interface AddressType {
   readonly canonical: string
   readonly aliases: ReadonlyArray<string>
@@ -18,21 +20,15 @@ export const CO_ADDRESS_TYPES: ReadonlyArray<AddressType> = [
   { canonical: 'Vereda', aliases: ['vereda', 'vda'] },
 ]
 
-const DIACRITICS = /[̀-ͯ]/g
-
-function fold(value: string): string {
-  return value.toLowerCase().trim().normalize('NFD').replace(DIACRITICS, '')
-}
-
 export function canonicalAddressType(input: string): string | null {
-  const needle = fold(input)
+  const needle = normalizeText(input)
   if (!needle) return null
   const exact = CO_ADDRESS_TYPES.find((type) => type.aliases.includes(needle))
   return exact?.canonical ?? null
 }
 
 export function suggestAddressTypes(term: string): ReadonlyArray<string> {
-  const needle = fold(term)
+  const needle = normalizeText(term)
   if (!needle) return CO_ADDRESS_TYPES.map((type) => type.canonical)
   return CO_ADDRESS_TYPES.filter((type) =>
     type.aliases.some((alias) => alias.startsWith(needle)),

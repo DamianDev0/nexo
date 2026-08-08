@@ -11,9 +11,9 @@ import {
   ModuleRow,
   SidebarPreview,
   SortableModule,
-  useDndReorder,
   useHighlightKey,
 } from '@/features/setup-workspace'
+import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { useManageSettings } from '../../model/settings-context'

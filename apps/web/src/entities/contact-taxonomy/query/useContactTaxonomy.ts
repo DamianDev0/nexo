@@ -52,5 +52,3 @@ export function useContactTaxonomy() {
     }
   }, [t, data, isPending])
 }
-
-export type ContactTaxonomyChoices = ReturnType<typeof useContactTaxonomy>

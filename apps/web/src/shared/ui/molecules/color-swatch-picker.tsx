@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { cn } from '@/shared/lib/cn'
+import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
 interface ColorSwatchPickerProps {
@@ -28,7 +29,7 @@ export function ColorSwatchPicker({
           aria-label={label}
           className="flex size-7 shrink-0 items-center justify-center rounded-md border border-border transition-colors hover:bg-muted"
         >
-          <span className="size-3.5 rounded-full" style={{ backgroundColor: color }} />
+          <ColorDot color={color} className="size-3.5" />
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto p-2">
@@ -38,6 +39,7 @@ export function ColorSwatchPicker({
               key={swatch}
               type="button"
               aria-label={swatch}
+              aria-pressed={swatch === color}
               className={cn(
                 'size-6 rounded-full transition-transform hover:scale-110',
                 swatch === color && 'ring-2 ring-ring ring-offset-2 ring-offset-popover',

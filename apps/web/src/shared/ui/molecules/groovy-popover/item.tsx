@@ -7,23 +7,21 @@ import { GROOVY_ITEM, GROOVY_ITEM_ACTIVE, GROOVY_ITEM_IDLE } from './constants'
 import type { AppIcon } from '@/shared/ui/icons'
 import type { ReactNode } from 'react'
 
-interface GroovyItemProps {
+interface GroovyItemContent {
   readonly label: string
   readonly icon?: AppIcon
   readonly shortcut?: ReadonlyArray<string>
-  readonly active?: boolean
   readonly trailing?: ReactNode
+}
+
+interface GroovyItemProps {
+  readonly content: GroovyItemContent
+  readonly active?: boolean
   readonly onSelect?: () => void
 }
 
-export function GroovyItem({
-  label,
-  icon: Icon,
-  shortcut,
-  active = false,
-  trailing,
-  onSelect,
-}: Readonly<GroovyItemProps>) {
+export function GroovyItem({ content, active = false, onSelect }: Readonly<GroovyItemProps>) {
+  const { label, icon: Icon, shortcut, trailing } = content
   return (
     <button
       type="button"

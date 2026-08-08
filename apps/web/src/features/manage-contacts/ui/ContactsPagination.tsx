@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { PAGE_SIZE_OPTIONS } from '@/shared/config/pagination'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
 interface ContactsPaginationProps {
@@ -10,7 +11,11 @@ interface ContactsPaginationProps {
   readonly onLimitChange: (limit: number) => void
 }
 
-export function ContactsPagination({ nav, onPageChange, onLimitChange }: ContactsPaginationProps) {
+export function ContactsPagination({
+  nav,
+  onPageChange,
+  onLimitChange,
+}: Readonly<ContactsPaginationProps>) {
   const { t } = useTranslation()
 
   return (
@@ -29,7 +34,7 @@ export function ContactsPagination({ nav, onPageChange, onLimitChange }: Contact
         <DataTable.Pagination.Divider />
         <DataTable.Pagination.PageSize
           value={nav.limit}
-          options={[10, 25, 50]}
+          options={PAGE_SIZE_OPTIONS}
           onChange={onLimitChange}
           label={t('contacts.pagination.perPage')}
         />

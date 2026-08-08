@@ -26,7 +26,7 @@ interface ContactFormSheetProps {
 
 export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<ContactFormSheetProps>) {
   const { t } = useTranslation()
-  const { form, isEdit, isPending, handleSubmit } = useContactForm(contact, () =>
+  const { form, taxonomy, isEdit, isPending, handleSubmit } = useContactForm(contact, () =>
     onOpenChange(false),
   )
 
@@ -48,7 +48,7 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
             void handleSubmit(event)
           }}
         >
-          <ContactFormFields control={form.control} setValue={form.setValue} />
+          <ContactFormFields control={form.control} setValue={form.setValue} taxonomy={taxonomy} />
           <SheetFooter className="-mx-6 mt-auto flex-row justify-end gap-2 border-t border-border px-6 py-3">
             <PillButton variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}

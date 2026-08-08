@@ -1,7 +1,9 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback, useState } from 'react'
+import { t } from 'i18next'
+import { useCallback, useMemo, useState } from 'react'
+import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
@@ -11,6 +13,7 @@ import {
   patchOption,
   removeOption,
   reorderOptions,
+  sameTaxonomy,
   type TaxonomyKind,
 } from '../lib/taxonomy-edit'
 
@@ -20,7 +23,7 @@ export function useContactTaxonomySection(onSaved: () => void) {
   const queryClient = useQueryClient()
   const [draft, setDraft] = useState<ContactTaxonomy | null>(null)
 
-  const { data } = useQuery({
+  const { data, isPending: isLoading } = useQuery({
     queryKey: QUERY_KEYS.settings.contactTaxonomy,
     queryFn: settingsService.getContactTaxonomy,
   })
@@ -33,6 +36,9 @@ export function useContactTaxonomySection(onSaved: () => void) {
       queryClient.setQueryData(QUERY_KEYS.settings.contactTaxonomy, saved)
       setDraft(null)
       onSaved()
+    },
+    onError: (error: { message?: string }) => {
+      sileo.error({ title: t('common.saveFailed'), description: error.message })
     },
   })
 
@@ -70,20 +76,23 @@ export function useContactTaxonomySection(onSaved: () => void) {
   )
 
   const handleSave = useCallback(() => {
-    if (draft) mutation.mutate(draft)
+    if (draft && !mutation.isPending) mutation.mutate(draft)
   }, [draft, mutation])
 
   const handleReset = useCallback(() => setDraft(null), [])
 
+  const isDirty = useMemo(() => draft !== null && !sameTaxonomy(draft, data), [draft, data])
+
   return {
     taxonomy,
+    isLoading,
     handleAdd,
     handlePatch,
     handleRemove,
     handleReorder,
     handleSave,
     handleReset,
-    isDirty: draft !== null && JSON.stringify(draft) !== JSON.stringify(data),
+    isDirty,
     isPending: mutation.isPending,
   }
 }

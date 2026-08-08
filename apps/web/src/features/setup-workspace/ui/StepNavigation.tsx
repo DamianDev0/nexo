@@ -6,10 +6,10 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { groupModules } from '../lib/navigation'
-import { useDndReorder } from '../model/useDndReorder'
 import { useHighlightKey } from '../model/useHighlightKey'
 
 import { ModuleRow } from './navigation/ModuleRow'

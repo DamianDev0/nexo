@@ -6,12 +6,11 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
 import { PlusIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
-
-import { useDndReorder } from '../model/useDndReorder'
 
 import { SortableStage } from './pipeline/SortableStage'
 import { StageRow, type Stage } from './pipeline/StageRow'

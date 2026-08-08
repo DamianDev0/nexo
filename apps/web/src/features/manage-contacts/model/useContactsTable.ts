@@ -6,16 +6,16 @@ import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from '@/shared/config/pagination'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
 
 import { EMPTY_QUICK_FILTERS, type QuickFilterState } from '../config/quick-filters.constants'
+import { contactsQueryString, parseListParam } from '../lib/contact-lists'
 import {
   clearQuickFilters,
   hasQuickFilters,
   parseQuickFilters,
   toggleQuickFilter,
 } from '../lib/quick-filters'
+import { contactListQuery } from '../query/contacts-query'
 
-import { contactsQueryString, parseListParam } from './contact-lists'
-
-import type { ContactListItem, ContactListQuery } from '@repo/shared-types'
+import type { ContactListItem } from '@repo/shared-types'
 
 const NO_ROWS: readonly ContactListItem[] = []
 
@@ -38,14 +38,7 @@ export function useContactsTable() {
   }, [status, debouncedSearch, filters])
 
   const query = useMemo(
-    () => ({
-      q: debouncedSearch.trim() || undefined,
-      status: status ?? undefined,
-      lifecycleStage: filters.lifecycleStage[0] as ContactListQuery['lifecycleStage'],
-      source: filters.source[0],
-      page,
-      limit,
-    }),
+    () => contactListQuery(debouncedSearch, status, filters, { page, limit }),
     [debouncedSearch, status, filters, page, limit],
   )
 

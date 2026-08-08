@@ -379,7 +379,7 @@ function systemOption(key: string, color: string, order: number): TaxonomyOption
   return { key, label: null, color, order, isSystem: true }
 }
 
-export const DEFAULT_CONTACT_STATUSES: TaxonomyOption[] = [
+const DEFAULT_CONTACT_STATUSES: TaxonomyOption[] = [
   systemOption('new', '#3B82F6', 1),
   systemOption('in_contact', '#8B5CF6', 2),
   systemOption('qualified', '#06B6D4', 3),
@@ -390,7 +390,7 @@ export const DEFAULT_CONTACT_STATUSES: TaxonomyOption[] = [
   systemOption('lost', '#EF4444', 8),
 ]
 
-export const DEFAULT_CONTACT_SOURCES: TaxonomyOption[] = [
+const DEFAULT_CONTACT_SOURCES: TaxonomyOption[] = [
   systemOption('manual', '#64748B', 1),
   systemOption('whatsapp', '#22C55E', 2),
   systemOption('web_form', '#3B82F6', 3),

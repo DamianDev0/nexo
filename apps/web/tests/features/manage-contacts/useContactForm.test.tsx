@@ -1,0 +1,112 @@
+import { DocumentType, LifecycleStage } from '@repo/shared-types'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { HttpResponse, http } from 'msw'
+import { describe, expect, it, vi } from 'vitest'
+
+import { API, createMswServer } from '../../msw/test-server'
+import { queryWrapper as wrapper } from '../../query-wrapper'
+
+import type { ContactListItem, ContactTaxonomy } from '@repo/shared-types'
+
+import { useContactForm } from '@/features/manage-contacts/model/useContactForm'
+
+const EXISTING_CONTACT: ContactListItem = {
+  id: 'contact-1',
+  firstName: 'Maria',
+  lastName: 'Lopez',
+  email: 'maria@nexo.test',
+  phone: '3001234567',
+  whatsapp: '3001234567',
+  documentType: DocumentType.CC,
+  documentNumber: '123456789',
+  jobTitle: null,
+  linkedinUrl: null,
+  birthday: null,
+  address: 'Calle 100 #7-21',
+  city: 'Bogota',
+  department: null,
+  municipioCode: '11001',
+  country: 'CO',
+  status: 'qualified',
+  lifecycleStage: LifecycleStage.LEAD,
+  source: 'manual',
+  leadScore: 0,
+  dataConsent: true,
+  consentDate: null,
+  consentSource: null,
+  optOutEmail: false,
+  optOutSms: false,
+  optOutWhatsapp: false,
+  lastContactedAt: null,
+  tags: [],
+  companyId: null,
+  assignedToId: null,
+  isActive: true,
+  createdById: null,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+}
+
+const EMPTY_TAXONOMY: ContactTaxonomy = { statuses: [], sources: [] }
+
+const server = createMswServer()
+
+function taxonomyHandler() {
+  return http.get(`${API}/settings/contact-taxonomy`, () =>
+    HttpResponse.json({ data: EMPTY_TAXONOMY }),
+  )
+}
+
+describe('useContactForm', () => {
+  it('populates the form with the contact values in edit mode', async () => {
+    server.use(taxonomyHandler())
+
+    const { result } = renderHook(() => useContactForm(EXISTING_CONTACT, vi.fn()), { wrapper })
+
+    await waitFor(() => expect(result.current.form.getValues('firstName')).toBe('Maria'))
+    expect(result.current.form.getValues('status')).toBe('qualified')
+    expect(result.current.form.getValues('source')).toBe('manual')
+    expect(result.current.form.getValues('address')).toBe('Calle 100 #7-21')
+    expect(result.current.form.getValues('whatsappSameAsPhone')).toBe(true)
+    expect(result.current.isEdit).toBe(true)
+  })
+
+  it('derives whatsappSameAsPhone as false when the numbers differ', async () => {
+    server.use(taxonomyHandler())
+    const contact = { ...EXISTING_CONTACT, whatsapp: '3009999999' }
+
+    const { result } = renderHook(() => useContactForm(contact, vi.fn()), { wrapper })
+
+    await waitFor(() => expect(result.current.form.getValues('firstName')).toBe('Maria'))
+    expect(result.current.form.getValues('whatsappSameAsPhone')).toBe(false)
+  })
+
+  it('posts a ContactInput with source undefined when the form value is empty', async () => {
+    server.use(taxonomyHandler())
+    let receivedBody: Record<string, unknown> | null = null
+    server.use(
+      http.post(`${API}/contacts`, async ({ request }) => {
+        receivedBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json({ data: EXISTING_CONTACT })
+      }),
+    )
+
+    const onDone = vi.fn()
+    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
+
+    await waitFor(() => expect(result.current.taxonomy.statuses).toBeDefined())
+
+    act(() => {
+      result.current.form.setValue('firstName', 'Carlos')
+      result.current.form.setValue('source', '')
+    })
+
+    await act(async () => {
+      await result.current.handleSubmit()
+    })
+
+    await waitFor(() => expect(onDone).toHaveBeenCalled())
+    expect(receivedBody).toMatchObject({ firstName: 'Carlos' })
+    expect(receivedBody).not.toHaveProperty('source')
+  })
+})

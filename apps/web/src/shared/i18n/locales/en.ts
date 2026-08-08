@@ -437,6 +437,8 @@ const en = {
       status: 'Status',
       source: 'Source',
       sourcePlaceholder: 'Where did this contact come from?',
+      whatsappAlt: 'WhatsApp logo',
+      countryAlt: 'Colombia flag',
       submitCreate: 'Create contact',
       submitEdit: 'Save changes',
     },

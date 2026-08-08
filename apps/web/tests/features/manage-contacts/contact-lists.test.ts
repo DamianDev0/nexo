@@ -7,7 +7,7 @@ import {
   buildSmartLists,
   listIdToStatus,
   statusToListId,
-} from '@/features/manage-contacts/model/contact-lists'
+} from '@/features/manage-contacts/lib/contact-lists'
 
 const t = ((key: string, opts?: { defaultValue?: string }) =>
   opts?.defaultValue ?? key) as TFunction

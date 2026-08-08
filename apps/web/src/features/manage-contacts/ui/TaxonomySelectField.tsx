@@ -2,6 +2,7 @@
 
 import { Controller } from 'react-hook-form'
 
+import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { Label } from '@/shared/ui/shadcn/label'
 import {
   Select,
@@ -45,11 +46,7 @@ export function TaxonomySelectField({
               {choices.map((choice) => (
                 <SelectItem key={choice.key} value={choice.key}>
                   <span className="flex items-center gap-2">
-                    <span
-                      aria-hidden
-                      className="size-2 shrink-0 rounded-full"
-                      style={{ backgroundColor: choice.color }}
-                    />
+                    <ColorDot color={choice.color} />
                     {choice.label}
                   </span>
                 </SelectItem>

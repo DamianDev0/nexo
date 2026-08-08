@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react'
 
-import { useDndReorder } from '@/features/setup-workspace'
+import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
 
 import { useManageSettings } from './settings-context'
 
@@ -24,7 +24,7 @@ export function useTaxonomyPane(kind: TaxonomyKind) {
 
   const handleAdd = useCallback(() => {
     const label = newLabel.trim()
-    if (!label) return
+    if (!label || contacts.isLoading) return
     contacts.handleAdd(kind, label)
     setNewLabel('')
   }, [contacts, kind, newLabel])
@@ -32,6 +32,7 @@ export function useTaxonomyPane(kind: TaxonomyKind) {
   return {
     namespace: kind === 'statuses' ? ('status' as const) : ('source' as const),
     options: contacts.taxonomy?.[kind] ?? [],
+    isLoading: contacts.isLoading,
     dnd,
     actions,
     newLabel,
@@ -39,5 +40,3 @@ export function useTaxonomyPane(kind: TaxonomyKind) {
     handleAdd,
   }
 }
-
-export type TaxonomyPaneModel = ReturnType<typeof useTaxonomyPane>

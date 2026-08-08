@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { sileo } from 'sileo'
 
+import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import contactsService from '@/shared/api/services/contacts.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
@@ -51,6 +52,7 @@ function toFormValues(contact: ContactListItem): ContactFormValues {
 export function useContactForm(contact: ContactListItem | null, onDone: () => void) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const { statuses, sources } = useContactTaxonomy()
   const schema = useMemo(() => buildContactSchema(t), [t])
 
   const form = useForm<ContactFormValues>({
@@ -80,6 +82,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
 
   return {
     form,
+    taxonomy: { statuses, sources },
     isEdit: Boolean(contact),
     isPending: mutation.isPending,
     handleSubmit: form.handleSubmit((values) => mutation.mutate(values)),

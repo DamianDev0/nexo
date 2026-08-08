@@ -22,7 +22,7 @@ const PANES = {
   contactTags: TagsPane,
 } as const
 
-export type SettingsPaneKey = keyof typeof PANES
+type SettingsPaneKey = keyof typeof PANES
 
 export function SettingsView({ pane }: Readonly<{ pane: SettingsPaneKey }>) {
   const Pane = PANES[pane]

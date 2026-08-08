@@ -1,0 +1,1 @@
+export const MAX_ADDRESS_SUGGESTIONS = 5

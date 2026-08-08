@@ -3,7 +3,6 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { AddressField, MunicipalityCombobox } from '@/entities/geo'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { Label } from '@/shared/ui/shadcn/label'
@@ -12,16 +11,25 @@ import { ContactPhoneFields } from './ContactPhoneFields'
 import { TaxonomySelectField } from './TaxonomySelectField'
 
 import type { ContactFormValues } from '../model/contact-form.schema'
+import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 
 interface ContactFormFieldsProps {
   readonly control: Control<ContactFormValues>
   readonly setValue: UseFormSetValue<ContactFormValues>
+  readonly taxonomy: {
+    readonly statuses: ReadonlyArray<TaxonomyChoice>
+    readonly sources: ReadonlyArray<TaxonomyChoice>
+  }
 }
 
-export function ContactFormFields({ control, setValue }: Readonly<ContactFormFieldsProps>) {
+export function ContactFormFields({
+  control,
+  setValue,
+  taxonomy,
+}: Readonly<ContactFormFieldsProps>) {
   const { t } = useTranslation()
-  const { statuses, sources } = useContactTaxonomy()
+  const { statuses, sources } = taxonomy
 
   return (
     <div className="flex flex-col gap-3.5">

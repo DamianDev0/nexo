@@ -1,13 +1,13 @@
 'use client'
 
-import { suggestAddressTypes, normalizeCOAddress } from '@repo/shared-utils'
+import { normalizeCOAddress } from '@repo/shared-utils'
 import { useMemo, useState } from 'react'
 
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 
-const MAX_SUGGESTIONS = 5
+import { buildAddressSuggestions } from '../lib/address-suggestions'
 
 interface AddressFieldProps {
   readonly value: string
@@ -15,18 +15,10 @@ interface AddressFieldProps {
   readonly placeholder?: string
 }
 
-function firstToken(value: string): string {
-  return value.trimStart().split(' ')[0] ?? ''
-}
-
 export function AddressField({ value, onChange, placeholder }: Readonly<AddressFieldProps>) {
   const [focused, setFocused] = useState(false)
 
-  const suggestions = useMemo(() => {
-    const token = firstToken(value)
-    if (!token || value.trimStart().includes(' ')) return []
-    return suggestAddressTypes(token).slice(0, MAX_SUGGESTIONS)
-  }, [value])
+  const suggestions = useMemo(() => buildAddressSuggestions(value), [value])
 
   const showSuggestions = focused && suggestions.length > 0
 

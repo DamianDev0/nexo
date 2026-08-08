@@ -40,18 +40,6 @@ export type ContactView = {
   updatedAt: string
 }
 
-export type ContactViewInput = {
-  name: string
-  filters?: Record<string, unknown>
-  advancedFilters?: Record<string, unknown> | null
-  columns?: ContactViewColumns
-  sort?: ContactViewSort | null
-  density?: ContactViewDensity
-  isDefault?: boolean
-  isFavorite?: boolean
-  visibility?: ContactViewVisibility
-}
-
 export type ContactCounts = {
   total: number
   byStatus: Record<string, number>
@@ -85,11 +73,6 @@ export type ContactWorkspace = {
   columns: ContactColumnDef[]
   quickFilters: ContactQuickFilterOptions
   counts: ContactCounts
-}
-
-export type ContactWorkspaceStateInput = {
-  activeViewId?: string | null
-  tableState?: ContactTableState
 }
 
 export type ContactDuplicateSeverity = 'hard' | 'soft'

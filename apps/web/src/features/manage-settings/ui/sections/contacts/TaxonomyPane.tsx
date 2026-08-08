@@ -5,16 +5,17 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useTranslation } from 'react-i18next'
 
-import { PlusIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
+import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { useTaxonomyPane } from '../../../model/useTaxonomyPane'
 
+import { AddOptionInput } from './AddOptionInput'
 import { TaxonomyOptionRow } from './TaxonomyOptionRow'
 
 import type { TaxonomyKind } from '../../../lib/taxonomy-edit'
+
+const SKELETON_ROWS = 5
 
 export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
   const { t } = useTranslation()
@@ -26,53 +27,49 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
         {t(`settings.taxonomy.${pane.namespace}Description`)}
       </p>
 
-      <TooltipProvider delayDuration={400}>
-        <DndContext
-          sensors={pane.dnd.sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
-          onDragStart={pane.dnd.handleDragStart}
-          onDragEnd={pane.dnd.handleDragEnd}
-          onDragCancel={pane.dnd.handleDragCancel}
-        >
-          <SortableContext
-            items={pane.options.map((option) => option.key)}
-            strategy={verticalListSortingStrategy}
+      {pane.isLoading ? (
+        <div className="flex flex-col gap-1.5">
+          {Array.from({ length: SKELETON_ROWS }, (_, index) => `row-${index}`).map((key) => (
+            <Skeleton key={key} className="h-11 w-full rounded-lg" />
+          ))}
+        </div>
+      ) : (
+        <TooltipProvider delayDuration={400}>
+          <DndContext
+            sensors={pane.dnd.sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragStart={pane.dnd.handleDragStart}
+            onDragEnd={pane.dnd.handleDragEnd}
+            onDragCancel={pane.dnd.handleDragCancel}
           >
-            <div className="flex flex-col gap-1.5">
-              {pane.options.map((option) => (
-                <TaxonomyOptionRow
-                  key={option.key}
-                  option={option}
-                  fallbackLabel={t(`contacts.${pane.namespace}.${option.key}`, {
-                    defaultValue: option.key,
-                  })}
-                  actions={pane.actions}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      </TooltipProvider>
+            <SortableContext
+              items={pane.options.map((option) => option.key)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="flex flex-col gap-1.5">
+                {pane.options.map((option) => (
+                  <TaxonomyOptionRow
+                    key={option.key}
+                    option={option}
+                    fallbackLabel={t(`contacts.${pane.namespace}.${option.key}`, {
+                      defaultValue: option.key,
+                    })}
+                    actions={pane.actions}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </TooltipProvider>
+      )}
 
-      <div className="mt-4 flex items-center gap-2">
-        <Input
-          className="h-9 max-w-xs text-sm"
-          value={pane.newLabel}
-          placeholder={t(`settings.taxonomy.${pane.namespace}AddPlaceholder`)}
-          onChange={(e) => pane.setNewLabel(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              pane.handleAdd()
-            }
-          }}
-        />
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={pane.handleAdd}>
-          <PlusIcon className="size-3.5" />
-          {t('settings.taxonomy.add')}
-        </Button>
-      </div>
+      <AddOptionInput
+        form={{ value: pane.newLabel, onChange: pane.setNewLabel, onSubmit: pane.handleAdd }}
+        placeholder={t(`settings.taxonomy.${pane.namespace}AddPlaceholder`)}
+        label={t('settings.taxonomy.add')}
+        disabled={pane.isLoading}
+      />
     </div>
   )
 }

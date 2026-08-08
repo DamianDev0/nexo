@@ -7,12 +7,12 @@ import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
+import { buildContactColumns } from '../lib/contact-columns'
+import { buildSmartLists, listIdToStatus, statusToListId } from '../lib/contact-lists'
 import { buildQuickFilterDefs } from '../lib/quick-filters'
 import { useArchiveContact } from '../query/useArchiveContact'
 import { useContactCounts } from '../query/useContactCounts'
 
-import { buildContactColumns } from './contact-columns'
-import { buildSmartLists, listIdToStatus, statusToListId } from './contact-lists'
 import { useContactsTable } from './useContactsTable'
 
 import type { ContactListItem } from '@repo/shared-types'

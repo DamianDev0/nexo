@@ -18,7 +18,7 @@ import type { ContactListItem } from '@repo/shared-types'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { TFunction } from 'i18next'
 
-export interface ContactRowHandlers {
+interface ContactRowHandlers {
   onEdit: (contact: ContactListItem) => void
   onArchive: (contact: ContactListItem) => void
 }

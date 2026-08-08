@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { contactsQueryString, parseListParam } from '@/features/manage-contacts/model/contact-lists'
+import { contactsQueryString, parseListParam } from '@/features/manage-contacts/lib/contact-lists'
 
 describe('parseListParam', () => {
   it('maps any well-formed taxonomy key', () => {

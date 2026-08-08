@@ -40,25 +40,25 @@ interface BadgeSoftProps extends VariantProps<typeof badgeSoftVariants> {
 }
 
 export function BadgeSoft({ tone, color, children, className }: Readonly<BadgeSoftProps>) {
-  if (color) {
-    return (
-      <span
-        data-slot="badge-soft"
-        className={cn(badgeSoftVariants({ tone: 'neutral' }), className)}
-        style={{
-          backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)`,
-          color: `color-mix(in srgb, ${color} 62%, var(--foreground))`,
-        }}
-      >
-        <span className={dotVariants({ tone: 'neutral' })} style={{ backgroundColor: color }} />
-        {children}
-      </span>
-    )
-  }
+  const resolvedTone = color ? 'neutral' : tone
 
   return (
-    <span data-slot="badge-soft" className={cn(badgeSoftVariants({ tone }), className)}>
-      <span className={dotVariants({ tone })} />
+    <span
+      data-slot="badge-soft"
+      className={cn(badgeSoftVariants({ tone: resolvedTone }), className)}
+      style={
+        color
+          ? {
+              backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)`,
+              color: `color-mix(in srgb, ${color} 62%, var(--foreground))`,
+            }
+          : undefined
+      }
+    >
+      <span
+        className={dotVariants({ tone: resolvedTone })}
+        style={color ? { backgroundColor: color } : undefined}
+      />
       {children}
     </span>
   )
