@@ -1,4 +1,5 @@
 # Backend Standards — NexoCRM (NestJS)
+
 # BMad Implementation Guide | Dev Agent: Amelia
 
 > Versión: 1.0 | Marzo 2026
@@ -192,6 +193,8 @@ REPOSITORY
 
 ### 2.2 Estructura de un módulo (plantilla)
 
+> Enforcement automático (ADR-0005): `scripts/check-api-architecture.mjs` corre en pre-commit (husky + lint-staged) y bloquea SQL fuera de `repositories/|queries/|constants/|entities/|migrations/`, mappers impuros, repositories que importan DTOs, controllers que importan repositories y nuevos imports cross-module. Full scan: `pnpm check:arch`. Legacy grandfathered en `scripts/api-architecture-baseline.json` (solo debe encoger).
+
 ```typescript
 // modules/contacts/contacts.module.ts
 
@@ -208,12 +211,7 @@ import { SharedModule } from '@/shared/shared.module'
     SharedModule, // Importar siempre SharedModule para TenantDb, Cache, EventBus
   ],
   controllers: [ContactsController],
-  providers: [
-    ContactsService,
-    ContactsQueryService,
-    ContactsSearchService,
-    ContactsRepository,
-  ],
+  providers: [ContactsService, ContactsQueryService, ContactsSearchService, ContactsRepository],
   exports: [ContactsService], // Exportar solo lo que otros módulos necesitan
 })
 export class ContactsModule {}
@@ -226,17 +224,7 @@ export class ContactsModule {}
 ```typescript
 // modules/contacts/controllers/contacts.controller.ts
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard'
@@ -461,10 +449,11 @@ export class ContactsRepository {
     )
   }
 
-  async create(schemaName: string, data: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>): Promise<Contact> {
-    return this.tenantDb.query(schemaName, (db) =>
-      db.contact.create({ data }),
-    )
+  async create(
+    schemaName: string,
+    data: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Contact> {
+    return this.tenantDb.query(schemaName, (db) => db.contact.create({ data }))
   }
 
   async update(schemaName: string, id: string, data: Partial<Contact>): Promise<Contact> {
@@ -557,7 +546,7 @@ export class CreateContactDto {
   @Length(5, 20)
   documentNumber?: string
 
-  @ApiPropertyOptional({ example: '05001' })  // Código DANE de Medellín
+  @ApiPropertyOptional({ example: '05001' }) // Código DANE de Medellín
   @IsOptional()
   @IsString()
   @Length(5, 5)
@@ -770,7 +759,8 @@ import { BadRequestException, Injectable, type PipeTransform } from '@nestjs/com
 @Injectable()
 export class ParseCOPCentsPipe implements PipeTransform<string | number, number> {
   transform(value: string | number): number {
-    const num = typeof value === 'string' ? Number.parseInt(value.replace(/[^0-9]/g, ''), 10) : value
+    const num =
+      typeof value === 'string' ? Number.parseInt(value.replace(/[^0-9]/g, ''), 10) : value
 
     if (Number.isNaN(num) || num < 0) {
       throw new BadRequestException('El monto debe ser un número positivo en centavos COP')
@@ -827,17 +817,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       error:
         typeof exceptionResponse === 'object' && 'error' in exceptionResponse
           ? String((exceptionResponse as { error: string }).error)
-          : HttpStatus[status] ?? 'Error',
+          : (HttpStatus[status] ?? 'Error'),
       timestamp: new Date().toISOString(),
       path: request.url,
     }
 
     // No loguear 4xx como errores — son comportamiento esperado
     if (status >= 500) {
-      this.logger.error(
-        `${request.method} ${request.url} → ${status}`,
-        exception.stack,
-      )
+      this.logger.error(`${request.method} ${request.url} → ${status}`, exception.stack)
     }
 
     response.status(status).json(errorResponse)
@@ -855,9 +842,9 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse<Response>()
 
     const statusMap: Record<string, number> = {
-      P2002: HttpStatus.CONFLICT,          // Unique constraint violation
-      P2025: HttpStatus.NOT_FOUND,         // Record not found
-      P2003: HttpStatus.BAD_REQUEST,       // Foreign key constraint
+      P2002: HttpStatus.CONFLICT, // Unique constraint violation
+      P2025: HttpStatus.NOT_FOUND, // Record not found
+      P2003: HttpStatus.BAD_REQUEST, // Foreign key constraint
     }
 
     const messageMap: Record<string, string> = {
@@ -904,12 +891,8 @@ export interface ResponseEnvelope<T> {
 }
 
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, ResponseEnvelope<T>> {
-  intercept(
-    _context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<ResponseEnvelope<T>> {
+export class TransformInterceptor<T> implements NestInterceptor<T, ResponseEnvelope<T>> {
+  intercept(_context: ExecutionContext, next: CallHandler): Observable<ResponseEnvelope<T>> {
     return next.handle().pipe(
       map((data) => ({
         data,
@@ -978,9 +961,9 @@ async function bootstrap() {
   // Validación global de DTOs
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,        // Elimina propiedades no en el DTO
+      whitelist: true, // Elimina propiedades no en el DTO
       forbidNonWhitelisted: true, // Error si vienen propiedades extra
-      transform: true,        // Transforma tipos automáticamente
+      transform: true, // Transforma tipos automáticamente
       transformOptions: { enableImplicitConversion: true },
     }),
   )
@@ -1043,4 +1026,4 @@ ANTES DE ABRIR UN PR
 
 ---
 
-*Backend Standards — BMad Enterprise Track | NexoCRM v1.0*
+_Backend Standards — BMad Enterprise Track | NexoCRM v1.0_

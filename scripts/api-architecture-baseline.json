@@ -1,36 +1,7 @@
 {
-  "apps/api/src/modules/activities/activities.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/api-keys/api-keys.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/audit-log/audit-log.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/bulk-actions/bulk-actions.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/companies/companies.controller.ts": ["cross-module-import"],
   "apps/api/src/modules/companies/companies.module.ts": ["cross-module-import"],
-  "apps/api/src/modules/companies/companies.service.ts": ["sql-outside-repository"],
   "apps/api/src/modules/contacts/contacts.module.ts": ["cross-module-import"],
-  "apps/api/src/modules/dashboard/dashboard-config.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/dashboard/dashboard.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/deals/deals.controller.ts": ["cross-module-import"],
   "apps/api/src/modules/deals/deals.module.ts": ["cross-module-import"],
-  "apps/api/src/modules/deals/deals.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/message-templates/message-templates.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/notifications/notifications.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/products/products.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/saved-filters/saved-filters.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/tags/tags.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/timeline/timeline.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/webhooks/webhooks.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/audit-log/controllers/audit-log.controller.ts": [
-    "controller-imports-repository"
-  ],
-  "apps/api/src/modules/contacts/controllers/contacts.controller.ts": ["cross-module-import"],
-  "apps/api/src/modules/contacts/services/contact-duplicates.service.ts": [
-    "sql-outside-repository"
-  ],
-  "apps/api/src/modules/contacts/services/contact-views.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/contacts/services/contact-workspace.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/contacts/services/contacts.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/geo/services/geo-seed.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/geo/services/geo.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/settings/services/pipeline-settings.service.ts": ["sql-outside-repository"],
-  "apps/api/src/modules/tenants/services/user-tenant-map.service.ts": ["sql-outside-repository"]
+  "apps/api/src/modules/companies/controllers/companies.controller.ts": ["cross-module-import"],
+  "apps/api/src/modules/contacts/controllers/contacts.controller.ts": ["cross-module-import"]
 }
