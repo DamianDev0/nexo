@@ -31,6 +31,15 @@
     "apps/api/src/modules/**/*.ts": [
       "node scripts/check-api-architecture.mjs"
     ],
+    "apps/web/src/**/*.{ts,tsx}": [
+      "node apps/web/scripts/check-ui-purity.mjs",
+      "node apps/web/scripts/check-props-count.mjs",
+      "node apps/web/scripts/check-cross-slice-imports.mjs",
+      "node apps/web/scripts/check-shared-duplication.mjs",
+      "node apps/web/scripts/check-html-primitives.mjs",
+      "node apps/web/scripts/check-colors.mjs",
+      "node apps/web/scripts/check-file-size.mjs"
+    ],
     "**/*.{ts,tsx}": [
       "prettier --write",
       "eslint --fix --no-error-on-unmatched-pattern"

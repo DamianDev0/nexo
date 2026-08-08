@@ -43,6 +43,11 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 - Max 200 lines per `.ts(x)` file (`scripts/check-file-size.mjs`, frozen baseline).
 - Zero hardcoded colors — tokens live in `src/shared/config/tokens/` and `globals.css` (`scripts/check-colors.mjs`).
 - Zero raw `<button>/<input>/<select>/<table>/<textarea>` outside `shared/ui` (`scripts/check-html-primitives.mjs`).
+- Zero data fetching in `ui/` — no react-query/services/dal/zustand imports outside `ui/containers/` (`scripts/check-ui-purity.mjs`).
+- Max 5 props per `*Props` type (`scripts/check-props-count.mjs`).
+- Zero deep imports into another slice's segments — only via its `index.ts` (`scripts/check-cross-slice-imports.mjs`).
+- Zero duplication of shared code: repeated long classNames across slices or local redeclaration of a shared export (`scripts/check-shared-duplication.mjs`).
+- All seven checks also run per-commit via lint-staged — a commit with a fresh violation fails.
 - Baselines regenerate with `node scripts/check-X.mjs --update` — only when legacy shrinks, never to add debt.
 - Zero comments in code. Names and types carry meaning. Only functional pragmas allowed.
 - No arbitrary px values where a canonical class exists: Tailwind v4 spacing is dynamic, so `h-[38px]` is `h-9.5` (n = px/4); radii use tokens (`rounded-sm/md/lg/xl` = 6/12/18/24). Arbitrary stays only for font sizes from the type scale, em tracking, deg rotation and fractional borders.

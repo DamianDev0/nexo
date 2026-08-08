@@ -1,0 +1,13 @@
+[
+  "src/features/setup-workspace/ui/StepAppearance.tsx:53 :: className repeated from src/features/manage-settings/ui/sections/appearance/AppearanceShell.tsx:17",
+  "src/features/setup-workspace/ui/StepNomenclature.tsx:43 :: className repeated from src/features/manage-settings/ui/sections/NomenclatureSettings.tsx:19",
+  "src/features/setup-workspace/ui/StepNomenclature.tsx:45 :: className repeated from src/features/manage-settings/ui/sections/NomenclatureSettings.tsx:21",
+  "src/features/setup-workspace/ui/StepNomenclature.tsx:48 :: className repeated from src/features/manage-settings/ui/sections/NomenclatureSettings.tsx:21",
+  "src/features/setup-workspace/ui/StepTeam.tsx:88 :: className repeated from src/features/setup-workspace/ui/StepPipeline.tsx:93",
+  "src/features/setup-workspace/ui/WizardLayout.tsx:78 :: className repeated from src/entities/session/ui/AuthGuard.tsx:40",
+  "src/features/setup-workspace/ui/WizardLayout.tsx:153 :: className repeated from src/entities/session/ui/AuthGuard.tsx:40",
+  "src/features/setup-workspace/ui/appearance/ColorField.tsx:26 :: className repeated from src/features/setup-workspace/ui/appearance/BrandColorSection.tsx:63",
+  "src/features/setup-workspace/ui/navigation/SidebarPreview.tsx:32 :: className repeated from src/features/setup-workspace/ui/AppearanceLivePreview/index.tsx:55",
+  "src/features/setup-workspace/ui/navigation/SidebarPreview.tsx:33 :: className repeated from src/features/setup-workspace/ui/AppearanceLivePreview/index.tsx:58",
+  "src/widgets/auth-shell/ui/AuthLayout.tsx:14 :: className repeated from src/entities/session/ui/AuthGuard.tsx:40"
+]
