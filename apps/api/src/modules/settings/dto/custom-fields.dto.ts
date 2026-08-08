@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsIn,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Min,
@@ -109,7 +110,19 @@ export class FieldPermissionDto implements FieldPermission {
   @IsIn(PERMISSION_LEVELS) editable: FieldPermission['editable']
 }
 
+export class FieldPermissionEntryDto extends FieldPermissionDto {
+  @IsString()
+  @IsNotEmpty()
+  key: string
+}
+
 export class UpdateFieldPermissionsDto {
-  @ApiProperty({ description: 'Map of fieldKey to permission definition' })
-  permissions: Record<string, FieldPermissionDto>
+  @ApiProperty({
+    type: [FieldPermissionEntryDto],
+    description: 'Permission definition per field key',
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FieldPermissionEntryDto)
+  permissions: FieldPermissionEntryDto[]
 }

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { CacheService } from '@/shared/cache/cache.service'
@@ -78,7 +83,7 @@ export class PipelineSettingsService {
           `INSERT INTO pipelines (name, is_default) VALUES ($1, $2) RETURNING id, name, is_default`,
           [dto.name, dto.isDefault ?? false],
         )
-        if (!rows[0]) throw new Error('Pipeline insert returned no row')
+        if (!rows[0]) throw new InternalServerErrorException('Pipeline insert returned no row')
 
         const stages = await this.insertStages(qr, rows[0].id, dto.stages)
         return this.buildPipeline(rows[0], stages)

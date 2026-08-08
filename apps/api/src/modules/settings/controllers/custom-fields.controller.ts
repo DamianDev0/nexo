@@ -200,7 +200,10 @@ export class CustomFieldsController {
   ): Promise<FieldPermissionsConfig> {
     assertValidEntity(entity)
     const current = await this.configService.getFieldPermissions(ctx.tenantId)
-    const updated: FieldPermissionsConfig = { ...current, [entity]: dto.permissions }
+    const entityPermissions = Object.fromEntries(
+      dto.permissions.map(({ key, visibility, editable }) => [key, { visibility, editable }]),
+    )
+    const updated: FieldPermissionsConfig = { ...current, [entity]: entityPermissions }
     return this.configService.updateFieldPermissions(ctx.tenantId, updated, ctx.slug)
   }
 }

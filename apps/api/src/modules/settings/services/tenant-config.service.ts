@@ -15,7 +15,7 @@ import type {
   FieldPermissionsConfig,
 } from '../interfaces/custom-field.interface'
 import { DEFAULT_ACTIVITY_TYPES, DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
-import type { ActivityTypeDef, ContactTaxonomy } from '@repo/shared-types'
+import type { ActivityTypeDef, ContactTaxonomy, OnboardingStatus } from '@repo/shared-types'
 import { deepMerge } from '@/shared/utils/deep-merge'
 import type { ThemePatch, TenantFullConfig } from '../interfaces/tenant-config.interface'
 import { CACHE_TTL_MEDIUM_SECONDS, CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
@@ -224,6 +224,16 @@ export class TenantConfigService {
     await this.saveConfigSection(tenantId, 'fieldPermissions', updated)
     await this.cache.del(`tenant:slug:${slug}`)
     return updated
+  }
+
+  async getOnboarding(tenantId: string): Promise<OnboardingStatus> {
+    const config = await this.getRawConfig(tenantId)
+    return (config.onboarding as OnboardingStatus | undefined) ?? { step: 1, completed: false }
+  }
+
+  async updateOnboarding(tenantId: string, status: OnboardingStatus): Promise<OnboardingStatus> {
+    await this.saveConfigSection(tenantId, 'onboarding', status)
+    return status
   }
 
   private async getRawConfig(tenantId: string): Promise<TenantFullConfig> {

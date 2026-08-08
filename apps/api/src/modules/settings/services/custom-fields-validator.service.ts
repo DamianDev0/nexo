@@ -22,6 +22,13 @@ function validateNumber(def: FieldDef, value: unknown): string | null {
   return null
 }
 
+function validateCurrencyCents(def: FieldDef, value: unknown): string | null {
+  const numberError = validateNumber(def, value)
+  if (numberError) return numberError
+  if (!Number.isInteger(value)) return `"${def.label}" must be integer cents (COP)`
+  return null
+}
+
 function validateText(def: FieldDef, value: unknown): string | null {
   if (typeof value !== 'string') return `"${def.label}" must be text`
   if (def.min !== undefined && value.length < def.min) return `"${def.label}" is too short`
@@ -40,7 +47,9 @@ function validateSelect(def: FieldDef, value: unknown): string | null {
 function validateMultiselect(def: FieldDef, value: unknown): string | null {
   if (!Array.isArray(value)) return `"${def.label}" must be a list`
   const allowed = optionValues(def)
-  return value.every((v) => allowed.has(v as string)) ? null : `"${def.label}" has an invalid option`
+  return value.every((v) => allowed.has(v as string))
+    ? null
+    : `"${def.label}" has an invalid option`
 }
 
 function validateEmail(def: FieldDef, value: unknown): string | null {
@@ -69,7 +78,7 @@ function validateGeneric(def: FieldDef, value: unknown): string | null {
 
 const VALIDATORS: Partial<Record<CustomFieldType, FieldValidator>> = {
   number: validateNumber,
-  currency: validateNumber,
+  currency: validateCurrencyCents,
   text: validateText,
   textarea: validateText,
   boolean: validateBoolean,
