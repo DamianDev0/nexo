@@ -115,6 +115,55 @@ const rules = [
     },
   },
   {
+    id: 'sql-interpolation',
+    describe: 'No runtime values interpolated into SQL template literals — use $n parameters',
+    check(relPath, lines) {
+      const out = []
+      const content = lines.join('\n')
+      for (const template of content.matchAll(/`[^`]*`/gs)) {
+        if (!SQL_REGEX.test(template[0])) continue
+        for (const m of template[0].matchAll(/\$\{([^}]+)\}/g)) {
+          const expr = m[1].trim()
+          const safe =
+            /^[A-Z][A-Z0-9_]*$/.test(expr) ||
+            expr.startsWith('this.') ||
+            expr.includes('.join(') ||
+            expr.includes('.length') ||
+            /^(where|exclude|exclusion|schema|schemaName|orderBy|sets|updates)$/.test(expr)
+          if (safe) continue
+          const offset = template.index + m.index
+          const line = content.slice(0, offset).split('\n').length
+          out.push({
+            line,
+            message: `Interpolated \${${expr}} inside SQL — pass it as a $n parameter`,
+          })
+        }
+      }
+      return out
+    },
+  },
+  {
+    id: 'route-missing-auth',
+    describe: 'Every controller route needs an explicit @Auth / @ApiEndpoint / @Public',
+    check(relPath, lines) {
+      if (!/\.controller\.ts$/.test(relPath)) return []
+      const out = []
+      lines.forEach((line, i) => {
+        if (!/^\s*@(Get|Post|Patch|Put|Delete)\s*\(/.test(line)) return
+        const start = Math.max(0, i - 6)
+        const end = Math.min(lines.length, i + 12)
+        const block = lines.slice(start, end).join('\n')
+        if (!/@(Auth|ApiEndpoint|Public)\s*\(?/.test(block)) {
+          out.push({
+            line: i + 1,
+            message: `${line.trim()} has no @Auth/@ApiEndpoint/@Public in its decorator block`,
+          })
+        }
+      })
+      return out
+    },
+  },
+  {
     id: 'cross-module-import',
     describe: 'Modules communicate via EventBus only (allowed infra: audit-log, auth, tenants)',
     check(relPath, lines) {

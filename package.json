@@ -37,6 +37,10 @@
       "node apps/web/scripts/check-cross-slice-imports.mjs",
       "node apps/web/scripts/check-shared-duplication.mjs",
       "node apps/web/scripts/check-html-primitives.mjs",
+      "node apps/web/scripts/check-i18n-sync.mjs",
+      "node apps/web/scripts/check-segment-purity.mjs",
+      "node apps/web/scripts/check-no-comments.mjs",
+      "node apps/web/scripts/check-test-mirror.mjs",
       "node apps/web/scripts/check-colors.mjs",
       "node apps/web/scripts/check-file-size.mjs"
     ],

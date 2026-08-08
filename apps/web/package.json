@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check:arch": "node scripts/check-file-size.mjs && node scripts/check-colors.mjs && node scripts/check-html-primitives.mjs && node scripts/check-ui-purity.mjs && node scripts/check-props-count.mjs && node scripts/check-cross-slice-imports.mjs && node scripts/check-shared-duplication.mjs",
+    "check:arch": "node scripts/check-file-size.mjs && node scripts/check-colors.mjs && node scripts/check-html-primitives.mjs && node scripts/check-ui-purity.mjs && node scripts/check-props-count.mjs && node scripts/check-cross-slice-imports.mjs && node scripts/check-shared-duplication.mjs && node scripts/check-i18n-sync.mjs && node scripts/check-segment-purity.mjs && node scripts/check-no-comments.mjs && node scripts/check-test-mirror.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

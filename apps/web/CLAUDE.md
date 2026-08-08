@@ -47,7 +47,11 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 - Max 5 props per `*Props` type (`scripts/check-props-count.mjs`).
 - Zero deep imports into another slice's segments — only via its `index.ts` (`scripts/check-cross-slice-imports.mjs`).
 - Zero duplication of shared code: repeated long classNames across slices or local redeclaration of a shared export (`scripts/check-shared-duplication.mjs`).
-- All seven checks also run per-commit via lint-staged — a commit with a fresh violation fails.
+- Locale parity: every key exists in both `en.ts` and `es.ts`, every static `t('…')` resolves (`scripts/check-i18n-sync.mjs`).
+- Segment purity: no runtime react/hooks/'use client' in `lib|config/`, no UPPER_SNAKE consts in `model/`, no `.tsx` in `query/` (`scripts/check-segment-purity.mjs`).
+- Zero comments, enforced (`scripts/check-no-comments.mjs` — only functional pragmas pass).
+- Every file in a slice's `lib/` or `model/` has a `<name>.test.*` under `tests/` (`scripts/check-test-mirror.mjs`).
+- All eleven checks also run per-commit via lint-staged — a commit with a fresh violation fails.
 - Baselines regenerate with `node scripts/check-X.mjs --update` — only when legacy shrinks, never to add debt.
 - Zero comments in code. Names and types carry meaning. Only functional pragmas allowed.
 - No arbitrary px values where a canonical class exists: Tailwind v4 spacing is dynamic, so `h-[38px]` is `h-9.5` (n = px/4); radii use tokens (`rounded-sm/md/lg/xl` = 6/12/18/24). Arbitrary stays only for font sizes from the type scale, em tracking, deg rotation and fractional borders.

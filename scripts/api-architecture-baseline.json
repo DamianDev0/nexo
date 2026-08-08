@@ -2,6 +2,18 @@
   "apps/api/src/modules/companies/companies.module.ts": ["cross-module-import"],
   "apps/api/src/modules/contacts/contacts.module.ts": ["cross-module-import"],
   "apps/api/src/modules/deals/deals.module.ts": ["cross-module-import"],
+  "apps/api/src/modules/activities/repositories/activities.repository.ts": ["sql-interpolation"],
+  "apps/api/src/modules/bulk-actions/repositories/bulk-actions.repository.ts": [
+    "sql-interpolation"
+  ],
   "apps/api/src/modules/companies/controllers/companies.controller.ts": ["cross-module-import"],
-  "apps/api/src/modules/contacts/controllers/contacts.controller.ts": ["cross-module-import"]
+  "apps/api/src/modules/contacts/controllers/contacts.controller.ts": ["cross-module-import"],
+  "apps/api/src/modules/contacts/repositories/contact-duplicates.repository.ts": [
+    "sql-interpolation"
+  ],
+  "apps/api/src/modules/products/repositories/products.repository.ts": ["sql-interpolation"],
+  "apps/api/src/modules/saved-filters/repositories/saved-filters.repository.ts": [
+    "sql-interpolation"
+  ],
+  "apps/api/src/modules/timeline/repositories/timeline.repository.ts": ["sql-interpolation"]
 }
