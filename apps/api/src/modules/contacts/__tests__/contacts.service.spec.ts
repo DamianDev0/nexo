@@ -4,7 +4,10 @@ import { AUDIT_EVENTS, AuditAction, AuditEntityEvent } from '@/shared/events/aud
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ContactsService } from '../services/contacts.service'
+import { ContactsRepository } from '../repositories/contacts.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { expectPageAndLimitApplied } from '@/shared/testing/crud-assertions'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { LifecycleStage } from '@repo/shared-types'
 import type { PaginatedContacts } from '@repo/shared-types'
 
@@ -38,17 +41,6 @@ function makeContactRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-function buildQrMock(overrides: Record<string, jest.Mock> = {}) {
-  return { query: jest.fn(), ...overrides }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-    transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 describe('ContactsService', () => {
   let service: ContactsService
   let db: ReturnType<typeof buildDbMock>
@@ -65,6 +57,7 @@ describe('ContactsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ContactsService,
+        ContactsRepository,
         { provide: TenantDbService, useValue: db },
         { provide: EventBusService, useValue: eventBus },
         { provide: ContactDuplicatesService, useValue: duplicates },
@@ -90,15 +83,7 @@ describe('ContactsService', () => {
     })
 
     it('applies page and limit correctly', async () => {
-      qr.query.mockResolvedValueOnce([{ count: '50' }]).mockResolvedValueOnce([makeContactRow()])
-
-      const result = await service.findAll(SCHEMA, { page: 3, limit: 10 })
-
-      expect(result.page).toBe(3)
-      expect(result.limit).toBe(10)
-
-      const listQuery: string = qr.query.mock.calls[1][0] as string
-      expect(listQuery).toContain('OFFSET')
+      await expectPageAndLimitApplied(qr, makeContactRow, (query) => service.findAll(SCHEMA, query))
     })
 
     it('applies status filter to WHERE clause', async () => {

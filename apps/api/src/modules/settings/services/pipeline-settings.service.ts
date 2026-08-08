@@ -1,21 +1,20 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common'
-import type { QueryRunner } from 'typeorm'
-import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { Injectable } from '@nestjs/common'
 import { CacheService } from '@/shared/cache/cache.service'
-import type { Pipeline, PipelineStage, KanbanBoard, KanbanStageSummary } from '@repo/shared-types'
+import type { Pipeline, KanbanBoard } from '@repo/shared-types'
 import type { CreatePipelineDto, UpdatePipelineDto, ReorderStagesDto } from '../dto/pipeline.dto'
-import type { PipelineRow, StageRow, KanbanStageRow } from '../interfaces/pipeline.interface'
+import { PipelineSettingsRepository } from '../repositories/pipeline-settings.repository'
+import {
+  buildPipeline,
+  buildPipelineList,
+  mapKanbanStage,
+  mapStage,
+} from '../mappers/pipeline.mapper'
 import { CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
 
 @Injectable()
 export class PipelineSettingsService {
   constructor(
-    private readonly db: TenantDbService,
+    private readonly repo: PipelineSettingsRepository,
     private readonly cache: CacheService,
   ) {}
 
@@ -24,33 +23,8 @@ export class PipelineSettingsService {
     const cached = await this.cache.get<Pipeline[]>(cacheKey)
     if (cached) return cached
 
-    const result = await this.db.query<Pipeline[]>(schemaName, async (qr): Promise<Pipeline[]> => {
-      const pipelines: PipelineRow[] = await qr.query(
-        `SELECT id, name, is_default FROM pipelines ORDER BY is_default DESC, name ASC`,
-      )
-      if (!pipelines.length) return []
-
-      const ids = pipelines.map((p) => p.id)
-      const stages: StageRow[] = await qr.query(
-        `SELECT id, pipeline_id, name, color, probability, position
-         FROM pipeline_stages
-         WHERE pipeline_id = ANY($1)
-         ORDER BY pipeline_id, position ASC`,
-        [ids],
-      )
-
-      const stagesByPipeline = new Map<string, PipelineStage[]>()
-      for (const s of stages) {
-        const arr = stagesByPipeline.get(s.pipeline_id) ?? []
-        arr.push(this.mapStage(s))
-        stagesByPipeline.set(s.pipeline_id, arr)
-      }
-
-      return pipelines.map((p): Pipeline => {
-        const stages: PipelineStage[] = stagesByPipeline.get(p.id) ?? []
-        return this.buildPipeline(p, stages)
-      })
-    })
+    const { pipelines, stages } = await this.repo.findAllWithStages(schemaName)
+    const result = buildPipelineList(pipelines, stages)
 
     await this.cache.set(cacheKey, result, CACHE_TTL_SHORT_SECONDS)
     return result
@@ -61,107 +35,37 @@ export class PipelineSettingsService {
     const cached = await this.cache.get<Pipeline>(cacheKey)
     if (cached) return cached
 
-    const result = await this.db.query<Pipeline>(schemaName, async (qr): Promise<Pipeline> => {
-      const pipeline = await this.fetchPipelineOrFail(qr, pipelineId)
-      const stages = await this.fetchStagesForPipeline(qr, pipelineId)
-      return this.buildPipeline(pipeline, stages)
-    })
+    const { pipeline, stages } = await this.repo.findOneWithStages(schemaName, pipelineId)
+    const result = buildPipeline(pipeline, stages.map(mapStage))
 
     await this.cache.set(cacheKey, result, CACHE_TTL_SHORT_SECONDS)
     return result
   }
 
   async create(schemaName: string, dto: CreatePipelineDto): Promise<Pipeline> {
-    const result = await this.db.transactional<Pipeline>(
+    const { pipeline, stages } = await this.repo.create(
       schemaName,
-      async (qr): Promise<Pipeline> => {
-        if (dto.isDefault) {
-          await qr.query(`UPDATE pipelines SET is_default = false WHERE is_default = true`)
-        }
-
-        const rows: PipelineRow[] = await qr.query(
-          `INSERT INTO pipelines (name, is_default) VALUES ($1, $2) RETURNING id, name, is_default`,
-          [dto.name, dto.isDefault ?? false],
-        )
-        if (!rows[0]) throw new InternalServerErrorException('Pipeline insert returned no row')
-
-        const stages = await this.insertStages(qr, rows[0].id, dto.stages)
-        return this.buildPipeline(rows[0], stages)
-      },
+      dto.name,
+      dto.isDefault,
+      dto.stages,
     )
 
     await this.cache.del(this.listKey(schemaName))
-    return result
+    return buildPipeline(pipeline, stages.map(mapStage))
   }
 
   async update(schemaName: string, pipelineId: string, dto: UpdatePipelineDto): Promise<Pipeline> {
-    const result = await this.db.transactional<Pipeline>(
-      schemaName,
-      async (qr): Promise<Pipeline> => {
-        const existing = await this.fetchPipelineOrFail(qr, pipelineId)
-
-        if (dto.isDefault) {
-          await qr.query(
-            `UPDATE pipelines SET is_default = false WHERE is_default = true AND id != $1`,
-            [pipelineId],
-          )
-        }
-
-        const updates: string[] = []
-        const values: unknown[] = []
-        if (dto.name !== undefined) {
-          updates.push(`name = $${values.push(dto.name)}`)
-        }
-        if (dto.isDefault !== undefined) {
-          updates.push(`is_default = $${values.push(dto.isDefault)}`)
-        }
-
-        if (!updates.length) {
-          const stages = await this.fetchStagesForPipeline(qr, pipelineId)
-          return this.buildPipeline(existing, stages)
-        }
-
-        values.push(pipelineId)
-        const updated: PipelineRow[] = await qr.query(
-          `UPDATE pipelines SET ${updates.join(', ')}, updated_at = NOW()
-         WHERE id = $${values.length}
-         RETURNING id, name, is_default`,
-          values,
-        )
-        const stages = await this.fetchStagesForPipeline(qr, pipelineId)
-        return this.buildPipeline(updated[0] ?? existing, stages)
-      },
-    )
+    const { pipeline, stages } = await this.repo.update(schemaName, pipelineId, {
+      name: dto.name,
+      isDefault: dto.isDefault,
+    })
 
     await this.invalidateCache(schemaName, pipelineId)
-    return result
+    return buildPipeline(pipeline, stages.map(mapStage))
   }
 
   async remove(schemaName: string, pipelineId: string): Promise<void> {
-    await this.db.transactional<void>(schemaName, async (qr): Promise<void> => {
-      const rows: PipelineRow[] = await qr.query(
-        `SELECT id, name, is_default FROM pipelines WHERE id = $1`,
-        [pipelineId],
-      )
-      const pipeline = rows[0]
-      if (!pipeline) throw new NotFoundException(`Pipeline ${pipelineId} not found`)
-      if (pipeline.is_default) {
-        throw new BadRequestException(
-          'Cannot delete the default pipeline. Set another pipeline as default first.',
-        )
-      }
-
-      const countRows: [{ count: string }] = await qr.query(
-        `SELECT COUNT(*)::text AS count FROM pipelines`,
-      )
-      if (Number.parseInt(countRows[0].count, 10) <= 1) {
-        throw new BadRequestException('Cannot delete the only pipeline.')
-      }
-
-      await qr.query(`DELETE FROM pipeline_stages WHERE pipeline_id = $1`, [pipelineId])
-      await qr.query(`DELETE FROM pipelines WHERE id = $1`, [pipelineId])
-    })
-
+    await this.repo.remove(schemaName, pipelineId)
     await this.invalidateCache(schemaName, pipelineId)
   }
 
@@ -170,95 +74,18 @@ export class PipelineSettingsService {
     pipelineId: string,
     dto: ReorderStagesDto,
   ): Promise<Pipeline> {
-    const result = await this.db.transactional<Pipeline>(
-      schemaName,
-      async (qr): Promise<Pipeline> => {
-        const pipeline = await this.fetchPipelineOrFail(qr, pipelineId)
-
-        await qr.query(`DELETE FROM pipeline_stages WHERE pipeline_id = $1`, [pipelineId])
-        const stages = await this.insertStages(qr, pipelineId, dto.stages)
-
-        return this.buildPipeline(pipeline, stages)
-      },
-    )
+    const { pipeline, stages } = await this.repo.replaceStages(schemaName, pipelineId, dto.stages)
 
     await this.invalidateCache(schemaName, pipelineId)
-    return result
+    return buildPipeline(pipeline, stages.map(mapStage))
   }
 
   async getKanbanBoard(schemaName: string, pipelineId: string): Promise<KanbanBoard> {
-    return this.db.query(schemaName, async (qr): Promise<KanbanBoard> => {
-      const pipeline = await this.fetchPipelineOrFail(qr, pipelineId)
-
-      const rows: KanbanStageRow[] = await qr.query(
-        `SELECT
-           ps.id, ps.pipeline_id, ps.name, ps.color, ps.probability, ps.position,
-           COUNT(d.id)::text                         AS deal_count,
-           COALESCE(SUM(d.value_cents), 0)::text     AS total_value_cents
-         FROM pipeline_stages ps
-         LEFT JOIN deals d
-           ON d.stage_id = ps.id AND d.is_active = true AND d.status = 'open'
-         WHERE ps.pipeline_id = $1
-         GROUP BY ps.id
-         ORDER BY ps.position ASC`,
-        [pipelineId],
-      )
-
-      return {
-        pipeline: { id: pipeline.id, name: pipeline.name },
-        stages: rows.map(
-          (r): KanbanStageSummary => ({
-            id: r.id,
-            pipelineId: r.pipeline_id,
-            name: r.name,
-            color: r.color,
-            probability: r.probability,
-            position: r.position,
-            dealCount: Number(r.deal_count),
-            totalValueCents: Number(r.total_value_cents),
-          }),
-        ),
-      }
-    })
-  }
-
-  private async fetchPipelineOrFail(qr: QueryRunner, pipelineId: string): Promise<PipelineRow> {
-    const rows: PipelineRow[] = await qr.query(
-      `SELECT id, name, is_default FROM pipelines WHERE id = $1`,
-      [pipelineId],
-    )
-    const row = rows[0]
-    if (!row) throw new NotFoundException(`Pipeline ${pipelineId} not found`)
-    return row
-  }
-
-  private async fetchStagesForPipeline(
-    qr: QueryRunner,
-    pipelineId: string,
-  ): Promise<PipelineStage[]> {
-    const rows: StageRow[] = await qr.query(
-      `SELECT id, pipeline_id, name, color, probability, position
-       FROM pipeline_stages WHERE pipeline_id = $1 ORDER BY position ASC`,
-      [pipelineId],
-    )
-    return rows.map((s) => this.mapStage(s))
-  }
-
-  private async insertStages(
-    qr: QueryRunner,
-    pipelineId: string,
-    stages: CreatePipelineDto['stages'],
-  ): Promise<PipelineStage[]> {
-    if (!stages.length) return []
-
-    const rows: StageRow[] = await qr.query(
-      `INSERT INTO pipeline_stages (pipeline_id, name, color, probability, position)
-       SELECT $1, s.name, s.color, s.probability::int, s.position::int
-       FROM jsonb_to_recordset($2::jsonb) AS s(name text, color text, probability int, position int)
-       RETURNING id, pipeline_id, name, color, probability, position`,
-      [pipelineId, JSON.stringify(stages)],
-    )
-    return rows.map((s) => this.mapStage(s))
+    const { pipeline, stages } = await this.repo.findKanban(schemaName, pipelineId)
+    return {
+      pipeline: { id: pipeline.id, name: pipeline.name },
+      stages: stages.map(mapKanbanStage),
+    }
   }
 
   private listKey(schemaName: string): string {
@@ -274,20 +101,5 @@ export class PipelineSettingsService {
       this.cache.del(this.listKey(schemaName)),
       this.cache.del(this.oneKey(schemaName, pipelineId)),
     ])
-  }
-
-  private buildPipeline(p: PipelineRow, stages: PipelineStage[]): Pipeline {
-    return { id: p.id, name: p.name, isDefault: p.is_default, stages }
-  }
-
-  private mapStage(s: StageRow): PipelineStage {
-    return {
-      id: s.id,
-      pipelineId: s.pipeline_id,
-      name: s.name,
-      color: s.color,
-      probability: s.probability,
-      position: s.position,
-    }
   }
 }

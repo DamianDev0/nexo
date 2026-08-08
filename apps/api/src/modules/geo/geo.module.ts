@@ -3,13 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { GeoController } from './controllers/geo.controller'
 import { Municipality } from './entities/municipality.entity'
+import { GeoRepository } from './repositories/geo.repository'
 import { GeoSeedService } from './services/geo-seed.service'
 import { GeoService } from './services/geo.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Municipality])],
   controllers: [GeoController],
-  providers: [GeoService, GeoSeedService],
+  providers: [GeoService, GeoSeedService, GeoRepository],
   exports: [GeoService],
 })
 export class GeoModule {}

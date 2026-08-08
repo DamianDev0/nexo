@@ -1,7 +1,9 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { PipelineSettingsService } from '../services/pipeline-settings.service'
+import { PipelineSettingsRepository } from '../repositories/pipeline-settings.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { CacheService } from '@/shared/cache/cache.service'
 import type { Pipeline } from '@repo/shared-types'
 
@@ -34,17 +36,6 @@ const mockPipeline: Pipeline = {
   ],
 }
 
-function buildQrMock() {
-  return { query: jest.fn() }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-    transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 function buildCacheMock() {
   return {
     get: jest.fn().mockResolvedValue(null),
@@ -67,6 +58,7 @@ describe('PipelineSettingsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         PipelineSettingsService,
+        PipelineSettingsRepository,
         { provide: TenantDbService, useValue: db },
         { provide: CacheService, useValue: cache },
       ],

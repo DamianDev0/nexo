@@ -1,26 +1,12 @@
 import { Test } from '@nestjs/testing'
 import { ContactWorkspaceController } from '../controllers/contact-workspace.controller'
 import { ContactWorkspaceService } from '../services/contact-workspace.service'
-import { PlanName, UserRole } from '@repo/shared-types'
-import type { AuthenticatedUser, ContactWorkspace, TenantContext } from '@repo/shared-types'
+import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
+import { UserRole } from '@repo/shared-types'
+import type { ContactWorkspace } from '@repo/shared-types'
 
-const mockCtx: TenantContext = {
-  tenantId: 'tenant-1',
-  slug: 'acme',
-  schemaName: 'tenant_acme',
-  plan: PlanName.FREE,
-  config: {},
-  productName: 'NexoCRM',
-  customDomain: null,
-}
-
-const mockUser: AuthenticatedUser = {
-  id: 'user-1',
-  email: 'owner@acme.com',
-  role: UserRole.OWNER,
-  tenantId: 'tenant-1',
-  schemaName: 'tenant_acme',
-}
+const mockCtx = makeTenantContext()
+const mockUser = makeAuthenticatedUser({ email: 'owner@acme.com', role: UserRole.OWNER })
 
 const mockWorkspace: ContactWorkspace = {
   views: [],

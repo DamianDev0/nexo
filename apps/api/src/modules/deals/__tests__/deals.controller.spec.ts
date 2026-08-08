@@ -1,32 +1,16 @@
-import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { DealsController } from '../deals.controller'
-import { DealsService } from '../deals.service'
-import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { DealPriority, DealStatus, DealType, PlanName } from '@repo/shared-types'
-import type {
-  DealDetail,
-  PaginatedDeals,
-  TenantContext,
-  AuthenticatedUser,
-} from '@repo/shared-types'
+import { DealsController } from '../controllers/deals.controller'
+import { DealsService } from '../services/deals.service'
+import { DealItemsService } from '../services/deal-items.service'
+import { DealForecastService } from '../services/deal-forecast.service'
+import { CUSTOM_FIELDS_VALIDATOR } from '../constants/deal.constants'
+import { expectNotFoundPropagation } from '@/shared/testing/crud-assertions'
+import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
+import { DealPriority, DealStatus, DealType } from '@repo/shared-types'
+import type { DealDetail, PaginatedDeals } from '@repo/shared-types'
 
-const mockCtx: TenantContext = {
-  tenantId: 'tenant-1',
-  schemaName: 'tenant_acme',
-  slug: 'acme',
-  plan: PlanName.FREE,
-  config: {},
-  productName: 'NexoCRM',
-  customDomain: null,
-}
-const mockUser: AuthenticatedUser = {
-  id: 'user-1',
-  email: 'a@b.co',
-  role: 'sales_rep' as AuthenticatedUser['role'],
-  tenantId: 'tenant-1',
-  schemaName: 'tenant_acme',
-}
+const mockCtx = makeTenantContext()
+const mockUser = makeAuthenticatedUser()
 
 const mockDeal: DealDetail = {
   id: 'deal-1',
@@ -73,6 +57,8 @@ const mockPaginated: PaginatedDeals = {
 describe('DealsController', () => {
   let controller: DealsController
   let service: jest.Mocked<DealsService>
+  let itemsService: jest.Mocked<DealItemsService>
+  let forecastService: jest.Mocked<DealForecastService>
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -90,19 +76,31 @@ describe('DealsController', () => {
             markWon: jest.fn(),
             markLost: jest.fn(),
             reopen: jest.fn(),
+          },
+        },
+        {
+          provide: DealItemsService,
+          useValue: {
             addItem: jest.fn(),
             updateItem: jest.fn(),
             removeItem: jest.fn(),
             getItems: jest.fn(),
+          },
+        },
+        {
+          provide: DealForecastService,
+          useValue: {
             getForecast: jest.fn(),
           },
         },
-        { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
+        { provide: CUSTOM_FIELDS_VALIDATOR, useValue: { validate: jest.fn() } },
       ],
     }).compile()
 
     controller = module.get(DealsController)
     service = module.get(DealsService)
+    itemsService = module.get(DealItemsService)
+    forecastService = module.get(DealForecastService)
   })
 
   describe('findAll', () => {
@@ -137,9 +135,7 @@ describe('DealsController', () => {
     })
 
     it('propagates NotFoundException', async () => {
-      service.findOne.mockRejectedValue(new NotFoundException())
-
-      await expect(controller.findOne('missing', mockCtx)).rejects.toThrow(NotFoundException)
+      await expectNotFoundPropagation(service.findOne, () => controller.findOne('missing', mockCtx))
     })
   })
 
@@ -246,7 +242,7 @@ describe('DealsController', () => {
         subtotalCents: 1000,
         createdAt: '',
       }
-      service.addItem.mockResolvedValue(mockItem)
+      itemsService.addItem.mockResolvedValue(mockItem)
 
       const result = await controller.addItem(
         'deal-1',
@@ -254,7 +250,7 @@ describe('DealsController', () => {
         mockCtx,
       )
 
-      expect(service.addItem).toHaveBeenCalledWith('tenant_acme', 'deal-1', {
+      expect(itemsService.addItem).toHaveBeenCalledWith('tenant_acme', 'deal-1', {
         description: 'Test',
         unitPriceCents: 1000,
       })
@@ -264,7 +260,7 @@ describe('DealsController', () => {
 
   describe('removeItem', () => {
     it('resolves void', async () => {
-      service.removeItem.mockResolvedValue(undefined)
+      itemsService.removeItem.mockResolvedValue(undefined)
 
       await expect(controller.removeItem('deal-1', 'item-1', mockCtx)).resolves.toBeUndefined()
     })
@@ -272,7 +268,7 @@ describe('DealsController', () => {
 
   describe('getForecast', () => {
     it('returns forecast entries', async () => {
-      service.getForecast.mockResolvedValue([
+      forecastService.getForecast.mockResolvedValue([
         { month: '2026-04', totalValueCents: 10000000, weightedValueCents: 5000000, dealCount: 3 },
       ])
 

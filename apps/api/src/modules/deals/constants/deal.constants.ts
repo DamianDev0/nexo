@@ -1,7 +1,9 @@
 import type { FieldMap } from '@/shared/utils/field-map'
-import type { UpdateDealDto } from '../dto/deal.dto'
+import type { UpdateDealInput } from '../interfaces/deal-input.interfaces'
 
-export const UPDATABLE_FIELDS: FieldMap<UpdateDealDto> = [
+export const CUSTOM_FIELDS_VALIDATOR = 'DEALS_CUSTOM_FIELDS_VALIDATOR'
+
+export const UPDATABLE_FIELDS: FieldMap<UpdateDealInput> = [
   ['title', 'title'],
   ['valueCents', 'value_cents'],
   ['expectedCloseDate', 'expected_close_date'],

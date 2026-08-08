@@ -23,6 +23,7 @@ import type { Request, Response } from 'express'
 import type { TenantContext, AuthenticatedUser, MeResponse } from '@repo/shared-types'
 import { Public } from '@/shared/decorators/public.decorator'
 import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { LocalAuthGuard } from '../guards/local-auth.guard'
@@ -160,9 +161,10 @@ export class AuthController {
   }
 
   @Post('logout')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Auth()
-  @ApiOperation({ summary: 'Revoke the current refresh token and clear auth cookies' })
+  @ApiEndpoint({
+    summary: 'Revoke the current refresh token and clear auth cookies',
+    status: HttpStatus.NO_CONTENT,
+  })
   async logout(
     @Req() req: Request,
     @TenantCtx() tenantCtx: TenantContext,

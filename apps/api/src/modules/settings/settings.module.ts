@@ -22,6 +22,8 @@ import { ThemeExportService } from './services/theme-export.service'
 import { ThemeImportService } from './services/theme-import.service'
 import { CustomFieldsValidator } from './services/custom-fields-validator.service'
 import { CustomFieldsComputer } from './services/custom-fields-computer.service'
+import { PipelineSettingsRepository } from './repositories/pipeline-settings.repository'
+import { TenantConfigRepository } from './repositories/tenant-config.repository'
 import { ModuleEnabledGuard } from './guards/module-enabled.guard'
 
 @Module({
@@ -48,6 +50,8 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     ThemeImportService,
     CustomFieldsValidator,
     CustomFieldsComputer,
+    PipelineSettingsRepository,
+    TenantConfigRepository,
     ModuleEnabledGuard,
   ],
   exports: [

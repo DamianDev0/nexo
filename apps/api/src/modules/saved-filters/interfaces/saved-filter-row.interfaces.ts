@@ -11,3 +11,16 @@ export interface FilterRow {
   created_at: string
   updated_at: string
 }
+
+export type CreateSavedFilterData = {
+  entityType: SavedFilterEntityType
+  name: string
+  filters: Record<string, unknown>
+  isDefault?: boolean
+}
+
+export type UpdateSavedFilterData = Partial<{
+  name: string
+  filters: Record<string, unknown>
+  isDefault: boolean
+}>

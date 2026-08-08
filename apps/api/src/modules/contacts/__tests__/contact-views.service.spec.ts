@@ -1,7 +1,9 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { ContactViewsService } from '../services/contact-views.service'
+import { ContactViewsRepository } from '../repositories/contact-views.repository'
 import type { ContactViewRow } from '../interfaces/contact-view-row.interfaces'
 
 const SCHEMA = 'tenant_test'
@@ -28,17 +30,6 @@ function makeViewRow(overrides: Partial<ContactViewRow> = {}): ContactViewRow {
   }
 }
 
-function buildQrMock() {
-  return { query: jest.fn() }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-    transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 describe('ContactViewsService', () => {
   let service: ContactViewsService
   let qr: ReturnType<typeof buildQrMock>
@@ -46,7 +37,11 @@ describe('ContactViewsService', () => {
   beforeEach(async () => {
     qr = buildQrMock()
     const module = await Test.createTestingModule({
-      providers: [ContactViewsService, { provide: TenantDbService, useValue: buildDbMock(qr) }],
+      providers: [
+        ContactViewsService,
+        ContactViewsRepository,
+        { provide: TenantDbService, useValue: buildDbMock(qr) },
+      ],
     }).compile()
     service = module.get(ContactViewsService)
   })

@@ -4,16 +4,15 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   HttpStatus,
   Param,
   Post,
   Put,
 } from '@nestjs/common'
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
+import { ApiParam, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext, ActivityTypeDef } from '@repo/shared-types'
-import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TenantConfigService } from '../services/tenant-config.service'
 import { ActivityTypeDto } from '../dto/activity-type.dto'
@@ -24,15 +23,13 @@ export class ActivityTypesController {
   constructor(private readonly configService: TenantConfigService) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'List activity types (system + custom)' })
+  @ApiEndpoint({ summary: 'List activity types (system + custom)', roles: [UserRole.VIEWER] })
   getAll(@TenantCtx() ctx: TenantContext): Promise<ActivityTypeDef[]> {
     return this.configService.getActivityTypes(ctx.tenantId)
   }
 
   @Post()
-  @Auth(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Add a custom activity type' })
+  @ApiEndpoint({ summary: 'Add a custom activity type', roles: [UserRole.ADMIN] })
   async create(
     @Body() dto: ActivityTypeDto,
     @TenantCtx() ctx: TenantContext,
@@ -46,10 +43,12 @@ export class ActivityTypesController {
   }
 
   @Put(':key')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
+  @ApiEndpoint({
+    summary: 'Update an activity type label/icon/color',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiParam({ name: 'key', description: 'Activity type key' })
-  @ApiOperation({ summary: 'Update an activity type label/icon/color' })
   async update(
     @Param('key') key: string,
     @Body() dto: ActivityTypeDto,
@@ -65,10 +64,12 @@ export class ActivityTypesController {
   }
 
   @Delete(':key')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
+  @ApiEndpoint({
+    summary: 'Delete a custom activity type (system types cannot be deleted)',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiParam({ name: 'key', description: 'Activity type key' })
-  @ApiOperation({ summary: 'Delete a custom activity type (system types cannot be deleted)' })
   async remove(
     @Param('key') key: string,
     @TenantCtx() ctx: TenantContext,

@@ -35,3 +35,31 @@ export interface CalendarRow {
   deal_title: string | null
   assigned_to_id: string | null
 }
+
+export interface ActivityListFilters {
+  activityType?: string
+  status?: string
+  contactId?: string
+  companyId?: string
+  dealId?: string
+  assignedToId?: string
+}
+
+export interface ActivityListPage {
+  rows: ActivityListRow[]
+  total: number
+}
+
+export interface ActivityInsertValues {
+  activityType: string
+  title: string | null
+  description: string | null
+  dueDate: string | null
+  durationMinutes: number | null
+  reminderAt: string | null
+  contactId: string | null
+  companyId: string | null
+  dealId: string | null
+  assignedToId: string
+  createdById: string
+}

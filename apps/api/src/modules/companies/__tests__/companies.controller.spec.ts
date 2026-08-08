@@ -1,42 +1,21 @@
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { CompaniesController } from '../companies.controller'
-import { CompaniesService } from '../companies.service'
+import { CompaniesController } from '../controllers/companies.controller'
+import { CompaniesService } from '../services/companies.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
+import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
 import {
   AccountType,
   CIIUSector,
   CompanySize,
   PersonType,
-  PlanName,
   TaxRegime,
   UserRole,
 } from '@repo/shared-types'
-import type {
-  TenantContext,
-  AuthenticatedUser,
-  Company,
-  PaginatedCompanies,
-  CompanySummary,
-} from '@repo/shared-types'
+import type { Company, PaginatedCompanies, CompanySummary } from '@repo/shared-types'
 
-const mockCtx: TenantContext = {
-  tenantId: 'tenant-1',
-  slug: 'acme',
-  schemaName: 'tenant_acme',
-  plan: PlanName.FREE,
-  config: {},
-  productName: 'NexoCRM',
-  customDomain: null,
-}
-
-const mockUser: AuthenticatedUser = {
-  id: 'user-1',
-  email: 'owner@acme.com',
-  role: UserRole.OWNER,
-  tenantId: 'tenant-1',
-  schemaName: 'tenant_acme',
-}
+const mockCtx = makeTenantContext()
+const mockUser = makeAuthenticatedUser({ email: 'owner@acme.com', role: UserRole.OWNER })
 
 const mockCompany: Company = {
   id: 'co-1',

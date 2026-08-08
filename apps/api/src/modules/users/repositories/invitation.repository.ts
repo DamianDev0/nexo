@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { InvitationRow } from '../interfaces/invitation-row.interface'
 import type { CreateInvitationData } from '../interfaces/invitation-rows.interface'
+import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
 export class InvitationRepository {
@@ -9,14 +10,15 @@ export class InvitationRepository {
 
   async create(schemaName: string, data: CreateInvitationData): Promise<InvitationRow> {
     return this.tenantDb.transactional<InvitationRow>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<InvitationRow[]>(
+        qr,
         `INSERT INTO "${schemaName}".invitations
            (email, role, token_hash, invited_by, expires_at)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING id, email, role, token_hash, invited_by, expires_at, accepted_at, created_at`,
         [data.email.toLowerCase(), data.role, data.tokenHash, data.invitedBy, data.expiresAt],
       )
-      const created = (raw as InvitationRow[])[0]
+      const created = raw[0]
       if (!created) throw new Error('INSERT returned no rows')
       return created
     })
@@ -24,12 +26,13 @@ export class InvitationRepository {
 
   async findByTokenHash(schemaName: string, tokenHash: string): Promise<InvitationRow | undefined> {
     return this.tenantDb.query<InvitationRow | undefined>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<InvitationRow[]>(
+        qr,
         `SELECT id, email, role, token_hash, invited_by, expires_at, accepted_at, created_at
          FROM "${schemaName}".invitations WHERE token_hash = $1 LIMIT 1`,
         [tokenHash],
       )
-      return (raw as InvitationRow[])[0]
+      return raw[0]
     })
   }
 

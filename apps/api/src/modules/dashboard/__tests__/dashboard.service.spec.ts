@@ -1,5 +1,6 @@
 import { Test } from '@nestjs/testing'
-import { DashboardService } from '../dashboard.service'
+import { DashboardService } from '../services/dashboard.service'
+import { DashboardRepository } from '../repositories/dashboard.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { CacheService } from '@/shared/cache/cache.service'
 
@@ -30,6 +31,7 @@ describe('DashboardService', () => {
     const module = await Test.createTestingModule({
       providers: [
         DashboardService,
+        DashboardRepository,
         { provide: TenantDbService, useValue: db },
         { provide: CacheService, useValue: cacheMock },
       ],

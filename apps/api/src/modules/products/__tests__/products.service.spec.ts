@@ -1,10 +1,10 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { ProductsService } from '../products.service'
+import { ProductsService } from '../services/products.service'
+import { ProductInventoryService } from '../services/product-inventory.service'
+import { ProductsRepository } from '../repositories/products.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import { CsvExportService } from '@/shared/csv/csv-export.service'
-import { ImportService } from '@/shared/imports/services/import.service'
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import type { PaginatedProducts } from '@repo/shared-types'
 
 const SCHEMA = 'tenant_acme'
@@ -69,6 +69,7 @@ function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
 
 describe('ProductsService', () => {
   let service: ProductsService
+  let inventoryService: ProductInventoryService
   let qr: ReturnType<typeof buildQrMock>
 
   beforeEach(async () => {
@@ -78,17 +79,15 @@ describe('ProductsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ProductsService,
+        ProductInventoryService,
+        ProductsRepository,
         { provide: TenantDbService, useValue: db },
-        { provide: CsvExportService, useValue: { toBuffer: jest.fn() } },
-        {
-          provide: ImportService,
-          useValue: { analyze: jest.fn(), getRowsForExecution: jest.fn() },
-        },
         { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
       ],
     }).compile()
 
     service = module.get(ProductsService)
+    inventoryService = module.get(ProductInventoryService)
   })
 
   describe('findAll', () => {
@@ -257,7 +256,7 @@ describe('ProductsService', () => {
         .mockResolvedValueOnce([makeMovementRow()])
         .mockResolvedValueOnce([])
 
-      const result = await service.adjustInventory(
+      const result = await inventoryService.adjustInventory(
         SCHEMA,
         PRODUCT_ID,
         {
@@ -276,7 +275,7 @@ describe('ProductsService', () => {
       qr.query.mockResolvedValueOnce([{ stock: 5 }])
 
       await expect(
-        service.adjustInventory(
+        inventoryService.adjustInventory(
           SCHEMA,
           PRODUCT_ID,
           {
@@ -294,7 +293,7 @@ describe('ProductsService', () => {
         .mockResolvedValueOnce([makeMovementRow({ movement_type: 'sale', quantity: 5 })])
         .mockResolvedValueOnce([])
 
-      const result = await service.adjustInventory(
+      const result = await inventoryService.adjustInventory(
         SCHEMA,
         PRODUCT_ID,
         {
@@ -315,7 +314,7 @@ describe('ProductsService', () => {
         { id: 'prod-2', name: 'Gadget', sku: null, stock: 0, min_stock: 5 },
       ])
 
-      const result = await service.getLowStock(SCHEMA)
+      const result = await inventoryService.getLowStock(SCHEMA)
 
       expect(result).toHaveLength(2)
       expect(result[0]?.stock).toBe(3)
@@ -325,7 +324,7 @@ describe('ProductsService', () => {
     it('returns empty array when no low stock products', async () => {
       qr.query.mockResolvedValueOnce([])
 
-      const result = await service.getLowStock(SCHEMA)
+      const result = await inventoryService.getLowStock(SCHEMA)
 
       expect(result).toHaveLength(0)
     })

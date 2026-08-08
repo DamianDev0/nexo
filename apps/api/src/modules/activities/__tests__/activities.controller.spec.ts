@@ -1,31 +1,12 @@
-import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { ActivitiesController } from '../activities.controller'
-import { ActivitiesService } from '../activities.service'
-import {
-  type ActivityListItem,
-  type AuthenticatedUser,
-  type PaginatedActivities,
-  PlanName,
-  type TenantContext,
-} from '@repo/shared-types'
+import { ActivitiesController } from '../controllers/activities.controller'
+import { ActivitiesService } from '../services/activities.service'
+import { expectNotFoundPropagation } from '@/shared/testing/crud-assertions'
+import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
+import type { ActivityListItem, PaginatedActivities } from '@repo/shared-types'
 
-const mockCtx: TenantContext = {
-  tenantId: 'tenant-1',
-  schemaName: 'tenant_acme',
-  slug: 'acme',
-  plan: PlanName.FREE,
-  config: {},
-  productName: 'NexoCRM',
-  customDomain: null,
-}
-const mockUser: AuthenticatedUser = {
-  id: 'user-1',
-  email: 'a@b.co',
-  role: 'sales_rep' as AuthenticatedUser['role'],
-  tenantId: 'tenant-1',
-  schemaName: 'tenant_acme',
-}
+const mockCtx = makeTenantContext()
+const mockUser = makeAuthenticatedUser()
 
 const mockActivity: ActivityListItem = {
   id: 'act-1',
@@ -127,9 +108,7 @@ describe('ActivitiesController', () => {
     })
 
     it('propagates NotFoundException', async () => {
-      service.findOne.mockRejectedValue(new NotFoundException())
-
-      await expect(controller.findOne('missing', mockCtx)).rejects.toThrow(NotFoundException)
+      await expectNotFoundPropagation(service.findOne, () => controller.findOne('missing', mockCtx))
     })
   })
 

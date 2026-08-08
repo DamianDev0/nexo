@@ -1,3 +1,5 @@
+import type { ContactSortField, LifecycleStage } from '@repo/shared-types'
+
 export interface ContactRow {
   id: string
   first_name: string
@@ -57,4 +59,72 @@ export interface DealRow {
   pipeline_id: string | null
   expected_close_date: string | null
   created_at: string
+}
+
+export interface ContactListQuery {
+  q?: string
+  status?: string
+  source?: string
+  tags?: string[]
+  companyId?: string
+  assignedToId?: string
+  lifecycleStage?: LifecycleStage
+  city?: string
+  createdFrom?: string
+  createdTo?: string
+  lastContactedFrom?: string
+  lastContactedTo?: string
+  sortBy?: ContactSortField
+  sortDir?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
+export interface ContactPage {
+  rows: ContactRow[]
+  total: number
+  page: number
+  limit: number
+}
+
+export interface ContactStatusCountRow {
+  status: string
+  count: string
+}
+
+export interface CreateContactData {
+  firstName: string
+  lastName: string | null
+  email: string | null
+  phone: string | null
+  whatsapp: string | null
+  documentType: string | null
+  documentNumber: string | null
+  jobTitle: string | null
+  linkedinUrl: string | null
+  birthday: string | null
+  address: string | null
+  city: string | null
+  department: string | null
+  municipioCode: string | null
+  status: string
+  lifecycleStage: string
+  source: string | null
+  leadScore: number
+  dataConsent: boolean
+  consentDate: Date | null
+  consentSource: string | null
+  optOutEmail: boolean
+  optOutSms: boolean
+  optOutWhatsapp: boolean
+  tags: string[]
+  companyId: string | null
+  assignedToId: string | null
+  customFields: Record<string, unknown>
+  createdBy: string
+}
+
+export interface ContactColumnChange {
+  column: string
+  value: unknown
 }

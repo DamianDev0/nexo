@@ -10,3 +10,12 @@ export interface ApiKeyRow {
   created_by: string | null
   created_at: string
 }
+
+export type InsertApiKeyData = {
+  name: string
+  keyHash: string
+  keyPrefix: string
+  scopes: string[]
+  expiresAt: string | null
+  createdBy: string
+}

@@ -4,6 +4,7 @@ import type {
   PasswordResetRow,
   CreateResetTokenData,
 } from '../interfaces/password-reset-rows.interface'
+import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
 export class PasswordResetRepository {
@@ -29,13 +30,14 @@ export class PasswordResetRepository {
     tokenHash: string,
   ): Promise<PasswordResetRow | undefined> {
     return this.tenantDb.query<PasswordResetRow | undefined>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<PasswordResetRow[]>(
+        qr,
         `SELECT id, user_id, token_hash, expires_at, used_at
          FROM "${schemaName}".password_reset_tokens
          WHERE token_hash = $1 LIMIT 1`,
         [tokenHash],
       )
-      return (raw as PasswordResetRow[])[0]
+      return raw[0]
     })
   }
 

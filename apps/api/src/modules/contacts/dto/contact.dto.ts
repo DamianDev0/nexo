@@ -18,7 +18,6 @@ import {
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
-import { Transform, Type } from 'class-transformer'
 import {
   DocumentType,
   LifecycleStage,
@@ -26,7 +25,7 @@ import {
   TAXONOMY_KEY_PATTERN,
 } from '@repo/shared-types'
 import type { ContactSortField } from '@repo/shared-types'
-import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@repo/shared-utils'
+import { TaggedPaginationQueryDto } from '@/shared/dto/tagged-pagination-query.dto'
 
 export class CreateContactDto {
   @ApiProperty()
@@ -185,7 +184,7 @@ export class CreateContactDto {
 
 export class UpdateContactDto extends PartialType(CreateContactDto) {}
 
-export class ContactQueryDto {
+export class ContactQueryDto extends TaggedPaginationQueryDto {
   @ApiPropertyOptional({ description: 'Full-text search (name, email, phone, document)' })
   @IsOptional()
   @IsString()
@@ -203,24 +202,10 @@ export class ContactQueryDto {
   @Matches(TAXONOMY_KEY_PATTERN)
   source?: string
 
-  @ApiPropertyOptional({ type: [String], description: 'Filter by tags (ALL must match)' })
-  @IsOptional()
-  @Transform(({ value }: { value: unknown }) => {
-    if (Array.isArray(value)) return value
-    return value ? [value] : undefined
-  })
-  @IsString({ each: true })
-  tags?: string[]
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsUUID()
   companyId?: string
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUUID()
-  assignedToId?: string
 
   @ApiPropertyOptional({ enum: LifecycleStage })
   @IsOptional()
@@ -262,19 +247,4 @@ export class ContactQueryDto {
   @IsOptional()
   @IsIn(['asc', 'desc'])
   sortDir?: 'asc' | 'desc'
-
-  @ApiPropertyOptional({ default: 1, minimum: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  page?: number = 1
-
-  @ApiPropertyOptional({ default: DEFAULT_PAGE_SIZE, minimum: 1, maximum: MAX_PAGE_SIZE })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(MAX_PAGE_SIZE)
-  limit?: number = DEFAULT_PAGE_SIZE
 }

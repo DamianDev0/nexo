@@ -13,6 +13,13 @@ export interface WebhookRow {
   updated_at: string
 }
 
+export interface WebhookDeliveryAttempt {
+  statusCode: number | null
+  responseTime: number
+  success: boolean
+  error: string | null
+}
+
 export interface LogRow {
   id: string
   webhook_id: string

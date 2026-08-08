@@ -7,6 +7,10 @@ import { ContactViewsService } from './services/contact-views.service'
 import { ContactWorkspaceController } from './controllers/contact-workspace.controller'
 import { ContactWorkspaceService } from './services/contact-workspace.service'
 import { ContactDuplicatesService } from './services/contact-duplicates.service'
+import { ContactsRepository } from './repositories/contacts.repository'
+import { ContactViewsRepository } from './repositories/contact-views.repository'
+import { ContactWorkspaceRepository } from './repositories/contact-workspace.repository'
+import { ContactDuplicatesRepository } from './repositories/contact-duplicates.repository'
 
 @Module({
   imports: [SettingsModule],
@@ -16,6 +20,10 @@ import { ContactDuplicatesService } from './services/contact-duplicates.service'
     ContactViewsService,
     ContactWorkspaceService,
     ContactDuplicatesService,
+    ContactsRepository,
+    ContactViewsRepository,
+    ContactWorkspaceRepository,
+    ContactDuplicatesRepository,
   ],
   exports: [ContactsService],
 })

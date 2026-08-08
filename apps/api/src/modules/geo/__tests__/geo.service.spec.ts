@@ -1,3 +1,4 @@
+import { GeoRepository } from '../repositories/geo.repository'
 import { GeoService } from '../services/geo.service'
 
 function buildQueryBuilderMock() {
@@ -29,7 +30,7 @@ describe('GeoService', () => {
 
   beforeEach(() => {
     qb = buildQueryBuilderMock()
-    service = new GeoService(buildRepoMock(qb) as never)
+    service = new GeoService(new GeoRepository(buildRepoMock(qb) as never))
   })
 
   describe('listDepartments', () => {

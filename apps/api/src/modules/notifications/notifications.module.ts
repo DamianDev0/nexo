@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { NotificationsController } from './notifications.controller'
-import { NotificationsService } from './notifications.service'
+import { NotificationsController } from './controllers/notifications.controller'
+import { NotificationsService } from './services/notifications.service'
+import { NotificationsRepository } from './repositories/notifications.repository'
 import { NotificationsGateway } from './notifications.gateway'
 import { NotificationsListener } from './notifications.listener'
 
@@ -17,7 +18,12 @@ import { NotificationsListener } from './notifications.listener'
     }),
   ],
   controllers: [NotificationsController],
-  providers: [NotificationsService, NotificationsGateway, NotificationsListener],
+  providers: [
+    NotificationsService,
+    NotificationsRepository,
+    NotificationsGateway,
+    NotificationsListener,
+  ],
   exports: [NotificationsService, NotificationsGateway],
 })
 export class NotificationsModule {}

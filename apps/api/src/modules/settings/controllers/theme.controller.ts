@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Header,
-  HttpCode,
   HttpStatus,
   Param,
   ParseIntPipe,
@@ -12,11 +11,11 @@ import {
   Query,
   Res,
 } from '@nestjs/common'
-import { ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger'
+import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger'
 import type { Response } from 'express'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext, AuthenticatedUser } from '@repo/shared-types'
-import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TenantConfigService } from '../services/tenant-config.service'
@@ -37,16 +36,17 @@ export class ThemeController {
   ) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Get current theme' })
+  @ApiEndpoint({ summary: 'Get current theme', roles: [UserRole.VIEWER] })
   getTheme(@TenantCtx() ctx: TenantContext): Promise<TenantTheme> {
     return this.configService.getTheme(ctx.tenantId)
   }
 
   @Patch()
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update theme (deep-merges)' })
+  @ApiEndpoint({
+    summary: 'Update theme (deep-merges)',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiOkResponse({ description: 'Updated theme' })
   updateTheme(
     @Body() dto: UpdateThemeDto,
@@ -57,9 +57,11 @@ export class ThemeController {
   }
 
   @Post('import')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Import a theme from a shadcn CSS-vars block or DTCG JSON' })
+  @ApiEndpoint({
+    summary: 'Import a theme from a shadcn CSS-vars block or DTCG JSON',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiOkResponse({ description: 'Updated theme' })
   importTheme(
     @Body() dto: ImportThemeDto,
@@ -71,10 +73,12 @@ export class ThemeController {
   }
 
   @Get('export')
-  @Auth(UserRole.ADMIN)
+  @ApiEndpoint({
+    summary: 'Export the resolved theme as shadcn CSS variables or DTCG JSON',
+    roles: [UserRole.ADMIN],
+  })
   @Header('Cache-Control', 'no-store')
   @ApiProduces('text/css', 'application/json')
-  @ApiOperation({ summary: 'Export the resolved theme as shadcn CSS variables or DTCG JSON' })
   async exportTheme(
     @TenantCtx() ctx: TenantContext,
     @Query() query: ExportThemeQueryDto,
@@ -89,8 +93,7 @@ export class ThemeController {
   }
 
   @Get('history')
-  @Auth(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get theme change history (last 10)' })
+  @ApiEndpoint({ summary: 'Get theme change history (last 10)', roles: [UserRole.ADMIN] })
   getHistory(
     @TenantCtx() ctx: TenantContext,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
@@ -99,9 +102,11 @@ export class ThemeController {
   }
 
   @Post('restore/:historyId')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Restore theme to a previous version' })
+  @ApiEndpoint({
+    summary: 'Restore theme to a previous version',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   restoreTheme(
     @Param('historyId') historyId: string,
     @TenantCtx() ctx: TenantContext,

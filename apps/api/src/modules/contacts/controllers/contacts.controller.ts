@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   HttpStatus,
   Param,
   ParseBoolPipe,
@@ -12,7 +11,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common'
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
+import { ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type {
   TenantContext,
@@ -22,7 +21,7 @@ import type {
   PaginatedContacts,
   ContactTimeline,
 } from '@repo/shared-types'
-import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { ContactsService } from '../services/contacts.service'
@@ -38,8 +37,10 @@ export class ContactsController {
   ) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'List contacts with pagination, filters and full-text search' })
+  @ApiEndpoint({
+    summary: 'List contacts with pagination, filters and full-text search',
+    roles: [UserRole.VIEWER],
+  })
   findAll(
     @TenantCtx() ctx: TenantContext,
     @Query() query: ContactQueryDto,
@@ -48,8 +49,10 @@ export class ContactsController {
   }
 
   @Post()
-  @Auth(UserRole.SALES_REP)
-  @ApiOperation({ summary: 'Create a contact; pass force=true to override soft duplicates' })
+  @ApiEndpoint({
+    summary: 'Create a contact; pass force=true to override soft duplicates',
+    roles: [UserRole.SALES_REP],
+  })
   async create(
     @Body() dto: CreateContactDto,
     @TenantCtx() ctx: TenantContext,
@@ -61,16 +64,17 @@ export class ContactsController {
   }
 
   @Get('counts')
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Contact totals grouped by status' })
+  @ApiEndpoint({ summary: 'Contact totals grouped by status', roles: [UserRole.VIEWER] })
   counts(@TenantCtx() ctx: TenantContext): Promise<ContactCounts> {
     return this.contactsService.counts(ctx.schemaName)
   }
 
   @Get(':id')
-  @Auth(UserRole.VIEWER)
-  @ApiParam({ name: 'id', description: 'Contact UUID' })
-  @ApiOperation({ summary: 'Get a single contact' })
+  @ApiEndpoint({
+    summary: 'Get a single contact',
+    roles: [UserRole.VIEWER],
+    param: 'Contact UUID',
+  })
   findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @TenantCtx() ctx: TenantContext,
@@ -79,9 +83,7 @@ export class ContactsController {
   }
 
   @Patch(':id')
-  @Auth(UserRole.SALES_REP)
-  @ApiParam({ name: 'id', description: 'Contact UUID' })
-  @ApiOperation({ summary: 'Update a contact' })
+  @ApiEndpoint({ summary: 'Update a contact', roles: [UserRole.SALES_REP], param: 'Contact UUID' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateContactDto,
@@ -93,18 +95,22 @@ export class ContactsController {
   }
 
   @Delete(':id')
-  @Auth(UserRole.MANAGER)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiParam({ name: 'id', description: 'Contact UUID' })
-  @ApiOperation({ summary: 'Soft-delete a contact' })
+  @ApiEndpoint({
+    summary: 'Soft-delete a contact',
+    roles: [UserRole.MANAGER],
+    param: 'Contact UUID',
+    status: HttpStatus.NO_CONTENT,
+  })
   remove(@Param('id', ParseUUIDPipe) id: string, @TenantCtx() ctx: TenantContext): Promise<void> {
     return this.contactsService.remove(ctx.schemaName, id)
   }
 
   @Get(':id/timeline')
-  @Auth(UserRole.VIEWER)
-  @ApiParam({ name: 'id', description: 'Contact UUID' })
-  @ApiOperation({ summary: 'Get contact timeline (activities + deals)' })
+  @ApiEndpoint({
+    summary: 'Get contact timeline (activities + deals)',
+    roles: [UserRole.VIEWER],
+    param: 'Contact UUID',
+  })
   getTimeline(
     @Param('id', ParseUUIDPipe) id: string,
     @TenantCtx() ctx: TenantContext,

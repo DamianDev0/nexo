@@ -11,6 +11,12 @@ export interface NotificationRow {
   created_at: string
 }
 
+export interface NotificationListResult {
+  rows: NotificationRow[]
+  total: number
+  unreadCount: number
+}
+
 export interface PreferencesRow {
   id: string
   user_id: string

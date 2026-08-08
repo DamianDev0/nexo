@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import type { AuditLogRow } from '../repositories/audit-log.repository'
-import type { AuditSeverity } from '../audit-log.interfaces'
+import type { AuditLogRow } from '../interfaces/audit-log-row.interfaces'
+import type { AuditSeverity } from '../interfaces/audit-log.interfaces'
 
 export class AuditLogEntryDto {
   @ApiProperty() id: string

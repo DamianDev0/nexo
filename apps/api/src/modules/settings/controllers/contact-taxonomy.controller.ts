@@ -11,6 +11,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { ContactTaxonomy, TaxonomyOption, TenantContext } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TenantConfigService } from '../services/tenant-config.service'
 import { UpdateContactTaxonomyDto } from '../dto/contact-taxonomy.dto'
@@ -21,8 +22,10 @@ export class ContactTaxonomyController {
   constructor(private readonly configService: TenantConfigService) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Get the tenant statuses and sources for contacts' })
+  @ApiEndpoint({
+    summary: 'Get the tenant statuses and sources for contacts',
+    roles: [UserRole.VIEWER],
+  })
   get(@TenantCtx() ctx: TenantContext): Promise<ContactTaxonomy> {
     return this.configService.getContactTaxonomy(ctx.tenantId)
   }

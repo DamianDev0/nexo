@@ -3,6 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TenantConfigService } from '../services/tenant-config.service'
 import { UpdateSidebarDto } from '../dto/sidebar.dto'
@@ -14,8 +15,7 @@ export class NavigationController {
   constructor(private readonly configService: TenantConfigService) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Get sidebar navigation config' })
+  @ApiEndpoint({ summary: 'Get sidebar navigation config', roles: [UserRole.VIEWER] })
   getSidebar(@TenantCtx() ctx: TenantContext): Promise<SidebarConfig> {
     return this.configService.getSidebarConfig(ctx.tenantId)
   }

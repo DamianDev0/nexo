@@ -1,8 +1,11 @@
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { CompaniesService } from '../companies.service'
+import { CompaniesService } from '../services/companies.service'
+import { CompaniesRepository } from '../repositories/companies.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { expectPageAndLimitApplied } from '@/shared/testing/crud-assertions'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import type { Company, PaginatedCompanies, CompanySummary } from '@repo/shared-types'
 import { TaxRegime, CompanySize, CIIUSector } from '@repo/shared-types'
 
@@ -76,17 +79,6 @@ function makeDealRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-function buildQrMock(overrides: Record<string, jest.Mock> = {}) {
-  return { query: jest.fn(), ...overrides }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-    transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 describe('CompaniesService', () => {
   let service: CompaniesService
   let db: ReturnType<typeof buildDbMock>
@@ -99,6 +91,7 @@ describe('CompaniesService', () => {
     const module = await Test.createTestingModule({
       providers: [
         CompaniesService,
+        CompaniesRepository,
         { provide: TenantDbService, useValue: db },
         { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
       ],
@@ -123,14 +116,7 @@ describe('CompaniesService', () => {
     })
 
     it('applies page and limit correctly', async () => {
-      qr.query.mockResolvedValueOnce([{ count: '50' }]).mockResolvedValueOnce([makeCompanyRow()])
-
-      const result = await service.findAll(SCHEMA, { page: 3, limit: 10 })
-
-      expect(result.page).toBe(3)
-      expect(result.limit).toBe(10)
-      const listQuery: string = qr.query.mock.calls[1][0] as string
-      expect(listQuery).toContain('OFFSET')
+      await expectPageAndLimitApplied(qr, makeCompanyRow, (query) => service.findAll(SCHEMA, query))
     })
 
     it('returns empty data when no companies match', async () => {

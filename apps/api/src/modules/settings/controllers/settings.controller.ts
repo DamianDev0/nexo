@@ -3,6 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext, AuthenticatedUser } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { extractMeta } from '@/modules/auth/utils/auth-request.util'
@@ -18,8 +19,7 @@ export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get('general')
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Get current tenant settings' })
+  @ApiEndpoint({ summary: 'Get current tenant settings', roles: [UserRole.VIEWER] })
   @ApiOkResponse({ type: SettingsResponseDto })
   getGeneral(@TenantCtx() tenantCtx: TenantContext): Promise<SettingsResponseDto> {
     return this.settingsService.getSettings(tenantCtx.tenantId)

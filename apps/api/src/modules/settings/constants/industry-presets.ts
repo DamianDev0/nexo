@@ -18,6 +18,16 @@ export interface IndustryPreset {
   pipelineStages: PipelineStagePreset[]
 }
 
+const COMMERCE_NOMENCLATURE = { contacts: 'Clientes', companies: 'Empresas', deals: 'Negocios' }
+
+const COMMERCE_STAGES: PipelineStagePreset[] = [
+  { name: 'Prospecto', order: 1, color: '#6366f1', probability: 10 },
+  { name: 'Contactado', order: 2, color: '#8b5cf6', probability: 25 },
+  { name: 'Propuesta enviada', order: 3, color: '#f59e0b', probability: 50 },
+  { name: 'Negociación', order: 4, color: '#f97316', probability: 75 },
+  { name: 'Cerrado ganado', order: 5, color: '#059669', probability: 100 },
+]
+
 export const INDUSTRY_PRESETS: Record<IndustrySector, IndustryPreset> = {
   salud: {
     sector: IndustrySector.SALUD,
@@ -58,15 +68,9 @@ export const INDUSTRY_PRESETS: Record<IndustrySector, IndustryPreset> = {
   },
   comercio: {
     sector: IndustrySector.COMERCIO,
-    nomenclature: { contacts: 'Clientes', companies: 'Empresas', deals: 'Negocios' },
+    nomenclature: { ...COMMERCE_NOMENCLATURE },
     iconPack: 'commerce',
-    pipelineStages: [
-      { name: 'Prospecto', order: 1, color: '#6366f1', probability: 10 },
-      { name: 'Contactado', order: 2, color: '#8b5cf6', probability: 25 },
-      { name: 'Propuesta enviada', order: 3, color: '#f59e0b', probability: 50 },
-      { name: 'Negociación', order: 4, color: '#f97316', probability: 75 },
-      { name: 'Cerrado ganado', order: 5, color: '#059669', probability: 100 },
-    ],
+    pipelineStages: COMMERCE_STAGES.map((stage) => ({ ...stage })),
   },
   servicios: {
     sector: IndustrySector.SERVICIOS,
@@ -119,15 +123,9 @@ export const INDUSTRY_PRESETS: Record<IndustrySector, IndustryPreset> = {
   },
   otros: {
     sector: IndustrySector.OTROS,
-    nomenclature: { contacts: 'Clientes', companies: 'Empresas', deals: 'Negocios' },
+    nomenclature: { ...COMMERCE_NOMENCLATURE },
     iconPack: 'commerce',
-    pipelineStages: [
-      { name: 'Prospecto', order: 1, color: '#6366f1', probability: 10 },
-      { name: 'Contactado', order: 2, color: '#8b5cf6', probability: 25 },
-      { name: 'Propuesta enviada', order: 3, color: '#f59e0b', probability: 50 },
-      { name: 'Negociación', order: 4, color: '#f97316', probability: 75 },
-      { name: 'Cerrado ganado', order: 5, color: '#059669', probability: 100 },
-    ],
+    pipelineStages: COMMERCE_STAGES.map((stage) => ({ ...stage })),
   },
 }
 

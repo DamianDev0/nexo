@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { UserRole } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { UserRow } from '../interfaces/auth-rows.interface'
+import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
 export class AuthRepository {
@@ -9,32 +10,35 @@ export class AuthRepository {
 
   async findUserByEmail(schemaName: string, email: string): Promise<UserRow | undefined> {
     return this.tenantDb.query<UserRow | undefined>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<UserRow[]>(
+        qr,
         `SELECT id, email, full_name, avatar_url, role, password_hash, is_active
          FROM "${schemaName}".users WHERE email = $1 LIMIT 1`,
         [email.toLowerCase()],
       )
-      return (raw as UserRow[])[0]
+      return raw[0]
     })
   }
 
   async findUserById(schemaName: string, id: string): Promise<UserRow | undefined> {
     return this.tenantDb.query<UserRow | undefined>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<UserRow[]>(
+        qr,
         `SELECT id, email, full_name, avatar_url, role, password_hash, is_active
          FROM "${schemaName}".users WHERE id = $1 AND is_active = true LIMIT 1`,
         [id],
       )
-      return (raw as UserRow[])[0]
+      return raw[0]
     })
   }
 
   async countUsers(schemaName: string): Promise<number> {
     return this.tenantDb.query<number>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<Array<{ count: number }>>(
+        qr,
         `SELECT COUNT(*)::int AS count FROM "${schemaName}".users`,
       )
-      return (raw as Array<{ count: number }>)[0]?.count ?? 0
+      return raw[0]?.count ?? 0
     })
   }
 
@@ -45,13 +49,14 @@ export class AuthRepository {
     fullName: string,
   ): Promise<UserRow> {
     return this.tenantDb.transactional<UserRow>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<UserRow[]>(
+        qr,
         `INSERT INTO "${schemaName}".users (email, password_hash, full_name, role)
          VALUES ($1, $2, $3, $4)
          RETURNING id, email, full_name, avatar_url, role, password_hash, is_active`,
         [email.toLowerCase(), passwordHash, fullName, UserRole.OWNER],
       )
-      const created = (raw as UserRow[])[0]
+      const created = raw[0]
       if (!created) throw new Error('INSERT returned no rows')
       return created
     })
@@ -65,13 +70,14 @@ export class AuthRepository {
     role: UserRole,
   ): Promise<UserRow> {
     return this.tenantDb.transactional<UserRow>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<UserRow[]>(
+        qr,
         `INSERT INTO "${schemaName}".users (email, password_hash, full_name, role, is_active)
          VALUES ($1, $2, $3, $4, true)
          RETURNING id, email, full_name, avatar_url, role, password_hash, is_active`,
         [email.toLowerCase(), passwordHash, fullName, role],
       )
-      const created = (raw as UserRow[])[0]
+      const created = raw[0]
       if (!created) throw new Error('INSERT returned no rows')
       return created
     })
@@ -92,20 +98,22 @@ export class AuthRepository {
     avatarUrl: string | null,
   ): Promise<UserRow | undefined> {
     return this.tenantDb.transactional<UserRow | undefined>(schemaName, async (qr) => {
-      const existingRaw: unknown = await qr.query(
+      const existingRaw = await sqlRows<UserRow[]>(
+        qr,
         `SELECT id, email, full_name, avatar_url, role, password_hash, is_active
          FROM "${schemaName}".users WHERE email = $1 LIMIT 1`,
         [email.toLowerCase()],
       )
-      const existing = (existingRaw as UserRow[])[0]
+      const existing = existingRaw[0]
       if (!existing) return undefined
 
-      const updatedRaw: unknown = await qr.query(
+      const updatedRaw = await sqlRows<UserRow[]>(
+        qr,
         `UPDATE "${schemaName}".users SET avatar_url = $1 WHERE id = $2
          RETURNING id, email, full_name, avatar_url, role, password_hash, is_active`,
         [avatarUrl, existing.id],
       )
-      return (updatedRaw as UserRow[])[0] ?? existing
+      return updatedRaw[0] ?? existing
     })
   }
 }

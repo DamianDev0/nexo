@@ -1,9 +1,9 @@
 import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext, AuthenticatedUser } from '@repo/shared-types'
-import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { S3Service } from '@/shared/integrations/aws/s3.service'
@@ -20,9 +20,8 @@ export class BrandingController {
   ) {}
 
   @Post('logo')
-  @Auth(UserRole.ADMIN)
+  @ApiEndpoint({ summary: 'Upload tenant logo', roles: [UserRole.ADMIN] })
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload tenant logo' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } },
@@ -38,9 +37,8 @@ export class BrandingController {
   }
 
   @Post('favicon')
-  @Auth(UserRole.ADMIN)
+  @ApiEndpoint({ summary: 'Upload tenant favicon', roles: [UserRole.ADMIN] })
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload tenant favicon' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } },
@@ -56,9 +54,8 @@ export class BrandingController {
   }
 
   @Post('login-bg')
-  @Auth(UserRole.ADMIN)
+  @ApiEndpoint({ summary: 'Upload login page background image', roles: [UserRole.ADMIN] })
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload login page background image' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } },

@@ -10,6 +10,7 @@ import type {
   AuthResult,
 } from '../interfaces/auth-rows.interface'
 import type { StoreRefreshTokenData } from '../interfaces/session-rows.interface'
+import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
 export class SessionRepository {
@@ -25,12 +26,13 @@ export class SessionRepository {
 
   async findByTokenHash(schemaName: string, hash: string): Promise<RefreshTokenRow | undefined> {
     return this.tenantDb.query<RefreshTokenRow | undefined>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<RefreshTokenRow[]>(
+        qr,
         `SELECT id, user_id, token_hash, expires_at, revoked_at
          FROM "${schemaName}".refresh_tokens WHERE token_hash = $1 LIMIT 1`,
         [hash],
       )
-      return (raw as RefreshTokenRow[])[0]
+      return raw[0]
     })
   }
 

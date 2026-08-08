@@ -1,47 +1,56 @@
 import { Injectable } from '@nestjs/common'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import type { AuditAction, AuditEntityType, AuditSeverity } from '../audit-log.interfaces'
-
-export interface AuditLogRow {
-  id: string
-  action: string
-  entity_type: string
-  entity_id: string | null
-  user_id: string | null
-  ip_address: string | null
-  user_agent: string | null
-  severity: AuditSeverity
-  description: string | null
-  metadata: Record<string, unknown> | null
-  old_value: Record<string, unknown> | null
-  new_value: Record<string, unknown> | null
-  created_at: Date
-}
-
-export interface AuditLogCursor {
-  createdAt: string
-  id: string
-}
-
-export interface AuditLogFilters {
-  userId?: string
-  action?: AuditAction
-  severity?: AuditSeverity
-  entityType?: AuditEntityType
-  from?: string
-  to?: string
-  cursor?: string
-  limit?: number
-}
-
-export interface AuditLogPage {
-  rows: AuditLogRow[]
-  nextCursor: string | null
-}
+import type { AuditEvent } from '../interfaces/audit-log.interfaces'
+import type {
+  AuditLogCursor,
+  AuditLogFilters,
+  AuditLogPage,
+  AuditLogRow,
+} from '../interfaces/audit-log-row.interfaces'
+import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
 export class AuditLogRepository {
   constructor(private readonly tenantDb: TenantDbService) {}
+
+  async insert(event: AuditEvent): Promise<void> {
+    const {
+      schemaName,
+      action,
+      entityType,
+      entityId = null,
+      userId = null,
+      ip = null,
+      userAgent = null,
+      severity = 'info',
+      description = null,
+      metadata = null,
+      oldValue = null,
+      newValue = null,
+    } = event
+
+    await this.tenantDb.query(schemaName, async (qr) => {
+      await qr.query(
+        `INSERT INTO "${schemaName}".audit_log
+           (action, entity_type, entity_id, user_id, ip_address, user_agent,
+            severity, description, metadata, old_value, new_value)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        [
+          action,
+          entityType,
+          entityId,
+          userId,
+          ip,
+          userAgent,
+          severity,
+          description,
+          metadata ? JSON.stringify(metadata) : null,
+          oldValue ? JSON.stringify(oldValue) : null,
+          newValue ? JSON.stringify(newValue) : null,
+        ],
+      )
+    })
+  }
 
   async findPage(schemaName: string, filters: AuditLogFilters): Promise<AuditLogPage> {
     const limit = Math.min(filters.limit ?? 50, 200)
@@ -60,7 +69,8 @@ export class AuditLogRepository {
     ]
 
     const rows = await this.tenantDb.query<AuditLogRow[]>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<AuditLogRow[]>(
+        qr,
         `SELECT id, action, entity_type, entity_id, user_id, ip_address, user_agent,
                 severity, description, metadata, old_value, new_value, created_at
            FROM "${schemaName}".audit_log
@@ -77,7 +87,7 @@ export class AuditLogRepository {
           LIMIT $9`,
         params,
       )
-      return raw as AuditLogRow[]
+      return raw
     })
 
     const hasNext = rows.length > limit
@@ -107,7 +117,8 @@ export class AuditLogRepository {
     ]
 
     return this.tenantDb.query<AuditLogRow[]>(schemaName, async (qr) => {
-      const raw: unknown = await qr.query(
+      const raw = await sqlRows<AuditLogRow[]>(
+        qr,
         `SELECT id, action, entity_type, entity_id, user_id, ip_address, user_agent,
                 severity, description, metadata, old_value, new_value, created_at
            FROM "${schemaName}".audit_log
@@ -120,7 +131,7 @@ export class AuditLogRepository {
           ORDER BY created_at DESC`,
         params,
       )
-      return raw as AuditLogRow[]
+      return raw
     })
   }
 

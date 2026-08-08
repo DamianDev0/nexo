@@ -70,3 +70,23 @@ export interface ForecastRow {
   weighted_value_cents: string
   deal_count: string
 }
+
+export interface DealListPageRow {
+  rows: DealListRow[]
+  total: number
+}
+
+export interface DealWithItemsRow {
+  deal: DealDetailRow
+  items: DealItemRow[]
+}
+
+export interface DealStageMoveRow extends DealWithItemsRow {
+  fromStageId: string | null
+}
+
+export interface DealStatusRow {
+  id: string
+  stage_id: string | null
+  status: string
+}

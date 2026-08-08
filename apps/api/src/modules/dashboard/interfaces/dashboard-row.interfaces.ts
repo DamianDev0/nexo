@@ -11,6 +11,24 @@ export interface MetricsRow {
   pending_activities_count: string
 }
 
+export interface DealMetricsRow {
+  active_count: string
+  active_value: string
+  won_count: string
+  won_value: string
+}
+
+export interface CountRow {
+  count: string
+}
+
+export type MetricsQueryResult = {
+  invoices: MetricsRow
+  deals: DealMetricsRow
+  newContacts: CountRow
+  pendingActivities: CountRow
+}
+
 export interface PipelineStageSummaryRow {
   pipeline_id: string
   pipeline_name: string

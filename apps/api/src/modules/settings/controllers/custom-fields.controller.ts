@@ -4,7 +4,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
@@ -15,13 +14,12 @@ import {
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
-  ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext } from '@repo/shared-types'
-import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TenantConfigService } from '../services/tenant-config.service'
 import {
@@ -54,16 +52,14 @@ export class CustomFieldsController {
   constructor(private readonly configService: TenantConfigService) {}
 
   @Get()
-  @Auth(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get all custom fields for all entities' })
+  @ApiEndpoint({ summary: 'Get all custom fields for all entities', roles: [UserRole.ADMIN] })
   getAllCustomFields(@TenantCtx() ctx: TenantContext): Promise<CustomFieldsConfig> {
     return this.configService.getCustomFields(ctx.tenantId)
   }
 
   @Get(':entity')
-  @Auth(UserRole.ADMIN)
+  @ApiEndpoint({ summary: 'Get custom fields for a specific entity', roles: [UserRole.ADMIN] })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
-  @ApiOperation({ summary: 'Get custom fields for a specific entity' })
   async getEntityFields(
     @Param('entity') entity: string,
     @TenantCtx() ctx: TenantContext,
@@ -74,10 +70,12 @@ export class CustomFieldsController {
   }
 
   @Post(':entity')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.CREATED)
+  @ApiEndpoint({
+    summary: 'Add a single custom field to an entity',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.CREATED,
+  })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
-  @ApiOperation({ summary: 'Add a single custom field to an entity' })
   @ApiCreatedResponse({ description: 'Field created' })
   async createField(
     @Param('entity') entity: string,
@@ -100,10 +98,12 @@ export class CustomFieldsController {
   }
 
   @Patch(':entity')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
+  @ApiEndpoint({
+    summary: 'Replace all custom fields for a specific entity',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
-  @ApiOperation({ summary: 'Replace all custom fields for a specific entity' })
   @ApiOkResponse({ description: 'Updated custom fields' })
   async updateEntityFields(
     @Param('entity') entity: string,
@@ -117,11 +117,13 @@ export class CustomFieldsController {
   }
 
   @Patch(':entity/:key')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
+  @ApiEndpoint({
+    summary: 'Update a single custom field',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
   @ApiParam({ name: 'key', description: 'Field key' })
-  @ApiOperation({ summary: 'Update a single custom field' })
   @ApiOkResponse({ description: 'Updated field' })
   async updateField(
     @Param('entity') entity: string,
@@ -149,11 +151,13 @@ export class CustomFieldsController {
   }
 
   @Delete(':entity/:key')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiEndpoint({
+    summary: 'Delete a single custom field',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.NO_CONTENT,
+  })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
   @ApiParam({ name: 'key', description: 'Field key' })
-  @ApiOperation({ summary: 'Delete a single custom field' })
   @ApiNoContentResponse({ description: 'Field deleted' })
   async deleteField(
     @Param('entity') entity: string,
@@ -176,9 +180,11 @@ export class CustomFieldsController {
   }
 
   @Get('permissions/:entity')
-  @Auth(UserRole.ADMIN)
+  @ApiEndpoint({
+    summary: 'Get field permissions for a specific entity',
+    roles: [UserRole.ADMIN],
+  })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
-  @ApiOperation({ summary: 'Get field permissions for a specific entity' })
   async getFieldPermissions(
     @Param('entity') entity: string,
     @TenantCtx() ctx: TenantContext,
@@ -189,10 +195,12 @@ export class CustomFieldsController {
   }
 
   @Patch('permissions/:entity')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
+  @ApiEndpoint({
+    summary: 'Update field permissions for a specific entity',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
-  @ApiOperation({ summary: 'Update field permissions for a specific entity' })
   async updateFieldPermissions(
     @Param('entity') entity: string,
     @Body() dto: UpdateFieldPermissionsDto,

@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsInt, IsISO8601, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator'
 import { Type } from 'class-transformer'
-import { AuditAction, AuditEntityType, AuditSeverity } from '../audit-log.interfaces'
+import { AuditAction, AuditEntityType, AuditSeverity } from '../interfaces/audit-log.interfaces'
 
 export class AuditLogQueryDto {
   @ApiPropertyOptional({ description: 'Filter by user ID' })

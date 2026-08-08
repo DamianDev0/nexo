@@ -1,6 +1,8 @@
 import { Test } from '@nestjs/testing'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { ContactWorkspaceService } from '../services/contact-workspace.service'
+import { ContactWorkspaceRepository } from '../repositories/contact-workspace.repository'
 import { ContactViewsService } from '../services/contact-views.service'
 import { ContactsService } from '../services/contacts.service'
 import type { ContactView } from '@repo/shared-types'
@@ -28,17 +30,6 @@ function makeView(overrides: Partial<ContactView> = {}): ContactView {
   }
 }
 
-function buildQrMock() {
-  return { query: jest.fn() }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-    transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 describe('ContactWorkspaceService', () => {
   let service: ContactWorkspaceService
   let db: ReturnType<typeof buildDbMock>
@@ -55,6 +46,7 @@ describe('ContactWorkspaceService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ContactWorkspaceService,
+        ContactWorkspaceRepository,
         { provide: TenantDbService, useValue: db },
         { provide: ContactViewsService, useValue: views },
         { provide: ContactsService, useValue: contacts },

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets'
 import type { Server, Socket } from 'socket.io'
 import { JwtService } from '@nestjs/jwt'
-import { NotificationsService } from './notifications.service'
+import { NotificationsService } from './services/notifications.service'
 
 interface JwtPayload {
   sub: string

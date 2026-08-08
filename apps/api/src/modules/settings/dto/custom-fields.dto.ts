@@ -10,7 +10,7 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger'
 import type {
   CustomFieldType,
   SelectOption,
@@ -71,31 +71,7 @@ export class FieldDefDto implements FieldDef {
   relationEntity?: CustomFieldEntity
 }
 
-export class PatchFieldDefDto {
-  @ApiPropertyOptional() @IsOptional() @IsString() label?: string
-  @ApiPropertyOptional({ enum: FIELD_TYPES })
-  @IsOptional()
-  @IsIn(FIELD_TYPES)
-  type?: CustomFieldType
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() required?: boolean
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() unique?: boolean
-  @ApiPropertyOptional() @IsOptional() @IsInt() @Min(1) order?: number
-  @ApiPropertyOptional() @IsOptional() defaultValue?: unknown
-  @ApiPropertyOptional() @IsOptional() @IsString() placeholder?: string
-  @ApiPropertyOptional({ type: [SelectOptionDto] })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => SelectOptionDto)
-  options?: SelectOptionDto[]
-  @ApiPropertyOptional() @IsOptional() min?: number
-  @ApiPropertyOptional() @IsOptional() max?: number
-  @ApiPropertyOptional() @IsOptional() @IsString() formula?: string
-  @ApiPropertyOptional({ enum: ENTITIES })
-  @IsOptional()
-  @IsIn(ENTITIES)
-  relationEntity?: CustomFieldEntity
-}
+export class PatchFieldDefDto extends PartialType(OmitType(FieldDefDto, ['key'] as const)) {}
 
 export class UpdateCustomFieldsDto {
   @ApiProperty({ type: [FieldDefDto] })

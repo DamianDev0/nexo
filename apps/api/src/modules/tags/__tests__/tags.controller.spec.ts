@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { TagsController } from '../tags.controller'
-import { TagsService } from '../tags.service'
+import { TagsController } from '../controllers/tags.controller'
+import { TagsService } from '../services/tags.service'
 import { PlanName } from '@repo/shared-types'
 import type { Tag, TenantContext } from '@repo/shared-types'
 

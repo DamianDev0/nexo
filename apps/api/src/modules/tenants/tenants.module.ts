@@ -9,11 +9,18 @@ import { TenantsService } from './services/tenants.service'
 import { TenantsRepository } from './repositories/tenants.repository'
 import { TenantProvisioningService } from './services/tenant-provisioning.service'
 import { UserTenantMapService } from './services/user-tenant-map.service'
+import { UserTenantMapRepository } from './repositories/user-tenant-map.repository'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenant, Plan, UserTenantMap])],
   controllers: [TenantsController],
-  providers: [TenantsService, TenantsRepository, TenantProvisioningService, UserTenantMapService],
+  providers: [
+    TenantsService,
+    TenantsRepository,
+    TenantProvisioningService,
+    UserTenantMapService,
+    UserTenantMapRepository,
+  ],
   exports: [TenantsService, TenantProvisioningService, UserTenantMapService],
 })
 export class TenantsModule {}

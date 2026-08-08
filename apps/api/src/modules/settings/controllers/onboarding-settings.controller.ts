@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from '@nestjs/common'
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Get, HttpStatus, Patch } from '@nestjs/common'
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { OnboardingStatus, TenantContext } from '@repo/shared-types'
-import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TenantConfigService } from '../services/tenant-config.service'
 import { UpdateOnboardingDto } from '../dto/onboarding-settings.dto'
@@ -15,17 +15,21 @@ export class OnboardingSettingsController {
   constructor(private readonly configService: TenantConfigService) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Get current onboarding step and completion status' })
+  @ApiEndpoint({
+    summary: 'Get current onboarding step and completion status',
+    roles: [UserRole.VIEWER],
+  })
   @ApiOkResponse()
   getOnboarding(@TenantCtx() tenantCtx: TenantContext): Promise<OnboardingStatus> {
     return this.configService.getOnboarding(tenantCtx.tenantId)
   }
 
   @Patch()
-  @Auth(UserRole.OWNER)
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update onboarding step progress' })
+  @ApiEndpoint({
+    summary: 'Update onboarding step progress',
+    roles: [UserRole.OWNER],
+    status: HttpStatus.OK,
+  })
   @ApiOkResponse()
   updateOnboarding(
     @Body() dto: UpdateOnboardingDto,

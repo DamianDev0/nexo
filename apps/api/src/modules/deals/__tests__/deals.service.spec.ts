@@ -1,7 +1,11 @@
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { DealsService } from '../deals.service'
+import { DealsService } from '../services/deals.service'
+import { DealItemsService } from '../services/deal-items.service'
+import { DealForecastService } from '../services/deal-forecast.service'
+import { DealsRepository } from '../repositories/deals.repository'
+import { DealItemsRepository } from '../repositories/deal-items.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { DealStatus } from '@repo/shared-types'
 import type { DealDetail, PaginatedDeals } from '@repo/shared-types'
@@ -92,6 +96,8 @@ function mockFetchDeal(
 
 describe('DealsService', () => {
   let service: DealsService
+  let itemsService: DealItemsService
+  let forecastService: DealForecastService
   let db: ReturnType<typeof buildDbMock>
   let qr: ReturnType<typeof buildQrMock>
 
@@ -102,12 +108,18 @@ describe('DealsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         DealsService,
+        DealItemsService,
+        DealForecastService,
+        DealsRepository,
+        DealItemsRepository,
         { provide: TenantDbService, useValue: db },
         { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
       ],
     }).compile()
 
     service = module.get(DealsService)
+    itemsService = module.get(DealItemsService)
+    forecastService = module.get(DealForecastService)
   })
 
   describe('findAll', () => {
@@ -361,7 +373,7 @@ describe('DealsService', () => {
         .mockResolvedValueOnce([makeItemRow()])
         .mockResolvedValueOnce([])
 
-      const result = await service.addItem(SCHEMA, DEAL_ID, {
+      const result = await itemsService.addItem(SCHEMA, DEAL_ID, {
         description: 'Consulting service',
         unitPriceCents: 50000,
       })
@@ -382,7 +394,7 @@ describe('DealsService', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([makeItemRow({ quantity: 5 })])
 
-      const result = await service.updateItem(SCHEMA, DEAL_ID, ITEM_ID, { quantity: 5 })
+      const result = await itemsService.updateItem(SCHEMA, DEAL_ID, ITEM_ID, { quantity: 5 })
 
       expect(result.quantity).toBe(5)
     })
@@ -395,13 +407,13 @@ describe('DealsService', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([])
 
-      await expect(service.removeItem(SCHEMA, DEAL_ID, ITEM_ID)).resolves.toBeUndefined()
+      await expect(itemsService.removeItem(SCHEMA, DEAL_ID, ITEM_ID)).resolves.toBeUndefined()
     })
 
     it('throws NotFoundException for missing item', async () => {
       qr.query.mockResolvedValueOnce([])
 
-      await expect(service.removeItem(SCHEMA, DEAL_ID, 'missing')).rejects.toThrow(
+      await expect(itemsService.removeItem(SCHEMA, DEAL_ID, 'missing')).rejects.toThrow(
         NotFoundException,
       )
     })
@@ -413,7 +425,7 @@ describe('DealsService', () => {
         .mockResolvedValueOnce([{ id: DEAL_ID }])
         .mockResolvedValueOnce([makeItemRow(), makeItemRow({ id: 'item-2', position: 1 })])
 
-      const result = await service.getItems(SCHEMA, DEAL_ID)
+      const result = await itemsService.getItems(SCHEMA, DEAL_ID)
 
       expect(result).toHaveLength(2)
       expect(result[0]?.subtotalCents).toBe(90000)
@@ -437,7 +449,7 @@ describe('DealsService', () => {
         },
       ])
 
-      const result = await service.getForecast(SCHEMA)
+      const result = await forecastService.getForecast(SCHEMA)
 
       expect(result).toHaveLength(2)
       expect(result[0]?.month).toBe('2026-04')
@@ -449,7 +461,7 @@ describe('DealsService', () => {
     it('returns empty array when no deals have expected close dates', async () => {
       qr.query.mockResolvedValueOnce([])
 
-      const result = await service.getForecast(SCHEMA)
+      const result = await forecastService.getForecast(SCHEMA)
 
       expect(result).toHaveLength(0)
     })

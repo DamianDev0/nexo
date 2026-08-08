@@ -1,22 +1,13 @@
 import { Test } from '@nestjs/testing'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { EventBusService } from '@/shared/events/event-bus.service'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { ContactDuplicatesService } from '../services/contact-duplicates.service'
 import { ContactsService } from '../services/contacts.service'
+import { ContactsRepository } from '../repositories/contacts.repository'
 import type { ContactQueryDto } from '../dto/contact.dto'
 
 const SCHEMA = 'tenant_test'
-
-function buildQrMock() {
-  return { query: jest.fn() }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-    transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
 
 describe('ContactsService query extensions', () => {
   let service: ContactsService
@@ -27,6 +18,7 @@ describe('ContactsService query extensions', () => {
     const module = await Test.createTestingModule({
       providers: [
         ContactsService,
+        ContactsRepository,
         { provide: TenantDbService, useValue: buildDbMock(qr) },
         { provide: EventBusService, useValue: { emit: jest.fn() } },
         { provide: ContactDuplicatesService, useValue: { assertNoDuplicates: jest.fn() } },

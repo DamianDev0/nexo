@@ -1,5 +1,6 @@
 import { ConflictException } from '@nestjs/common'
 import { ContactDuplicatesService } from '../services/contact-duplicates.service'
+import { ContactDuplicatesRepository } from '../repositories/contact-duplicates.repository'
 import type { ContactDuplicatePayload } from '@repo/shared-types'
 
 function makeDuplicateRow(overrides: Record<string, unknown> = {}) {
@@ -30,7 +31,7 @@ describe('ContactDuplicatesService', () => {
   let qr: ReturnType<typeof buildQrMock>
 
   beforeEach(() => {
-    service = new ContactDuplicatesService()
+    service = new ContactDuplicatesService(new ContactDuplicatesRepository())
     qr = buildQrMock()
   })
 

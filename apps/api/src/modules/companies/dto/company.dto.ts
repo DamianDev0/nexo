@@ -1,21 +1,17 @@
 import {
   IsEmail,
   IsEnum,
-  IsInt,
   IsObject,
   IsOptional,
   IsString,
   IsUUID,
   Length,
   Matches,
-  Max,
-  Min,
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
-import { Transform, Type } from 'class-transformer'
 import { TaxRegime, CompanySize, CIIUSector } from '@repo/shared-types'
-import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@repo/shared-utils'
+import { TaggedPaginationQueryDto } from '@/shared/dto/tagged-pagination-query.dto'
 
 export class CreateCompanyDto {
   @ApiProperty({ example: 'Acme Corp S.A.S' })
@@ -105,7 +101,7 @@ export class CreateCompanyDto {
 
 export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {}
 
-export class CompanyQueryDto {
+export class CompanyQueryDto extends TaggedPaginationQueryDto {
   @ApiPropertyOptional({ description: 'Full-text search (name, NIT)' })
   @IsOptional()
   @IsString()
@@ -130,35 +126,6 @@ export class CompanyQueryDto {
   @IsOptional()
   @IsString()
   city?: string
-
-  @ApiPropertyOptional({ type: [String], description: 'Filter by tags (ALL must match)' })
-  @IsOptional()
-  @Transform(({ value }: { value: unknown }) => {
-    if (Array.isArray(value)) return value
-    return value ? [value] : undefined
-  })
-  @IsString({ each: true })
-  tags?: string[]
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUUID()
-  assignedToId?: string
-
-  @ApiPropertyOptional({ default: 1, minimum: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  page?: number = 1
-
-  @ApiPropertyOptional({ default: DEFAULT_PAGE_SIZE, minimum: 1, maximum: MAX_PAGE_SIZE })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(MAX_PAGE_SIZE)
-  limit?: number = DEFAULT_PAGE_SIZE
 }
 
 export class AssignContactDto {

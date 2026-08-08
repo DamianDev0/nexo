@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common'
-import { AuditLogService } from './audit-log.service'
-import { AuditLogListener } from './audit-log.listener'
+import { AuditLogService } from './services/audit-log.service'
+import { AuditLogListener } from './listeners/audit-log.listener'
 import { AuditLogRepository } from './repositories/audit-log.repository'
 import { AuditLogController } from './controllers/audit-log.controller'
 import { CsvExportService } from '@/shared/csv/csv-export.service'

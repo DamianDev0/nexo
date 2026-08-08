@@ -1,8 +1,10 @@
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { ActivitiesService } from '../activities.service'
+import { ActivitiesService } from '../services/activities.service'
+import { ActivitiesRepository } from '../repositories/activities.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import type { PaginatedActivities } from '@repo/shared-types'
 
 const SCHEMA = 'tenant_acme'
@@ -38,16 +40,6 @@ function makeActivityListRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-function buildQrMock() {
-  return { query: jest.fn() }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((_schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 describe('ActivitiesService', () => {
   let service: ActivitiesService
   let qr: ReturnType<typeof buildQrMock>
@@ -59,6 +51,7 @@ describe('ActivitiesService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ActivitiesService,
+        ActivitiesRepository,
         { provide: TenantDbService, useValue: db },
         { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
       ],

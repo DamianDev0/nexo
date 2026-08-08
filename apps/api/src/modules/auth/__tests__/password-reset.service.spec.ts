@@ -10,7 +10,7 @@ import { PasswordResetRepository } from '../repositories/password-reset.reposito
 import { SessionRepository } from '../repositories/session.repository'
 import { TokenService } from '../services/token.service'
 import { PasswordService } from '@/shared/security/password.service'
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { TenantEmailService } from '@/shared/integrations/resend/tenant-email.service'
 import type { UserRow, RequestMeta } from '../interfaces/auth-rows.interface'
 import type { PasswordResetRow } from '../interfaces/password-reset-rows.interface'

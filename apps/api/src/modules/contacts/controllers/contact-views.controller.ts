@@ -3,17 +3,16 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common'
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
+import { ApiParam, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext, AuthenticatedUser, ContactView } from '@repo/shared-types'
-import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { ContactViewsService } from '../services/contact-views.service'
@@ -30,8 +29,7 @@ export class ContactViewsController {
   constructor(private readonly views: ContactViewsService) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'List own and shared contact views' })
+  @ApiEndpoint({ summary: 'List own and shared contact views', roles: [UserRole.VIEWER] })
   findAll(
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
@@ -40,8 +38,7 @@ export class ContactViewsController {
   }
 
   @Post()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Create a contact view' })
+  @ApiEndpoint({ summary: 'Create a contact view', roles: [UserRole.VIEWER] })
   create(
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
@@ -51,9 +48,11 @@ export class ContactViewsController {
   }
 
   @Patch('reorder')
-  @Auth(UserRole.VIEWER)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Reorder own contact views' })
+  @ApiEndpoint({
+    summary: 'Reorder own contact views',
+    roles: [UserRole.VIEWER],
+    status: HttpStatus.NO_CONTENT,
+  })
   reorder(
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
@@ -63,8 +62,7 @@ export class ContactViewsController {
   }
 
   @Patch(':id')
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Update a contact view' })
+  @ApiEndpoint({ summary: 'Update a contact view', roles: [UserRole.VIEWER] })
   @ApiParam({ name: 'id', format: 'uuid' })
   update(
     @TenantCtx() ctx: TenantContext,
@@ -76,8 +74,7 @@ export class ContactViewsController {
   }
 
   @Post(':id/duplicate')
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'Duplicate a visible contact view' })
+  @ApiEndpoint({ summary: 'Duplicate a visible contact view', roles: [UserRole.VIEWER] })
   @ApiParam({ name: 'id', format: 'uuid' })
   duplicate(
     @TenantCtx() ctx: TenantContext,
@@ -89,9 +86,11 @@ export class ContactViewsController {
   }
 
   @Delete(':id')
-  @Auth(UserRole.VIEWER)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete an own contact view' })
+  @ApiEndpoint({
+    summary: 'Delete an own contact view',
+    roles: [UserRole.VIEWER],
+    status: HttpStatus.NO_CONTENT,
+  })
   @ApiParam({ name: 'id', format: 'uuid' })
   remove(
     @TenantCtx() ctx: TenantContext,

@@ -1,4 +1,5 @@
 import { TenantConfigService } from '../services/tenant-config.service'
+import { TenantConfigRepository } from '../repositories/tenant-config.repository'
 import { DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
 import type { ContactTaxonomy, OnboardingStatus } from '@repo/shared-types'
 
@@ -35,7 +36,12 @@ function buildService(config: Record<string, unknown> = {}) {
   const tenantRepo = buildTenantRepoMock(config)
   const historyRepo = buildHistoryRepoMock()
   const cache = buildCacheMock()
-  const service = new TenantConfigService(tenantRepo as never, historyRepo as never, cache as never)
+  const service = new TenantConfigService(
+    tenantRepo as never,
+    historyRepo as never,
+    cache as never,
+    new TenantConfigRepository(tenantRepo as never),
+  )
   return { service, tenantRepo, historyRepo, cache }
 }
 

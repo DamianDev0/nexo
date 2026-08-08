@@ -1,7 +1,9 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { TagsService } from '../tags.service'
+import { TagsService } from '../services/tags.service'
+import { TagsRepository } from '../repositories/tags.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 
 const SCHEMA = 'tenant_acme'
 const OTHER_SCHEMA = 'tenant_globex'
@@ -17,17 +19,6 @@ function makeTagRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-function buildQrMock(overrides: Record<string, jest.Mock> = {}) {
-  return { query: jest.fn(), ...overrides }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-    transactional: jest.fn((schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 describe('TagsService', () => {
   let service: TagsService
   let db: ReturnType<typeof buildDbMock>
@@ -38,7 +29,7 @@ describe('TagsService', () => {
     db = buildDbMock(qr)
 
     const module = await Test.createTestingModule({
-      providers: [TagsService, { provide: TenantDbService, useValue: db }],
+      providers: [TagsService, TagsRepository, { provide: TenantDbService, useValue: db }],
     }).compile()
 
     service = module.get(TagsService)

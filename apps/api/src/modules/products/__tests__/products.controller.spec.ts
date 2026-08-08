@@ -1,7 +1,9 @@
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { ProductsController } from '../products.controller'
-import { ProductsService } from '../products.service'
+import { ProductsController } from '../controllers/products.controller'
+import { ProductsService } from '../services/products.service'
+import { ProductInventoryService } from '../services/product-inventory.service'
+import { ProductImportExportService } from '../services/product-import-export.service'
 import {
   type AuthenticatedUser,
   type PaginatedProducts,
@@ -63,6 +65,7 @@ const mockPaginated: PaginatedProducts = {
 describe('ProductsController', () => {
   let controller: ProductsController
   let service: jest.Mocked<ProductsService>
+  let inventoryService: jest.Mocked<ProductInventoryService>
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -77,8 +80,21 @@ describe('ProductsController', () => {
             create: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
+          },
+        },
+        {
+          provide: ProductInventoryService,
+          useValue: {
             adjustInventory: jest.fn(),
             getLowStock: jest.fn(),
+          },
+        },
+        {
+          provide: ProductImportExportService,
+          useValue: {
+            exportCsv: jest.fn(),
+            analyzeImport: jest.fn(),
+            executeImport: jest.fn(),
           },
         },
       ],
@@ -86,6 +102,7 @@ describe('ProductsController', () => {
 
     controller = module.get(ProductsController)
     service = module.get(ProductsService)
+    inventoryService = module.get(ProductInventoryService)
   })
 
   describe('findAll', () => {
@@ -175,7 +192,7 @@ describe('ProductsController', () => {
         createdById: 'user-1',
         createdAt: '',
       }
-      service.adjustInventory.mockResolvedValue(mockMovement)
+      inventoryService.adjustInventory.mockResolvedValue(mockMovement)
 
       const result = await controller.adjustInventory(
         'prod-1',
@@ -184,7 +201,7 @@ describe('ProductsController', () => {
         mockUser,
       )
 
-      expect(service.adjustInventory).toHaveBeenCalledWith(
+      expect(inventoryService.adjustInventory).toHaveBeenCalledWith(
         'tenant_acme',
         'prod-1',
         { quantity: 10, movementType: 'purchase', notes: 'Restock' },
@@ -196,7 +213,7 @@ describe('ProductsController', () => {
 
   describe('getLowStock', () => {
     it('returns low stock items', async () => {
-      service.getLowStock.mockResolvedValue([
+      inventoryService.getLowStock.mockResolvedValue([
         { id: 'prod-1', name: 'Widget', sku: 'WDG-001', stock: 3, minStock: 10 },
       ])
 

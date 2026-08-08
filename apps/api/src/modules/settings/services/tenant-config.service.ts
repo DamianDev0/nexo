@@ -4,6 +4,7 @@ import { Repository } from 'typeorm'
 import { CacheService } from '@/shared/cache/cache.service'
 import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { TenantThemeHistory } from '../entities/tenant-theme-history.entity'
+import { TenantConfigRepository } from '../repositories/tenant-config.repository'
 import { DEFAULT_THEME } from '../constants/default-theme'
 import { DEFAULT_NOMENCLATURE } from '../constants/default-nomenclature'
 import { DEFAULT_SIDEBAR_CONFIG } from '../constants/default-sidebar'
@@ -30,6 +31,7 @@ export class TenantConfigService {
     @InjectRepository(TenantThemeHistory)
     private readonly historyRepo: Repository<TenantThemeHistory>,
     private readonly cache: CacheService,
+    private readonly configRepo: TenantConfigRepository,
   ) {}
 
   async getTheme(tenantId: string): Promise<TenantTheme> {
@@ -246,12 +248,7 @@ export class TenantConfigService {
     section: string,
     value: unknown,
   ): Promise<void> {
-    await this.tenantRepo.query(
-      `UPDATE public.tenants
-         SET config = jsonb_set(COALESCE(config, '{}'::jsonb), $2::text[], $3::jsonb, true)
-       WHERE id = $1`,
-      [tenantId, `{${section}}`, JSON.stringify(value)],
-    )
+    await this.configRepo.saveConfigSection(tenantId, section, value)
   }
 
   private async writeHistory(

@@ -14,6 +14,7 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type { TenantContext, Pipeline, KanbanBoard } from '@repo/shared-types'
 import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { PipelineSettingsService } from '../services/pipeline-settings.service'
 import { CreatePipelineDto, ReorderStagesDto, UpdatePipelineDto } from '../dto/pipeline.dto'
@@ -24,16 +25,14 @@ export class PipelineController {
   constructor(private readonly service: PipelineSettingsService) {}
 
   @Get()
-  @Auth(UserRole.VIEWER)
-  @ApiOperation({ summary: 'List all pipelines with stages' })
+  @ApiEndpoint({ summary: 'List all pipelines with stages', roles: [UserRole.VIEWER] })
   findAll(@TenantCtx() ctx: TenantContext): Promise<Pipeline[]> {
     return this.service.findAll(ctx.schemaName)
   }
 
   @Get(':id')
-  @Auth(UserRole.VIEWER)
+  @ApiEndpoint({ summary: 'Get a pipeline by ID', roles: [UserRole.VIEWER] })
   @ApiParam({ name: 'id', type: 'string' })
-  @ApiOperation({ summary: 'Get a pipeline by ID' })
   findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @TenantCtx() ctx: TenantContext,
@@ -42,17 +41,18 @@ export class PipelineController {
   }
 
   @Post()
-  @Auth(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create a pipeline with stages' })
+  @ApiEndpoint({ summary: 'Create a pipeline with stages', roles: [UserRole.ADMIN] })
   create(@Body() dto: CreatePipelineDto, @TenantCtx() ctx: TenantContext): Promise<Pipeline> {
     return this.service.create(ctx.schemaName, dto)
   }
 
   @Patch(':id')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
+  @ApiEndpoint({
+    summary: 'Update pipeline name or default flag',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
   @ApiParam({ name: 'id', type: 'string' })
-  @ApiOperation({ summary: 'Update pipeline name or default flag' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdatePipelineDto,
@@ -62,10 +62,12 @@ export class PipelineController {
   }
 
   @Delete(':id')
-  @Auth(UserRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiEndpoint({
+    summary: 'Delete a pipeline (not allowed if default or only one)',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.NO_CONTENT,
+  })
   @ApiParam({ name: 'id', type: 'string' })
-  @ApiOperation({ summary: 'Delete a pipeline (not allowed if default or only one)' })
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @TenantCtx() ctx: TenantContext,
@@ -91,9 +93,11 @@ export class PipelineController {
   }
 
   @Get(':id/kanban')
-  @Auth(UserRole.VIEWER)
+  @ApiEndpoint({
+    summary: 'Kanban board: stages with deal counts and value totals',
+    roles: [UserRole.VIEWER],
+  })
   @ApiParam({ name: 'id', type: 'string' })
-  @ApiOperation({ summary: 'Kanban board: stages with deal counts and value totals' })
   getKanbanBoard(
     @Param('id', ParseUUIDPipe) id: string,
     @TenantCtx() ctx: TenantContext,

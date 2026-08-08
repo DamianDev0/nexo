@@ -1,8 +1,10 @@
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { NotificationType } from '@repo/shared-types'
-import { NotificationsService } from '../notifications.service'
+import { NotificationsService } from '../services/notifications.service'
+import { NotificationsRepository } from '../repositories/notifications.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 
 const SCHEMA = 'tenant_acme'
 const USER_ID = 'user-1'
@@ -38,16 +40,6 @@ function makePreferencesRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-function buildQrMock() {
-  return { query: jest.fn() }
-}
-
-function buildDbMock(qr: ReturnType<typeof buildQrMock>) {
-  return {
-    query: jest.fn((_schema: string, cb: (qr: unknown) => Promise<unknown>) => cb(qr)),
-  }
-}
-
 describe('NotificationsService', () => {
   let service: NotificationsService
   let qr: ReturnType<typeof buildQrMock>
@@ -57,7 +49,11 @@ describe('NotificationsService', () => {
     const db = buildDbMock(qr)
 
     const module = await Test.createTestingModule({
-      providers: [NotificationsService, { provide: TenantDbService, useValue: db }],
+      providers: [
+        NotificationsService,
+        NotificationsRepository,
+        { provide: TenantDbService, useValue: db },
+      ],
     }).compile()
 
     service = module.get(NotificationsService)

@@ -62,3 +62,49 @@ export interface StatsRow {
   total_billed_cents: string
   pending_debt_cents: string
 }
+
+export interface CompanyListFilters {
+  q?: string
+  taxRegime?: string
+  companySize?: string
+  sectorCiiu?: string
+  city?: string
+  assignedToId?: string
+  tags?: string[]
+}
+
+export interface CompanyInsertValues {
+  name: string
+  nit: string | null
+  nitDv: string | null
+  taxRegime: string | null
+  companySize: string | null
+  sectorCiiu: string | null
+  website: string | null
+  phone: string | null
+  email: string | null
+  address: string | null
+  city: string | null
+  department: string | null
+  municipioCode: string | null
+  tags: string[]
+  assignedToId: string | null
+  customFields: Record<string, unknown>
+  createdById: string
+}
+
+export interface CompanyNitUpdate {
+  nit: string | null
+  nitDv: string | null
+}
+
+export type CompanyNitResolver = () => CompanyNitUpdate
+
+export type CompanyFieldUpdate = [string, unknown]
+
+export interface CompanySummaryRows {
+  company: CompanyRow
+  stats: StatsRow[]
+  contacts: ContactRow[]
+  deals: DealRow[]
+}

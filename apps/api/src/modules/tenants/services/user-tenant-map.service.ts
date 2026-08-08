@@ -2,9 +2,9 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { UserTenantMap } from '../entities/user-tenant-map.entity'
 import { Tenant } from '../entities/tenant.entity'
+import { UserTenantMapRepository } from '../repositories/user-tenant-map.repository'
 
 @Injectable()
 export class UserTenantMapService implements OnApplicationBootstrap {
@@ -15,7 +15,7 @@ export class UserTenantMapService implements OnApplicationBootstrap {
     private readonly mapRepo: Repository<UserTenantMap>,
     @InjectRepository(Tenant)
     private readonly tenantRepo: Repository<Tenant>,
-    private readonly tenantDb: TenantDbService,
+    private readonly userTenantMapRepository: UserTenantMapRepository,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -65,7 +65,7 @@ export class UserTenantMapService implements OnApplicationBootstrap {
     let created = 0
 
     for (const tenant of tenants) {
-      const users = await this.fetchUsersFromSchema(tenant.schemaName)
+      const users = await this.userTenantMapRepository.findActiveUserEmails(tenant.schemaName)
 
       for (const user of users) {
         const exists = await this.mapRepo.findOne({
@@ -80,14 +80,5 @@ export class UserTenantMapService implements OnApplicationBootstrap {
     }
 
     return created
-  }
-
-  private async fetchUsersFromSchema(schemaName: string): Promise<Array<{ email: string }>> {
-    return this.tenantDb.query(schemaName, async (qr) => {
-      const rows: Array<{ email: string }> = await qr.query(
-        `SELECT LOWER(email) as email FROM "${schemaName}".users WHERE is_active = true`,
-      )
-      return rows
-    })
   }
 }

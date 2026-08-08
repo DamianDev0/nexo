@@ -12,3 +12,8 @@ export interface TimelineRow {
   metadata: Record<string, unknown>
   created_at: string
 }
+
+export interface TimelinePageResult {
+  rows: TimelineRow[]
+  total: number
+}

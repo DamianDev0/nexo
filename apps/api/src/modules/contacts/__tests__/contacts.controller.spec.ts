@@ -2,31 +2,12 @@ import { Test } from '@nestjs/testing'
 import { ContactsController } from '../controllers/contacts.controller'
 import { ContactsService } from '../services/contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { LifecycleStage, PlanName, UserRole } from '@repo/shared-types'
-import type {
-  TenantContext,
-  AuthenticatedUser,
-  Contact,
-  PaginatedContacts,
-} from '@repo/shared-types'
+import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
+import { LifecycleStage, UserRole } from '@repo/shared-types'
+import type { Contact, PaginatedContacts } from '@repo/shared-types'
 
-const mockCtx: TenantContext = {
-  tenantId: 'tenant-1',
-  slug: 'acme',
-  schemaName: 'tenant_acme',
-  plan: PlanName.FREE,
-  config: {},
-  productName: 'NexoCRM',
-  customDomain: null,
-}
-
-const mockUser: AuthenticatedUser = {
-  id: 'user-1',
-  email: 'owner@acme.com',
-  role: UserRole.OWNER,
-  tenantId: 'tenant-1',
-  schemaName: 'tenant_acme',
-}
+const mockCtx = makeTenantContext()
+const mockUser = makeAuthenticatedUser({ email: 'owner@acme.com', role: UserRole.OWNER })
 
 const mockContact: Contact = {
   id: 'c-1',

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { OnEvent } from '@nestjs/event-emitter'
 import type { WebhookEvent } from '@repo/shared-types'
-import { WebhooksService } from './webhooks.service'
+import { WebhooksService } from './services/webhooks.service'
 
 interface CrmEvent {
   schemaName: string
