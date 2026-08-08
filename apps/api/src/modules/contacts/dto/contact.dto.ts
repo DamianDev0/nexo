@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsIn,
@@ -7,6 +8,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  IsUrl,
   IsUUID,
   Length,
   Matches,
@@ -69,6 +71,23 @@ export class CreateContactDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @Length(1, 150)
+  jobTitle?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl()
+  @MaxLength(255)
+  linkedinUrl?: string
+
+  @ApiPropertyOptional({ description: 'Date of birth (ISO 8601)' })
+  @IsOptional()
+  @IsISO8601()
+  birthday?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   @Length(1, 100)
   city?: string
 
@@ -102,12 +121,43 @@ export class CreateContactDto {
   @Matches(TAXONOMY_KEY_PATTERN)
   source?: string
 
+  @ApiPropertyOptional({ enum: LifecycleStage })
+  @IsOptional()
+  @IsEnum(LifecycleStage)
+  lifecycleStage?: LifecycleStage
+
   @ApiPropertyOptional({ minimum: 0, maximum: 100 })
   @IsOptional()
   @IsInt()
   @Min(0)
   @Max(100)
   leadScore?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  dataConsent?: boolean
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @Length(1, 100)
+  consentSource?: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  optOutEmail?: boolean
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  optOutSms?: boolean
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  optOutWhatsapp?: boolean
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()

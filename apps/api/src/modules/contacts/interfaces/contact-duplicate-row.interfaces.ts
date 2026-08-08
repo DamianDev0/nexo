@@ -7,7 +7,7 @@ export interface DuplicateProbe {
   lastName?: string | null
 }
 
-export interface DuplicateRow {
+export interface ContactDuplicateRow {
   id: string
   first_name: string
   last_name: string | null

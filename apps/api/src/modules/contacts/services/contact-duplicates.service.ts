@@ -1,7 +1,10 @@
 import { ConflictException, Injectable } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import type { ContactDuplicateMatch, ContactDuplicatePayload } from '@repo/shared-types'
-import type { DuplicateProbe, DuplicateRow } from '../interfaces/contact-duplicate-row.interfaces'
+import type {
+  DuplicateProbe,
+  ContactDuplicateRow,
+} from '../interfaces/contact-duplicate-row.interfaces'
 
 const MATCH_COLUMNS = 'id, first_name, last_name, email, phone, document_number'
 const MAX_MATCHES = 5
@@ -81,7 +84,7 @@ export class ContactDuplicatesService {
     condition: string,
     params: unknown[],
     excludeId?: string,
-  ): Promise<DuplicateRow[]> {
+  ): Promise<ContactDuplicateRow[]> {
     const exclusion = excludeId ? ` AND id != $${params.length + 1}` : ''
     const finalParams = excludeId ? [...params, excludeId] : params
     return qr.query(
@@ -105,7 +108,10 @@ export class ContactDuplicatesService {
     })
   }
 
-  private map(row: DuplicateRow, field: ContactDuplicateMatch['field']): ContactDuplicateMatch {
+  private map(
+    row: ContactDuplicateRow,
+    field: ContactDuplicateMatch['field'],
+  ): ContactDuplicateMatch {
     return {
       id: row.id,
       firstName: row.first_name,

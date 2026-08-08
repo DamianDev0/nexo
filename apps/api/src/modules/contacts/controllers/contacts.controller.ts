@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseBoolPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -48,14 +49,15 @@ export class ContactsController {
 
   @Post()
   @Auth(UserRole.SALES_REP)
-  @ApiOperation({ summary: 'Create a contact' })
+  @ApiOperation({ summary: 'Create a contact; pass force=true to override soft duplicates' })
   async create(
     @Body() dto: CreateContactDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
+    @Query('force', new ParseBoolPipe({ optional: true })) force?: boolean,
   ): Promise<Contact> {
     await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
-    return this.contactsService.create(ctx.schemaName, dto, user.id)
+    return this.contactsService.create(ctx.schemaName, dto, user.id, force ?? false)
   }
 
   @Get('counts')
@@ -84,9 +86,10 @@ export class ContactsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateContactDto,
     @TenantCtx() ctx: TenantContext,
+    @Query('force', new ParseBoolPipe({ optional: true })) force?: boolean,
   ): Promise<Contact> {
     await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
-    return this.contactsService.update(ctx.schemaName, id, dto)
+    return this.contactsService.update(ctx.schemaName, id, dto, force ?? false)
   }
 
   @Delete(':id')

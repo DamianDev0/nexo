@@ -1,8 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
+import { LifecycleStage } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
-import { AuditAction, AuditEntityType } from '@/modules/audit-log/audit-log.interfaces'
+import { EventBusService } from '@/shared/events/event-bus.service'
+import {
+  AUDIT_EVENTS,
+  AuditAction,
+  AuditEntityEvent,
+  AuditEntityType,
+} from '@/shared/events/audit.events'
+import { ContactDuplicatesService } from './contact-duplicates.service'
 import type {
   Contact,
   ContactCounts,
@@ -26,8 +33,29 @@ import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 export class ContactsService {
   constructor(
     private readonly db: TenantDbService,
-    private readonly audit: AuditLogService,
+    private readonly eventBus: EventBusService,
+    private readonly duplicates: ContactDuplicatesService,
   ) {}
+
+  private emitAudit(
+    schemaName: string,
+    action: AuditAction,
+    entityId: string,
+    userId: string | undefined,
+    description: string,
+  ): void {
+    this.eventBus.emit(
+      AUDIT_EVENTS.ENTITY,
+      new AuditEntityEvent(
+        schemaName,
+        action,
+        AuditEntityType.Contact,
+        entityId,
+        userId,
+        description,
+      ),
+    )
+  }
 
   async findAll(schemaName: string, query: ContactQueryDto): Promise<PaginatedContacts> {
     return this.db.query(schemaName, async (qr): Promise<PaginatedContacts> => {
@@ -82,15 +110,25 @@ export class ContactsService {
     })
   }
 
-  async create(schemaName: string, dto: CreateContactDto, createdById: string): Promise<Contact> {
+  async create(
+    schemaName: string,
+    dto: CreateContactDto,
+    createdById: string,
+    force = false,
+  ): Promise<Contact> {
     return this.db.query(schemaName, async (qr): Promise<Contact> => {
+      await this.duplicates.assertNoDuplicates(qr, dto, { force })
+
       const rows: ContactRow[] = await qr.query(
         `INSERT INTO contacts (
            first_name, last_name, email, phone, whatsapp,
-           document_type, document_number, address, city, department, municipio_code,
-           status, source, lead_score, tags, company_id, assigned_to_id,
-           custom_fields, created_by
-         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+           document_type, document_number, job_title, linkedin_url, birthday,
+           address, city, department, municipio_code,
+           status, lifecycle_stage, source, lead_score,
+           data_consent, consent_date, consent_source,
+           opt_out_email, opt_out_sms, opt_out_whatsapp,
+           tags, company_id, assigned_to_id, custom_fields, created_by
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29)
          RETURNING ${CONTACT_COLUMNS}`,
         [
           dto.firstName,
@@ -100,13 +138,23 @@ export class ContactsService {
           dto.whatsapp ?? null,
           dto.documentType ?? null,
           dto.documentNumber ?? null,
+          dto.jobTitle ?? null,
+          dto.linkedinUrl ?? null,
+          dto.birthday ?? null,
           dto.address ?? null,
           dto.city ?? null,
           dto.department ?? null,
           dto.municipioCode ?? null,
           dto.status ?? 'new',
+          dto.lifecycleStage ?? LifecycleStage.SUBSCRIBER,
           dto.source ?? null,
           dto.leadScore ?? 0,
+          dto.dataConsent ?? false,
+          dto.dataConsent ? new Date() : null,
+          dto.consentSource ?? null,
+          dto.optOutEmail ?? false,
+          dto.optOutSms ?? false,
+          dto.optOutWhatsapp ?? false,
           dto.tags ?? [],
           dto.companyId ?? null,
           dto.assignedToId ?? null,
@@ -115,12 +163,11 @@ export class ContactsService {
         ],
       )
       const row = rows[0]
-      if (!row) throw new Error('Contact insert returned no row')
+      if (!row) throw new InternalServerErrorException('Contact insert returned no row')
       const result = this.mapContact(row)
-      void this.audit.entityEvent(
+      this.emitAudit(
         schemaName,
         AuditAction.ContactCreated,
-        AuditEntityType.Contact,
         result.id,
         createdById,
         `Contact ${dto.firstName} created`,
@@ -129,9 +176,15 @@ export class ContactsService {
     })
   }
 
-  async update(schemaName: string, contactId: string, dto: UpdateContactDto): Promise<Contact> {
+  async update(
+    schemaName: string,
+    contactId: string,
+    dto: UpdateContactDto,
+    force = false,
+  ): Promise<Contact> {
     return this.db.transactional(schemaName, async (qr): Promise<Contact> => {
       await this.assertContactExists(qr, contactId)
+      await this.duplicates.assertNoDuplicates(qr, dto, { force, excludeId: contactId })
 
       const updates: string[] = []
       const values: unknown[] = []
@@ -141,6 +194,11 @@ export class ContactsService {
           values.push(dto[dtoKey])
           updates.push(`${col} = $${values.length}`)
         }
+      }
+
+      if (dto.dataConsent !== undefined) {
+        values.push(dto.dataConsent ? new Date() : null)
+        updates.push(`consent_date = $${values.length}`)
       }
 
       if (!updates.length) return this.fetchContactOrFail(qr, contactId)
@@ -154,10 +212,9 @@ export class ContactsService {
         values,
       )
       const result = this.mapContact(rows[0]!)
-      void this.audit.entityEvent(
+      this.emitAudit(
         schemaName,
         AuditAction.ContactUpdated,
-        AuditEntityType.Contact,
         contactId,
         undefined,
         `Contact ${contactId} updated`,
@@ -172,10 +229,9 @@ export class ContactsService {
       await qr.query(`UPDATE contacts SET is_active = false, updated_at = NOW() WHERE id = $1`, [
         contactId,
       ])
-      void this.audit.entityEvent(
+      this.emitAudit(
         schemaName,
         AuditAction.ContactDeleted,
-        AuditEntityType.Contact,
         contactId,
         undefined,
         `Contact ${contactId} deleted`,

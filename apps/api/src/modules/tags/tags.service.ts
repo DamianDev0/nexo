@@ -3,6 +3,8 @@ import type { Tag, TagEntityType } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { TagRow } from './interfaces/tag-row.interfaces'
 
+const TAG_COLUMNS = 'id, name, color, entity_type, created_at'
+
 @Injectable()
 export class TagsService {
   constructor(private readonly db: TenantDbService) {}
@@ -18,7 +20,7 @@ export class TagsService {
       }
 
       const rows: TagRow[] = await qr.query(
-        `SELECT * FROM tags${where} ORDER BY entity_type, name`,
+        `SELECT ${TAG_COLUMNS} FROM tags${where} ORDER BY entity_type, name`,
         params,
       )
 
@@ -40,7 +42,7 @@ export class TagsService {
       }
 
       const rows: TagRow[] = await qr.query(
-        `INSERT INTO tags (name, color, entity_type) VALUES ($1, $2, $3) RETURNING *`,
+        `INSERT INTO tags (name, color, entity_type) VALUES ($1, $2, $3) RETURNING ${TAG_COLUMNS}`,
         [data.name, data.color ?? '#6B7280', data.entityType],
       )
 
@@ -67,14 +69,16 @@ export class TagsService {
       }
 
       if (sets.length === 0) {
-        const rows: TagRow[] = await qr.query(`SELECT * FROM tags WHERE id = $1`, [tagId])
+        const rows: TagRow[] = await qr.query(`SELECT ${TAG_COLUMNS} FROM tags WHERE id = $1`, [
+          tagId,
+        ])
         if (!rows[0]) throw new NotFoundException(`Tag ${tagId} not found`)
         return this.map(rows[0])
       }
 
       params.push(tagId)
       const result: unknown = await qr.query(
-        `UPDATE tags SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING *`,
+        `UPDATE tags SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING ${TAG_COLUMNS}`,
         params,
       )
 

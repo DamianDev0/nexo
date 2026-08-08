@@ -4,11 +4,19 @@ import { ContactsController } from './controllers/contacts.controller'
 import { ContactsService } from './services/contacts.service'
 import { ContactViewsController } from './controllers/contact-views.controller'
 import { ContactViewsService } from './services/contact-views.service'
+import { ContactWorkspaceController } from './controllers/contact-workspace.controller'
+import { ContactWorkspaceService } from './services/contact-workspace.service'
+import { ContactDuplicatesService } from './services/contact-duplicates.service'
 
 @Module({
   imports: [SettingsModule],
-  controllers: [ContactViewsController, ContactsController],
-  providers: [ContactsService, ContactViewsService],
+  controllers: [ContactViewsController, ContactWorkspaceController, ContactsController],
+  providers: [
+    ContactsService,
+    ContactViewsService,
+    ContactWorkspaceService,
+    ContactDuplicatesService,
+  ],
   exports: [ContactsService],
 })
 export class ContactsModule {}

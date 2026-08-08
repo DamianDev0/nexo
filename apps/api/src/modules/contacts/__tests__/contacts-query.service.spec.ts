@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { EventBusService } from '@/shared/events/event-bus.service'
+import { ContactDuplicatesService } from '../services/contact-duplicates.service'
 import { ContactsService } from '../services/contacts.service'
 import type { ContactQueryDto } from '../dto/contact.dto'
 
@@ -27,7 +28,8 @@ describe('ContactsService query extensions', () => {
       providers: [
         ContactsService,
         { provide: TenantDbService, useValue: buildDbMock(qr) },
-        { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
+        { provide: EventBusService, useValue: { emit: jest.fn() } },
+        { provide: ContactDuplicatesService, useValue: { assertNoDuplicates: jest.fn() } },
       ],
     }).compile()
     service = module.get(ContactsService)

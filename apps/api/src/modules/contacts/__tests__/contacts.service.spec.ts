@@ -1,8 +1,11 @@
-import { AuditLogService } from '@/modules/audit-log/audit-log.service'
+import { EventBusService } from '@/shared/events/event-bus.service'
+import { ContactDuplicatesService } from '../services/contact-duplicates.service'
+import { AUDIT_EVENTS, AuditAction, AuditEntityEvent } from '@/shared/events/audit.events'
 import { NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ContactsService } from '../services/contacts.service'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { LifecycleStage } from '@repo/shared-types'
 import type { PaginatedContacts } from '@repo/shared-types'
 
 const SCHEMA = 'tenant_acme'
@@ -50,16 +53,21 @@ describe('ContactsService', () => {
   let service: ContactsService
   let db: ReturnType<typeof buildDbMock>
   let qr: ReturnType<typeof buildQrMock>
+  let eventBus: { emit: jest.Mock }
+  let duplicates: { assertNoDuplicates: jest.Mock }
 
   beforeEach(async () => {
     qr = buildQrMock()
     db = buildDbMock(qr)
+    eventBus = { emit: jest.fn() }
+    duplicates = { assertNoDuplicates: jest.fn() }
 
     const module = await Test.createTestingModule({
       providers: [
         ContactsService,
         { provide: TenantDbService, useValue: db },
-        { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
+        { provide: EventBusService, useValue: eventBus },
+        { provide: ContactDuplicatesService, useValue: duplicates },
       ],
     }).compile()
 
@@ -195,6 +203,69 @@ describe('ContactsService', () => {
         'Contact insert returned no row',
       )
     })
+
+    it('checks for duplicates before inserting, honouring the force flag', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow()])
+
+      await service.create(SCHEMA, { firstName: 'John', email: 'john@example.com' }, 'user-1', true)
+
+      expect(duplicates.assertNoDuplicates).toHaveBeenCalledWith(
+        qr,
+        { firstName: 'John', email: 'john@example.com' },
+        { force: true },
+      )
+    })
+
+    it('emits a ContactCreated audit event with the created id and actor', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow({ id: 'c-new' })])
+
+      await service.create(SCHEMA, { firstName: 'John' }, 'user-1')
+
+      expect(eventBus.emit).toHaveBeenCalledWith(AUDIT_EVENTS.ENTITY, expect.any(AuditEntityEvent))
+      const event = eventBus.emit.mock.calls[0][1] as AuditEntityEvent
+      expect(event.action).toBe(AuditAction.ContactCreated)
+      expect(event.entityId).toBe('c-new')
+      expect(event.userId).toBe('user-1')
+      expect(event.schemaName).toBe(SCHEMA)
+    })
+
+    it('defaults jobTitle to null and lifecycleStage to subscriber when omitted', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow()])
+
+      await service.create(SCHEMA, { firstName: 'Jane' }, 'user-1')
+
+      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(params[7]).toBeNull()
+      expect(params[15]).toBe(LifecycleStage.SUBSCRIBER)
+      expect(LifecycleStage.SUBSCRIBER).toBe('subscriber')
+    })
+
+    it('passes jobTitle through when provided', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow()])
+
+      await service.create(SCHEMA, { firstName: 'Jane', jobTitle: 'CFO' }, 'user-1')
+
+      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(params[7]).toBe('CFO')
+    })
+
+    it('stores a consent_date only when dataConsent is true', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow()])
+
+      await service.create(SCHEMA, { firstName: 'Jane', dataConsent: true }, 'user-1')
+
+      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(params[19]).toBeInstanceOf(Date)
+    })
+
+    it('stores a null consent_date when dataConsent is false or omitted', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow()])
+
+      await service.create(SCHEMA, { firstName: 'Jane' }, 'user-1')
+
+      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(params[19]).toBeNull()
+    })
   })
 
   describe('update', () => {
@@ -240,6 +311,32 @@ describe('ContactsService', () => {
       expect(result.customFields).toEqual(customFields)
       const updateQuery: string = qr.query.mock.calls[1][0] as string
       expect(updateQuery).toContain('custom_fields = $')
+    })
+
+    it('checks for duplicates excluding itself, honouring the force flag', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([makeContactRow({ email: 'new@example.com' })])
+
+      await service.update(SCHEMA, 'c-1', { email: 'new@example.com' }, true)
+
+      expect(duplicates.assertNoDuplicates).toHaveBeenCalledWith(
+        qr,
+        { email: 'new@example.com' },
+        { force: true, excludeId: 'c-1' },
+      )
+    })
+
+    it('emits a ContactUpdated audit event for the updated contact', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([makeContactRow({ first_name: 'Jane' })])
+
+      await service.update(SCHEMA, 'c-1', { firstName: 'Jane' })
+
+      const event = eventBus.emit.mock.calls[0][1] as AuditEntityEvent
+      expect(event.action).toBe(AuditAction.ContactUpdated)
+      expect(event.entityId).toBe('c-1')
     })
   })
 

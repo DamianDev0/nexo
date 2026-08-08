@@ -82,6 +82,7 @@ function buildServiceMock() {
     update: jest.fn(),
     remove: jest.fn(),
     getTimeline: jest.fn(),
+    counts: jest.fn(),
   }
 }
 
@@ -130,9 +131,9 @@ describe('ContactsController', () => {
       service.create.mockResolvedValue(mockContact)
 
       const dto = { firstName: 'John', email: 'john@example.com' }
-      const result = await controller.create(dto, mockCtx, mockUser)
+      const result = await controller.create(dto, mockCtx, mockUser, undefined)
 
-      expect(service.create).toHaveBeenCalledWith(mockCtx.schemaName, dto, mockUser.id)
+      expect(service.create).toHaveBeenCalledWith(mockCtx.schemaName, dto, mockUser.id, false)
       expect(result.id).toBe('c-1')
     })
   })
@@ -160,9 +161,14 @@ describe('ContactsController', () => {
       const updated = { ...mockContact, firstName: 'Jane' }
       service.update.mockResolvedValue(updated)
 
-      const result = await controller.update('c-1', { firstName: 'Jane' }, mockCtx)
+      const result = await controller.update('c-1', { firstName: 'Jane' }, mockCtx, undefined)
 
-      expect(service.update).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1', { firstName: 'Jane' })
+      expect(service.update).toHaveBeenCalledWith(
+        mockCtx.schemaName,
+        'c-1',
+        { firstName: 'Jane' },
+        false,
+      )
       expect(result.firstName).toBe('Jane')
     })
   })
@@ -173,6 +179,17 @@ describe('ContactsController', () => {
 
       await expect(controller.remove('c-1', mockCtx)).resolves.toBeUndefined()
       expect(service.remove).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1')
+    })
+  })
+
+  describe('counts', () => {
+    it('delegates to service with schema', async () => {
+      service.counts.mockResolvedValue({ total: 5, byStatus: { new: 5 } })
+
+      const result = await controller.counts(mockCtx)
+
+      expect(service.counts).toHaveBeenCalledWith(mockCtx.schemaName)
+      expect(result).toEqual({ total: 5, byStatus: { new: 5 } })
     })
   })
 

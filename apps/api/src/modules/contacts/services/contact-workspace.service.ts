@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import type { QueryRunner } from 'typeorm'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { DEFAULT_CONTACT_TAXONOMY, LifecycleStage } from '@repo/shared-types'
 import type { ContactWorkspace, ContactTableState } from '@repo/shared-types'
@@ -70,10 +71,7 @@ export class ContactWorkspaceService {
     return this.db.query(schemaName, async (qr) => this.loadStateRow(qr, userId))
   }
 
-  private async loadStateRow(
-    qr: Parameters<Parameters<TenantDbService['query']>[1]>[0],
-    userId: string,
-  ): Promise<WorkspaceStateRow | null> {
+  private async loadStateRow(qr: QueryRunner, userId: string): Promise<WorkspaceStateRow | null> {
     const rows: WorkspaceStateRow[] = await qr.query(
       `SELECT active_view_id, table_state FROM contact_workspace_states WHERE user_id = $1`,
       [userId],

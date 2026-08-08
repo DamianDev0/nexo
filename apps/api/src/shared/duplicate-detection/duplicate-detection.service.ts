@@ -18,14 +18,15 @@ export class DuplicateDetectionService {
   ): Promise<DuplicateCheckResult> {
     return this.db.query(schemaName, async (qr): Promise<DuplicateCheckResult> => {
       const matches: DuplicateMatch[] = []
-      const exclude = excludeId ? ` AND id != '${excludeId}'` : ''
+      const exclude = excludeId ? ` AND id != $2` : ''
+      const withExclude = (value: unknown): unknown[] => (excludeId ? [value, excludeId] : [value])
 
       if (email) {
         const rows: DuplicateRow[] = await qr.query(
           `SELECT id, first_name || ' ' || COALESCE(last_name, '') AS name,
            'email' AS match_field, email AS match_value, 1.0 AS similarity, created_at
            FROM contacts WHERE LOWER(email) = LOWER($1) AND is_active = true${exclude}`,
-          [email],
+          withExclude(email),
         )
         matches.push(...rows.map((r) => this.mapMatch(r, 'contact')))
       }
@@ -37,7 +38,7 @@ export class DuplicateDetectionService {
            'phone' AS match_field, phone AS match_value, 1.0 AS similarity, created_at
            FROM contacts WHERE REPLACE(REPLACE(REPLACE(phone, ' ', ''), '-', ''), '+', '') = $1
            AND is_active = true${exclude}`,
-          [cleaned],
+          withExclude(cleaned),
         )
         matches.push(...rows.map((r) => this.mapMatch(r, 'contact')))
       }
@@ -47,7 +48,7 @@ export class DuplicateDetectionService {
           `SELECT id, first_name || ' ' || COALESCE(last_name, '') AS name,
            'documentNumber' AS match_field, document_number AS match_value, 1.0 AS similarity, created_at
            FROM contacts WHERE document_number = $1 AND is_active = true${exclude}`,
-          [documentNumber],
+          withExclude(documentNumber),
         )
         matches.push(...rows.map((r) => this.mapMatch(r, 'contact')))
       }
@@ -61,7 +62,7 @@ export class DuplicateDetectionService {
            FROM contacts WHERE similarity(first_name || ' ' || COALESCE(last_name, ''), $1) > 0.6
            AND is_active = true${exclude}
            ORDER BY similarity DESC LIMIT 5`,
-          [fullName],
+          withExclude(fullName),
         )
         matches.push(...rows.map((r) => this.mapMatch(r, 'contact')))
       }
@@ -80,13 +81,14 @@ export class DuplicateDetectionService {
   ): Promise<DuplicateCheckResult> {
     return this.db.query(schemaName, async (qr): Promise<DuplicateCheckResult> => {
       const matches: DuplicateMatch[] = []
-      const exclude = excludeId ? ` AND id != '${excludeId}'` : ''
+      const exclude = excludeId ? ` AND id != $2` : ''
+      const withExclude = (value: unknown): unknown[] => (excludeId ? [value, excludeId] : [value])
 
       if (nit) {
         const rows: DuplicateRow[] = await qr.query(
           `SELECT id, name, 'nit' AS match_field, nit AS match_value, 1.0 AS similarity, created_at
            FROM companies WHERE nit = $1 AND is_active = true${exclude}`,
-          [nit],
+          withExclude(nit),
         )
         matches.push(...rows.map((r) => this.mapMatch(r, 'company')))
       }
@@ -95,7 +97,7 @@ export class DuplicateDetectionService {
         const rows: DuplicateRow[] = await qr.query(
           `SELECT id, name, 'email' AS match_field, email AS match_value, 1.0 AS similarity, created_at
            FROM companies WHERE LOWER(email) = LOWER($1) AND is_active = true${exclude}`,
-          [email],
+          withExclude(email),
         )
         matches.push(...rows.map((r) => this.mapMatch(r, 'company')))
       }
@@ -106,7 +108,7 @@ export class DuplicateDetectionService {
            similarity(name, $1) AS similarity, created_at
            FROM companies WHERE similarity(name, $1) > 0.6 AND is_active = true${exclude}
            ORDER BY similarity DESC LIMIT 5`,
-          [name],
+          withExclude(name),
         )
         matches.push(...rows.map((r) => this.mapMatch(r, 'company')))
       }
