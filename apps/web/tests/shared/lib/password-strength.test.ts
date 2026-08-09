@@ -23,6 +23,19 @@ describe('assessPassword', () => {
     expect(assessPassword('Str0ng!Pass').score).toBe(5)
   })
 
+  it('isolates each character class', () => {
+    const metKeys = (value: string) =>
+      assessPassword(value)
+        .requirements.filter((req) => req.met)
+        .map((req) => req.key)
+
+    expect(metKeys('11111111')).toEqual(['minLength', 'number'])
+    expect(metKeys('aaaaaaaa')).toEqual(['minLength', 'lowercase'])
+    expect(metKeys('AAAAAAAA')).toEqual(['minLength', 'uppercase'])
+    expect(metKeys('!!!!!!!!')).toEqual(['minLength', 'special'])
+    expect(metKeys('a1')).toEqual(['number', 'lowercase'])
+  })
+
   it('treats unicode symbols as special characters', () => {
     expect(assessPassword('Añ0········').requirements.find((r) => r.key === 'special')?.met).toBe(
       true,

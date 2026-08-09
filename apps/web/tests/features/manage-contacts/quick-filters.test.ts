@@ -36,6 +36,12 @@ describe('parseQuickFilters', () => {
     expect(state.lifecycleStage).toEqual([])
   })
 
+  it('validates lifecycleStage against the enum even when the value is a valid taxonomy key', () => {
+    const state = parseQuickFilters((key) => (key === 'lifecycleStage' ? 'random_key' : null))
+
+    expect(state.lifecycleStage).toEqual([])
+  })
+
   it('keeps a source value that matches the taxonomy key pattern', () => {
     const state = parseQuickFilters((key) => (key === 'source' ? 'manual' : null))
 
@@ -90,6 +96,12 @@ describe('clearQuickFilters', () => {
 
     expect(clearQuickFilters(state)).toEqual(EMPTY_QUICK_FILTERS)
   })
+
+  it('is a no-op for an unknown filter id', () => {
+    const state = { lifecycleStage: [LifecycleStage.LEAD], source: ['manual'] }
+
+    expect(clearQuickFilters(state, 'bogus')).toBe(state)
+  })
 })
 
 describe('hasQuickFilters', () => {
@@ -120,5 +132,32 @@ describe('buildQuickFilterDefs', () => {
       value: LifecycleStage.SUBSCRIBER,
       label: LifecycleStage.SUBSCRIBER,
     })
+  })
+
+  it('resolves labels and hints through the exact translation keys', () => {
+    const translations: Record<string, string> = {
+      'contacts.filters.source': 'Origen',
+      'contacts.filters.lifecycleStage': 'Ciclo de vida',
+      'common.filters.hints.source.whatsapp': 'Canal directo',
+      [`common.filters.hints.lifecycleStage.${LifecycleStage.LEAD}`]: 'Pinta bien',
+      [`contacts.lifecycleStage.${LifecycleStage.LEAD}`]: 'Lead ES',
+    }
+    const tExact = ((key: string, opts?: { defaultValue?: string }) =>
+      translations[key] ?? opts?.defaultValue ?? key) as TFunction
+
+    const defs = buildQuickFilterDefs(tExact, EMPTY_QUICK_FILTERS, SOURCES)
+    const sourceDef = defs.find((def) => def.id === 'source')
+    const lifecycleDef = defs.find((def) => def.id === 'lifecycleStage')
+
+    expect(sourceDef?.label).toBe('Origen')
+    expect(lifecycleDef?.label).toBe('Ciclo de vida')
+    expect(sourceDef?.options.find((o) => o.value === 'whatsapp')?.hint).toBe('Canal directo')
+    expect(sourceDef?.options.find((o) => o.value === 'manual')?.hint).toBeUndefined()
+
+    const lead = lifecycleDef?.options.find((o) => o.value === LifecycleStage.LEAD)
+    expect(lead?.label).toBe('Lead ES')
+    expect(lead?.hint).toBe('Pinta bien')
+    const subscriber = lifecycleDef?.options.find((o) => o.value === LifecycleStage.SUBSCRIBER)
+    expect(subscriber?.hint).toBeUndefined()
   })
 })

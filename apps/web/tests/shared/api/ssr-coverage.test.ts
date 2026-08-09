@@ -11,7 +11,7 @@ const PREFETCH_RE = /QUERY_KEYS\.([\w.]+?)(?:\(|,|\s|\))/g
 
 const CACHE_MUTATORS = /invalidateQueries|removeQueries|cancelQueries|refetchQueries|setQueryData/
 
-const SEARCH_AS_YOU_TYPE_KEYS = new Set(['geo.municipalities'])
+const SEARCH_AS_YOU_TYPE_KEYS = new Set(['geo.municipalities', 'geo.addresses'])
 
 function read(patterns: string[]): string {
   return globSync(patterns, { cwd: SRC, absolute: true })
