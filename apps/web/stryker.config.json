@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "vitest",
+  "vitest": {
+    "configFile": "vitest.stryker.config.mts"
+  },
+  "mutate": [
+    "src/features/*/lib/**/*.ts",
+    "src/features/*/model/**/*.ts",
+    "src/entities/*/lib/**/*.ts",
+    "src/shared/lib/**/*.ts",
+    "!src/**/model/types/**",
+    "!src/**/index.ts",
+    "!src/**/*.d.ts"
+  ],
+  "timeoutMS": 60000,
+  "ignorePatterns": [".next", "reports", "test-results", "storybook-static", "playwright-report"],
+  "incremental": true,
+  "incrementalFile": "reports/stryker-incremental.json",
+  "thresholds": {
+    "high": 80,
+    "low": 65,
+    "break": null
+  },
+  "reporters": ["html", "clear-text", "progress"],
+  "tempDirName": ".stryker-tmp"
+}

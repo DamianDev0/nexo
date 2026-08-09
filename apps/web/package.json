@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "check:arch": "node scripts/check-file-size.mjs && node scripts/check-colors.mjs && node scripts/check-html-primitives.mjs && node scripts/check-ui-purity.mjs && node scripts/check-props-count.mjs && node scripts/check-cross-slice-imports.mjs && node scripts/check-shared-duplication.mjs && node scripts/check-i18n-sync.mjs && node scripts/check-segment-purity.mjs && node scripts/check-no-comments.mjs && node scripts/check-test-mirror.mjs",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:mutation": "stryker run"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -67,6 +68,8 @@
     "@storybook/addon-themes": "^9.1.20",
     "@storybook/addon-vitest": "^9.1.20",
     "@storybook/nextjs-vite": "^9.1.20",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
