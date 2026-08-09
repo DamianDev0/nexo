@@ -69,6 +69,50 @@ describe('useContactsTable', () => {
     expect(result.current.status).toBe('qualified')
   })
 
+  it('sends page and limit to the API and recomputes totalPages', async () => {
+    const urls: URL[] = []
+    server.use(
+      http.get(`${API}/contacts`, ({ request }) => {
+        urls.push(new URL(request.url))
+        return HttpResponse.json(contactsResponse({ total: 60 }))
+      }),
+    )
+
+    const { result } = renderHook(() => useContactsTable(), { wrapper })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+
+    expect(urls.at(-1)?.searchParams.get('page')).toBe('1')
+    expect(urls.at(-1)?.searchParams.get('limit')).toBe('25')
+    expect(result.current.totalPages).toBe(3)
+
+    act(() => result.current.setPage(2))
+    act(() => result.current.handleLimit(50))
+
+    await waitFor(() => expect(urls.at(-1)?.searchParams.get('limit')).toBe('50'))
+    expect(result.current.page).toBe(1)
+    expect(result.current.totalPages).toBe(2)
+  })
+
+  it('mirrors status and filters into the browser URL', async () => {
+    server.use(http.get(`${API}/contacts`, () => HttpResponse.json(contactsResponse())))
+
+    const { result } = renderHook(() => useContactsTable(), { wrapper })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+    expect(result.current.isFiltered).toBe(false)
+
+    act(() => result.current.handleStatus('qualified'))
+    await waitFor(() => expect(globalThis.location.search).toBe('?list=qualified'))
+    expect(result.current.isFiltered).toBe(true)
+
+    act(() => result.current.handleToggleFilter('source', 'whatsapp'))
+    await waitFor(() => expect(globalThis.location.search).toBe('?list=qualified&source=whatsapp'))
+
+    act(() => result.current.handleClearFilters())
+    act(() => result.current.handleStatus(null))
+    await waitFor(() => expect(globalThis.location.search).toBe(''))
+    expect(result.current.isFiltered).toBe(false)
+  })
+
   it('debounces the search value before it reaches the query', async () => {
     const receivedQueries: Array<string | null> = []
     server.use(

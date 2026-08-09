@@ -81,6 +81,107 @@ describe('useContactForm', () => {
     expect(result.current.form.getValues('whatsappSameAsPhone')).toBe(false)
   })
 
+  it('maps null contact fields to empty form strings', async () => {
+    server.use(taxonomyHandler())
+    const contact: ContactListItem = {
+      ...EXISTING_CONTACT,
+      lastName: null,
+      email: null,
+      phone: null,
+      whatsapp: null,
+      address: null,
+      city: null,
+      municipioCode: null,
+      source: null,
+    }
+
+    const { result } = renderHook(() => useContactForm(contact, vi.fn()), { wrapper })
+
+    await waitFor(() => expect(result.current.form.getValues('firstName')).toBe('Maria'))
+    expect(result.current.form.getValues()).toMatchObject({
+      lastName: '',
+      email: '',
+      phone: '',
+      whatsapp: '',
+      whatsappSameAsPhone: false,
+      address: '',
+      city: '',
+      municipioCode: '',
+      source: '',
+    })
+  })
+
+  it('serializes the full payload and resolves whatsapp from the phone', async () => {
+    server.use(taxonomyHandler())
+    let receivedBody: Record<string, unknown> | null = null
+    server.use(
+      http.post(`${API}/contacts`, async ({ request }) => {
+        receivedBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json({ data: EXISTING_CONTACT })
+      }),
+    )
+
+    const onDone = vi.fn()
+    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
+    await waitFor(() => expect(result.current.taxonomy.statuses).toBeDefined())
+
+    act(() => {
+      result.current.form.reset({
+        firstName: 'Valentina',
+        lastName: 'Restrepo',
+        email: 'valentina@nexo.test',
+        phone: '3001234567',
+        whatsapp: '',
+        whatsappSameAsPhone: true,
+        address: 'Calle 100 #7-21',
+        city: 'Bogotá',
+        municipioCode: '11001',
+        status: 'new',
+        source: 'manual',
+      })
+    })
+
+    await act(async () => {
+      await result.current.handleSubmit()
+    })
+
+    await waitFor(() => expect(onDone).toHaveBeenCalled())
+    expect(receivedBody).toEqual({
+      firstName: 'Valentina',
+      lastName: 'Restrepo',
+      email: 'valentina@nexo.test',
+      phone: '3001234567',
+      whatsapp: '3001234567',
+      address: 'Calle 100 #7-21',
+      city: 'Bogotá',
+      municipioCode: '11001',
+      status: 'new',
+      source: 'manual',
+    })
+  })
+
+  it('patches the existing contact in edit mode', async () => {
+    server.use(taxonomyHandler())
+    let patchedUrl: string | null = null
+    server.use(
+      http.patch(`${API}/contacts/:id`, ({ request }) => {
+        patchedUrl = request.url
+        return HttpResponse.json({ data: EXISTING_CONTACT })
+      }),
+    )
+
+    const onDone = vi.fn()
+    const { result } = renderHook(() => useContactForm(EXISTING_CONTACT, onDone), { wrapper })
+    await waitFor(() => expect(result.current.form.getValues('firstName')).toBe('Maria'))
+
+    await act(async () => {
+      await result.current.handleSubmit()
+    })
+
+    await waitFor(() => expect(onDone).toHaveBeenCalled())
+    expect(patchedUrl).toContain('/contacts/contact-1')
+  })
+
   it('posts a ContactInput with source undefined when the form value is empty', async () => {
     server.use(taxonomyHandler())
     let receivedBody: Record<string, unknown> | null = null
