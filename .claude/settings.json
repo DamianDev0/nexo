@@ -1,4 +1,17 @@
 {
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"$CLAUDE_PROJECT_DIR/.claude/skills/nexo-context/SKILL.md\" 2>/dev/null || true",
+            "statusMessage": "Cargando contexto NexoCRM..."
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(curl -s http://localhost:8080/api/v1/auth/me -H \"Authorization: Bearer test\")",
