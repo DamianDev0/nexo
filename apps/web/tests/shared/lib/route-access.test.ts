@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { decideRoute } from '@/shared/lib/route-access'
+import { decideRoute, isGuestOnlyPath } from '@/shared/lib/route-access'
 
 describe('decideRoute', () => {
   describe('without session', () => {
@@ -50,5 +50,24 @@ describe('decideRoute', () => {
 
   it('allows unknown public paths', () => {
     expect(decideRoute('/some-public-page', false)).toBe('allow')
+  })
+
+  it('allows an unknown public path even with an active session', () => {
+    expect(decideRoute('/some-public-page', true)).toBe('allow')
+  })
+})
+
+describe('isGuestOnlyPath', () => {
+  it('never treats a protected path as guest-only, even if it shares a guest prefix', () => {
+    expect(isGuestOnlyPath('/onboarding/setup')).toBe(false)
+  })
+
+  it('treats the guest-only paths as guest-only', () => {
+    expect(isGuestOnlyPath('/login')).toBe(true)
+    expect(isGuestOnlyPath('/onboarding')).toBe(true)
+  })
+
+  it('does not treat unrelated public paths as guest-only', () => {
+    expect(isGuestOnlyPath('/some-public-page')).toBe(false)
   })
 })

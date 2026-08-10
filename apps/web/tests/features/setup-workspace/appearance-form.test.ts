@@ -42,4 +42,25 @@ describe('matchingPresetKey', () => {
     const values = { ...withPreset(APPEARANCE_DEFAULT_VALUES, nexo), density: 'spacious' as const }
     expect(matchingPresetKey(values)).toBeNull()
   })
+
+  it('returns null when only the primary color diverges', () => {
+    const nexo = THEME_PRESETS.find((p) => p.key === 'nexo')
+    if (!nexo) throw new Error('missing preset')
+    const values = { ...withPreset(APPEARANCE_DEFAULT_VALUES, nexo), primaryColor: '#010203' }
+    expect(matchingPresetKey(values)).toBeNull()
+  })
+
+  it('returns null when only the font family diverges', () => {
+    const nexo = THEME_PRESETS.find((p) => p.key === 'nexo')
+    if (!nexo) throw new Error('missing preset')
+    const values = { ...withPreset(APPEARANCE_DEFAULT_VALUES, nexo), fontFamily: 'roboto' as const }
+    expect(matchingPresetKey(values)).toBeNull()
+  })
+
+  it('returns null when only the border radius diverges', () => {
+    const nexo = THEME_PRESETS.find((p) => p.key === 'nexo')
+    if (!nexo) throw new Error('missing preset')
+    const values = { ...withPreset(APPEARANCE_DEFAULT_VALUES, nexo), borderRadius: 'lg' as const }
+    expect(matchingPresetKey(values)).toBeNull()
+  })
 })

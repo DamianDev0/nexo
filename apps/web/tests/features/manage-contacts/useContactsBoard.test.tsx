@@ -1,4 +1,6 @@
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { flexRender } from '@tanstack/react-table'
+import { act, render, renderHook, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { HttpResponse, http } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
@@ -7,6 +9,21 @@ import { API, createMswServer } from '../../msw/test-server'
 import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import { useContactsBoard } from '@/features/manage-contacts/model/useContactsBoard'
+
+function BoardActionsCell({ contactId }: Readonly<{ contactId: string }>) {
+  const board = useContactsBoard()
+  const row = board.instance.table.getRowModel().rows.find((r) => r.id === contactId)
+  const cell = row?.getVisibleCells().find((c) => c.column.id === 'actions')
+
+  return (
+    <>
+      {cell ? flexRender(cell.column.columnDef.cell, cell.getContext()) : null}
+      <output data-testid="sheet-state">
+        {JSON.stringify({ open: board.sheet.open, contactId: board.sheet.contact?.id ?? null })}
+      </output>
+    </>
+  )
+}
 
 const server = createMswServer()
 
@@ -182,5 +199,44 @@ describe('useContactsBoard', () => {
     await waitFor(() => expect(deletedIds).toHaveLength(2))
     expect(deletedIds).toEqual(CONTACTS_FIXTURE.map((contact) => contact.id))
     await waitFor(() => expect(result.current.state.selectedCount).toBe(0))
+  })
+
+  it('opens the edit sheet for the exact contact whose row action was clicked', async () => {
+    server.use(...boardHandlers())
+    const user = userEvent.setup()
+    const target = CONTACTS_FIXTURE[1]!
+
+    render(<BoardActionsCell contactId={target.id} />, { wrapper })
+
+    await screen.findByRole('button', { name: 'contacts.actions.open' })
+    await user.click(screen.getByRole('button', { name: 'contacts.actions.open' }))
+    await user.click(await screen.findByText('contacts.actions.edit'))
+
+    await waitFor(() =>
+      expect(screen.getByTestId('sheet-state')).toHaveTextContent(
+        JSON.stringify({ open: true, contactId: target.id }),
+      ),
+    )
+  })
+
+  it('archives only the exact contact whose row action was clicked', async () => {
+    server.use(...boardHandlers())
+    const deletedIds: string[] = []
+    server.use(
+      http.delete(`${API}/contacts/:id`, ({ params }) => {
+        deletedIds.push(String(params.id))
+        return HttpResponse.json({ data: null })
+      }),
+    )
+    const user = userEvent.setup()
+    const target = CONTACTS_FIXTURE[0]!
+
+    render(<BoardActionsCell contactId={target.id} />, { wrapper })
+
+    await screen.findByRole('button', { name: 'contacts.actions.open' })
+    await user.click(screen.getByRole('button', { name: 'contacts.actions.open' }))
+    await user.click(await screen.findByText('contacts.actions.archive'))
+
+    await waitFor(() => expect(deletedIds).toEqual([target.id]))
   })
 })

@@ -24,6 +24,10 @@ describe('contactInitials', () => {
   it('builds initials from a single name when lastName is missing', () => {
     expect(contactInitials({ firstName: 'Maria', lastName: null })).toBe('Ma')
   })
+
+  it('falls back to the bare first initial when lastName is missing and firstName is one character', () => {
+    expect(contactInitials({ firstName: 'M', lastName: null })).toBe('M')
+  })
 })
 
 describe('contactAvatarTone', () => {
@@ -37,5 +41,17 @@ describe('contactAvatarTone', () => {
     for (const id of ['contact-1', 'contact-2', 'a', 'zzzzzzzz', '']) {
       expect(tones).toContain(contactAvatarTone(id))
     }
+  })
+
+  it('assigns different tones to ids that hash to different buckets', () => {
+    expect(contactAvatarTone('a')).toBe('info')
+    expect(contactAvatarTone('b')).toBe('warning')
+    expect(contactAvatarTone('c')).toBe('neutral')
+    expect(contactAvatarTone('d')).toBe('lime')
+  })
+
+  it('folds every character into the hash, not just the first', () => {
+    expect(contactAvatarTone('contact-1')).toBe('info')
+    expect(contactAvatarTone('contact-2')).toBe('warning')
   })
 })

@@ -5,7 +5,11 @@ import { buildAddressSuggestions } from '@/entities/geo/lib/address-suggestions'
 
 describe('buildAddressSuggestions', () => {
   it('suggests matching address types for a single token', () => {
-    expect(buildAddressSuggestions('cra')).toContain('Carrera')
+    expect(buildAddressSuggestions('cra')).toEqual(['Carrera'])
+  })
+
+  it('trims leading whitespace before reading the token', () => {
+    expect(buildAddressSuggestions('  cra')).toEqual(['Carrera'])
   })
 
   it('is case-insensitive and accent-insensitive', () => {

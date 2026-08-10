@@ -41,7 +41,15 @@ describe('slugifyTaxonomyKey', () => {
 
     const collided = slugifyTaxonomyKey(longLabel, new Set([truncated]))
     expect(collided).toBe(`${'x'.repeat(38)}_2`)
-    expect(collided.length).toBe(40)
+    expect(collided).toHaveLength(40)
+  })
+
+  it('collapses a run of separators into a single underscore', () => {
+    expect(slugifyTaxonomyKey('A   B---C', new Set())).toBe('a_b_c')
+  })
+
+  it('trims a trailing separator run left after stripping punctuation', () => {
+    expect(slugifyTaxonomyKey('Medico!!!', new Set())).toBe('medico')
   })
 })
 
@@ -70,6 +78,12 @@ describe('appendOption', () => {
 
     expect(next[1]?.key).toBe('contactado_2')
     expect(next[1]?.isSystem).toBe(false)
+  })
+
+  it('trims the label before storing it', () => {
+    const next = appendOption([], '  Contactado  ')
+
+    expect(next[0]?.label).toBe('Contactado')
   })
 })
 
@@ -141,6 +155,30 @@ describe('reorderOptions', () => {
 
     expect(next).toEqual(options)
   })
+
+  it('is a no-op when toKey is unknown, even among three or more options', () => {
+    const options = [
+      option({ key: 'a', order: 1 }),
+      option({ key: 'b', order: 2 }),
+      option({ key: 'c', order: 3 }),
+    ]
+
+    const next = reorderOptions(options, 'a', 'missing')
+
+    expect(next).toEqual(options)
+  })
+
+  it('moves to a target position other than the first', () => {
+    const options = [
+      option({ key: 'a', order: 1 }),
+      option({ key: 'b', order: 2 }),
+      option({ key: 'c', order: 3 }),
+    ]
+
+    const next = reorderOptions(options, 'c', 'b')
+
+    expect(next.map((o) => o.key)).toEqual(['a', 'c', 'b'])
+  })
 })
 
 describe('sameTaxonomy', () => {
@@ -169,6 +207,50 @@ describe('sameTaxonomy', () => {
       sources: [...base.sources],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
+  })
+
+  it('returns false when a key differs', () => {
+    const other = {
+      statuses: [{ ...base.statuses[0]!, key: 'other' }],
+      sources: [...base.sources],
+    }
+    expect(sameTaxonomy(base, other)).toBe(false)
+  })
+
+  it('returns false when a color differs', () => {
+    const other = {
+      statuses: [{ ...base.statuses[0]!, color: '#000000' }],
+      sources: [...base.sources],
+    }
+    expect(sameTaxonomy(base, other)).toBe(false)
+  })
+
+  it('returns false when isSystem differs', () => {
+    const other = {
+      statuses: [{ ...base.statuses[0]!, isSystem: !base.statuses[0]!.isSystem }],
+      sources: [...base.sources],
+    }
+    expect(sameTaxonomy(base, other)).toBe(false)
+  })
+
+  it('returns false when one taxonomy has more options than the other', () => {
+    const other = {
+      statuses: [...base.statuses, option({ key: 'extra', order: 2 })],
+      sources: [...base.sources],
+    }
+    expect(sameTaxonomy(base, other)).toBe(false)
+  })
+
+  it('returns false when only one of several options differs, not just when all differ', () => {
+    const multi = {
+      statuses: [option({ key: 'new', order: 1 }), option({ key: 'client', order: 2 })],
+      sources: [...base.sources],
+    }
+    const other = {
+      statuses: [multi.statuses[0]!, { ...multi.statuses[1]!, label: 'Cambiado' }],
+      sources: [...base.sources],
+    }
+    expect(sameTaxonomy(multi, other)).toBe(false)
   })
 
   it('treats null and undefined as equal to each other but not to a value', () => {

@@ -155,6 +155,9 @@ Hard-won gotchas (violating these produced fake 100% scores via mass timeouts):
 
 - ALWAYS run Stryker from `apps/web`, never the repo root — root runs sandbox the whole monorepo and die on `.claude/skills` symlinks.
 - After editing TEST files, rerun with `--force` — the incremental cache serves stale Survived results and your new assertions appear not to work.
+- `--force` combined with `-m "<file>"` can silently ignore the mutate scope and sweep the whole glob. For a properly scoped fresh run: `rm -f reports/stryker-incremental.json && pnpm exec stryker run --concurrency 2 -m "src/<path>.ts"`.
+- Zod chains like `.max(1).min(6)` compile to one quantifier regex — bound-flipping mutants crash the module at load; Stryker reports collection crashes as Survived, not killed. Judge as equivalent-by-tooling.
+- react-hook-form: `isDirty` recomputes on ANY `shouldDirty` call in a batch, masking sibling `setValue` mutants — assert `formState.dirtyFields` per field when the hook exposes the raw form. After async hydration, wait on a distinguishing hydrated VALUE, never on `isPending`/`isDirty`, before acting.
 - `vitest.stryker.config.mts` anchors `@repo/*` aliases to the REAL monorepo (sandbox-relocation-proof via the `.stryker-tmp` path strip). Never revert to config-relative `../../packages` paths: inside the sandbox they resolve to nowhere, instrumented files fail to import, and every mutant times out instead of being tested.
 - `include` globs resolve RELATIVE to vitest `dir`. The config sets `dir: 'tests'` + `include: ['**/*...']`; scope a run by narrowing dir, not include.
 - A mutant marked **timeout** is only a real kill for infinite-loop mutants; 100% timeout across a file means the runner is broken, not the tests are great.
