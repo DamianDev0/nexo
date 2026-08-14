@@ -1,5 +1,5 @@
 export const GROOVY_SURFACE =
-  'group relative rounded-xl border border-border/70 bg-popover p-1.5 shadow-e3'
+  'group relative w-auto rounded-xl border border-border/70 bg-popover p-1.5 shadow-e3'
 
 export const GROOVY_ARROW = 'fill-popover'
 

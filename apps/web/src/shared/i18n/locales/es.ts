@@ -21,6 +21,7 @@ const es = {
     and: 'y',
     saveFailed: 'Error al guardar',
     toggleTheme: 'Cambiar tema',
+    moreOptions: 'Más opciones',
     filters: {
       removeOne: 'Quitar {{value}}',
       hints: {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
@@ -27,6 +28,7 @@ export function SplitButton({
   actions = [],
   disabled,
 }: Readonly<SplitButtonProps>) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
   if (actions.length === 0) {
@@ -55,7 +57,7 @@ export function SplitButton({
             type="button"
             size="sm"
             disabled={disabled}
-            aria-label={label}
+            aria-label={t('common.moreOptions')}
             aria-haspopup="menu"
             aria-expanded={open}
             className={cn('rounded-l-none px-2.5', open && 'brightness-95')}
@@ -63,7 +65,7 @@ export function SplitButton({
             <CaretDownIcon className="size-3.5" />
           </PillButton>
         </GroovyPopover.Trigger>
-        <GroovyPopover.Content align="end" subtle className="min-w-48 p-1">
+        <GroovyPopover.Content align="end" subtle className="min-w-40 p-1">
           {actions.map((action) => (
             <GroovyPopover.Item
               key={action.label}

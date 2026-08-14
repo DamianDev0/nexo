@@ -21,6 +21,7 @@ const en = {
     and: 'and',
     saveFailed: 'Failed to save',
     toggleTheme: 'Toggle theme',
+    moreOptions: 'More options',
     filters: {
       removeOne: 'Remove {{value}}',
       hints: {
