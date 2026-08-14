@@ -1,3 +1,5 @@
+export const CREATE_PARAM = 'new'
+
 export const ROUTES = {
   auth: {
     login: '/login',

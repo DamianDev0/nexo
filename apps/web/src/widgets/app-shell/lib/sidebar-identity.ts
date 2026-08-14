@@ -17,3 +17,7 @@ export function toSidebarTeam(branding: { name: string; plan: string | null }): 
     plan: branding.plan ?? DEFAULT_PLAN_LABEL,
   }
 }
+
+export function teamInitial(name: string): string {
+  return name.trim().charAt(0).toUpperCase() || '?'
+}

@@ -14,6 +14,10 @@ export const QUERY_KEYS = {
       ['contacts', 'duplicate-probe', params] as const,
     timeline: (id: string) => ['contacts', 'timeline', id] as const,
   },
+  notifications: {
+    all: ['notifications'] as const,
+    unread: (limit: number) => ['notifications', 'unread', limit] as const,
+  },
   settings: {
     general: ['settings', 'general'] as const,
     pipelines: ['settings', 'pipelines'] as const,

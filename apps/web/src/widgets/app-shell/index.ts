@@ -1,5 +1,7 @@
 export { AppSidebar } from './ui/AppSidebar'
+export { HeaderBreadcrumb } from './ui/HeaderBreadcrumb'
+export { HeaderQuickCreate } from './ui/HeaderQuickCreate'
 export { HeaderSearch } from './ui/HeaderSearch'
 export { HeaderSettingsLink } from './ui/HeaderSettingsLink'
-export { HeaderTitle } from './ui/HeaderTitle'
+export { HeaderNotifications } from './ui/containers/HeaderNotifications'
 export { TenantThemeLoader } from './ui/containers/TenantThemeLoader'

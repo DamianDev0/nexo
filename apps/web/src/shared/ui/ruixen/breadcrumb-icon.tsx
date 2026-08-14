@@ -7,39 +7,34 @@ import { HouseIcon } from '@/shared/ui/icons'
 
 import type { AppIcon } from '@/shared/ui/icons'
 
-/* ═══════════════════════════════════════════════════════════
-   Breadcrumb Icon — Magnetic pill-tracking breadcrumb.
-
-   Flips the cascade metaphor on its head. Instead of dimming
-   everything else when you hover, a soft pill highlight
-   slides TO the item you're pointing at — the highlight
-   comes to you. The hovered icon does a spring micro-bounce
-   for tactile feedback without disturbing its neighbors.
-
-   Two fundamentally different interaction approaches:
-     • breadcrumb-separator: hover affects OTHER items (cascade)
-     • breadcrumb-icon: hover affects ONLY the target (pill tracks)
-
-   Curves:
-     • Pill slide: cubic-bezier(0.33, 1.52, 0.58, 1) — spring overshoot
-     • Icon pop:   cubic-bezier(0.34, 1.56, 0.64, 1) — tactile bounce
-   ═══════════════════════════════════════════════════════════ */
-
 export interface BreadcrumbIconItem {
   label: string
   href?: string
   icon?: AppIcon
 }
 
+type LinkLikeProps = {
+  href: string
+  className?: string
+  children?: React.ReactNode
+  onMouseEnter?: () => void
+  ref?: React.Ref<HTMLAnchorElement>
+}
+
 export interface BreadcrumbIconProps {
-  items: BreadcrumbIconItem[]
+  items: ReadonlyArray<BreadcrumbIconItem>
+  linkComponent?: React.ComponentType<LinkLikeProps>
   showHomeIcon?: boolean
   iconOnly?: boolean
   className?: string
 }
 
+const PILL_TRANSITION =
+  'left 0.35s cubic-bezier(0.33, 1.52, 0.58, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease'
+
 export function BreadcrumbIcon({
   items,
+  linkComponent,
   showHomeIcon = true,
   iconOnly = false,
   className,
@@ -52,50 +47,43 @@ export function BreadcrumbIcon({
 
   const itemsWithIcons = items.map((item, index) => ({
     ...item,
-    icon: item.icon || (index === 0 && showHomeIcon ? HouseIcon : undefined),
+    icon: item.icon ?? (index === 0 && showHomeIcon ? HouseIcon : undefined),
   }))
 
   const handleHover = React.useCallback((index: number) => {
     setHoveredIndex(index)
     const el = itemRefs.current[index]
     const container = containerRef.current
-    if (el && container) {
-      const containerRect = container.getBoundingClientRect()
-      const elRect = el.getBoundingClientRect()
-      setPill({
-        left: elRect.left - containerRect.left,
-        width: elRect.width,
-      })
-    }
+    if (!el || !container) return
+    const containerRect = container.getBoundingClientRect()
+    const elRect = el.getBoundingClientRect()
+    setPill({ left: elRect.left - containerRect.left, width: elRect.width })
   }, [])
 
   React.useEffect(() => {
-    if (hoveredIndex !== null) {
-      hasPositioned.current = true
-    }
+    if (hoveredIndex !== null) hasPositioned.current = true
   }, [hoveredIndex])
 
   if (items.length === 0) return null
 
+  const Link = linkComponent ?? 'a'
+
   return (
-    <nav aria-label="Breadcrumb" className={cn('', className)}>
+    <nav aria-label="Breadcrumb" className={className}>
       <ol
         ref={containerRef}
         className="relative flex flex-wrap items-center gap-0.5"
         onMouseLeave={() => setHoveredIndex(null)}
       >
-        {/* Magnetic pill — slides to the hovered item */}
         <div
-          className="pointer-events-none absolute rounded-md bg-foreground/[0.06]"
+          className="pointer-events-none absolute inset-y-0 rounded-md bg-foreground/[0.06]"
           style={{
             left: pill.left,
             width: pill.width,
-            top: 0,
-            bottom: 0,
             opacity: hoveredIndex !== null ? 1 : 0,
             transition:
               hoveredIndex !== null && hasPositioned.current
-                ? 'left 0.35s cubic-bezier(0.33, 1.52, 0.58, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease'
+                ? PILL_TRANSITION
                 : 'opacity 0.2s ease',
           }}
         />
@@ -117,10 +105,10 @@ export function BreadcrumbIcon({
           ) : null
 
           return (
-            <li key={index} className="z-10 inline-flex items-center">
-              {isLink ? (
-                <a
-                  ref={(el) => {
+            <li key={item.label} className="z-10 inline-flex items-center">
+              {isLink && item.href ? (
+                <Link
+                  ref={(el: HTMLAnchorElement | null) => {
                     itemRefs.current[index] = el
                   }}
                   href={item.href}
@@ -132,7 +120,7 @@ export function BreadcrumbIcon({
                 >
                   {iconEl}
                   {!iconOnly && <span>{item.label}</span>}
-                </a>
+                </Link>
               ) : (
                 <span
                   ref={(el) => {

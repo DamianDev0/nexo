@@ -15,28 +15,6 @@ import * as React from 'react'
 
 import { cn } from '@/shared/lib/index'
 
-/**
- * Toolbar Dock — Vercel-style floating icon dock.
- *
- * A dark pill of icon buttons. One continuous tooltip rail lives above the
- * dock: on hover it slides (x) and clip-paths itself so only the active label
- * is revealed, sitting perfectly above the hovered icon.
- *
- * One item is marked `toggle` and stays pinned on the right. Clicking it
- * collapses the dock to JUST that button and back — the icon strip is an
- * overflow-clipped region whose width springs between 0 and its measured size,
- * so the icons slide out FROM the toggle and tuck back INTO it. The toggle
- * never moves: the wrapper reserves the expanded width as a constant footprint,
- * so the centered pill can't recenter as it resizes.
- *
- * Movement craft:
- *  - Tooltip `x` and `clipPath` are spring-driven by Motion in the SAME rAF
- *    tick, so the slide and the reveal window never desync.
- *  - The collapse width is one spring on a tiny element → cheap, 60fps.
- *  - Geometry is read from layout (offsetLeft / offsetWidth), transform-
- *    independent, so nothing fights an in-flight animation.
- */
-
 export interface ToolbarDockItem {
   /** Stable identifier. */
   id: string

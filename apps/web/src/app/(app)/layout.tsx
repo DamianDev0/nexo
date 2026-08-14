@@ -7,11 +7,14 @@ import { prefetchAppShell } from '@/shared/query/prefetch-session'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
+import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 import {
   AppSidebar,
+  HeaderBreadcrumb,
+  HeaderNotifications,
+  HeaderQuickCreate,
   HeaderSearch,
   HeaderSettingsLink,
-  HeaderTitle,
   TenantThemeLoader,
 } from '@/widgets/app-shell'
 
@@ -35,21 +38,27 @@ export default async function AppLayout({ children }: Readonly<{ children: React
             style={{ '--sidebar-width': '13.5rem' } as React.CSSProperties}
           >
             <AppSidebar />
-            <SidebarInset>
-              <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+            <SidebarInset className="min-w-0">
+              <header className="relative z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
                 <SidebarTrigger className="-ml-1 md:hidden" />
                 <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
-                <HeaderTitle />
+                <HeaderBreadcrumb />
                 <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
                 <HeaderSearch />
                 <div className="flex-1" />
-                <HeaderSettingsLink />
-                <LanguageSwitcher />
-                <ThemeToggle />
+                <TooltipProvider delayDuration={400}>
+                  <div className="flex items-center gap-0.5">
+                    <HeaderQuickCreate />
+                    <HeaderSettingsLink />
+                    <HeaderNotifications />
+                    <LanguageSwitcher />
+                    <ThemeToggle />
+                  </div>
+                </TooltipProvider>
               </header>
               <div
                 id={APP_SCROLL_ID}
-                className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]"
+                className="min-h-0 min-w-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]"
               >
                 {children}
               </div>

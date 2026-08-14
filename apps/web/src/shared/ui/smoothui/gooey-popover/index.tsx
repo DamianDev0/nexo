@@ -1,34 +1,63 @@
 'use client'
 
 import gsap from 'gsap'
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 
 import { cn } from '@/shared/lib/index'
 
 import { useClickOutside } from './use-click-outside'
 
-const MEASURE_DELAY_SHORT = 100
-const MEASURE_DELAY_LONG = 500
-const DEFAULT_TRIGGER_SIZE = 44
 const DEFAULT_CONTENT_WIDTH = 240
 const DEFAULT_SIDE_OFFSET = 24
 const DEFAULT_SPEED = 0.25
 const GOO_STD_DEVIATION = 10
 const GOO_MATRIX_ALPHA_MULTIPLIER = 24
 const GOO_MATRIX_ALPHA_OFFSET = -10
-const CONTENT_BORDER_RADIUS = 18
+const DEFAULT_CONTENT_RADIUS = 18
+const OFFSCREEN = -9999
+
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
+
+type Size = { width: number; height: number }
+
+const EMPTY_SIZE: Size = { width: 0, height: 0 }
+
+function useObservedSize(ref: React.RefObject<HTMLElement | null>, enabled: boolean): Size {
+  const [size, setSize] = useState<Size>(EMPTY_SIZE)
+
+  useIsoLayoutEffect(() => {
+    const element = ref.current
+    if (!element || !enabled) return
+
+    const measure = () => {
+      setSize({ width: element.offsetWidth, height: element.offsetHeight })
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [ref, enabled])
+
+  return size
+}
 
 export type GooeyPopoverProps = {
   children: React.ReactNode
   trigger?: React.ReactNode
   triggerSize?: number
+  triggerRadius?: number
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
   side?: 'top' | 'bottom'
+  align?: 'start' | 'center' | 'end'
   sideOffset?: number
   contentWidth?: number
+  contentRadius?: number
   speed?: number
   bgClassName?: string
+  triggerClassName?: string
+  surfaceClassName?: string
   contentClassName?: string
   className?: string
 }
@@ -36,14 +65,19 @@ export type GooeyPopoverProps = {
 export default function GooeyPopover({
   children,
   trigger,
-  triggerSize = DEFAULT_TRIGGER_SIZE,
+  triggerSize,
+  triggerRadius,
   isOpen: controlledIsOpen,
   onOpenChange,
   side = 'top',
+  align = 'center',
   sideOffset = DEFAULT_SIDE_OFFSET,
   contentWidth = DEFAULT_CONTENT_WIDTH,
+  contentRadius = DEFAULT_CONTENT_RADIUS,
   speed = DEFAULT_SPEED,
-  bgClassName = 'bg-neutral-900',
+  bgClassName = 'bg-popover',
+  triggerClassName,
+  surfaceClassName,
   contentClassName,
   className,
 }: GooeyPopoverProps) {
@@ -54,271 +88,213 @@ export default function GooeyPopover({
   const [isVisible, setIsVisible] = useState(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const measureRef = useRef<HTMLDivElement>(null)
   const filteredContentRef = useRef<HTMLDivElement>(null)
-  const unfilteredContentRef = useRef<HTMLDivElement>(null)
   const innerContentRef = useRef<HTMLDivElement>(null)
+  const [panelNode, setPanelNode] = useState<HTMLDivElement | null>(null)
   const timelineRef = useRef<gsap.core.Timeline | null>(null)
-  const [contentHeight, setContentHeight] = useState(0)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
+  const showOverlay = isOpen || isVisible
+  const isFixedSquare = triggerSize !== undefined
+  const measuredTrigger = useObservedSize(triggerRef, !isFixedSquare)
+  const measuredContent = useObservedSize(measureRef, true)
+
+  const triggerWidth = isFixedSquare ? triggerSize : measuredTrigger.width
+  const triggerHeight = isFixedSquare ? triggerSize : measuredTrigger.height
+  const contentHeight = measuredContent.height
+  const radius = triggerRadius ?? Math.min(triggerWidth, triggerHeight) / 2
+
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mq.matches)
-    const handler = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches)
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(query.matches)
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches)
     }
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
+    query.addEventListener('change', handler)
+    return () => query.removeEventListener('change', handler)
   }, [])
 
   const setIsOpen = useCallback(
     (open: boolean) => {
-      if (!isControlled) {
-        setInternalIsOpen(open)
-      }
+      if (!isControlled) setInternalIsOpen(open)
       onOpenChange?.(open)
     },
     [isControlled, onOpenChange],
   )
 
   const handleClose = useCallback(() => {
-    if (isOpen) {
-      setIsOpen(false)
-    }
+    if (isOpen) setIsOpen(false)
   }, [isOpen, setIsOpen])
 
   useClickOutside(containerRef, handleClose)
 
-  // Escape key to close
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
-        setIsOpen(false)
-      }
+      if (event.key === 'Escape' && isOpen) setIsOpen(false)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, setIsOpen])
 
-  // Measure content height
+  const translateY = side === 'top' ? -(contentHeight + sideOffset) : triggerHeight + sideOffset
+  const centeredLeft = triggerWidth / 2 - contentWidth / 2
+  const contentLeft =
+    align === 'start' ? 0 : align === 'end' ? triggerWidth - contentWidth : centeredLeft
+
   useEffect(() => {
-    const measureHeight = () => {
-      if (measureRef.current) {
-        const height = measureRef.current.scrollHeight
-        if (height > 0) {
-          setContentHeight(height)
-        }
-      }
-    }
+    if (contentHeight === 0 || triggerHeight === 0) return
 
-    const timeoutId = setTimeout(measureHeight, MEASURE_DELAY_SHORT)
-    const timeoutId2 = setTimeout(measureHeight, MEASURE_DELAY_LONG)
-    return () => {
-      clearTimeout(timeoutId)
-      clearTimeout(timeoutId2)
-    }
-  }, [children])
-
-  const triggerRadius = triggerSize / 2
-  // Position content so its edge clears the trigger with sideOffset gap
-  const translateY = side === 'top' ? -(contentHeight + sideOffset) : triggerSize + sideOffset
-  const contentLeft = triggerRadius - contentWidth / 2
-
-  // GSAP animations
-  useEffect(() => {
-    if (contentHeight === 0) {
-      return
-    }
-
-    // Kill any running timeline
-    if (timelineRef.current) {
-      timelineRef.current.kill()
-    }
+    timelineRef.current?.kill()
 
     const filteredTarget = filteredContentRef.current
-    const unfilteredTarget = unfilteredContentRef.current
+    const unfilteredTarget = panelNode
     const innerTarget = innerContentRef.current
+    if (!(unfilteredTarget && innerTarget)) return
 
-    if (!(unfilteredTarget && innerTarget)) {
-      return
+    const collapsed = {
+      width: triggerWidth,
+      height: triggerHeight,
+      borderRadius: radius,
+      x: 0,
+      y: 0,
+    }
+    const expanded = {
+      width: contentWidth,
+      height: contentHeight,
+      borderRadius: contentRadius,
+      x: contentLeft,
+      y: translateY,
     }
 
     if (prefersReducedMotion) {
-      if (isOpen) {
-        setIsVisible(true)
-        gsap.set(unfilteredTarget, {
-          width: contentWidth,
-          height: contentHeight,
-          borderRadius: CONTENT_BORDER_RADIUS,
-          x: contentLeft,
-          y: translateY,
-          opacity: 1,
-        })
-        gsap.set(innerTarget, { opacity: 1, y: 0 })
-      } else {
-        gsap.set(unfilteredTarget, {
-          width: triggerSize,
-          height: triggerSize,
-          borderRadius: triggerRadius,
-          x: 0,
-          y: 0,
-          opacity: 0,
-        })
-        gsap.set(innerTarget, { opacity: 0, y: 0 })
-        setIsVisible(false)
-      }
+      gsap.set(unfilteredTarget, { ...(isOpen ? expanded : collapsed), opacity: isOpen ? 1 : 0 })
+      gsap.set(innerTarget, { opacity: isOpen ? 1 : 0, y: 0 })
+      setIsVisible(isOpen)
       return
     }
 
     if (isOpen) {
       setIsVisible(true)
 
-      // Start both content shapes as circles at trigger position
-      const startProps = {
-        width: triggerSize,
-        height: triggerSize,
-        borderRadius: triggerRadius,
-        x: 0,
-        y: 0,
-        opacity: 1,
-      }
-      if (filteredTarget) {
-        gsap.set(filteredTarget, startProps)
-      }
+      const startProps = { ...collapsed, opacity: 1 }
+      if (filteredTarget) gsap.set(filteredTarget, startProps)
       gsap.set(unfilteredTarget, startProps)
       gsap.set(innerTarget, { opacity: 0, y: 16 })
 
-      const tl = gsap.timeline()
+      const timeline = gsap.timeline()
 
-      // Filtered content: morph to rectangle with borderRadius=0
-      // The goo filter softens the edges naturally
       if (filteredTarget) {
-        tl.to(
+        timeline.to(
           filteredTarget,
-          {
-            width: contentWidth,
-            height: contentHeight,
-            borderRadius: 0,
-            x: contentLeft,
-            y: translateY,
-            duration: speed,
-            ease: 'power1.in',
-          },
+          { ...expanded, borderRadius: 0, duration: speed, ease: 'power1.in' },
           0,
         )
       }
-
-      // Unfiltered content: morph to rectangle with rounded corners
-      tl.to(
-        unfilteredTarget,
-        {
-          width: contentWidth,
-          height: contentHeight,
-          borderRadius: CONTENT_BORDER_RADIUS,
-          x: contentLeft,
-          y: translateY,
-          duration: speed,
-          ease: 'power1.in',
-        },
-        0,
-      )
-
-      // Content text fade in (overlapping with shape morph)
-      tl.to(
+      timeline.to(unfilteredTarget, { ...expanded, duration: speed, ease: 'power1.in' }, 0)
+      timeline.to(
         innerTarget,
-        {
-          opacity: 1,
-          y: 0,
-          duration: speed * 0.75,
-          ease: 'power1.out',
-        },
+        { opacity: 1, y: 0, duration: speed * 0.75, ease: 'power1.out' },
         speed * 0.575,
       )
 
-      timelineRef.current = tl
+      timelineRef.current = timeline
     } else {
-      // Content text fade out first
-      const tl = gsap.timeline({
+      const timeline = gsap.timeline({
         onComplete: () => {
           setIsVisible(false)
         },
       })
-
-      tl.to(innerTarget, {
-        opacity: 0,
-        y: 8,
-        duration: speed * 0.4,
-        ease: 'power1.in',
-      })
-
-      // Shape morph back: rectangle → circle
       const targets = [filteredTarget, unfilteredTarget].filter(Boolean)
-      tl.to(
-        targets,
-        {
-          width: triggerSize,
-          height: triggerSize,
-          borderRadius: triggerRadius,
-          x: 0,
-          y: 0,
-          duration: speed,
-          ease: 'power1.in',
-        },
-        speed * 0.2,
-      )
 
-      // Fade out at the end
-      tl.to(
+      timeline.to(innerTarget, { opacity: 0, y: 8, duration: speed * 0.4, ease: 'power1.in' })
+      timeline.to(targets, { ...collapsed, duration: speed, ease: 'power1.in' }, speed * 0.2)
+      timeline.to(
         targets,
-        {
-          opacity: 0,
-          duration: speed * 0.3,
-          ease: 'power1.in',
-        },
+        { opacity: 0, duration: speed * 0.3, ease: 'power1.in' },
         `-=${speed * 0.3}`,
       )
 
-      timelineRef.current = tl
+      timelineRef.current = timeline
     }
 
     return () => {
-      if (timelineRef.current) {
-        timelineRef.current.kill()
-      }
+      timelineRef.current?.kill()
     }
   }, [
     isOpen,
     contentHeight,
     contentWidth,
-    triggerSize,
-    triggerRadius,
+    contentRadius,
+    triggerWidth,
+    triggerHeight,
+    radius,
     contentLeft,
     translateY,
     speed,
     prefersReducedMotion,
+    panelNode,
   ])
 
-  const defaultTriggerIcon = (
-    <svg
-      fill="none"
-      height={20}
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-      width={20}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <line x1="12" x2="12" y1="5" y2="19" />
-      <line x1="5" x2="19" y1="12" y2="12" />
-    </svg>
-  )
+  const collapsedStyle = {
+    top: 0,
+    left: 0,
+    width: triggerWidth,
+    height: triggerHeight,
+    borderRadius: radius,
+    opacity: 0,
+  }
+
+  const overlay = showOverlay ? (
+    <>
+      {!prefersReducedMotion && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{ filter: `url(#${filterId})` }}
+        >
+          <div
+            className={cn('absolute', bgClassName)}
+            style={{
+              top: 0,
+              left: 0,
+              width: triggerWidth,
+              height: triggerHeight,
+              borderRadius: radius,
+            }}
+          />
+          <div
+            className={cn('absolute', bgClassName)}
+            ref={filteredContentRef}
+            style={collapsedStyle}
+          />
+        </div>
+      )}
+
+      <div
+        className={cn(
+          'pointer-events-auto absolute z-10 overflow-hidden',
+          bgClassName,
+          surfaceClassName,
+        )}
+        ref={setPanelNode}
+        role="dialog"
+        style={collapsedStyle}
+      >
+        <div
+          className={cn('p-4', contentClassName)}
+          ref={innerContentRef}
+          style={{ opacity: 0, transform: 'translateY(16px)' }}
+        >
+          {children}
+        </div>
+      </div>
+    </>
+  ) : null
 
   return (
     <div className={cn('relative inline-flex', className)} ref={containerRef}>
-      {/* SVG goo filter definition */}
       <svg aria-hidden="true" className="absolute" style={{ width: 0, height: 0 }}>
         <defs>
           <filter id={filterId}>
@@ -334,98 +310,36 @@ export default function GooeyPopover({
         </defs>
       </svg>
 
-      {/* Hidden measurement div */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute"
         ref={measureRef}
-        style={{
-          width: contentWidth,
-          position: 'absolute',
-          top: -9999,
-          left: -9999,
-          visibility: 'hidden',
-        }}
+        style={{ width: contentWidth, top: OFFSCREEN, left: OFFSCREEN, visibility: 'hidden' }}
       >
         <div className={cn('p-4', contentClassName)}>{children}</div>
       </div>
 
-      {/* Filtered layer: SVG goo filter creates liquid bridge between blob and content */}
-      {!prefersReducedMotion && (isOpen || isVisible) && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
-          style={{ filter: `url(#${filterId})` }}
-        >
-          {/* Blob: circle at trigger position — stays put while content morphs away */}
-          <div
-            className={cn('absolute rounded-full', bgClassName)}
-            style={{
-              width: triggerSize,
-              height: triggerSize,
-              top: 0,
-              left: 0,
-            }}
-          />
-
-          {/* Content shape: morphs from circle to rectangle (borderRadius=0, goo softens edges) */}
-          <div
-            className={cn('absolute', bgClassName)}
-            ref={filteredContentRef}
-            style={{
-              top: 0,
-              left: 0,
-              width: triggerSize,
-              height: triggerSize,
-              borderRadius: triggerRadius,
-              opacity: 0,
-            }}
-          />
-        </div>
-      )}
-
-      {/* Trigger button (z-10, sits on top of filtered blob) */}
       <button
+        ref={triggerRef}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         className={cn(
-          'relative z-10 flex items-center justify-center rounded-full text-white transition-colors',
+          'relative z-10 inline-flex items-center justify-center transition-colors',
           bgClassName,
+          triggerClassName,
         )}
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          width: triggerSize,
-          height: triggerSize,
-        }}
+        style={
+          isFixedSquare
+            ? { width: triggerSize, height: triggerSize, borderRadius: radius }
+            : { borderRadius: radius }
+        }
         type="button"
       >
-        {trigger ?? defaultTriggerIcon}
+        {trigger}
       </button>
 
-      {/* Unfiltered content panel (z-10, clean edges, actual text) */}
-      {(isOpen || isVisible) && (
-        <div
-          className={cn('absolute z-10 overflow-hidden text-white', bgClassName)}
-          ref={unfilteredContentRef}
-          role="dialog"
-          style={{
-            top: 0,
-            left: 0,
-            width: triggerSize,
-            height: triggerSize,
-            borderRadius: triggerRadius,
-            opacity: 0,
-          }}
-        >
-          <div
-            className={cn('p-4', contentClassName)}
-            ref={innerContentRef}
-            style={{ opacity: 0, transform: 'translateY(16px)' }}
-          >
-            {children}
-          </div>
-        </div>
-      )}
+      {overlay}
     </div>
   )
 }

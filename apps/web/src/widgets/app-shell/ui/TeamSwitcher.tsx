@@ -18,6 +18,8 @@ import {
   useSidebar,
 } from '@/shared/ui/shadcn/sidebar'
 
+import { teamInitial } from '../lib/sidebar-identity'
+
 import type { SidebarTeam } from '../model/types'
 
 export function TeamSwitcher({ team }: Readonly<{ team: SidebarTeam }>) {
@@ -33,15 +35,18 @@ export function TeamSwitcher({ team }: Readonly<{ team: SidebarTeam }>) {
               size="lg"
               className="h-13 rounded-md px-2.5 transition-colors hover:bg-sidebar-hover hover:text-sidebar-foreground data-[state=open]:bg-sidebar-hover data-[state=open]:text-sidebar-foreground"
             >
-              <div className="grid flex-1 text-left leading-tight">
+              <span className="hidden size-8 shrink-0 items-center justify-center rounded-md bg-primary-pale text-sm font-black text-primary-deep group-data-[collapsible=icon]:flex">
+                {teamInitial(team.name)}
+              </span>
+              <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate text-base font-black tracking-[-0.02em] text-foreground">
                   {team.name}
                 </span>
-                <span className="truncate text-[11px] font-medium text-muted-foreground">
+                <span className="truncate text-xs font-medium text-muted-foreground">
                   {team.plan}
                 </span>
               </div>
-              <CaretUpDownIcon className="ml-auto size-4 text-faint" />
+              <CaretUpDownIcon className="ml-auto size-4 text-faint group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent

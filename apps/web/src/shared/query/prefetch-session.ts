@@ -2,10 +2,12 @@ import 'server-only'
 
 import { redirect } from 'next/navigation'
 
+import { NOTIFICATION_PAGE_SIZE } from '@/shared/config/pagination'
 import { ROUTES } from '@/shared/config/routes'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { getMe } from '../api/dal/auth'
+import { listUnreadNotifications } from '../api/dal/notifications'
 import {
   getContactTaxonomy,
   getGeneral,
@@ -34,6 +36,9 @@ export async function prefetchAppShell(): Promise<QueryClient> {
     prefetch(client, QUERY_KEYS.settings.navigation, getNavigation),
     prefetch(client, QUERY_KEYS.settings.contactTaxonomy, getContactTaxonomy),
     prefetch(client, QUERY_KEYS.settings.nomenclature, getNomenclature),
+    prefetch(client, QUERY_KEYS.notifications.unread(NOTIFICATION_PAGE_SIZE), () =>
+      listUnreadNotifications(NOTIFICATION_PAGE_SIZE),
+    ),
   ])
 
   return client
