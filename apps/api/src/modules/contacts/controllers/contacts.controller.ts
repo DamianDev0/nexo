@@ -18,6 +18,8 @@ import type {
   AuthenticatedUser,
   Contact,
   ContactCounts,
+  ContactDuplicateProbeResult,
+  ContactTaxonomyUsage,
   PaginatedContacts,
   ContactTimeline,
 } from '@repo/shared-types'
@@ -26,7 +28,13 @@ import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { ContactsService } from '../services/contacts.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
-import { CreateContactDto, UpdateContactDto, ContactQueryDto } from '../dto/contact.dto'
+import {
+  CreateContactDto,
+  UpdateContactDto,
+  ContactQueryDto,
+  ProbeContactDuplicatesDto,
+  ReassignTaxonomyDto,
+} from '../dto/contact.dto'
 
 @ApiTags('Contacts')
 @Controller('contacts')
@@ -67,6 +75,39 @@ export class ContactsController {
   @ApiEndpoint({ summary: 'Contact totals grouped by status', roles: [UserRole.VIEWER] })
   counts(@TenantCtx() ctx: TenantContext): Promise<ContactCounts> {
     return this.contactsService.counts(ctx.schemaName)
+  }
+
+  @Get('taxonomy-usage')
+  @ApiEndpoint({
+    summary: 'Contact totals grouped by status, source, type and tag',
+    roles: [UserRole.VIEWER],
+  })
+  taxonomyUsage(@TenantCtx() ctx: TenantContext): Promise<ContactTaxonomyUsage> {
+    return this.contactsService.taxonomyUsage(ctx.schemaName)
+  }
+
+  @Patch('reassign-taxonomy')
+  @ApiEndpoint({
+    summary: 'Move every contact from one taxonomy option or tag to another',
+    roles: [UserRole.ADMIN],
+  })
+  reassignTaxonomy(
+    @Body() dto: ReassignTaxonomyDto,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<{ reassigned: number }> {
+    return this.contactsService.reassignTaxonomy(ctx.schemaName, dto.kind, dto.fromKey, dto.toKey)
+  }
+
+  @Get('duplicates/probe')
+  @ApiEndpoint({
+    summary: 'Probe potential duplicate contacts before saving',
+    roles: [UserRole.VIEWER],
+  })
+  probeDuplicates(
+    @TenantCtx() ctx: TenantContext,
+    @Query() query: ProbeContactDuplicatesDto,
+  ): Promise<ContactDuplicateProbeResult> {
+    return this.contactsService.probeDuplicates(ctx.schemaName, query)
   }
 
   @Get(':id')

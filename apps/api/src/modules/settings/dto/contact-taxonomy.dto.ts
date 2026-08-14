@@ -3,15 +3,20 @@ import { Type } from 'class-transformer'
 import {
   IsArray,
   IsBoolean,
-  IsHexColor,
   IsInt,
   IsOptional,
   IsString,
   Matches,
+  Max,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator'
-import { TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
+import {
+  SWATCH_COLOR_PATTERN,
+  TAXONOMY_DESCRIPTION_MAX,
+  TAXONOMY_KEY_PATTERN,
+} from '@repo/shared-types'
 import type { ContactTaxonomy, TaxonomyOption } from '@repo/shared-types'
 
 export class TaxonomyOptionDto implements TaxonomyOption {
@@ -25,8 +30,14 @@ export class TaxonomyOptionDto implements TaxonomyOption {
   @IsString()
   label: string | null
 
+  @ApiProperty({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(TAXONOMY_DESCRIPTION_MAX)
+  description: string | null
+
   @ApiProperty()
-  @IsHexColor()
+  @Matches(SWATCH_COLOR_PATTERN)
   color: string
 
   @ApiProperty()
@@ -37,6 +48,10 @@ export class TaxonomyOptionDto implements TaxonomyOption {
   @ApiProperty()
   @IsBoolean()
   isSystem: boolean
+
+  @ApiProperty()
+  @IsBoolean()
+  enabled: boolean
 }
 
 export class UpdateContactTaxonomyDto implements ContactTaxonomy {
@@ -51,4 +66,10 @@ export class UpdateContactTaxonomyDto implements ContactTaxonomy {
   @ValidateNested({ each: true })
   @Type(() => TaxonomyOptionDto)
   sources: TaxonomyOptionDto[]
+
+  @ApiProperty({ type: [TaxonomyOptionDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaxonomyOptionDto)
+  types: TaxonomyOptionDto[]
 }

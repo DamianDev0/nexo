@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common'
 import type { Request, Response } from 'express'
+import type { ContactDuplicatePayload } from '@repo/shared-types'
 
 import type {
   ApiErrorResponse,
@@ -47,6 +48,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       ...base,
       message: this.extractMessage(exceptionResponse, exception),
       error: this.extractErrorCode(status),
+      ...this.extractDuplicate(exceptionResponse),
     }
 
     if (status >= 500) {
@@ -76,6 +78,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     return exception.message
+  }
+
+  private extractDuplicate(
+    exceptionResponse: string | object,
+  ): { duplicate: ContactDuplicatePayload } | Record<string, never> {
+    if (typeof exceptionResponse === 'object' && 'duplicate' in exceptionResponse) {
+      return { duplicate: (exceptionResponse as { duplicate: ContactDuplicatePayload }).duplicate }
+    }
+    return {}
   }
 
   private extractErrorCode(status: number): string {

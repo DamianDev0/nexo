@@ -4,35 +4,41 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { TagRow } from '../interfaces/tag-row.interfaces'
 import { sqlRows } from '@/shared/database/sql.util'
 
-const TAG_COLUMNS = 'id, name, color, entity_type, created_at'
+const TAG_COLUMNS = 'id, name, color, description, enabled, entity_type, created_at'
 
 @Injectable()
 export class TagsRepository {
   constructor(private readonly db: TenantDbService) {}
 
-  async findAll(schemaName: string, entityType?: TagEntityType): Promise<TagRow[]> {
-    return this.db.query(schemaName, async (qr): Promise<TagRow[]> => {
-      const params: unknown[] = []
-      let where = ''
+  async findPage(
+    schemaName: string,
+    query: { entityType?: TagEntityType; page: number; limit: number },
+  ): Promise<{ rows: TagRow[]; total: number }> {
+    return this.db.query(schemaName, async (qr): Promise<{ rows: TagRow[]; total: number }> => {
+      const whereParams: unknown[] = query.entityType ? [query.entityType] : []
+      const where = query.entityType ? ` WHERE entity_type = $1` : ''
 
-      if (entityType) {
-        params.push(entityType)
-        where = ` WHERE entity_type = $1`
-      }
+      const countRows = await sqlRows<Array<{ count: string }>>(
+        qr,
+        `SELECT COUNT(*)::text AS count FROM tags${where}`,
+        whereParams,
+      )
+      const total = Number.parseInt(countRows[0]?.count ?? '0', 10)
 
+      const pageParams = [...whereParams, query.limit, (query.page - 1) * query.limit]
       const rows = await sqlRows<TagRow[]>(
         qr,
-        `SELECT ${TAG_COLUMNS} FROM tags${where} ORDER BY entity_type, name`,
-        params,
+        `SELECT ${TAG_COLUMNS} FROM tags${where} ORDER BY entity_type, name LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`,
+        pageParams,
       )
 
-      return rows
+      return { rows, total }
     })
   }
 
   async create(
     schemaName: string,
-    data: { name: string; color?: string; entityType: TagEntityType },
+    data: { name: string; color?: string; description?: string; entityType: TagEntityType },
   ): Promise<TagRow> {
     return this.db.query(schemaName, async (qr): Promise<TagRow> => {
       const existing = await sqlRows<TagRow[]>(
@@ -46,8 +52,8 @@ export class TagsRepository {
 
       const rows = await sqlRows<TagRow[]>(
         qr,
-        `INSERT INTO tags (name, color, entity_type) VALUES ($1, $2, $3) RETURNING ${TAG_COLUMNS}`,
-        [data.name, data.color ?? '#6B7280', data.entityType],
+        `INSERT INTO tags (name, color, description, entity_type) VALUES ($1, $2, $3, $4) RETURNING ${TAG_COLUMNS}`,
+        [data.name, data.color ?? '#9CA3AF', data.description ?? null, data.entityType],
       )
 
       return rows[0]!
@@ -57,7 +63,7 @@ export class TagsRepository {
   async update(
     schemaName: string,
     tagId: string,
-    data: { name?: string; color?: string },
+    data: { name?: string; color?: string; description?: string | null; enabled?: boolean },
   ): Promise<TagRow> {
     return this.db.query(schemaName, async (qr): Promise<TagRow> => {
       const sets: string[] = []
@@ -71,6 +77,14 @@ export class TagsRepository {
         params.push(data.color)
         sets.push(`color = $${params.length}`)
       }
+      if (data.description !== undefined) {
+        params.push(data.description)
+        sets.push(`description = $${params.length}`)
+      }
+      if (data.enabled !== undefined) {
+        params.push(data.enabled)
+        sets.push(`enabled = $${params.length}`)
+      }
 
       if (sets.length === 0) {
         const rows = await sqlRows<TagRow[]>(qr, `SELECT ${TAG_COLUMNS} FROM tags WHERE id = $1`, [
@@ -78,6 +92,17 @@ export class TagsRepository {
         ])
         if (!rows[0]) throw new NotFoundException(`Tag ${tagId} not found`)
         return rows[0]
+      }
+
+      let previousName: string | null = null
+      if (data.name) {
+        const previous = await sqlRows<Array<{ name: string }>>(
+          qr,
+          `SELECT name FROM tags WHERE id = $1`,
+          [tagId],
+        )
+        if (!previous[0]) throw new NotFoundException(`Tag ${tagId} not found`)
+        previousName = previous[0].name
       }
 
       params.push(tagId)
@@ -89,6 +114,14 @@ export class TagsRepository {
 
       const row = firstReturnedRow<TagRow>(result)
       if (!row) throw new NotFoundException(`Tag ${tagId} not found`)
+
+      if (data.name && previousName && data.name !== previousName) {
+        await qr.query(
+          `UPDATE contacts SET tags = array_replace(tags, $1, $2) WHERE $1 = ANY(tags)`,
+          [previousName, data.name],
+        )
+      }
+
       return row
     })
   }

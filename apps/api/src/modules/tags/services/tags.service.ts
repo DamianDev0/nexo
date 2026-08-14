@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import type { Tag, TagEntityType } from '@repo/shared-types'
+import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
+import type { PaginatedTags, Tag, TagEntityType } from '@repo/shared-types'
 import { TagsRepository } from '../repositories/tags.repository'
 import { mapTagRow } from '../mappers/tag.mapper'
 
@@ -7,9 +8,18 @@ import { mapTagRow } from '../mappers/tag.mapper'
 export class TagsService {
   constructor(private readonly tagsRepository: TagsRepository) {}
 
-  async findAll(schemaName: string, entityType?: TagEntityType): Promise<Tag[]> {
-    const rows = await this.tagsRepository.findAll(schemaName, entityType)
-    return rows.map(mapTagRow)
+  async findAll(
+    schemaName: string,
+    query: { entityType?: TagEntityType; page?: number; limit?: number } = {},
+  ): Promise<PaginatedTags> {
+    const page = query.page ?? 1
+    const limit = query.limit ?? DEFAULT_PAGE_SIZE
+    const { rows, total } = await this.tagsRepository.findPage(schemaName, {
+      entityType: query.entityType,
+      page,
+      limit,
+    })
+    return { data: rows.map(mapTagRow), total, page, limit }
   }
 
   async create(

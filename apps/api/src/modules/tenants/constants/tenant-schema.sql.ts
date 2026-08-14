@@ -80,6 +80,8 @@ export function getTenantSchemaSQL(schema: string): string {
       status VARCHAR(30) DEFAULT 'new',
       lifecycle_stage VARCHAR(30) DEFAULT 'subscriber',
       source VARCHAR(50),
+      type VARCHAR(30),
+      type_label VARCHAR(50),
       lead_score INTEGER DEFAULT 0,
       data_consent BOOLEAN DEFAULT false,
       consent_date TIMESTAMPTZ,
@@ -112,7 +114,7 @@ export function getTenantSchemaSQL(schema: string): string {
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       pipeline_id UUID NOT NULL REFERENCES "${schema}".pipelines(id),
       name VARCHAR(100) NOT NULL,
-      color VARCHAR(7) DEFAULT '#3B82F6',
+      color VARCHAR(100) DEFAULT '#3B82F6',
       probability INTEGER DEFAULT 0,
       position INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMPTZ DEFAULT NOW()
@@ -291,7 +293,9 @@ export function getTenantSchemaSQL(schema: string): string {
     CREATE TABLE "${schema}".tags (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(100) NOT NULL,
-      color VARCHAR(7) DEFAULT '#6B7280',
+      color VARCHAR(100) DEFAULT '#6B7280',
+      description VARCHAR(200),
+      enabled BOOLEAN NOT NULL DEFAULT true,
       entity_type VARCHAR(30) NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );

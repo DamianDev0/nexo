@@ -26,6 +26,8 @@ const mockTag: Tag = {
   id: 'tag-1',
   name: 'VIP',
   color: '#6B7280',
+  description: null,
+  enabled: true,
   entityType: 'contact',
   createdAt: '2024-01-01T00:00:00Z',
 }
@@ -55,30 +57,35 @@ describe('TagsController', () => {
   })
 
   describe('findAll', () => {
-    it('delegates to service with schema and no entity type filter', async () => {
-      service.findAll.mockResolvedValue([mockTag])
+    it('delegates to service with schema and the full query', async () => {
+      const paginated = { data: [mockTag], total: 1, page: 1, limit: 25 }
+      service.findAll.mockResolvedValue(paginated)
 
       const result = await controller.findAll(mockCtx, {})
 
-      expect(service.findAll).toHaveBeenCalledWith(mockCtx.schemaName, undefined)
-      expect(result).toEqual([mockTag])
+      expect(service.findAll).toHaveBeenCalledWith(mockCtx.schemaName, {})
+      expect(result).toEqual(paginated)
     })
 
-    it('passes entityType filter through to service', async () => {
-      service.findAll.mockResolvedValue([])
+    it('passes entityType and pagination through to service', async () => {
+      service.findAll.mockResolvedValue({ data: [], total: 0, page: 2, limit: 10 })
 
-      await controller.findAll(mockCtx, { entityType: 'deal' })
+      await controller.findAll(mockCtx, { entityType: 'deal', page: 2, limit: 10 })
 
-      expect(service.findAll).toHaveBeenCalledWith(mockCtx.schemaName, 'deal')
+      expect(service.findAll).toHaveBeenCalledWith(mockCtx.schemaName, {
+        entityType: 'deal',
+        page: 2,
+        limit: 10,
+      })
     })
 
     it('resolves against the requesting tenant schema only', async () => {
-      service.findAll.mockResolvedValue([mockTag])
+      service.findAll.mockResolvedValue({ data: [mockTag], total: 1, page: 1, limit: 25 })
 
       await controller.findAll(otherTenantCtx, {})
 
-      expect(service.findAll).toHaveBeenCalledWith(otherTenantCtx.schemaName, undefined)
-      expect(service.findAll).not.toHaveBeenCalledWith(mockCtx.schemaName, undefined)
+      expect(service.findAll).toHaveBeenCalledWith(otherTenantCtx.schemaName, {})
+      expect(service.findAll).not.toHaveBeenCalledWith(mockCtx.schemaName, {})
     })
   })
 

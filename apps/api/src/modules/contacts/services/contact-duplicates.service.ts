@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
-import type { ContactDuplicateMatch, ContactDuplicatePayload } from '@repo/shared-types'
+import type { ContactDuplicatePayload } from '@repo/shared-types'
 import type { DuplicateProbe } from '../interfaces/contact-duplicate-row.interfaces'
 import { ContactDuplicatesRepository } from '../repositories/contact-duplicates.repository'
 import { mapContactDuplicateMatch } from '../mappers/contact-duplicate.mapper'
@@ -15,23 +15,37 @@ export class ContactDuplicatesService {
     options: { force?: boolean; excludeId?: string } = {},
   ): Promise<void> {
     const hard = await this.findHard(qr, probe, options.excludeId)
-    if (hard) this.throwConflict('hard', hard.field, hard.matches)
+    if (hard) this.throwConflict(hard)
 
     if (options.force) return
     const soft = await this.findSoft(qr, probe, options.excludeId)
-    if (soft) this.throwConflict('soft', soft.field, soft.matches)
+    if (soft) this.throwConflict(soft)
+  }
+
+  async probe(
+    qr: QueryRunner,
+    probe: DuplicateProbe,
+    excludeId?: string,
+  ): Promise<ContactDuplicatePayload | null> {
+    const hard = await this.findHard(qr, probe, excludeId)
+    if (hard) return hard
+    return this.findSoft(qr, probe, excludeId)
   }
 
   private async findHard(
     qr: QueryRunner,
     probe: DuplicateProbe,
     excludeId?: string,
-  ): Promise<{ field: ContactDuplicateMatch['field']; matches: ContactDuplicateMatch[] } | null> {
+  ): Promise<ContactDuplicatePayload | null> {
     const email = probe.email?.trim().toLowerCase()
     if (email) {
       const rows = await this.repository.findByEmail(qr, email, excludeId)
       if (rows.length > 0) {
-        return { field: 'email', matches: rows.map((r) => mapContactDuplicateMatch(r, 'email')) }
+        return {
+          severity: 'hard',
+          field: 'email',
+          matches: rows.map((r) => mapContactDuplicateMatch(r, 'email')),
+        }
       }
     }
 
@@ -40,6 +54,7 @@ export class ContactDuplicatesService {
       const rows = await this.repository.findByDocumentNumber(qr, document, excludeId)
       if (rows.length > 0) {
         return {
+          severity: 'hard',
           field: 'documentNumber',
           matches: rows.map((r) => mapContactDuplicateMatch(r, 'documentNumber')),
         }
@@ -53,14 +68,18 @@ export class ContactDuplicatesService {
     qr: QueryRunner,
     probe: DuplicateProbe,
     excludeId?: string,
-  ): Promise<{ field: ContactDuplicateMatch['field']; matches: ContactDuplicateMatch[] } | null> {
+  ): Promise<ContactDuplicatePayload | null> {
     const phones = [probe.phone?.trim(), probe.whatsapp?.trim()].filter((value): value is string =>
       Boolean(value),
     )
     if (phones.length > 0) {
       const rows = await this.repository.findByPhones(qr, phones, excludeId)
       if (rows.length > 0) {
-        return { field: 'phone', matches: rows.map((r) => mapContactDuplicateMatch(r, 'phone')) }
+        return {
+          severity: 'soft',
+          field: 'phone',
+          matches: rows.map((r) => mapContactDuplicateMatch(r, 'phone')),
+        }
       }
     }
 
@@ -69,23 +88,23 @@ export class ContactDuplicatesService {
     if (first && last) {
       const rows = await this.repository.findByName(qr, first, last, excludeId)
       if (rows.length > 0) {
-        return { field: 'name', matches: rows.map((r) => mapContactDuplicateMatch(r, 'name')) }
+        return {
+          severity: 'soft',
+          field: 'name',
+          matches: rows.map((r) => mapContactDuplicateMatch(r, 'name')),
+        }
       }
     }
 
     return null
   }
 
-  private throwConflict(
-    severity: ContactDuplicatePayload['severity'],
-    field: ContactDuplicateMatch['field'],
-    matches: ContactDuplicateMatch[],
-  ): never {
+  private throwConflict(duplicate: ContactDuplicatePayload): never {
     throw new ConflictException({
       statusCode: 409,
       error: 'Conflict',
       message: 'contact_duplicate',
-      duplicate: { severity, field, matches } satisfies ContactDuplicatePayload,
+      duplicate,
     })
   }
 }

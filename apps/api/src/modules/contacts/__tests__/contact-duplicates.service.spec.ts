@@ -128,6 +128,47 @@ describe('ContactDuplicatesService', () => {
     })
   })
 
+  describe('probe', () => {
+    it('returns a hard payload on email match without throwing', async () => {
+      qr.query.mockResolvedValueOnce([makeDuplicateRow()])
+
+      const result = await service.probe(qr as never, { email: 'John@Example.com' })
+
+      expect(result).toMatchObject({ severity: 'hard', field: 'email' })
+      expect(result?.matches[0]).toMatchObject({ id: 'existing-1', field: 'email' })
+      const [, params] = qr.query.mock.calls[0] as [string, unknown[]]
+      expect(params).toEqual(['john@example.com'])
+    })
+
+    it('falls back to a soft payload when only phones match', async () => {
+      qr.query.mockResolvedValueOnce([makeDuplicateRow()])
+
+      const result = await service.probe(qr as never, { phone: '3001234567' })
+
+      expect(result).toMatchObject({ severity: 'soft', field: 'phone' })
+    })
+
+    it('returns null when nothing matches', async () => {
+      qr.query.mockResolvedValue([])
+
+      const result = await service.probe(qr as never, {
+        email: 'free@example.com',
+        phone: '3009999999',
+      })
+
+      expect(result).toBeNull()
+    })
+
+    it('passes excludeId down to the queries', async () => {
+      qr.query.mockResolvedValue([])
+
+      await service.probe(qr as never, { email: 'john@example.com' }, 'self-1')
+
+      const [, params] = qr.query.mock.calls[0] as [string, unknown[]]
+      expect(params).toContain('self-1')
+    })
+  })
+
   describe('excludeId', () => {
     it('adds an id exclusion clause and param to the query', async () => {
       qr.query.mockResolvedValueOnce([])

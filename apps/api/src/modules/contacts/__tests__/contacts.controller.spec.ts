@@ -29,6 +29,8 @@ const mockContact: Contact = {
   status: 'new',
   lifecycleStage: LifecycleStage.LEAD,
   source: 'manual',
+  type: null,
+  typeLabel: null,
   leadScore: 0,
   dataConsent: false,
   consentDate: null,
@@ -64,6 +66,7 @@ function buildServiceMock() {
     remove: jest.fn(),
     getTimeline: jest.fn(),
     counts: jest.fn(),
+    probeDuplicates: jest.fn(),
   }
 }
 
@@ -171,6 +174,18 @@ describe('ContactsController', () => {
 
       expect(service.counts).toHaveBeenCalledWith(mockCtx.schemaName)
       expect(result).toEqual({ total: 5, byStatus: { new: 5 } })
+    })
+  })
+
+  describe('probeDuplicates', () => {
+    it('delegates to service with schema and probe query', async () => {
+      service.probeDuplicates.mockResolvedValue({ duplicate: null })
+
+      const query = { email: 'john@example.com', excludeId: 'c-1' }
+      const result = await controller.probeDuplicates(mockCtx, query)
+
+      expect(service.probeDuplicates).toHaveBeenCalledWith(mockCtx.schemaName, query)
+      expect(result).toEqual({ duplicate: null })
     })
   })
 

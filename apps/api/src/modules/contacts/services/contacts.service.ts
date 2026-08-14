@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { LifecycleStage } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
@@ -10,10 +15,23 @@ import {
   AuditEntityType,
 } from '@/shared/events/audit.events'
 import { ContactDuplicatesService } from './contact-duplicates.service'
-import type { Contact, ContactCounts, PaginatedContacts, ContactTimeline } from '@repo/shared-types'
-import type { CreateContactDto, UpdateContactDto, ContactQueryDto } from '../dto/contact.dto'
+import type {
+  Contact,
+  ContactCounts,
+  ContactDuplicateProbeResult,
+  ContactTaxonomyUsage,
+  TaxonomyReassignKind,
+  PaginatedContacts,
+  ContactTimeline,
+} from '@repo/shared-types'
+import type {
+  CreateContactDto,
+  UpdateContactDto,
+  ContactQueryDto,
+  ProbeContactDuplicatesDto,
+} from '../dto/contact.dto'
 import type { ContactColumnChange, CreateContactData } from '../interfaces/contact-row.interfaces'
-import { UPDATABLE_FIELDS } from '../constants/contact.constants'
+import { OTHER_CONTACT_TYPE, UPDATABLE_FIELDS } from '../constants/contact.constants'
 import { ContactsRepository } from '../repositories/contacts.repository'
 import {
   mapContact,
@@ -66,6 +84,44 @@ export class ContactsService {
       total += value
     }
     return { total, byStatus }
+  }
+
+  async taxonomyUsage(schemaName: string): Promise<ContactTaxonomyUsage> {
+    const raw = await this.repository.taxonomyUsage(schemaName)
+    const toRecord = (rows: Array<{ key: string; count: string }>) =>
+      Object.fromEntries(rows.map((row) => [row.key, Number.parseInt(row.count, 10)]))
+    return {
+      statuses: toRecord(raw.statuses),
+      sources: toRecord(raw.sources),
+      types: toRecord(raw.types),
+      tags: toRecord(raw.tags),
+    }
+  }
+
+  async reassignTaxonomy(
+    schemaName: string,
+    kind: TaxonomyReassignKind,
+    fromKey: string,
+    toKey: string,
+  ): Promise<{ reassigned: number }> {
+    if (fromKey === toKey) {
+      throw new BadRequestException('fromKey and toKey must be different')
+    }
+    const reassigned =
+      kind === 'tag'
+        ? await this.repository.reassignTag(schemaName, fromKey, toKey)
+        : await this.repository.reassignTaxonomyColumn(schemaName, kind, fromKey, toKey)
+    return { reassigned }
+  }
+
+  async probeDuplicates(
+    schemaName: string,
+    query: ProbeContactDuplicatesDto,
+  ): Promise<ContactDuplicateProbeResult> {
+    const { excludeId, ...probe } = query
+    return this.db.query(schemaName, async (qr): Promise<ContactDuplicateProbeResult> => {
+      return { duplicate: await this.duplicates.probe(qr, probe, excludeId) }
+    })
   }
 
   async findOne(schemaName: string, contactId: string): Promise<Contact> {
@@ -183,6 +239,8 @@ export class ContactsService {
       status: dto.status ?? 'new',
       lifecycleStage: dto.lifecycleStage ?? LifecycleStage.SUBSCRIBER,
       source: dto.source ?? null,
+      type: dto.type ?? null,
+      typeLabel: dto.type === OTHER_CONTACT_TYPE ? (dto.typeLabel ?? null) : null,
       leadScore: dto.leadScore ?? 0,
       dataConsent: dto.dataConsent ?? false,
       consentDate: dto.dataConsent ? new Date() : null,
@@ -207,6 +265,16 @@ export class ContactsService {
 
     if (dto.dataConsent !== undefined) {
       changes.push({ column: 'consent_date', value: dto.dataConsent ? new Date() : null })
+    }
+
+    if (dto.type !== undefined) {
+      changes.push({ column: 'type', value: dto.type })
+      changes.push({
+        column: 'type_label',
+        value: dto.type === OTHER_CONTACT_TYPE ? (dto.typeLabel ?? null) : null,
+      })
+    } else if (dto.typeLabel !== undefined) {
+      changes.push({ column: 'type_label', value: dto.typeLabel })
     }
 
     return changes

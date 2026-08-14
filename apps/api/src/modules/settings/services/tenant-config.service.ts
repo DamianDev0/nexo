@@ -16,7 +16,12 @@ import type {
   FieldPermissionsConfig,
 } from '../interfaces/custom-field.interface'
 import { DEFAULT_ACTIVITY_TYPES, DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
-import type { ActivityTypeDef, ContactTaxonomy, OnboardingStatus } from '@repo/shared-types'
+import type {
+  ActivityTypeDef,
+  ContactTaxonomy,
+  OnboardingStatus,
+  TaxonomyOption,
+} from '@repo/shared-types'
 import { deepMerge } from '@/shared/utils/deep-merge'
 import type { ThemePatch, TenantFullConfig } from '../interfaces/tenant-config.interface'
 import { CACHE_TTL_MEDIUM_SECONDS, CACHE_TTL_SHORT_SECONDS } from '@/shared/cache/cache.constants'
@@ -184,14 +189,10 @@ export class TenantConfigService {
 
   async getContactTaxonomy(tenantId: string): Promise<ContactTaxonomy> {
     const cached = await this.cache.get<ContactTaxonomy>(this.contactTaxonomyKey(tenantId))
-    if (cached) return cached
+    if (cached) return normalizeTaxonomy(cached)
 
     const config = await this.getRawConfig(tenantId)
-    const stored = config.contactTaxonomy
-    const taxonomy: ContactTaxonomy = {
-      statuses: stored?.statuses?.length ? stored.statuses : DEFAULT_CONTACT_TAXONOMY.statuses,
-      sources: stored?.sources?.length ? stored.sources : DEFAULT_CONTACT_TAXONOMY.sources,
-    }
+    const taxonomy = normalizeTaxonomy(config.contactTaxonomy)
     await this.cache.set(this.contactTaxonomyKey(tenantId), taxonomy, CACHE_TTL_MEDIUM_SECONDS)
     return taxonomy
   }
@@ -293,6 +294,26 @@ export class TenantConfigService {
   }
   private contactTaxonomyKey(tenantId: string): string {
     return `tenant:contact-taxonomy:${tenantId}`
+  }
+}
+
+function normalizeOptions(
+  stored: TaxonomyOption[] | undefined,
+  fallback: TaxonomyOption[],
+): TaxonomyOption[] {
+  if (!stored?.length) return fallback
+  return stored.map((option) => ({
+    ...option,
+    description: option.description ?? null,
+    enabled: option.enabled ?? true,
+  }))
+}
+
+function normalizeTaxonomy(stored: Partial<ContactTaxonomy> | undefined): ContactTaxonomy {
+  return {
+    statuses: normalizeOptions(stored?.statuses, DEFAULT_CONTACT_TAXONOMY.statuses),
+    sources: normalizeOptions(stored?.sources, DEFAULT_CONTACT_TAXONOMY.sources),
+    types: normalizeOptions(stored?.types, DEFAULT_CONTACT_TAXONOMY.types),
   }
 }
 

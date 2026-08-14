@@ -4,6 +4,8 @@ export interface TagRow {
   id: string
   name: string
   color: string
+  description: string | null
+  enabled: boolean
   entity_type: TagEntityType
   created_at: string
 }

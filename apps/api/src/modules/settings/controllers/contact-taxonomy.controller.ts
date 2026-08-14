@@ -44,8 +44,10 @@ export class ContactTaxonomyController {
     const current = await this.configService.getContactTaxonomy(ctx.tenantId)
     assertSystemKeysKept(current.statuses, dto.statuses, 'status')
     assertSystemKeysKept(current.sources, dto.sources, 'source')
+    assertSystemKeysKept(current.types, dto.types, 'type')
     assertUniqueKeys(dto.statuses, 'status')
     assertUniqueKeys(dto.sources, 'source')
+    assertUniqueKeys(dto.types, 'type')
 
     return this.configService.updateContactTaxonomy(ctx.tenantId, dto, ctx.slug)
   }

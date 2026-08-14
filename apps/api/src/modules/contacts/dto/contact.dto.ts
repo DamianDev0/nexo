@@ -17,14 +17,14 @@ import {
   Min,
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { PartialType } from '@nestjs/mapped-types'
+import { PartialType, PickType } from '@nestjs/mapped-types'
 import {
   DocumentType,
   LifecycleStage,
   CONTACT_SORT_FIELDS,
   TAXONOMY_KEY_PATTERN,
 } from '@repo/shared-types'
-import type { ContactSortField } from '@repo/shared-types'
+import type { ContactSortField, TaxonomyReassignKind } from '@repo/shared-types'
 import { TaggedPaginationQueryDto } from '@/shared/dto/tagged-pagination-query.dto'
 
 export class CreateContactDto {
@@ -120,6 +120,18 @@ export class CreateContactDto {
   @Matches(TAXONOMY_KEY_PATTERN)
   source?: string
 
+  @ApiPropertyOptional({ description: 'Tenant taxonomy type key' })
+  @IsOptional()
+  @IsString()
+  @Length(1, 30)
+  type?: string
+
+  @ApiPropertyOptional({ description: 'Free-text label, persisted only when type is other' })
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  typeLabel?: string
+
   @ApiPropertyOptional({ enum: LifecycleStage })
   @IsOptional()
   @IsEnum(LifecycleStage)
@@ -184,6 +196,22 @@ export class CreateContactDto {
 
 export class UpdateContactDto extends PartialType(CreateContactDto) {}
 
+export class ProbeContactDuplicatesDto extends PartialType(
+  PickType(CreateContactDto, [
+    'email',
+    'phone',
+    'whatsapp',
+    'firstName',
+    'lastName',
+    'documentNumber',
+  ] as const),
+) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID('4')
+  excludeId?: string
+}
+
 export class ContactQueryDto extends TaggedPaginationQueryDto {
   @ApiPropertyOptional({ description: 'Full-text search (name, email, phone, document)' })
   @IsOptional()
@@ -247,4 +275,20 @@ export class ContactQueryDto extends TaggedPaginationQueryDto {
   @IsOptional()
   @IsIn(['asc', 'desc'])
   sortDir?: 'asc' | 'desc'
+}
+
+export class ReassignTaxonomyDto {
+  @ApiProperty({ enum: ['status', 'source', 'type', 'tag'] })
+  @IsIn(['status', 'source', 'type', 'tag'])
+  kind: TaxonomyReassignKind
+
+  @ApiProperty()
+  @IsString()
+  @Length(1, 100)
+  fromKey: string
+
+  @ApiProperty()
+  @IsString()
+  @Length(1, 100)
+  toKey: string
 }

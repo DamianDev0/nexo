@@ -14,6 +14,7 @@ function makeTagRow(overrides: Record<string, unknown> = {}) {
     name: 'VIP',
     color: '#6B7280',
     entity_type: 'contact',
+    enabled: true,
     created_at: '2024-01-01T00:00:00Z',
     ...overrides,
   }
@@ -36,34 +37,60 @@ describe('TagsService', () => {
   })
 
   describe('findAll', () => {
-    it('returns all tags mapped from rows', async () => {
-      qr.query.mockResolvedValueOnce([makeTagRow(), makeTagRow({ id: 'tag-2', name: 'Hot' })])
+    it('returns a paginated page of tags mapped from rows', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ count: '2' }])
+        .mockResolvedValueOnce([makeTagRow(), makeTagRow({ id: 'tag-2', name: 'Hot' })])
 
       const result = await service.findAll(SCHEMA)
 
-      expect(result).toHaveLength(2)
-      expect(result[0]?.id).toBe('tag-1')
-      expect(result[0]?.entityType).toBe('contact')
+      expect(result.data).toHaveLength(2)
+      expect(result.data[0]?.id).toBe('tag-1')
+      expect(result.data[0]?.entityType).toBe('contact')
+      expect(result.total).toBe(2)
+      expect(result.page).toBe(1)
       expect(db.query).toHaveBeenCalledWith(SCHEMA, expect.any(Function))
     })
 
-    it('filters by entityType when provided', async () => {
-      qr.query.mockResolvedValueOnce([makeTagRow({ entity_type: 'deal' })])
+    it('filters by entityType in both count and page queries', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ count: '1' }])
+        .mockResolvedValueOnce([makeTagRow({ entity_type: 'deal' })])
 
-      await service.findAll(SCHEMA, 'deal')
+      await service.findAll(SCHEMA, { entityType: 'deal' })
 
-      const sql: string = qr.query.mock.calls[0][0] as string
-      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(sql).toContain('WHERE entity_type = $1')
-      expect(params).toEqual(['deal'])
+      const countSql: string = qr.query.mock.calls[0][0] as string
+      const countParams: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(countSql).toContain('WHERE entity_type = $1')
+      expect(countParams).toEqual(['deal'])
+
+      const pageSql: string = qr.query.mock.calls[1][0] as string
+      const pageParams: unknown[] = qr.query.mock.calls[1][1] as unknown[]
+      expect(pageSql).toContain('WHERE entity_type = $1')
+      expect(pageSql).toContain('LIMIT $2 OFFSET $3')
+      expect(pageParams).toEqual(['deal', 25, 0])
     })
 
-    it('returns an empty array when no tags exist', async () => {
-      qr.query.mockResolvedValueOnce([])
+    it('applies page and limit as LIMIT/OFFSET bind params', async () => {
+      qr.query.mockResolvedValueOnce([{ count: '30' }]).mockResolvedValueOnce([makeTagRow()])
+
+      const result = await service.findAll(SCHEMA, { page: 3, limit: 10 })
+
+      const pageSql: string = qr.query.mock.calls[1][0] as string
+      const pageParams: unknown[] = qr.query.mock.calls[1][1] as unknown[]
+      expect(pageSql).toContain('LIMIT $1 OFFSET $2')
+      expect(pageParams).toEqual([10, 20])
+      expect(result.page).toBe(3)
+      expect(result.limit).toBe(10)
+    })
+
+    it('returns an empty page when no tags exist', async () => {
+      qr.query.mockResolvedValueOnce([{ count: '0' }]).mockResolvedValueOnce([])
 
       const result = await service.findAll(SCHEMA)
 
-      expect(result).toEqual([])
+      expect(result.data).toEqual([])
+      expect(result.total).toBe(0)
     })
   })
 
@@ -87,7 +114,7 @@ describe('TagsService', () => {
       await service.create(SCHEMA, { name: 'VIP', entityType: 'contact' })
 
       const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(params).toContain('#6B7280')
+      expect(params).toContain('#9CA3AF')
     })
 
     it('throws BadRequestException when a tag with the same name already exists for the entity type', async () => {
@@ -102,20 +129,40 @@ describe('TagsService', () => {
 
   describe('update (rename)', () => {
     it('renames a tag and returns the unwrapped row from a [rows, affectedCount] result', async () => {
-      qr.query.mockResolvedValueOnce([[makeTagRow({ name: 'Renamed' })], 1])
+      qr.query
+        .mockResolvedValueOnce([{ name: 'VIP' }])
+        .mockResolvedValueOnce([[makeTagRow({ name: 'Renamed' })], 1])
+        .mockResolvedValueOnce([])
 
       const result = await service.update(SCHEMA, 'tag-1', { name: 'Renamed' })
 
       expect(result.id).toBe('tag-1')
       expect(result.name).toBe('Renamed')
-      const updateQuery: string = qr.query.mock.calls[0][0] as string
+      const updateQuery: string = qr.query.mock.calls[1][0] as string
       expect(updateQuery).toContain('UPDATE tags')
       expect(updateQuery).toContain('name = $')
       expect(updateQuery).toContain('RETURNING')
     })
 
+    it('rewrites the renamed tag inside contacts.tags arrays', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ name: 'VIP' }])
+        .mockResolvedValueOnce([[makeTagRow({ name: 'Renamed' })], 1])
+        .mockResolvedValueOnce([])
+
+      await service.update(SCHEMA, 'tag-1', { name: 'Renamed' })
+
+      const cleanupQuery: string = qr.query.mock.calls[2][0] as string
+      const cleanupParams: unknown[] = qr.query.mock.calls[2][1] as unknown[]
+      expect(cleanupQuery).toContain('array_replace(tags, $1, $2)')
+      expect(cleanupParams).toEqual(['VIP', 'Renamed'])
+    })
+
     it('renames a tag and returns the unwrapped row when the driver returns plain rows', async () => {
-      qr.query.mockResolvedValueOnce([makeTagRow({ name: 'Renamed' })])
+      qr.query
+        .mockResolvedValueOnce([{ name: 'VIP' }])
+        .mockResolvedValueOnce([makeTagRow({ name: 'Renamed' })])
+        .mockResolvedValueOnce([])
 
       const result = await service.update(SCHEMA, 'tag-1', { name: 'Renamed' })
 
@@ -142,7 +189,7 @@ describe('TagsService', () => {
     })
 
     it('throws NotFoundException when renaming a nonexistent tag and the driver returns [[], 0]', async () => {
-      qr.query.mockResolvedValueOnce([[], 0])
+      qr.query.mockResolvedValueOnce([])
 
       await expect(service.update(SCHEMA, 'missing', { name: 'Ghost' })).rejects.toThrow(
         NotFoundException,
@@ -219,7 +266,7 @@ describe('TagsService', () => {
 
   describe('tenant isolation', () => {
     it('runs findAll against the resolved tenant schema, not another tenant', async () => {
-      qr.query.mockResolvedValueOnce([makeTagRow()])
+      qr.query.mockResolvedValueOnce([{ count: '1' }]).mockResolvedValueOnce([makeTagRow()])
 
       await service.findAll(SCHEMA)
 

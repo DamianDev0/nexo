@@ -46,13 +46,13 @@ describe('ContactsService', () => {
   let db: ReturnType<typeof buildDbMock>
   let qr: ReturnType<typeof buildQrMock>
   let eventBus: { emit: jest.Mock }
-  let duplicates: { assertNoDuplicates: jest.Mock }
+  let duplicates: { assertNoDuplicates: jest.Mock; probe: jest.Mock }
 
   beforeEach(async () => {
     qr = buildQrMock()
     db = buildDbMock(qr)
     eventBus = { emit: jest.fn() }
-    duplicates = { assertNoDuplicates: jest.fn() }
+    duplicates = { assertNoDuplicates: jest.fn(), probe: jest.fn() }
 
     const module = await Test.createTestingModule({
       providers: [
@@ -141,6 +141,31 @@ describe('ContactsService', () => {
       qr.query.mockResolvedValueOnce([])
 
       await expect(service.findOne(SCHEMA, 'c-deleted')).rejects.toThrow(NotFoundException)
+    })
+  })
+
+  describe('probeDuplicates', () => {
+    it('delegates to the duplicates service inside a read query and wraps the payload', async () => {
+      const payload = { severity: 'hard', field: 'email', matches: [] }
+      duplicates.probe.mockResolvedValue(payload)
+
+      const result = await service.probeDuplicates(SCHEMA, {
+        email: 'john@example.com',
+        excludeId: 'c-1',
+      })
+
+      expect(result).toEqual({ duplicate: payload })
+      expect(db.query).toHaveBeenCalledWith(SCHEMA, expect.any(Function))
+      expect(duplicates.probe).toHaveBeenCalledWith(qr, { email: 'john@example.com' }, 'c-1')
+    })
+
+    it('returns a null duplicate when nothing matches', async () => {
+      duplicates.probe.mockResolvedValue(null)
+
+      const result = await service.probeDuplicates(SCHEMA, { phone: '3001234567' })
+
+      expect(result).toEqual({ duplicate: null })
+      expect(duplicates.probe).toHaveBeenCalledWith(qr, { phone: '3001234567' }, undefined)
     })
   })
 
@@ -251,6 +276,52 @@ describe('ContactsService', () => {
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
       expect(params[19]).toBeNull()
     })
+
+    it('nulls typeLabel when type is not other', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow({ type: 'customer' })])
+
+      await service.create(
+        SCHEMA,
+        { firstName: 'Jane', type: 'customer', typeLabel: 'Distribuidor' },
+        'user-1',
+      )
+
+      const insertQuery: string = qr.query.mock.calls[0][0] as string
+      expect(insertQuery).toContain('type, type_label')
+      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(params[29]).toBe('customer')
+      expect(params[30]).toBeNull()
+    })
+
+    it('persists typeLabel when type is other', async () => {
+      qr.query.mockResolvedValueOnce([
+        makeContactRow({ type: 'other', type_label: 'Distribuidor' }),
+      ])
+
+      const result = await service.create(
+        SCHEMA,
+        { firstName: 'Jane', type: 'other', typeLabel: 'Distribuidor' },
+        'user-1',
+      )
+
+      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(params[29]).toBe('other')
+      expect(params[30]).toBe('Distribuidor')
+      expect(result.type).toBe('other')
+      expect(result.typeLabel).toBe('Distribuidor')
+    })
+
+    it('defaults type and typeLabel to null when omitted', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow()])
+
+      const result = await service.create(SCHEMA, { firstName: 'Jane' }, 'user-1')
+
+      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
+      expect(params[29]).toBeNull()
+      expect(params[30]).toBeNull()
+      expect(result.type).toBeNull()
+      expect(result.typeLabel).toBeNull()
+    })
   })
 
   describe('update', () => {
@@ -310,6 +381,50 @@ describe('ContactsService', () => {
         { email: 'new@example.com' },
         { force: true, excludeId: 'c-1' },
       )
+    })
+
+    it('clears type_label when the type changes away from other', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([makeContactRow({ type: 'customer' })])
+
+      const result = await service.update(SCHEMA, 'c-1', { type: 'customer' })
+
+      const updateQuery: string = qr.query.mock.calls[1][0] as string
+      expect(updateQuery).toContain('type = $')
+      expect(updateQuery).toContain('type_label = $')
+      const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
+      expect(params[0]).toBe('customer')
+      expect(params[1]).toBeNull()
+      expect(result.type).toBe('customer')
+      expect(result.typeLabel).toBeNull()
+    })
+
+    it('persists typeLabel when the type changes to other', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([makeContactRow({ type: 'other', type_label: 'Aliado' })])
+
+      const result = await service.update(SCHEMA, 'c-1', { type: 'other', typeLabel: 'Aliado' })
+
+      const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
+      expect(params[0]).toBe('other')
+      expect(params[1]).toBe('Aliado')
+      expect(result.typeLabel).toBe('Aliado')
+    })
+
+    it('updates only type_label when typeLabel comes without type', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([makeContactRow({ type: 'other', type_label: 'Mentor' })])
+
+      await service.update(SCHEMA, 'c-1', { typeLabel: 'Mentor' })
+
+      const updateQuery: string = qr.query.mock.calls[1][0] as string
+      expect(updateQuery).toContain('type_label = $')
+      expect(updateQuery).not.toContain('SET type = $')
+      const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
+      expect(params[0]).toBe('Mentor')
     })
 
     it('emits a ContactUpdated audit event for the updated contact', async () => {

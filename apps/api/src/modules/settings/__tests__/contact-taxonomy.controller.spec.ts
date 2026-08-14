@@ -16,12 +16,22 @@ const mockCtx: TenantContext = {
 }
 
 function option(overrides: Partial<TaxonomyOption> = {}): TaxonomyOption {
-  return { key: 'new', label: null, color: '#3B82F6', order: 1, isSystem: true, ...overrides }
+  return {
+    key: 'new',
+    label: null,
+    description: null,
+    color: '#3B82F6',
+    order: 1,
+    isSystem: true,
+    enabled: true,
+    ...overrides,
+  }
 }
 
 const currentTaxonomy: ContactTaxonomy = {
   statuses: [option({ key: 'new' }), option({ key: 'qualified', order: 2 })],
   sources: [option({ key: 'manual' })],
+  types: [option({ key: 'customer' }), option({ key: 'other', order: 2 })],
 }
 
 function buildServiceMock() {
@@ -61,6 +71,7 @@ describe('ContactTaxonomyController', () => {
       const dto = {
         statuses: [option({ key: 'new' })],
         sources: currentTaxonomy.sources,
+        types: currentTaxonomy.types,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
@@ -72,6 +83,7 @@ describe('ContactTaxonomyController', () => {
       const dto = {
         statuses: currentTaxonomy.statuses,
         sources: [],
+        types: currentTaxonomy.types,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
@@ -87,6 +99,7 @@ describe('ContactTaxonomyController', () => {
           option({ key: 'new', order: 3, isSystem: false }),
         ],
         sources: currentTaxonomy.sources,
+        types: currentTaxonomy.types,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
@@ -98,9 +111,33 @@ describe('ContactTaxonomyController', () => {
       const dto = {
         statuses: currentTaxonomy.statuses,
         sources: [option({ key: 'manual' }), option({ key: 'manual', order: 2, isSystem: false })],
+        types: currentTaxonomy.types,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(/Duplicate source key/)
+      expect(service.updateContactTaxonomy).not.toHaveBeenCalled()
+    })
+
+    it('rejects when a system type key is dropped, listing the missing keys', async () => {
+      const dto = {
+        statuses: currentTaxonomy.statuses,
+        sources: currentTaxonomy.sources,
+        types: [option({ key: 'customer' })],
+      }
+
+      await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
+      await expect(controller.update(dto, mockCtx)).rejects.toThrow(/other/)
+      expect(service.updateContactTaxonomy).not.toHaveBeenCalled()
+    })
+
+    it('rejects duplicate type keys', async () => {
+      const dto = {
+        statuses: currentTaxonomy.statuses,
+        sources: currentTaxonomy.sources,
+        types: [...currentTaxonomy.types, option({ key: 'customer', order: 3, isSystem: false })],
+      }
+
+      await expect(controller.update(dto, mockCtx)).rejects.toThrow(/Duplicate type key/)
       expect(service.updateContactTaxonomy).not.toHaveBeenCalled()
     })
 
@@ -111,6 +148,7 @@ describe('ContactTaxonomyController', () => {
           option({ key: 'custom_vip', order: 3, isSystem: false }),
         ],
         sources: currentTaxonomy.sources,
+        types: currentTaxonomy.types,
       }
       service.updateContactTaxonomy.mockResolvedValue(dto)
 
@@ -131,6 +169,7 @@ describe('ContactTaxonomyController', () => {
           option({ key: 'qualified', order: 2 }),
         ],
         sources: currentTaxonomy.sources,
+        types: currentTaxonomy.types,
       }
       service.updateContactTaxonomy.mockResolvedValue(dto)
 

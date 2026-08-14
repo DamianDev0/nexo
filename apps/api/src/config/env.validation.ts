@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer'
-import { IsEnum, IsInt, IsString, IsUrl, Min, validateSync } from 'class-validator'
+import { IsEnum, IsInt, IsOptional, IsString, IsUrl, Min, validateSync } from 'class-validator'
 
 enum NodeEnv {
   Development = 'development',
@@ -58,6 +58,10 @@ class EnvironmentVariables {
 
   @IsUrl({ require_tld: false })
   GOOGLE_CALLBACK_URL: string
+
+  @IsOptional()
+  @IsString()
+  GOOGLE_MAPS_API_KEY?: string
 
   @IsString()
   RESEND_API_KEY: string

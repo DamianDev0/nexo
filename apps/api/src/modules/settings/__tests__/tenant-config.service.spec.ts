@@ -47,14 +47,21 @@ function buildService(config: Record<string, unknown> = {}) {
 
 describe('TenantConfigService', () => {
   describe('getContactTaxonomy', () => {
-    it('returns the cached taxonomy without touching the tenant repo', async () => {
-      const cached: ContactTaxonomy = { statuses: [], sources: [] }
+    it('returns the cached taxonomy normalized without touching the tenant repo', async () => {
+      const cachedOption = {
+        key: 'custom',
+        label: 'Custom',
+        color: '#fff',
+        order: 1,
+        isSystem: false,
+      } as ContactTaxonomy['statuses'][number]
+      const cached = { statuses: [cachedOption], sources: [], types: [] } as ContactTaxonomy
       const { service, tenantRepo, cache } = buildService()
       cache.get.mockResolvedValue(cached)
 
       const result = await service.getContactTaxonomy(TENANT_ID)
 
-      expect(result).toBe(cached)
+      expect(result.statuses).toEqual([{ ...cachedOption, description: null, enabled: true }])
       expect(tenantRepo.findOne).not.toHaveBeenCalled()
     })
 
@@ -65,19 +72,52 @@ describe('TenantConfigService', () => {
 
       expect(result.statuses).toEqual(DEFAULT_CONTACT_TAXONOMY.statuses)
       expect(result.sources).toEqual(DEFAULT_CONTACT_TAXONOMY.sources)
+      expect(result.types).toEqual(DEFAULT_CONTACT_TAXONOMY.types)
     })
 
     it('merges stored statuses with default sources when only statuses are customized', async () => {
       const customStatuses = [
-        { key: 'custom', label: 'Custom', color: '#fff', order: 1, isSystem: false },
+        {
+          key: 'custom',
+          label: 'Custom',
+          description: null,
+          color: '#fff',
+          order: 1,
+          isSystem: false,
+          enabled: true,
+        },
       ]
       const { service } = buildService({
-        contactTaxonomy: { statuses: customStatuses, sources: [] },
+        contactTaxonomy: { statuses: customStatuses, sources: [], types: [] },
       })
 
       const result = await service.getContactTaxonomy(TENANT_ID)
 
       expect(result.statuses).toEqual(customStatuses)
+      expect(result.sources).toEqual(DEFAULT_CONTACT_TAXONOMY.sources)
+      expect(result.types).toEqual(DEFAULT_CONTACT_TAXONOMY.types)
+    })
+
+    it('keeps stored types while falling back for the other sections', async () => {
+      const customTypes = [
+        {
+          key: 'distributor',
+          label: 'Distribuidor',
+          description: null,
+          color: '#0EA5E9',
+          order: 1,
+          isSystem: false,
+          enabled: true,
+        },
+      ]
+      const { service } = buildService({
+        contactTaxonomy: { statuses: [], sources: [], types: customTypes },
+      })
+
+      const result = await service.getContactTaxonomy(TENANT_ID)
+
+      expect(result.types).toEqual(customTypes)
+      expect(result.statuses).toEqual(DEFAULT_CONTACT_TAXONOMY.statuses)
       expect(result.sources).toEqual(DEFAULT_CONTACT_TAXONOMY.sources)
     })
 
@@ -97,7 +137,7 @@ describe('TenantConfigService', () => {
   describe('updateContactTaxonomy', () => {
     it('persists the taxonomy and invalidates both the taxonomy and slug cache entries', async () => {
       const { service, tenantRepo, cache } = buildService()
-      const taxonomy: ContactTaxonomy = { statuses: [], sources: [] }
+      const taxonomy: ContactTaxonomy = { statuses: [], sources: [], types: [] }
 
       const result = await service.updateContactTaxonomy(TENANT_ID, taxonomy, SLUG)
 

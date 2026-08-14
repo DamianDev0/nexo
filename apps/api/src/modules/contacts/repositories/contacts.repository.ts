@@ -11,11 +11,15 @@ import type {
   ContactStatusCountRow,
   CreateContactData,
   DealRow,
+  TaxonomyUsageCountRow,
 } from '../interfaces/contact-row.interfaces'
 import {
   CONTACT_COLUMNS,
   CONTACT_LIST_COLUMNS,
+  REASSIGN_TAXONOMY_SQL,
   SORTABLE_COLUMNS,
+  TAXONOMY_USAGE_SQL,
+  type TaxonomyColumn,
 } from '../constants/contact.constants'
 import { sqlRows } from '@/shared/database/sql.util'
 
@@ -66,6 +70,63 @@ export class ContactsRepository {
     })
   }
 
+  async taxonomyUsage(schemaName: string): Promise<{
+    statuses: TaxonomyUsageCountRow[]
+    sources: TaxonomyUsageCountRow[]
+    types: TaxonomyUsageCountRow[]
+    tags: TaxonomyUsageCountRow[]
+  }> {
+    return this.db.query(schemaName, async (qr) => {
+      const grouped = (column: TaxonomyColumn) =>
+        sqlRows<TaxonomyUsageCountRow[]>(qr, TAXONOMY_USAGE_SQL[column])
+
+      const [statuses, sources, types, tags] = await Promise.all([
+        grouped('status'),
+        grouped('source'),
+        grouped('type'),
+        sqlRows<TaxonomyUsageCountRow[]>(
+          qr,
+          `SELECT tag AS key, COUNT(*)::text AS count
+           FROM contacts, unnest(tags) AS tag
+           WHERE is_active = true
+           GROUP BY tag`,
+        ),
+      ])
+
+      return { statuses, sources, types, tags }
+    })
+  }
+
+  async reassignTaxonomyColumn(
+    schemaName: string,
+    column: TaxonomyColumn,
+    fromKey: string,
+    toKey: string,
+  ): Promise<number> {
+    return this.db.query(schemaName, async (qr) => {
+      const rows = await sqlRows<Array<{ id: string }>>(qr, REASSIGN_TAXONOMY_SQL[column], [
+        fromKey,
+        toKey,
+      ])
+      return rows.length
+    })
+  }
+
+  async reassignTag(schemaName: string, fromName: string, toName: string): Promise<number> {
+    return this.db.query(schemaName, async (qr) => {
+      const rows = await sqlRows<Array<{ id: string }>>(
+        qr,
+        `UPDATE contacts
+         SET tags = ARRAY(SELECT DISTINCT t FROM unnest(array_replace(tags, $1, $2)) AS t),
+             updated_at = NOW()
+         WHERE $1 = ANY(tags)
+         RETURNING id`,
+        [fromName, toName],
+      )
+      return rows.length
+    })
+  }
+
   async findActiveById(qr: QueryRunner, contactId: string): Promise<ContactRow | null> {
     const rows = await sqlRows<ContactRow[]>(
       qr,
@@ -94,8 +155,9 @@ export class ContactsRepository {
          status, lifecycle_stage, source, lead_score,
          data_consent, consent_date, consent_source,
          opt_out_email, opt_out_sms, opt_out_whatsapp,
-         tags, company_id, assigned_to_id, custom_fields, created_by
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29)
+         tags, company_id, assigned_to_id, custom_fields, created_by,
+         type, type_label
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31)
        RETURNING ${CONTACT_COLUMNS}`,
       [
         data.firstName,
@@ -127,6 +189,8 @@ export class ContactsRepository {
         data.assignedToId,
         data.customFields,
         data.createdBy,
+        data.type,
+        data.typeLabel,
       ],
     )
     return rows[0] ?? null

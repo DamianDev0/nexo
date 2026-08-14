@@ -420,4 +420,29 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       );
     `,
   },
+  {
+    id: '0024_contact_types',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS type       VARCHAR(30),
+        ADD COLUMN IF NOT EXISTS type_label VARCHAR(50);
+    `,
+  },
+  {
+    id: '0025_swatch_colors_descriptions',
+    up: (schema) => `
+      ALTER TABLE "${schema}".tags
+        ALTER COLUMN color TYPE VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS description VARCHAR(200);
+      ALTER TABLE "${schema}".pipeline_stages
+        ALTER COLUMN color TYPE VARCHAR(100);
+    `,
+  },
+  {
+    id: '0026_tags_enabled',
+    up: (schema) => `
+      ALTER TABLE "${schema}".tags
+        ADD COLUMN IF NOT EXISTS enabled BOOLEAN NOT NULL DEFAULT true;
+    `,
+  },
 ]

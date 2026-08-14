@@ -20,6 +20,8 @@ export interface ContactRow {
   status: string
   lifecycle_stage: string | null
   source: string | null
+  type: string | null
+  type_label: string | null
   lead_score: number
   data_consent: boolean | null
   consent_date: string | null
@@ -92,6 +94,11 @@ export interface ContactStatusCountRow {
   count: string
 }
 
+export interface TaxonomyUsageCountRow {
+  key: string
+  count: string
+}
+
 export interface CreateContactData {
   firstName: string
   lastName: string | null
@@ -110,6 +117,8 @@ export interface CreateContactData {
   status: string
   lifecycleStage: string
   source: string | null
+  type: string | null
+  typeLabel: string | null
   leadScore: number
   dataConsent: boolean
   consentDate: Date | null

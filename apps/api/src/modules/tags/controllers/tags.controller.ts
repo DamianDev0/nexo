@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common'
 import { ApiTags as SwaggerTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
-import type { Tag, TenantContext } from '@repo/shared-types'
+import type { PaginatedTags, Tag, TenantContext } from '@repo/shared-types'
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TagsService } from '../services/tags.service'
@@ -25,11 +25,11 @@ export class TagsController {
 
   @Get()
   @ApiEndpoint({
-    summary: 'List all tags, optionally filtered by entity type',
+    summary: 'List tags paginated, optionally filtered by entity type',
     roles: [UserRole.VIEWER],
   })
-  findAll(@TenantCtx() ctx: TenantContext, @Query() query: TagQueryDto): Promise<Tag[]> {
-    return this.tagsService.findAll(ctx.schemaName, query.entityType)
+  findAll(@TenantCtx() ctx: TenantContext, @Query() query: TagQueryDto): Promise<PaginatedTags> {
+    return this.tagsService.findAll(ctx.schemaName, query)
   }
 
   @Post()

@@ -70,9 +70,9 @@ const CREATE_TRACKING_TABLE = (schema: string) => `
 `
 
 async function getAppliedMigrations(runner: QueryRunner, schema: string): Promise<Set<string>> {
-  const rows = await runner.query<Array<{ name: string }>>(
+  const rows = (await runner.query(
     `SELECT name FROM "${schema}".migrations ORDER BY id`,
-  )
+  )) as Array<{ name: string }>
   return new Set(rows.map((r) => r.name))
 }
 

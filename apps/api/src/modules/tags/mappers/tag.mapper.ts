@@ -6,6 +6,8 @@ export function mapTagRow(r: TagRow): Tag {
     id: r.id,
     name: r.name,
     color: r.color,
+    description: r.description ?? null,
+    enabled: r.enabled ?? true,
     entityType: r.entity_type,
     createdAt: r.created_at,
   }
