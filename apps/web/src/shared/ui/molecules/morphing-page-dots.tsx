@@ -100,7 +100,7 @@ export function MorphingPageDots({
                   transition={MORPH_SPRING}
                   className={cn(
                     'h-2 rounded-full transition-colors',
-                    isActive ? 'bg-foreground/70' : 'bg-foreground/15 hover:bg-foreground/30',
+                    isActive ? 'bg-primary' : 'bg-foreground/15 hover:bg-foreground/30',
                   )}
                 />
               </button>

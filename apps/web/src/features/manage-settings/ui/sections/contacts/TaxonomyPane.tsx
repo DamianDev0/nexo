@@ -1,14 +1,13 @@
 'use client'
 
-import { closestCenter, DndContext } from '@dnd-kit/core'
+import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
-import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { PlusIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
+import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
@@ -17,16 +16,23 @@ import { useTaxonomyPane } from '../../../model/useTaxonomyPane'
 
 import { OptionFormDialog } from './OptionFormDialog'
 import { ReassignOptionDialog } from './ReassignOptionDialog'
+import { SortableTaxonomyOption } from './SortableTaxonomyOption'
 import { TaxonomyOptionRow } from './TaxonomyOptionRow'
 
 import type { TaxonomyKind } from '../../../lib/taxonomy-edit'
 
 const SKELETON_ROWS = 5
 
+const DROP_ANIMATION = {
+  duration: 220,
+  easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+}
+
 export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
   const { t } = useTranslation()
   const pane = useTaxonomyPane(kind)
-  const pageTransition = useReducedTransition(quickEase)
+
+  const dragged = pane.options.find((option) => option.key === pane.dnd.activeId)
 
   return (
     <div className="max-w-2xl">
@@ -66,24 +72,34 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
               items={pane.options.map((option) => option.key)}
               strategy={verticalListSortingStrategy}
             >
-              <motion.div
-                key={pane.pagination.page}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={pageTransition}
-                className="flex flex-col gap-1.5"
-              >
+              <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
                 {pane.options.map((option) => (
-                  <TaxonomyOptionRow
+                  <SortableTaxonomyOption
                     key={option.key}
-                    option={option}
-                    fallbackLabel={pane.optionLabel(option)}
-                    count={pane.counts[option.key] ?? 0}
+                    row={{
+                      option,
+                      label: pane.optionLabel(option),
+                      count: pane.counts[option.key] ?? 0,
+                    }}
                     actions={pane.actions}
                   />
                 ))}
-              </motion.div>
+              </PagedTransition>
             </SortableContext>
+
+            <DragOverlay modifiers={[restrictToVerticalAxis]} dropAnimation={DROP_ANIMATION}>
+              {dragged ? (
+                <TaxonomyOptionRow
+                  ghost
+                  row={{
+                    option: dragged,
+                    label: pane.optionLabel(dragged),
+                    count: pane.counts[dragged.key] ?? 0,
+                  }}
+                  actions={pane.actions}
+                />
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </TooltipProvider>
       )}

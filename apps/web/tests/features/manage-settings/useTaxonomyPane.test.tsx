@@ -70,7 +70,8 @@ let contacts = {
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key,
+    t: (key: string, opts?: { defaultValue?: string }) =>
+      key === 'contacts.status.dormido' ? 'Dormido' : (opts?.defaultValue ?? key),
   }),
 }))
 
@@ -189,5 +190,119 @@ describe('useTaxonomyPane', () => {
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
     expect(result.current.counts).toEqual({ new: 7 })
+  })
+
+  it('prefills the editor with the localized label of a system option, never its raw key', () => {
+    contacts = {
+      ...contacts,
+      taxonomy: {
+        ...TAXONOMY,
+        statuses: [
+          {
+            key: 'dormido',
+            label: null,
+            description: 'Sin contacto hace 90 dias',
+            color: '#94A3B8',
+            order: 1,
+            isSystem: true,
+            enabled: true,
+          },
+        ],
+      },
+    }
+
+    const { result } = renderHook(() => useTaxonomyPane('statuses'))
+
+    expect(result.current.optionLabel(result.current.options[0]!)).toBe('Dormido')
+
+    act(() => result.current.actions.onEdit('dormido'))
+
+    expect(result.current.editor.editing).toEqual({
+      name: 'Dormido',
+      description: 'Sin contacto hace 90 dias',
+    })
+  })
+
+  it('falls back to the raw key only when there is no translation either', () => {
+    contacts = {
+      ...contacts,
+      taxonomy: {
+        ...TAXONOMY,
+        statuses: [
+          {
+            key: 'sin_traducir',
+            label: null,
+            description: null,
+            color: '#94A3B8',
+            order: 1,
+            isSystem: false,
+            enabled: true,
+          },
+        ],
+      },
+    }
+
+    const { result } = renderHook(() => useTaxonomyPane('statuses'))
+
+    act(() => result.current.actions.onEdit('sin_traducir'))
+
+    expect(result.current.editor.editing).toEqual({ name: 'sin_traducir', description: '' })
+  })
+
+  it('prefills the editor with the localized label of a system option, never its raw key', () => {
+    contacts = {
+      ...contacts,
+      taxonomy: {
+        ...TAXONOMY,
+        statuses: [
+          {
+            key: 'dormido',
+            label: null,
+            description: 'Sin contacto hace 90 dias',
+            color: '#94A3B8',
+            order: 1,
+            isSystem: true,
+            enabled: true,
+          },
+        ],
+      },
+    }
+
+    const { result } = renderHook(() => useTaxonomyPane('statuses'))
+
+    expect(result.current.optionLabel(result.current.options[0]!)).toBe('Dormido')
+
+    act(() => result.current.actions.onEdit('dormido'))
+
+    expect(result.current.editor.editing).toEqual({
+      name: 'Dormido',
+      description: 'Sin contacto hace 90 dias',
+    })
+  })
+
+  it('falls back to the raw key only when there is no translation either', () => {
+    contacts = {
+      ...contacts,
+      taxonomy: {
+        ...TAXONOMY,
+        statuses: [
+          {
+            key: 'sin_traducir',
+            label: null,
+            description: null,
+            color: '#94A3B8',
+            order: 1,
+            isSystem: false,
+            enabled: true,
+          },
+        ],
+      },
+    }
+
+    const { result } = renderHook(() => useTaxonomyPane('statuses'))
+
+    act(() => result.current.actions.onEdit('sin_traducir'))
+
+    expect(result.current.editor.editing).toEqual({ name: 'sin_traducir', description: '' })
   })
 })

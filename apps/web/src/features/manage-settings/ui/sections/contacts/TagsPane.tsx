@@ -1,12 +1,12 @@
 'use client'
 
-import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
-import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { PlusIcon, TagIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
+import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
 import { Button } from '@/shared/ui/shadcn/button'
+import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { useTagsPane } from '../../../model/useTagsPane'
 
@@ -17,7 +17,6 @@ import { TagRow } from './TagRow'
 export function TagsPane() {
   const { t } = useTranslation()
   const pane = useTagsPane()
-  const pageTransition = useReducedTransition(quickEase)
 
   return (
     <div className="max-w-2xl">
@@ -45,22 +44,18 @@ export function TagsPane() {
         </div>
       )}
 
-      <motion.div
-        key={pane.pagination.page}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={pageTransition}
-        className="flex flex-col gap-1.5"
-      >
-        {pane.tags.map((tag) => (
-          <TagRow
-            key={tag.id}
-            tag={tag}
-            count={pane.counts[tag.name] ?? 0}
-            actions={pane.actions}
-          />
-        ))}
-      </motion.div>
+      <TooltipProvider delayDuration={400}>
+        <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
+          {pane.tags.map((tag) => (
+            <TagRow
+              key={tag.id}
+              tag={tag}
+              count={pane.counts[tag.name] ?? 0}
+              actions={pane.actions}
+            />
+          ))}
+        </PagedTransition>
+      </TooltipProvider>
 
       <MorphingPageDots
         total={pane.pagination.totalPages}

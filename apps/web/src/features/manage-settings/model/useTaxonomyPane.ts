@@ -93,7 +93,7 @@ export function useTaxonomyPane(kind: TaxonomyKind) {
     [contacts, editingKey, kind, options.length, setPage],
   )
 
-  const editingLabel = editingOption ? (editingOption.label ?? editingOption.key) : null
+  const editingLabel = editingOption ? label(editingOption) : null
   const editingDescription = editingOption?.description ?? ''
   const editing = useMemo(
     () => (editingLabel === null ? null : { name: editingLabel, description: editingDescription }),

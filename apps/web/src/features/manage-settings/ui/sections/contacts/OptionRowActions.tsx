@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { CountHint } from '@/shared/ui/atoms/count-hint'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { LockIcon, PencilSimpleIcon, TrashIcon } from '@/shared/ui/icons'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 
 interface RemoveAction {
@@ -16,16 +16,14 @@ interface RemoveAction {
 
 interface OptionRowActionsProps {
   readonly count: number
-  readonly enabled: boolean
-  readonly onToggle: (enabled: boolean) => void
+  readonly toggle: { readonly enabled: boolean; readonly onToggle: (enabled: boolean) => void }
   readonly onEdit: () => void
   readonly remove: RemoveAction
 }
 
 export function OptionRowActions({
   count,
-  enabled,
-  onToggle,
+  toggle,
   onEdit,
   remove,
 }: Readonly<OptionRowActionsProps>) {
@@ -35,9 +33,9 @@ export function OptionRowActions({
     <>
       <AnimatedToggle
         size="sm"
-        checked={enabled}
+        checked={toggle.enabled}
         label={t('settings.taxonomy.toggle')}
-        onChange={onToggle}
+        onChange={toggle.onToggle}
       />
       <CountHint count={count} label={t('settings.taxonomy.inUse', { count })} />
       <PillButton
@@ -59,14 +57,11 @@ export function OptionRowActions({
           <TrashIcon className="size-3.5" />
         </PillButton>
       ) : (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="flex size-8 items-center justify-center text-muted-foreground">
-              <LockIcon className="size-3.5" />
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{remove.lockedHint}</TooltipContent>
-        </Tooltip>
+        <HintTooltip asChild hint={remove.lockedHint}>
+          <span className="flex size-8 items-center justify-center text-muted-foreground">
+            <LockIcon className="size-3.5" />
+          </span>
+        </HintTooltip>
       )}
     </>
   )
