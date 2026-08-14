@@ -4,6 +4,7 @@ export { useReducedTransition } from './useReducedTransition'
 export {
   DURATION,
   EASE_SMOOTH,
+  expandCollapse,
   fade,
   fadeSlideUp,
   slideRight,
@@ -17,5 +18,7 @@ export {
   indicatorSpring,
   gooeyPopover,
   gooeySpring,
+  subtlePopover,
+  subtleTween,
   instant,
 } from './variants'

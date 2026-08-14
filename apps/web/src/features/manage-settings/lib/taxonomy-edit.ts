@@ -1,9 +1,26 @@
 import { TAXONOMY_KEY_PATTERN, taxonomyColorAt } from '@repo/shared-types'
 import { normalizeText } from '@repo/shared-utils'
 
+import type { TaxonomyOptionPatch } from '../model/types'
 import type { ContactTaxonomy, TaxonomyOption } from '@repo/shared-types'
+import type { TFunction } from 'i18next'
 
 export type TaxonomyKind = keyof ContactTaxonomy
+
+export type TaxonomyNamespace = 'status' | 'source' | 'types'
+
+export function taxonomyNamespace(kind: TaxonomyKind): TaxonomyNamespace {
+  if (kind === 'statuses') return 'status'
+  return kind === 'sources' ? 'source' : 'types'
+}
+
+export function optionLabel(
+  t: TFunction,
+  namespace: TaxonomyNamespace,
+  option: TaxonomyOption,
+): string {
+  return option.label ?? t(`contacts.${namespace}.${option.key}`, { defaultValue: option.key })
+}
 
 const MAX_KEY_LENGTH = 40
 
@@ -40,6 +57,7 @@ export function reindexOptions(options: ReadonlyArray<TaxonomyOption>): Taxonomy
 export function appendOption(
   options: ReadonlyArray<TaxonomyOption>,
   label: string,
+  description?: string,
 ): TaxonomyOption[] {
   const taken = new Set(options.map((option) => option.key))
   return reindexOptions([
@@ -47,9 +65,11 @@ export function appendOption(
     {
       key: slugifyTaxonomyKey(label, taken),
       label: label.trim(),
+      description: description?.trim() ? description.trim() : null,
       color: taxonomyColorAt(options.length),
       order: 0,
       isSystem: false,
+      enabled: true,
     },
   ])
 }
@@ -57,7 +77,7 @@ export function appendOption(
 export function patchOption(
   options: ReadonlyArray<TaxonomyOption>,
   key: string,
-  patch: Partial<Pick<TaxonomyOption, 'label' | 'color'>>,
+  patch: TaxonomyOptionPatch,
 ): TaxonomyOption[] {
   return options.map((option) => (option.key === key ? { ...option, ...patch } : option))
 }
@@ -73,9 +93,11 @@ function sameOption(a: TaxonomyOption, b: TaxonomyOption): boolean {
   return (
     a.key === b.key &&
     a.label === b.label &&
+    a.description === b.description &&
     a.color === b.color &&
     a.order === b.order &&
-    a.isSystem === b.isSystem
+    a.isSystem === b.isSystem &&
+    a.enabled === b.enabled
   )
 }
 
@@ -88,7 +110,11 @@ export function sameTaxonomy(
   b: ContactTaxonomy | null | undefined,
 ): boolean {
   if (!a || !b) return a === b
-  return sameOptions(a.statuses, b.statuses) && sameOptions(a.sources, b.sources)
+  return (
+    sameOptions(a.statuses, b.statuses) &&
+    sameOptions(a.sources, b.sources) &&
+    sameOptions(a.types, b.types)
+  )
 }
 
 export function reorderOptions(

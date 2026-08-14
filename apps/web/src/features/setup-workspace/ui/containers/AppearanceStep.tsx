@@ -1,36 +1,71 @@
+'use client'
+
+import { useWatch } from 'react-hook-form'
+
+import { useAppearanceColors, useActivePresetKey } from '../../model/useAppearanceDerived'
 import { useSetupWizard } from '../../model/wizard-context'
 import { StepAppearance } from '../StepAppearance'
 
 export function AppearanceStep() {
   const { wizard, appearance, navigation } = useSetupWizard()
+  const { control, bindField } = appearance
+  const colors = useAppearanceColors(control)
+  const activePresetKey = useActivePresetKey(control)
+  const navModules = useWatch({ control: navigation.control, name: 'modules' })
+  const [
+    primaryColor,
+    grainIntensity,
+    darkMode,
+    fontFamily,
+    borderRadius,
+    density,
+    productName,
+    tagline,
+    logoPreview,
+    logoFileName,
+  ] = useWatch({
+    control,
+    name: [
+      'primaryColor',
+      'grainIntensity',
+      'darkMode',
+      'fontFamily',
+      'borderRadius',
+      'density',
+      'productName',
+      'tagline',
+      'logoPreview',
+      'logoFileName',
+    ],
+  })
 
   return (
     <StepAppearance
       data={{
-        primaryColor: appearance.primaryColor,
-        colors: appearance.colors,
-        grainIntensity: appearance.grainIntensity,
-        darkMode: appearance.darkMode,
-        fontFamily: appearance.fontFamily,
-        borderRadius: appearance.borderRadius,
-        density: appearance.density,
-        productName: appearance.productName,
-        tagline: appearance.tagline,
-        logoPreview: appearance.logoPreview,
-        logoFileName: appearance.logoFileName,
-        navModules: navigation.modules,
-        activePresetKey: appearance.activePresetKey,
+        primaryColor,
+        colors,
+        grainIntensity,
+        darkMode,
+        fontFamily,
+        borderRadius,
+        density,
+        productName,
+        tagline,
+        logoPreview,
+        logoFileName,
+        navModules,
+        activePresetKey,
       }}
       actions={{
         onPrimaryColorChange: appearance.handlePrimaryChange,
         onColorOverride: appearance.handleColorOverride,
-        onGrainIntensityChange: appearance.setGrainIntensity,
-        onDarkModeChange: appearance.setDarkMode,
-        onFontFamilyChange: appearance.setFontFamily,
-        onBorderRadiusChange: appearance.setBorderRadius,
-        onDensityChange: appearance.setDensity,
-        onProductNameChange: appearance.setProductName,
-        onTaglineChange: appearance.setTagline,
+        onGrainIntensityChange: bindField('grainIntensity'),
+        onDarkModeChange: bindField('darkMode'),
+        onFontFamilyChange: bindField('fontFamily'),
+        onBorderRadiusChange: bindField('borderRadius'),
+        onDensityChange: bindField('density'),
+        onProductNameChange: bindField('productName'),
+        onTaglineChange: bindField('tagline'),
         onLogoUpload: appearance.handleLogoUpload,
         onLogoRemove: appearance.handleLogoRemove,
         onRestoreTheme: appearance.handleRestoreTheme,

@@ -1,40 +1,29 @@
-import { UserRole } from '@repo/shared-types'
 import { t } from 'i18next'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
+import { useFormFields } from '@/shared/lib/hooks/useFormFields'
+
 import { inviteUsersAction } from '../api/setup-steps.actions'
+import { TEAM_INVITE_DEFAULT } from '../config/team.constants'
 import { useStepMutation } from '../query/useStepMutation'
 
-interface InviteRow {
-  email: string
-  role: UserRole
-}
-
-interface TeamFormValues {
-  invites: InviteRow[]
-}
-
-function newInvite(): InviteRow {
-  return { email: '', role: UserRole.SALES_REP }
-}
+import type { InviteRow, TeamFormValues } from './types'
 
 export function useStepTeam(onNext: () => void) {
-  const { control, watch, getValues } = useForm<TeamFormValues>({
-    defaultValues: { invites: [newInvite()] },
+  const { control, setValue, getValues } = useForm<TeamFormValues>({
+    defaultValues: { invites: [TEAM_INVITE_DEFAULT] },
   })
-  const { fields, append, remove, update } = useFieldArray({ control, name: 'invites' })
-  const watchedInvites = watch('invites')
+  const { fields, append, remove } = useFieldArray({ control, name: 'invites' })
+  const { setField } = useFormFields(setValue)
 
-  const invites = fields.map((field, index) => ({
-    ...(watchedInvites[index] ?? field),
-    id: field.id,
-  }))
+  const indexOf = useCallback(
+    (id: string) => fields.findIndex((field) => field.id === id),
+    [fields],
+  )
 
-  const indexOf = useCallback((id: string) => fields.findIndex((f) => f.id === id), [fields])
-
-  const handleAdd = useCallback(() => append(newInvite()), [append])
+  const handleAdd = useCallback(() => append(TEAM_INVITE_DEFAULT), [append])
 
   const handleRemove = useCallback(
     (id: string) => {
@@ -48,14 +37,15 @@ export function useStepTeam(onNext: () => void) {
     (id: string, patch: Partial<InviteRow>) => {
       const index = indexOf(id)
       if (index < 0) return
-      update(index, { ...getValues(`invites.${index}`), ...patch })
+      if (patch.email !== undefined) setField(`invites.${index}.email`, patch.email)
+      if (patch.role !== undefined) setField(`invites.${index}.role`, patch.role)
     },
-    [indexOf, update, getValues],
+    [indexOf, setField],
   )
 
   const { handleSave, isPending } = useStepMutation({
     mutationFn: async () => {
-      const valid = getValues('invites').filter((inv) => inv.email.trim().length > 0)
+      const valid = getValues('invites').filter((invite) => invite.email.trim().length > 0)
       if (valid.length === 0) return 0
       const result = await inviteUsersAction(valid)
       if (!result.ok) throw new Error(result.error)
@@ -68,12 +58,8 @@ export function useStepTeam(onNext: () => void) {
     },
   })
 
-  return {
-    invites,
-    handleAdd,
-    handleRemove,
-    handleUpdate,
-    handleSave,
-    isPending,
-  }
+  return useMemo(
+    () => ({ control, fields, handleAdd, handleRemove, handleUpdate, handleSave, isPending }),
+    [control, fields, handleAdd, handleRemove, handleUpdate, handleSave, isPending],
+  )
 }

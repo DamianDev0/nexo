@@ -1,11 +1,13 @@
 'use client'
 
+import { useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
   BrandColorSection,
   BrandingFieldsSection,
   PresetsSection,
+  useActivePresetKey,
 } from '@/features/setup-workspace'
 import { FileUpload } from '@/shared/ui/molecules/file-upload'
 import { Label } from '@/shared/ui/shadcn/label'
@@ -15,11 +17,19 @@ import { useManageSettings } from '../../../model/settings-context'
 export function BrandPane() {
   const { t } = useTranslation()
   const { appearance } = useManageSettings()
+  const { control, bindField } = appearance
+  const activePresetKey = useActivePresetKey(control)
+  const primaryColor = useWatch({ control, name: 'primaryColor' })
+  const grainIntensity = useWatch({ control, name: 'grainIntensity' })
+  const productName = useWatch({ control, name: 'productName' })
+  const tagline = useWatch({ control, name: 'tagline' })
+  const logoPreview = useWatch({ control, name: 'logoPreview' })
+  const logoFileName = useWatch({ control, name: 'logoFileName' })
 
   return (
     <>
       <PresetsSection
-        activePresetKey={appearance.activePresetKey}
+        activePresetKey={activePresetKey}
         onApplyPreset={appearance.handleApplyPreset}
       />
 
@@ -28,25 +38,25 @@ export function BrandPane() {
           {t('onboarding.steps.appearance.logo')}
         </Label>
         <FileUpload
-          preview={appearance.logoPreview}
-          fileName={appearance.logoFileName}
+          preview={logoPreview}
+          fileName={logoFileName}
           onUpload={appearance.handleLogoUpload}
           onRemove={appearance.handleLogoRemove}
         />
       </div>
 
       <BrandingFieldsSection
-        productName={appearance.productName}
-        tagline={appearance.tagline}
-        onProductNameChange={appearance.setProductName}
-        onTaglineChange={appearance.setTagline}
+        productName={productName}
+        tagline={tagline}
+        onProductNameChange={bindField('productName')}
+        onTaglineChange={bindField('tagline')}
       />
 
       <BrandColorSection
-        primaryColor={appearance.primaryColor}
-        grainIntensity={appearance.grainIntensity}
+        primaryColor={primaryColor}
+        grainIntensity={grainIntensity}
         onPrimaryColorChange={appearance.handlePrimaryChange}
-        onGrainIntensityChange={appearance.setGrainIntensity}
+        onGrainIntensityChange={bindField('grainIntensity')}
       />
     </>
   )

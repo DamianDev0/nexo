@@ -1,21 +1,39 @@
 'use client'
 
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
-import { TagIcon } from '@/shared/ui/icons'
+import { quickEase, useReducedTransition } from '@/shared/lib/animations'
+import { PlusIcon, TagIcon } from '@/shared/ui/icons'
+import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
+import { Button } from '@/shared/ui/shadcn/button'
 
 import { useTagsPane } from '../../../model/useTagsPane'
 
-import { AddOptionInput } from './AddOptionInput'
+import { OptionFormDialog } from './OptionFormDialog'
+import { ReassignOptionDialog } from './ReassignOptionDialog'
 import { TagRow } from './TagRow'
 
 export function TagsPane() {
   const { t } = useTranslation()
   const pane = useTagsPane()
+  const pageTransition = useReducedTransition(quickEase)
 
   return (
     <div className="max-w-2xl">
-      <p className="mb-4 text-sm text-muted-foreground">{t('settings.tags.description')}</p>
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <p className="text-sm text-muted-foreground">{t('settings.tags.description')}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="shrink-0 gap-1.5"
+          disabled={pane.isPending}
+          onClick={pane.editor.openCreate}
+        >
+          <PlusIcon className="size-3.5" />
+          {t('settings.tags.add')}
+        </Button>
+      </div>
 
       {!pane.isPending && pane.tags.length === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-10 text-center">
@@ -27,18 +45,52 @@ export function TagsPane() {
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
+      <motion.div
+        key={pane.pagination.page}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={pageTransition}
+        className="flex flex-col gap-1.5"
+      >
         {pane.tags.map((tag) => (
-          <TagRow key={tag.id} tag={tag} actions={pane.actions} />
+          <TagRow
+            key={tag.id}
+            tag={tag}
+            count={pane.counts[tag.name] ?? 0}
+            actions={pane.actions}
+          />
         ))}
-      </div>
+      </motion.div>
 
-      <AddOptionInput
-        form={{ value: pane.newName, onChange: pane.setNewName, onSubmit: pane.handleAdd }}
-        placeholder={t('settings.tags.addPlaceholder')}
-        label={t('settings.tags.add')}
-        disabled={pane.isPending}
+      <MorphingPageDots
+        total={pane.pagination.totalPages}
+        page={pane.pagination.page}
+        onPageChange={pane.pagination.onPageChange}
+        label={t('settings.pagination.page')}
+        className="mt-3"
       />
+
+      {pane.editor.open && (
+        <OptionFormDialog
+          open
+          onOpenChange={pane.editor.onOpenChange}
+          initial={pane.editor.editing}
+          namePlaceholder={t('settings.tags.addPlaceholder')}
+          onSubmit={pane.editor.onSubmit}
+        />
+      )}
+
+      {pane.removal && (
+        <ReassignOptionDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) pane.removal?.cancel()
+          }}
+          source={pane.removal.source}
+          candidates={pane.removal.candidates}
+          onConfirm={pane.removal.confirm}
+        />
+      )}
     </div>
   )
 }

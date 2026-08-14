@@ -6,10 +6,12 @@ import { TAXONOMY_COLOR_PALETTE } from '@repo/shared-types'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
-import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { DotsSixVerticalIcon, LockIcon, TrashIcon } from '@/shared/ui/icons'
+import { DotsSixVerticalIcon } from '@/shared/ui/icons'
 import { EditableSwatchRow } from '@/shared/ui/molecules/editable-swatch-row'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
+
+import { useEditableName } from '../../../model/useEditableName'
+
+import { OptionRowActions } from './OptionRowActions'
 
 import type { TaxonomyRowActions } from '../../../model/types'
 import type { TaxonomyOption } from '@repo/shared-types'
@@ -17,24 +19,31 @@ import type { TaxonomyOption } from '@repo/shared-types'
 interface TaxonomyOptionRowProps {
   readonly option: TaxonomyOption
   readonly fallbackLabel: string
+  readonly count: number
   readonly actions: TaxonomyRowActions
 }
 
 export function TaxonomyOptionRow({
   option,
   fallbackLabel,
+  count,
   actions,
 }: Readonly<TaxonomyOptionRowProps>) {
   const { t } = useTranslation()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: option.key,
   })
+  const editable = useEditableName({
+    value: option.label ?? '',
+    onCommit: (label) => actions.onPatch(option.key, { label: label || null }),
+    allowEmpty: true,
+  })
 
   return (
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn(isDragging && 'opacity-40')}
+      className={cn(isDragging && 'opacity-40', !option.enabled && 'opacity-55')}
     >
       <EditableSwatchRow
         swatch={{
@@ -44,9 +53,10 @@ export function TaxonomyOptionRow({
           label: t('settings.taxonomy.pickColor'),
         }}
         name={{
-          value: option.label ?? '',
+          value: editable.name,
           placeholder: fallbackLabel,
-          onChange: (label) => actions.onPatch(option.key, { label: label || null }),
+          onChange: editable.setName,
+          onBlur: editable.commit,
         }}
         leading={
           <span
@@ -59,25 +69,17 @@ export function TaxonomyOptionRow({
           </span>
         }
         trailing={
-          option.isSystem ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="px-2 text-muted-foreground">
-                  <LockIcon className="size-3.5" />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{t('settings.taxonomy.systemHint')}</TooltipContent>
-            </Tooltip>
-          ) : (
-            <PillButton
-              variant="ghost"
-              size="sm"
-              aria-label={t('settings.taxonomy.remove')}
-              onClick={() => actions.onRemove(option.key)}
-            >
-              <TrashIcon className="size-3.5" />
-            </PillButton>
-          )
+          <OptionRowActions
+            count={count}
+            enabled={option.enabled}
+            onToggle={(enabled) => actions.onPatch(option.key, { enabled })}
+            onEdit={() => actions.onEdit(option.key)}
+            remove={{
+              label: t('settings.taxonomy.remove'),
+              onRemove: option.isSystem ? null : () => actions.onRemove(option.key),
+              lockedHint: t('settings.taxonomy.systemHint'),
+            }}
+          />
         }
       />
     </div>

@@ -4,6 +4,7 @@ import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useMemo } from 'react'
+import { useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -21,11 +22,12 @@ import { useManageSettings } from '../../model/settings-context'
 export function NavigationSettings() {
   const { t } = useTranslation()
   const { navigation } = useManageSettings()
+  const modules = useWatch({ control: navigation.control, name: 'modules' })
   const dnd = useDndReorder(navigation.handleReorder)
   const focus = useHighlightKey()
 
-  const groups = groupModules(navigation.modules)
-  const activeModule = dnd.activeId ? navigation.modules.find((m) => m.key === dnd.activeId) : null
+  const groups = groupModules(modules)
+  const activeModule = dnd.activeId ? modules.find((module) => module.key === dnd.activeId) : null
   const rowActions = useMemo(
     () => ({ onToggle: navigation.handleToggle, onHover: focus.highlight, onLeave: focus.clear }),
     [navigation.handleToggle, focus.highlight, focus.clear],
@@ -73,7 +75,7 @@ export function NavigationSettings() {
       </div>
 
       <div className="w-full xl:sticky xl:top-6 xl:flex-1 xl:self-start">
-        <SidebarPreview modules={navigation.modules} highlightKey={focus.key} />
+        <SidebarPreview modules={modules} highlightKey={focus.key} />
       </div>
     </div>
   )

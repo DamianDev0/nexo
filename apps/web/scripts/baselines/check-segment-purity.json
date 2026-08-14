@@ -1,4 +1,3 @@
 [
-  "src/entities/nomenclature/model/module-entity.ts:3 :: export const MODULE_ENTITY: Readonly<Record<string, EntityKey>> = {",
-  "src/features/manage-contacts/model/contact-form.schema.ts:42 :: export const CONTACT_FORM_DEFAULTS: ContactFormValues = {"
+  "src/entities/nomenclature/model/module-entity.ts:3 :: export const MODULE_ENTITY: Readonly<Record<string, EntityKey>> = {"
 ]

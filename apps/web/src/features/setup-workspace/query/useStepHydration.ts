@@ -5,19 +5,21 @@ interface StepHydrationOptions<TData> {
   readonly queryKey: readonly unknown[]
   readonly queryFn: () => Promise<TData>
   readonly hydrate: (data: TData) => void
+  readonly skip?: boolean
 }
 
 export function useStepHydration<TData>({
   queryKey,
   queryFn,
   hydrate,
+  skip,
 }: StepHydrationOptions<TData>) {
   const { data } = useQuery({ queryKey, queryFn, staleTime: Number.POSITIVE_INFINITY })
-  const hydrated = useRef(false)
+  const hydrated = useRef<TData | undefined>(undefined)
 
   useEffect(() => {
-    if (data === undefined || hydrated.current) return
-    hydrated.current = true
+    if (data === undefined || skip || data === hydrated.current) return
+    hydrated.current = data
     hydrate(data)
-  }, [data, hydrate])
+  }, [data, hydrate, skip])
 }

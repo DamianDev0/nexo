@@ -53,6 +53,12 @@ export const staggerChild: Variants = {
   animate: { opacity: 1, y: 0 },
 }
 
+export const expandCollapse: Variants = {
+  initial: { height: 0, opacity: 0 },
+  animate: { height: 'auto', opacity: 1 },
+  exit: { height: 0, opacity: 0 },
+}
+
 export const smoothSpring = {
   type: 'spring' as const,
   stiffness: 260,
@@ -88,4 +94,15 @@ export const gooeySpring = {
   type: 'spring' as const,
   bounce: 0.24,
   duration: 0.36,
+}
+
+export const subtlePopover: Variants = {
+  initial: { opacity: 0, scale: 0.97 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.97 },
+}
+
+export const subtleTween = {
+  duration: 0.14,
+  ease: EASE_SMOOTH,
 }

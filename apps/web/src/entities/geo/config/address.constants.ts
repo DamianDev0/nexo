@@ -1,1 +1,2 @@
 export const MAX_ADDRESS_SUGGESTIONS = 5
+export const MAX_ADDRESS_OPTIONS = 6

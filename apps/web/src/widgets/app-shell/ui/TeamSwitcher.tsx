@@ -50,7 +50,7 @@ export function TeamSwitcher({ team }: Readonly<{ team: SidebarTeam }>) {
             side={isMobile ? 'bottom' : 'right'}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
+            <DropdownMenuLabel className="text-xs font-semibold text-body">
               {t('nav.teams')}
             </DropdownMenuLabel>
             <DropdownMenuItem className="gap-2 p-2">

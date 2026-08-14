@@ -1,5 +1,7 @@
 export * from './appearance.types'
+export * from './company.types'
 export * from './navigation.types'
 export * from './nomenclature.types'
+export * from './pipeline.types'
 export * from './team.types'
 export * from './wizard.types'

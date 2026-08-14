@@ -44,7 +44,7 @@ export function PasswordField<T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <Label className="text-xs text-muted-foreground">{copy.label}</Label>
+          <Label className="text-xs font-semibold text-body">{copy.label}</Label>
           <div className="relative mt-1.5">
             <Input
               type={visibility.shown ? 'text' : 'password'}

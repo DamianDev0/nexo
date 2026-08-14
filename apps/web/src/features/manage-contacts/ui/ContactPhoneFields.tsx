@@ -7,17 +7,25 @@ import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
 
 import { ContactPhoneField } from './ContactPhoneField'
 
-import type { ContactFormValues } from '../model/contact-form.schema'
+import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { Control } from 'react-hook-form'
 
-export function ContactPhoneFields({ control }: Readonly<{ control: Control<ContactFormValues> }>) {
+export function ContactPhoneFields({
+  control,
+  onPhoneBlur,
+}: Readonly<{ control: Control<ContactFormValues>; onPhoneBlur?: () => void }>) {
   const { t } = useTranslation()
   const sameAsPhone = useWatch({ control, name: 'whatsappSameAsPhone' })
 
   return (
     <div className="flex flex-col gap-2">
       <div className="grid grid-cols-2 gap-3.5">
-        <ContactPhoneField control={control} name="phone" label={t('contacts.form.phone')} />
+        <ContactPhoneField
+          control={control}
+          name="phone"
+          label={t('contacts.form.phone')}
+          onBlur={onPhoneBlur}
+        />
         <ContactPhoneField
           control={control}
           name="whatsapp"

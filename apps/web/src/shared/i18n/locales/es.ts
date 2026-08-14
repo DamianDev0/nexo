@@ -136,6 +136,9 @@ const es = {
   geo: {
     typeToSearch: 'Escribe para buscar un municipio',
     noMatches: 'Sin municipios que coincidan',
+    poweredByGoogle: 'Powered by Google',
+    streetTypes: 'Tipo de vía',
+    addresses: 'Direcciones',
   },
   onboarding: {
     map: {
@@ -389,6 +392,12 @@ const es = {
       partner: 'Aliado',
       chat: 'Chat',
     },
+    types: {
+      customer: 'Cliente',
+      supplier: 'Proveedor',
+      partner: 'Socio',
+      other: 'Otro',
+    },
     lifecycleStage: {
       subscriber: 'Suscriptor',
       lead: 'Lead',
@@ -440,6 +449,12 @@ const es = {
       status: 'Estado',
       source: 'Origen',
       sourcePlaceholder: '¿De dónde llegó este contacto?',
+      type: 'Tipo',
+      typePlaceholder: '¿Qué es este contacto para tu negocio?',
+      typeOtherLabel: '¿Cuál?',
+      typeOtherPlaceholder: 'Describe el tipo de contacto',
+      hidePanel: 'Ocultar panel',
+      submitAndNew: 'Crear y agregar otro',
       whatsappAlt: 'Logo de WhatsApp',
       countryAlt: 'Bandera de Colombia',
       submitCreate: 'Crear contacto',
@@ -450,11 +465,22 @@ const es = {
       updated: 'Contacto actualizado',
       archived: 'Contacto archivado',
       archivedMany: 'Contactos archivados',
+      archivedPartial: 'Solo se archivaron {{archived}} de {{total}} contactos',
     },
     errors: {
       firstNameRequired: 'El nombre es obligatorio',
       emailInvalid: 'Ingresa un email válido',
       phoneInvalid: 'Número inválido: 10 dígitos, celular 3XX o fijo 60X',
+      typeOtherRequired: 'Indica cuál es el tipo de contacto',
+    },
+    duplicates: {
+      emailTaken: 'Ya existe un contacto con este email: {{name}}',
+      documentTaken: 'Ya existe un contacto con este documento: {{name}}',
+      phoneMatch: 'Este teléfono ya pertenece a {{name}}',
+      nameMatch: 'Ya existe un contacto llamado {{name}}',
+      createAnyway: 'Crear de todas formas',
+      saveAnyway: 'Guardar de todas formas',
+      dismiss: 'Descartar',
     },
     pagination: {
       pages: 'Paginación',
@@ -470,6 +496,32 @@ const es = {
     unsavedChanges: 'Tienes cambios sin guardar',
     noChanges: 'Sin cambios',
     noChangesHint: 'Haz un cambio para poder guardar',
+    pagination: {
+      page: 'Página',
+    },
+    optionForm: {
+      createTitle: 'Nueva opción',
+      editTitle: 'Editar opción',
+      name: 'Nombre',
+      description: 'Descripción',
+      descriptionPlaceholder: 'Describe cuándo usar esta opción…',
+      errors: {
+        nameRequired: 'Escribe un nombre',
+        nameTooLong: 'Máximo {{max}} caracteres',
+        descriptionTooLong: 'Máximo {{max}} caracteres',
+      },
+    },
+    reassign: {
+      title: 'Reasignar contactos',
+      description:
+        '{{count}} contactos usan «{{name}}». Muévelos a otra opción antes de eliminarla.',
+      target: 'Mover a…',
+      confirm: 'Reasignar y eliminar',
+      done: '{{count}} contactos reasignados',
+      errors: {
+        targetRequired: 'Elige a dónde mover los contactos',
+      },
+    },
     discard: 'Descartar',
     back: 'Volver',
     comingSoon: 'Esta sección llega pronto. Estamos construyéndola.',
@@ -498,6 +550,7 @@ const es = {
       contacts: {
         status: 'Estados',
         sources: 'Fuentes',
+        types: 'Tipos',
         tags: 'Etiquetas',
       },
     },
@@ -506,12 +559,17 @@ const es = {
         'Los estados describen en qué punto está cada contacto. Renómbralos, cámbiales el color, reordénalos o crea los tuyos.',
       sourceDescription:
         'Las fuentes registran de dónde llegan los contactos. Renómbralas, cámbiales el color, reordénalas o crea las tuyas.',
+      typesDescription:
+        'Los tipos clasifican qué es cada contacto para tu negocio. Renómbralos, cámbiales el color, reordénalos o crea los tuyos.',
       statusAddPlaceholder: 'Nombre del nuevo estado',
       sourceAddPlaceholder: 'Nombre de la nueva fuente',
+      typesAddPlaceholder: 'Nombre del nuevo tipo',
       add: 'Agregar',
       remove: 'Eliminar opción',
       reorder: 'Arrastra para reordenar',
       pickColor: 'Elegir color',
+      inUse: '{{count}} contactos',
+      toggle: 'Mostrar u ocultar en el CRM',
       systemHint: 'Opción por defecto — puedes renombrarla o recolorearla, pero no eliminarla.',
     },
     tags: {

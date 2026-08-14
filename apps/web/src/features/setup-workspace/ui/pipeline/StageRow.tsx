@@ -1,13 +1,13 @@
 'use client'
 
-import { STAGE_COLOR_OPTIONS } from '@repo/shared-utils'
+import { TAXONOMY_COLOR_PALETTE } from '@repo/shared-types'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { DotsSixVerticalIcon, XIcon } from '@/shared/ui/icons'
+import { ColorSwatchPicker } from '@/shared/ui/molecules/color-swatch-picker'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 import { Slider } from '@/shared/ui/shadcn/slider'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
@@ -62,47 +62,12 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
         <TooltipContent side="top">{t(`${s}.dragToReorder`)}</TooltipContent>
       </Tooltip>
 
-      <Popover>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <PopoverTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-6 shrink-0 rounded-full hover:ring-2 hover:ring-ring/40"
-                aria-label={t(`${s}.stageColor`)}
-              >
-                <span
-                  className="size-4.5 rounded-full border-2 border-foreground/10"
-                  style={{ background: stage.color }}
-                />
-              </Button>
-            </PopoverTrigger>
-          </TooltipTrigger>
-          <TooltipContent side="top">{t(`${s}.stageColor`)}</TooltipContent>
-        </Tooltip>
-        <PopoverContent align="start" className="w-auto p-2">
-          <div className="grid grid-cols-5 gap-1.5">
-            {STAGE_COLOR_OPTIONS.map((hex) => (
-              <Button
-                key={hex}
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => actions.onUpdate(stage.id, { color: hex })}
-                aria-label={hex}
-                className={cn(
-                  'size-7 rounded-full hover:scale-110',
-                  stage.color === hex && 'ring-2 ring-ring ring-offset-2 ring-offset-popover',
-                )}
-              >
-                <span className="size-5 rounded-full" style={{ background: hex }} />
-              </Button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
+      <ColorSwatchPicker
+        color={stage.color}
+        colors={TAXONOMY_COLOR_PALETTE}
+        onChange={(color) => actions.onUpdate(stage.id, { color })}
+        label={t(`${s}.stageColor`)}
+      />
 
       <Input
         className="h-8 flex-1 bg-background text-sm font-medium"

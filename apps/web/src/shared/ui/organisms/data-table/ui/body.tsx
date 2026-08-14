@@ -23,7 +23,10 @@ export function DataTableBody({ className }: Readonly<{ className?: string }>) {
           {row.getVisibleCells().map((cell) => (
             <div
               key={cell.id}
-              style={{ width: cell.column.getSize() }}
+              style={{
+                width: cell.column.getSize(),
+                flexGrow: cell.column.columnDef.meta?.grow ? 1 : 0,
+              }}
               className="flex min-w-0 shrink-0 items-center px-1.5 text-[15px] text-body"
             >
               {flexRender(cell.column.columnDef.cell, cell.getContext())}

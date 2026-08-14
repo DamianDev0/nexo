@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import type { TFunction } from 'i18next'
 
+import { CONTACT_FORM_DEFAULTS } from '@/features/manage-contacts/config/contact-form.constants'
 import {
   buildContactSchema,
   resolveWhatsapp,
-  CONTACT_FORM_DEFAULTS,
-} from '@/features/manage-contacts/model/contact-form.schema'
+} from '@/features/manage-contacts/lib/contact-form.schema'
 
 const t = ((key: string) => key) as TFunction
 
@@ -22,6 +22,8 @@ const payload = (overrides: Record<string, unknown> = {}) => ({
   municipioCode: '',
   source: '',
   status: 'new',
+  type: '',
+  typeLabel: '',
   ...overrides,
 })
 
@@ -39,6 +41,8 @@ describe('buildContactSchema', () => {
       municipioCode: '',
       source: '',
       status: 'new',
+      type: '',
+      typeLabel: '',
     })
 
     expect(result.success).toBe(false)
@@ -60,6 +64,8 @@ describe('buildContactSchema', () => {
       municipioCode: '',
       source: '',
       status: 'new',
+      type: '',
+      typeLabel: '',
     })
 
     expect(result.success).toBe(false)
@@ -81,6 +87,8 @@ describe('buildContactSchema', () => {
       municipioCode: '',
       source: '',
       status: 'new',
+      type: '',
+      typeLabel: '',
     })
 
     expect(result.success).toBe(true)
@@ -135,6 +143,8 @@ describe('buildContactSchema', () => {
       municipioCode: '',
       status: CONTACT_FORM_DEFAULTS.status,
       source: '',
+      type: '',
+      typeLabel: '',
     })
     expect(CONTACT_FORM_DEFAULTS.status).not.toBe('')
   })
@@ -160,9 +170,43 @@ describe('buildContactSchema', () => {
       municipioCode: '11001',
       source: '',
       status: 'qualified',
+      type: 'supplier',
+      typeLabel: '',
     })
 
     expect(result.success).toBe(true)
+  })
+
+  it('requires typeLabel when the type is other', () => {
+    const result = buildContactSchema(t).safeParse(payload({ type: 'other' }))
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.path).toEqual(['typeLabel'])
+      expect(result.error.issues[0]?.message).toBe('contacts.errors.typeOtherRequired')
+    }
+  })
+
+  it('rejects a whitespace-only typeLabel when the type is other', () => {
+    expect(
+      buildContactSchema(t).safeParse(payload({ type: 'other', typeLabel: '   ' })).success,
+    ).toBe(false)
+  })
+
+  it('accepts type other with a trimmed typeLabel', () => {
+    const result = buildContactSchema(t).safeParse(
+      payload({ type: 'other', typeLabel: '  Inversionista  ' }),
+    )
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.typeLabel).toBe('Inversionista')
+    }
+  })
+
+  it('accepts an empty typeLabel for any non-other type', () => {
+    expect(buildContactSchema(t).safeParse(payload({ type: 'customer' })).success).toBe(true)
+    expect(buildContactSchema(t).safeParse(payload({ type: '' })).success).toBe(true)
   })
 })
 

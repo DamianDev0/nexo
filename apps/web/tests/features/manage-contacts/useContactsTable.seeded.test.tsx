@@ -1,18 +1,21 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CONTACTS_FIXTURE } from '../../msw/handlers'
 import { API, createMswServer } from '../../msw/test-server'
+import { setUrl } from '../../next-navigation-mock'
 import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import { useContactsTable } from '@/features/manage-contacts/model/useContactsTable'
 
-vi.mock('next/navigation', () => ({
-  useSearchParams: () => new URLSearchParams('q=ana&list=qualified&source=whatsapp'),
-}))
+vi.mock('next/navigation', () => import('../../next-navigation-mock'))
 
 const server = createMswServer()
+
+beforeEach(() => {
+  setUrl('q=ana&list=qualified&source=whatsapp')
+})
 
 describe('useContactsTable seeded from the URL', () => {
   it('hydrates search, status and quick filters from searchParams', async () => {

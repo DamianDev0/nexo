@@ -1,4 +1,4 @@
-import type { ContactListQuery } from '@repo/shared-types'
+import type { ContactDuplicateProbeQuery, ContactListQuery } from '@repo/shared-types'
 
 export const QUERY_KEYS = {
   auth: {
@@ -7,8 +7,11 @@ export const QUERY_KEYS = {
   contacts: {
     all: ['contacts'] as const,
     counts: ['contacts', 'counts'] as const,
+    taxonomyUsage: ['contacts', 'taxonomy-usage'] as const,
     list: (query: ContactListQuery) => ['contacts', 'list', query] as const,
     detail: (id: string) => ['contacts', 'detail', id] as const,
+    duplicateProbe: (params: ContactDuplicateProbeQuery) =>
+      ['contacts', 'duplicate-probe', params] as const,
     timeline: (id: string) => ['contacts', 'timeline', id] as const,
   },
   settings: {
@@ -22,11 +25,12 @@ export const QUERY_KEYS = {
   },
   tags: {
     all: ['tags'] as const,
-    byEntity: (entityType: string) => ['tags', entityType] as const,
+    page: (entityType: string, page: number) => ['tags', entityType, 'page', page] as const,
   },
   geo: {
     departments: ['geo', 'departments'] as const,
     municipalities: (q: string, department?: string) =>
       ['geo', 'municipalities', q, department ?? null] as const,
+    addresses: (q: string) => ['geo', 'addresses', q] as const,
   },
 } as const

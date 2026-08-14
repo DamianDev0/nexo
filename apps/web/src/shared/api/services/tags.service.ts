@@ -1,16 +1,22 @@
 import { request } from '@/shared/api/request'
 
-import type { Tag, TagEntityType } from '@repo/shared-types'
+import type { PaginatedTags, Tag, TagEntityType } from '@repo/shared-types'
 
 const tagsService = {
-  list: (entityType?: TagEntityType) =>
-    request<Tag[]>({ method: 'get', url: '/tags', params: entityType ? { entityType } : {} }),
+  list: (params: { entityType?: TagEntityType; page?: number; limit?: number } = {}) =>
+    request<PaginatedTags>({ method: 'get', url: '/tags', params }),
 
-  create: (data: { name: string; color?: string; entityType: TagEntityType }) =>
-    request<Tag>({ method: 'post', url: '/tags', data }),
+  create: (data: {
+    name: string
+    color?: string
+    description?: string
+    entityType: TagEntityType
+  }) => request<Tag>({ method: 'post', url: '/tags', data }),
 
-  update: (id: string, data: { name?: string; color?: string }) =>
-    request<Tag>({ method: 'patch', url: `/tags/${id}`, data }),
+  update: (
+    id: string,
+    data: { name?: string; color?: string; description?: string; enabled?: boolean },
+  ) => request<Tag>({ method: 'patch', url: `/tags/${id}`, data }),
 
   remove: (id: string) => request<void>({ method: 'delete', url: `/tags/${id}` }),
 }

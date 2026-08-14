@@ -15,6 +15,7 @@ interface ControlledFieldProps<T extends FieldValues> {
   readonly onValueChange?: (value: string, onChange: (value: string) => void) => void
   readonly hintFormat?: (value: string) => string
   readonly required?: boolean
+  readonly onBlur?: () => void
 }
 
 export function ControlledField<T extends FieldValues>({
@@ -27,6 +28,7 @@ export function ControlledField<T extends FieldValues>({
   onValueChange,
   hintFormat,
   required,
+  onBlur,
 }: Readonly<ControlledFieldProps<T>>) {
   return (
     <Controller
@@ -34,7 +36,7 @@ export function ControlledField<T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <Label className="text-xs text-muted-foreground">
+          <Label className="text-xs font-semibold text-body">
             {label}
             {required && <span className="text-destructive">*</span>}
           </Label>
@@ -48,6 +50,10 @@ export function ControlledField<T extends FieldValues>({
             onChange={
               onValueChange ? (e) => onValueChange(e.target.value, field.onChange) : field.onChange
             }
+            onBlur={() => {
+              field.onBlur()
+              onBlur?.()
+            }}
           />
           {hintFormat && (
             <span className="mt-1 block text-xs text-muted-foreground/50">

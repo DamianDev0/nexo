@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
+import { useWatch } from 'react-hook-form'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { API, createMswServer } from '../../msw/test-server'
@@ -13,6 +14,10 @@ import {
   APPEARANCE_DEFAULT_VALUES,
   THEME_PRESETS,
 } from '@/features/setup-workspace/config/appearance.constants'
+import {
+  useActivePresetKey,
+  useAppearanceColors,
+} from '@/features/setup-workspace/model/useAppearanceDerived'
 import { useStepAppearance } from '@/features/setup-workspace/model/useStepAppearance'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
@@ -94,11 +99,68 @@ function emptyTheme() {
   return http.get(`${API}/settings/theme`, () => HttpResponse.json({ data: {} }))
 }
 
+function useAppearanceStep(onNext: () => void) {
+  const step = useStepAppearance(onNext)
+  const colors = useAppearanceColors(step.control)
+  const activePresetKey = useActivePresetKey(step.control)
+  const [
+    primaryColor,
+    fontFamily,
+    borderRadius,
+    density,
+    darkMode,
+    productName,
+    tagline,
+    logoPreview,
+    logoFileName,
+    logoUrl,
+    grainIntensity,
+  ] = useWatch({
+    control: step.control,
+    name: [
+      'primaryColor',
+      'fontFamily',
+      'borderRadius',
+      'density',
+      'darkMode',
+      'productName',
+      'tagline',
+      'logoPreview',
+      'logoFileName',
+      'logoUrl',
+      'grainIntensity',
+    ],
+  })
+  return {
+    ...step,
+    colors,
+    activePresetKey,
+    primaryColor,
+    fontFamily,
+    borderRadius,
+    density,
+    darkMode,
+    productName,
+    tagline,
+    logoPreview,
+    logoFileName,
+    logoUrl,
+    grainIntensity,
+    setDarkMode: (value: typeof darkMode) => step.bindField('darkMode')(value),
+    setFontFamily: (value: typeof fontFamily) => step.bindField('fontFamily')(value),
+    setBorderRadius: (value: typeof borderRadius) => step.bindField('borderRadius')(value),
+    setDensity: (value: typeof density) => step.bindField('density')(value),
+    setProductName: (value: string) => step.bindField('productName')(value),
+    setTagline: (value: string) => step.bindField('tagline')(value),
+    setGrainIntensity: (value: number) => step.bindField('grainIntensity')(value),
+  }
+}
+
 describe('useStepAppearance hydration', () => {
   it('resets the form with the saved theme', async () => {
     server.use(themeHandler())
 
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
     expect(result.current.fontFamily).toBe('roboto')
@@ -113,7 +175,7 @@ describe('useStepAppearance hydration', () => {
   it('falls back typography and branding when the saved theme omits them', async () => {
     server.use(themeHandler({ typography: undefined, branding: undefined }))
 
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
     expect(result.current.fontFamily).toBe(APPEARANCE_DEFAULT_VALUES.fontFamily)
@@ -126,7 +188,7 @@ describe('useStepAppearance hydration', () => {
   it('keeps every default when the server has nothing saved yet', async () => {
     server.use(emptyTheme())
 
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.isPending).toBe(false))
     await new Promise((resolve) => setTimeout(resolve, 0))
 
@@ -140,7 +202,7 @@ describe('useStepAppearance hydration', () => {
 describe('useStepAppearance color actions', () => {
   it('changing the primary color clears prior overrides', async () => {
     server.use(themeHandler())
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     act(() => result.current.handleColorOverride('accent', '#123456'))
@@ -153,7 +215,7 @@ describe('useStepAppearance color actions', () => {
 
   it('overriding one color key preserves the others', async () => {
     server.use(themeHandler())
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     act(() => result.current.handleColorOverride('accent', '#111111'))
@@ -167,7 +229,7 @@ describe('useStepAppearance color actions', () => {
 describe('useStepAppearance presets', () => {
   it('applying a preset updates the visual dimensions and is detected as active', async () => {
     server.use(themeHandler())
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     const midnight = THEME_PRESETS.find((p) => p.key === 'midnight')
@@ -183,7 +245,7 @@ describe('useStepAppearance presets', () => {
 
   it('reports no active preset once a dimension diverges', async () => {
     server.use(themeHandler())
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     act(() => result.current.handlePrimaryChange('#ABCDEF'))
@@ -194,7 +256,7 @@ describe('useStepAppearance presets', () => {
 describe('useStepAppearance restore', () => {
   it('merges a partial saved theme over the current values and toasts success', async () => {
     server.use(themeHandler())
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     act(() =>
@@ -212,7 +274,7 @@ describe('useStepAppearance restore', () => {
 
   it('keeps current values for fields absent from the restored config', async () => {
     server.use(themeHandler())
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     act(() => result.current.setProductName('Keep Me'))
@@ -228,7 +290,7 @@ describe('useStepAppearance restore', () => {
 
   it('applies typography and dark mode fields present in the restored config', async () => {
     server.use(themeHandler())
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     act(() =>
@@ -247,7 +309,7 @@ describe('useStepAppearance restore', () => {
 
 async function renderHydratedAppearance() {
   server.use(themeHandler())
-  const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+  const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
   await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
   expect(result.current.isDirty).toBe(false)
   return result
@@ -344,7 +406,7 @@ describe('useStepAppearance save', () => {
     const invalidateSpy = vi.spyOn(client, 'invalidateQueries')
     const onNext = vi.fn()
 
-    const { result } = renderHook(() => useStepAppearance(onNext), { wrapper: Wrapper })
+    const { result } = renderHook(() => useAppearanceStep(onNext), { wrapper: Wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
     expect(result.current.productName).toBe('')
 
@@ -369,7 +431,7 @@ describe('useStepAppearance save', () => {
       }),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepAppearance(onNext), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     result.current.handleSave()
@@ -390,7 +452,7 @@ describe('useStepAppearance save', () => {
       }),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepAppearance(onNext), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     result.current.handleSave()
@@ -417,7 +479,7 @@ describe('useStepAppearance save', () => {
       ),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepAppearance(onNext), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     result.current.handleSave()
@@ -431,7 +493,7 @@ describe('useStepAppearance logo delegation', () => {
   it('uploads a logo and exposes the preview and stored url', async () => {
     server.use(themeHandler())
     uploadLogo.mockResolvedValue({ url: 'https://cdn.acme.co/uploaded.png' })
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
 
     const file = new File(['logo'], 'logo.png', { type: 'image/png' })
@@ -450,7 +512,7 @@ describe('useStepAppearance logo delegation', () => {
   it('rolls back the optimistic preview when the upload fails', async () => {
     server.use(themeHandler())
     uploadLogo.mockRejectedValue(new Error('upload failed'))
-    const { result } = renderHook(() => useStepAppearance(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useAppearanceStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.primaryColor).toBe(HYDRATED_PRIMARY))
     const previewBefore = result.current.logoPreview
     const fileNameBefore = result.current.logoFileName

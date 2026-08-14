@@ -65,6 +65,7 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
         children: [
           { key: 'status', href: SETTINGS.contacts.status },
           { key: 'sources', href: SETTINGS.contacts.sources },
+          { key: 'types', href: SETTINGS.contacts.types },
           { key: 'tags', href: SETTINGS.contacts.tags },
         ],
       },

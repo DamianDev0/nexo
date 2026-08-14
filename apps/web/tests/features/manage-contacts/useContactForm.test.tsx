@@ -30,6 +30,8 @@ const EXISTING_CONTACT: ContactListItem = {
   status: 'qualified',
   lifecycleStage: LifecycleStage.LEAD,
   source: 'manual',
+  type: 'customer',
+  typeLabel: null,
   leadScore: 0,
   dataConsent: true,
   consentDate: null,
@@ -47,7 +49,7 @@ const EXISTING_CONTACT: ContactListItem = {
   updatedAt: new Date().toISOString(),
 }
 
-const EMPTY_TAXONOMY: ContactTaxonomy = { statuses: [], sources: [] }
+const EMPTY_TAXONOMY: ContactTaxonomy = { statuses: [], sources: [], types: [] }
 
 const server = createMswServer()
 
@@ -66,6 +68,8 @@ describe('useContactForm', () => {
     await waitFor(() => expect(result.current.form.getValues('firstName')).toBe('Maria'))
     expect(result.current.form.getValues('status')).toBe('qualified')
     expect(result.current.form.getValues('source')).toBe('manual')
+    expect(result.current.form.getValues('type')).toBe('customer')
+    expect(result.current.form.getValues('typeLabel')).toBe('')
     expect(result.current.form.getValues('address')).toBe('Calle 100 #7-21')
     expect(result.current.form.getValues('whatsappSameAsPhone')).toBe(true)
     expect(result.current.isEdit).toBe(true)
@@ -93,6 +97,8 @@ describe('useContactForm', () => {
       city: null,
       municipioCode: null,
       source: null,
+      type: null,
+      typeLabel: null,
     }
 
     const { result } = renderHook(() => useContactForm(contact, vi.fn()), { wrapper })
@@ -108,6 +114,8 @@ describe('useContactForm', () => {
       city: '',
       municipioCode: '',
       source: '',
+      type: '',
+      typeLabel: '',
     })
   })
 
@@ -138,6 +146,8 @@ describe('useContactForm', () => {
         municipioCode: '11001',
         status: 'new',
         source: 'manual',
+        type: 'customer',
+        typeLabel: '',
       })
     })
 
@@ -157,6 +167,7 @@ describe('useContactForm', () => {
       municipioCode: '11001',
       status: 'new',
       source: 'manual',
+      type: 'customer',
     })
   })
 
@@ -209,5 +220,91 @@ describe('useContactForm', () => {
     await waitFor(() => expect(onDone).toHaveBeenCalled())
     expect(receivedBody).toMatchObject({ firstName: 'Carlos' })
     expect(receivedBody).not.toHaveProperty('source')
+  })
+
+  it('sends the free-text typeLabel when the type is other', async () => {
+    server.use(taxonomyHandler())
+    let receivedBody: Record<string, unknown> | null = null
+    server.use(
+      http.post(`${API}/contacts`, async ({ request }) => {
+        receivedBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json({ data: EXISTING_CONTACT })
+      }),
+    )
+
+    const onDone = vi.fn()
+    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
+    await waitFor(() => expect(result.current.taxonomy.types).toBeDefined())
+
+    act(() => {
+      result.current.form.setValue('firstName', 'Camila')
+      result.current.form.setValue('type', 'other')
+      result.current.form.setValue('typeLabel', 'Inversionista')
+    })
+
+    await act(async () => {
+      await result.current.handleSubmit()
+    })
+
+    await waitFor(() => expect(onDone).toHaveBeenCalled())
+    expect(receivedBody).toMatchObject({ type: 'other', typeLabel: 'Inversionista' })
+  })
+
+  it('omits typeLabel when the type is not other', async () => {
+    server.use(taxonomyHandler())
+    let receivedBody: Record<string, unknown> | null = null
+    server.use(
+      http.post(`${API}/contacts`, async ({ request }) => {
+        receivedBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json({ data: EXISTING_CONTACT })
+      }),
+    )
+
+    const onDone = vi.fn()
+    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
+    await waitFor(() => expect(result.current.taxonomy.types).toBeDefined())
+
+    act(() => {
+      result.current.form.setValue('firstName', 'Camila')
+      result.current.form.setValue('type', 'customer')
+      result.current.form.setValue('typeLabel', 'Inversionista')
+    })
+
+    await act(async () => {
+      await result.current.handleSubmit()
+    })
+
+    await waitFor(() => expect(onDone).toHaveBeenCalled())
+    expect(receivedBody).toMatchObject({ type: 'customer' })
+    expect(receivedBody).not.toHaveProperty('typeLabel')
+  })
+
+  it('blocks submit when the type is other and typeLabel is empty', async () => {
+    server.use(taxonomyHandler())
+    const posted = vi.fn()
+    server.use(
+      http.post(`${API}/contacts`, () => {
+        posted()
+        return HttpResponse.json({ data: EXISTING_CONTACT })
+      }),
+    )
+
+    const onDone = vi.fn()
+    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
+    await waitFor(() => expect(result.current.taxonomy.types).toBeDefined())
+
+    act(() => {
+      result.current.form.setValue('firstName', 'Camila')
+      result.current.form.setValue('type', 'other')
+    })
+
+    await act(async () => {
+      await result.current.handleSubmit()
+    })
+
+    expect(posted).not.toHaveBeenCalled()
+    expect(result.current.form.getFieldState('typeLabel').error?.message).toBe(
+      'contacts.errors.typeOtherRequired',
+    )
   })
 })

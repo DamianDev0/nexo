@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { useFormFields } from '@/shared/lib/hooks/useFormFields'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { saveNomenclatureAction } from '../api/setup-steps.actions'
@@ -17,18 +18,19 @@ import type { NomenclatureConfig } from '@repo/shared-types'
 
 export function useStepNomenclature(onNext: () => void) {
   const {
-    watch,
+    control,
     setValue,
     getValues,
     reset,
     formState: { isDirty },
   } = useForm<NomenclatureState>({ defaultValues: buildDefaultNomenclature(t) })
-  const nomen = watch()
+  const { setField } = useFormFields(setValue)
   const queryClient = useQueryClient()
 
   useStepHydration({
     queryKey: QUERY_KEYS.settings.nomenclature,
     queryFn: settingsService.getNomenclature,
+    skip: isDirty,
     hydrate: useCallback(
       (config: NomenclatureConfig) => {
         const localized = buildDefaultNomenclature(t)
@@ -46,9 +48,9 @@ export function useStepNomenclature(onNext: () => void) {
 
   const handleUpdate = useCallback(
     (entity: keyof NomenclatureState, field: 'singular' | 'plural', value: string) => {
-      setValue(`${entity}.${field}`, value, { shouldDirty: true })
+      setField(`${entity}.${field}`, value)
     },
-    [setValue],
+    [setField],
   )
 
   const handlePreset = useCallback(
@@ -72,13 +74,10 @@ export function useStepNomenclature(onNext: () => void) {
     },
   })
 
-  return {
-    nomen,
-    handleUpdate,
-    handlePreset,
-    handleSave,
-    handleReset: () => reset(),
-    isDirty,
-    isPending,
-  }
+  const handleReset = useCallback(() => reset(), [reset])
+
+  return useMemo(
+    () => ({ control, handleUpdate, handlePreset, handleSave, handleReset, isDirty, isPending }),
+    [control, handleUpdate, handlePreset, handleSave, handleReset, isDirty, isPending],
+  )
 }

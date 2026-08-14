@@ -1,7 +1,9 @@
 'use client'
 
+import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
+import { expandCollapse, smoothEase, useReducedTransition } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
@@ -17,6 +19,7 @@ interface SettingsNavItemProps {
 
 export function SettingsNavItem({ section, pathname, isActive }: Readonly<SettingsNavItemProps>) {
   const { t } = useTranslation()
+  const submenuTransition = useReducedTransition(smoothEase)
   const { key, href, icon: Icon, available, children } = section
   const label = t(`settings.sections.${key}`)
 
@@ -51,19 +54,28 @@ export function SettingsNavItem({ section, pathname, isActive }: Readonly<Settin
         hasChildren={Boolean(children)}
       />
 
-      {isActive && children && (
-        <ul className="mt-0.5 flex flex-col gap-0.5">
-          {children.map((child) => (
-            <li key={child.key}>
-              <SettingsNavRow
-                label={t(`settings.children.${key}.${child.key}`)}
-                href={child.href}
-                isActive={pathname === child.href}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <AnimatePresence initial={false}>
+        {isActive && children && (
+          <motion.ul
+            variants={expandCollapse}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={submenuTransition}
+            className="ml-4.5 mt-0.5 flex flex-col gap-0.5 overflow-hidden border-l border-border"
+          >
+            {children.map((child) => (
+              <li key={child.key}>
+                <SettingsNavRow
+                  label={t(`settings.children.${key}.${child.key}`)}
+                  href={child.href}
+                  isActive={pathname === child.href}
+                />
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </li>
   )
 }

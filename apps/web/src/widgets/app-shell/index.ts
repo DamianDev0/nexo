@@ -1,4 +1,5 @@
 export { AppSidebar } from './ui/AppSidebar'
 export { HeaderSearch } from './ui/HeaderSearch'
+export { HeaderSettingsLink } from './ui/HeaderSettingsLink'
 export { HeaderTitle } from './ui/HeaderTitle'
-export { TenantThemeLoader } from './ui/TenantThemeLoader'
+export { TenantThemeLoader } from './ui/containers/TenantThemeLoader'

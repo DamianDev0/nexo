@@ -2,64 +2,101 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
+import { AUTOSAVE_DEBOUNCE_MS, TAXONOMY_STALE_MS } from '../config/autosave.constants'
 import {
   appendOption,
   patchOption,
   removeOption,
   reorderOptions,
-  sameTaxonomy,
   type TaxonomyKind,
 } from '../lib/taxonomy-edit'
 
+import type { TaxonomyOptionPatch } from './types'
 import type { ContactTaxonomy, TaxonomyOption } from '@repo/shared-types'
 
-export function useContactTaxonomySection(onSaved: () => void) {
+export function useContactTaxonomySection() {
   const queryClient = useQueryClient()
   const [draft, setDraft] = useState<ContactTaxonomy | null>(null)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pending = useRef<ContactTaxonomy | null>(null)
+  const latestSave = useRef(0)
 
   const { data, isPending: isLoading } = useQuery({
     queryKey: QUERY_KEYS.settings.contactTaxonomy,
     queryFn: settingsService.getContactTaxonomy,
+    staleTime: TAXONOMY_STALE_MS,
   })
 
   const taxonomy = draft ?? data ?? null
 
   const mutation = useMutation({
     mutationFn: settingsService.updateContactTaxonomy,
-    onSuccess: (saved) => {
-      queryClient.setQueryData(QUERY_KEYS.settings.contactTaxonomy, saved)
-      setDraft(null)
-      onSaved()
+    onMutate: () => {
+      latestSave.current += 1
+      return { save: latestSave.current }
     },
-    onError: (error: { message?: string }) => {
+    onSuccess: (saved, _input, context) => {
+      if (context.save !== latestSave.current) return
+      queryClient.setQueryData(QUERY_KEYS.settings.contactTaxonomy, saved)
+      if (!timer.current) setDraft(null)
+    },
+    onError: (error: { message?: string }, _input, context) => {
+      if (context && context.save !== latestSave.current) return
       sileo.error({ title: t('common.saveFailed'), description: error.message })
+      setDraft(null)
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.settings.contactTaxonomy })
     },
   })
 
+  const { mutate } = mutation
+
+  const scheduleSave = useCallback(
+    (next: ContactTaxonomy) => {
+      pending.current = next
+      if (timer.current) clearTimeout(timer.current)
+      timer.current = setTimeout(() => {
+        timer.current = null
+        pending.current = null
+        mutate(next)
+      }, AUTOSAVE_DEBOUNCE_MS)
+    },
+    [mutate],
+  )
+
+  useEffect(
+    () => () => {
+      if (!timer.current) return
+      clearTimeout(timer.current)
+      if (pending.current) mutate(pending.current)
+    },
+    [mutate],
+  )
+
   const edit = useCallback(
     (kind: TaxonomyKind, apply: (options: ReadonlyArray<TaxonomyOption>) => TaxonomyOption[]) => {
-      setDraft((current) => {
-        const base = current ?? data
-        if (!base) return current
-        return { ...base, [kind]: apply(base[kind]) }
-      })
+      const base = draft ?? data
+      if (!base) return
+      const next = { ...base, [kind]: apply(base[kind]) }
+      setDraft(next)
+      scheduleSave(next)
     },
-    [data],
+    [data, draft, scheduleSave],
   )
 
   const handleAdd = useCallback(
-    (kind: TaxonomyKind, label: string) => edit(kind, (options) => appendOption(options, label)),
+    (kind: TaxonomyKind, label: string, description?: string) =>
+      edit(kind, (options) => appendOption(options, label, description)),
     [edit],
   )
 
   const handlePatch = useCallback(
-    (kind: TaxonomyKind, key: string, patch: Partial<Pick<TaxonomyOption, 'label' | 'color'>>) =>
+    (kind: TaxonomyKind, key: string, patch: TaxonomyOptionPatch) =>
       edit(kind, (options) => patchOption(options, key, patch)),
     [edit],
   )
@@ -75,24 +112,10 @@ export function useContactTaxonomySection(onSaved: () => void) {
     [edit],
   )
 
-  const handleSave = useCallback(() => {
-    if (draft && !mutation.isPending) mutation.mutate(draft)
-  }, [draft, mutation])
+  const { isPending } = mutation
 
-  const handleReset = useCallback(() => setDraft(null), [])
-
-  const isDirty = useMemo(() => draft !== null && !sameTaxonomy(draft, data), [draft, data])
-
-  return {
-    taxonomy,
-    isLoading,
-    handleAdd,
-    handlePatch,
-    handleRemove,
-    handleReorder,
-    handleSave,
-    handleReset,
-    isDirty,
-    isPending: mutation.isPending,
-  }
+  return useMemo(
+    () => ({ taxonomy, isLoading, handleAdd, handlePatch, handleRemove, handleReorder, isPending }),
+    [taxonomy, isLoading, handleAdd, handlePatch, handleRemove, handleReorder, isPending],
+  )
 }

@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
+import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
@@ -25,34 +26,23 @@ export function useContactsBoard() {
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
   const { archive } = useArchiveContact()
-  const [sheetContact, setSheetContact] = useState<ContactListItem | null>(null)
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const sheet = useEntityEditor<ContactListItem>()
   const [listOrder, setListOrder] = useLocalStorageState<readonly string[] | null>(
     LIST_ORDER_KEY,
     null,
   )
-
-  const openCreate = useCallback(() => {
-    setSheetContact(null)
-    setSheetOpen(true)
-  }, [])
-
-  const openEdit = useCallback((contact: ContactListItem) => {
-    setSheetContact(contact)
-    setSheetOpen(true)
-  }, [])
 
   const columns = useMemo(
     () =>
       buildContactColumns(
         t,
         {
-          onEdit: openEdit,
+          onEdit: sheet.openEdit,
           onArchive: (contact) => archive([contact.id]),
         },
         taxonomy.statusByKey,
       ),
-    [t, openEdit, archive, taxonomy.statusByKey],
+    [t, sheet.openEdit, archive, taxonomy.statusByKey],
   )
 
   const instance = useDataTable({
@@ -92,6 +82,7 @@ export function useContactsBoard() {
       totalPages: table.totalPages,
       limit: table.limit,
       isPending: table.isPending,
+      isFetching: table.isFetching,
       isFiltered: table.isFiltered,
       isEmpty: !table.isPending && table.rows.length === 0,
       selectedCount: selectedRows.length,
@@ -101,14 +92,14 @@ export function useContactsBoard() {
       onSelectList: selectList,
       onReorderLists: setListOrder,
       onSearch: table.handleSearch,
-      onPageChange: table.setPage,
+      onPageChange: table.handlePage,
       onLimitChange: table.handleLimit,
-      onCreate: openCreate,
+      onCreate: sheet.openCreate,
       onArchiveSelected: archiveSelected,
       onToggleFilter: table.handleToggleFilter,
       onClearFilters: table.handleClearFilters,
     },
-    sheet: { contact: sheetContact, open: sheetOpen, onOpenChange: setSheetOpen },
+    sheet: { contact: sheet.editing, open: sheet.open, onOpenChange: sheet.setOpen },
   }
 }
 

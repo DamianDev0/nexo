@@ -1,6 +1,10 @@
 import { AxiosError } from 'axios'
 
-import type { ApiErrorResponse, ApiValidationErrorResponse } from '@repo/shared-types'
+import type {
+  ApiErrorResponse,
+  ApiValidationErrorResponse,
+  ContactDuplicatePayload,
+} from '@repo/shared-types'
 
 const UNKNOWN_ERROR_MESSAGE = 'Unknown error occurred'
 const NETWORK_ERROR_MESSAGE = 'Unable to connect to the server'
@@ -11,22 +15,25 @@ const GENERIC_ERROR_LABEL = 'Error'
 
 type ApiErrorBody = Partial<Omit<ApiValidationErrorResponse, 'message'>> & {
   message?: string | string[]
+  duplicate?: ContactDuplicatePayload
+}
+
+export type ApiHandledError = ApiErrorResponse & {
+  errors?: ApiValidationErrorResponse['errors']
+  duplicate?: ContactDuplicatePayload
 }
 
 function emptyMeta() {
   return { timestamp: new Date().toISOString(), path: '', method: '' }
 }
 
-function fromResponseBody(
-  status: number,
-  body: ApiErrorBody,
-): ApiErrorResponse | ApiValidationErrorResponse {
+function fromResponseBody(status: number, body: ApiErrorBody): ApiHandledError {
   const rawMessage = body.message
   const message = Array.isArray(rawMessage)
     ? rawMessage.join(', ')
     : (rawMessage ?? body.error ?? UNKNOWN_ERROR_MESSAGE)
 
-  const base: ApiErrorResponse = {
+  const base: ApiHandledError = {
     statusCode: status,
     message,
     error: body.error ?? GENERIC_ERROR_LABEL,
@@ -35,10 +42,14 @@ function fromResponseBody(
     method: body.method ?? '',
   }
 
-  return body.errors ? { ...base, errors: body.errors } : base
+  return {
+    ...base,
+    ...(body.errors ? { errors: body.errors } : {}),
+    ...(body.duplicate ? { duplicate: body.duplicate } : {}),
+  }
 }
 
-export function handleApiError(error: unknown): ApiErrorResponse | ApiValidationErrorResponse {
+export function handleApiError(error: unknown): ApiHandledError {
   if (error instanceof AxiosError) {
     if (error.response) {
       return fromResponseBody(error.response.status, (error.response.data ?? {}) as ApiErrorBody)

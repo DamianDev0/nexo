@@ -2,18 +2,30 @@ import { taxonomyColorAt } from '@repo/shared-types'
 import { describe, expect, it } from 'vitest'
 
 import type { TaxonomyOption } from '@repo/shared-types'
+import type { TFunction } from 'i18next'
 
 import {
   appendOption,
+  optionLabel,
   patchOption,
   removeOption,
   reorderOptions,
   sameTaxonomy,
   slugifyTaxonomyKey,
+  taxonomyNamespace,
 } from '@/features/manage-settings/lib/taxonomy-edit'
 
 function option(overrides: Partial<TaxonomyOption> = {}): TaxonomyOption {
-  return { key: 'new', label: 'Nuevo', color: '#3B82F6', order: 1, isSystem: true, ...overrides }
+  return {
+    key: 'new',
+    label: 'Nuevo',
+    description: null,
+    color: '#3B82F6',
+    order: 1,
+    isSystem: true,
+    enabled: true,
+    ...overrides,
+  }
 }
 
 describe('slugifyTaxonomyKey', () => {
@@ -104,7 +116,7 @@ describe('patchOption', () => {
 describe('removeOption', () => {
   it('never removes a system option', () => {
     const options = [
-      option({ key: 'new', isSystem: true }),
+      option({ key: 'new', isSystem: true, enabled: true }),
       option({ key: 'custom', isSystem: false, order: 2 }),
     ]
 
@@ -181,22 +193,44 @@ describe('reorderOptions', () => {
   })
 })
 
+describe('taxonomyNamespace', () => {
+  it('maps each taxonomy kind to its i18n namespace', () => {
+    expect(taxonomyNamespace('statuses')).toBe('status')
+    expect(taxonomyNamespace('sources')).toBe('source')
+    expect(taxonomyNamespace('types')).toBe('types')
+  })
+})
+
 describe('sameTaxonomy', () => {
   const base = {
     statuses: [option({ key: 'new', order: 1 })],
     sources: [option({ key: 'manual', order: 1 })],
+    types: [option({ key: 'customer', order: 1 })],
   }
 
   it('returns true for equal taxonomies', () => {
-    expect(sameTaxonomy(base, { statuses: [...base.statuses], sources: [...base.sources] })).toBe(
-      true,
-    )
+    const clone = {
+      statuses: [...base.statuses],
+      sources: [...base.sources],
+      types: [...base.types],
+    }
+    expect(sameTaxonomy(base, clone)).toBe(true)
+  })
+
+  it('returns false when a type differs', () => {
+    const other = {
+      statuses: [...base.statuses],
+      sources: [...base.sources],
+      types: [{ ...base.types[0]!, label: 'Cliente VIP' }],
+    }
+    expect(sameTaxonomy(base, other)).toBe(false)
   })
 
   it('returns false when a label differs', () => {
     const other = {
       statuses: [{ ...base.statuses[0]!, label: 'Nuevo!' }],
       sources: [...base.sources],
+      types: [...base.types],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -205,6 +239,7 @@ describe('sameTaxonomy', () => {
     const other = {
       statuses: [{ ...base.statuses[0]!, order: 2 }],
       sources: [...base.sources],
+      types: [...base.types],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -213,6 +248,7 @@ describe('sameTaxonomy', () => {
     const other = {
       statuses: [{ ...base.statuses[0]!, key: 'other' }],
       sources: [...base.sources],
+      types: [...base.types],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -221,6 +257,7 @@ describe('sameTaxonomy', () => {
     const other = {
       statuses: [{ ...base.statuses[0]!, color: '#000000' }],
       sources: [...base.sources],
+      types: [...base.types],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -229,6 +266,7 @@ describe('sameTaxonomy', () => {
     const other = {
       statuses: [{ ...base.statuses[0]!, isSystem: !base.statuses[0]!.isSystem }],
       sources: [...base.sources],
+      types: [...base.types],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -237,6 +275,7 @@ describe('sameTaxonomy', () => {
     const other = {
       statuses: [...base.statuses, option({ key: 'extra', order: 2 })],
       sources: [...base.sources],
+      types: [...base.types],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -245,10 +284,12 @@ describe('sameTaxonomy', () => {
     const multi = {
       statuses: [option({ key: 'new', order: 1 }), option({ key: 'client', order: 2 })],
       sources: [...base.sources],
+      types: [...base.types],
     }
     const other = {
       statuses: [multi.statuses[0]!, { ...multi.statuses[1]!, label: 'Cambiado' }],
       sources: [...base.sources],
+      types: [...base.types],
     }
     expect(sameTaxonomy(multi, other)).toBe(false)
   })
@@ -258,5 +299,36 @@ describe('sameTaxonomy', () => {
     expect(sameTaxonomy(null, null)).toBe(true)
     expect(sameTaxonomy(undefined, undefined)).toBe(true)
     expect(sameTaxonomy(base, null)).toBe(false)
+  })
+})
+
+describe('optionLabel', () => {
+  const t = ((key: string, opts?: { defaultValue?: string }) =>
+    key === 'contacts.status.new' ? 'Nuevo' : (opts?.defaultValue ?? key)) as unknown as TFunction
+
+  const option = (key: string, label: string | null): TaxonomyOption => ({
+    key,
+    label,
+    description: null,
+    color: '#60A5FA',
+    order: 1,
+    isSystem: true,
+    enabled: true,
+  })
+
+  it('prefers the stored label', () => {
+    expect(optionLabel(t, 'status', option('new', 'Recien llegado'))).toBe('Recien llegado')
+  })
+
+  it('falls back to the translated system label', () => {
+    expect(optionLabel(t, 'status', option('new', null))).toBe('Nuevo')
+  })
+
+  it('falls back to the raw key when no translation exists', () => {
+    expect(optionLabel(t, 'status', option('dormido', null))).toBe('dormido')
+  })
+
+  it('keeps an empty stored label instead of translating', () => {
+    expect(optionLabel(t, 'status', option('new', ''))).toBe('')
   })
 })

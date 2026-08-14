@@ -37,7 +37,10 @@ function setup() {
     }
   })
   const { result: logoField } = renderHook(() =>
-    useLogoField({ setValue: form.current.setValue, getValues: form.current.getValues }),
+    useLogoField({
+      setField: (name, value) => form.current.setValue(name, value, { shouldDirty: true }),
+      getValues: form.current.getValues,
+    }),
   )
   return { form, logoField }
 }

@@ -1,19 +1,20 @@
 'use client'
 
-import { ModeSection, ThemeColorsSection } from '@/features/setup-workspace'
+import { useWatch } from 'react-hook-form'
+
+import { ModeSection, ThemeColorsSection, useAppearanceColors } from '@/features/setup-workspace'
 
 import { useManageSettings } from '../../../model/settings-context'
 
 export function ThemePane() {
-  const { appearance } = useManageSettings()
+  const { control, bindField, handleColorOverride } = useManageSettings().appearance
+  const colors = useAppearanceColors(control)
+  const darkMode = useWatch({ control, name: 'darkMode' })
 
   return (
     <>
-      <ThemeColorsSection
-        colors={appearance.colors}
-        onColorOverride={appearance.handleColorOverride}
-      />
-      <ModeSection darkMode={appearance.darkMode} onDarkModeChange={appearance.setDarkMode} />
+      <ThemeColorsSection colors={colors} onColorOverride={handleColorOverride} />
+      <ModeSection darkMode={darkMode} onDarkModeChange={bindField('darkMode')} />
     </>
   )
 }

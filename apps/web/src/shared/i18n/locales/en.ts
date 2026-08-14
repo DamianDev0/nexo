@@ -136,6 +136,9 @@ const en = {
   geo: {
     typeToSearch: 'Type to search a municipality',
     noMatches: 'No matching municipalities',
+    poweredByGoogle: 'Powered by Google',
+    streetTypes: 'Street type',
+    addresses: 'Addresses',
   },
   onboarding: {
     map: {
@@ -387,6 +390,12 @@ const en = {
       partner: 'Partner',
       chat: 'Chat',
     },
+    types: {
+      customer: 'Customer',
+      supplier: 'Supplier',
+      partner: 'Partner',
+      other: 'Other',
+    },
     lifecycleStage: {
       subscriber: 'Subscriber',
       lead: 'Lead',
@@ -437,6 +446,12 @@ const en = {
       status: 'Status',
       source: 'Source',
       sourcePlaceholder: 'Where did this contact come from?',
+      type: 'Type',
+      typePlaceholder: 'What is this contact to your business?',
+      typeOtherLabel: 'Which?',
+      typeOtherPlaceholder: 'Describe the contact type',
+      hidePanel: 'Hide panel',
+      submitAndNew: 'Create and add another',
       whatsappAlt: 'WhatsApp logo',
       countryAlt: 'Colombia flag',
       submitCreate: 'Create contact',
@@ -447,11 +462,22 @@ const en = {
       updated: 'Contact updated',
       archived: 'Contact archived',
       archivedMany: 'Contacts archived',
+      archivedPartial: 'Only {{archived}} of {{total}} contacts could be archived',
     },
     errors: {
       firstNameRequired: 'First name is required',
       emailInvalid: 'Enter a valid email address',
       phoneInvalid: 'Invalid number: 10 digits, mobile 3XX or landline 60X',
+      typeOtherRequired: 'Tell us which type this contact is',
+    },
+    duplicates: {
+      emailTaken: 'A contact with this email already exists: {{name}}',
+      documentTaken: 'A contact with this document already exists: {{name}}',
+      phoneMatch: 'This phone number already belongs to {{name}}',
+      nameMatch: 'A contact named {{name}} already exists',
+      createAnyway: 'Create anyway',
+      saveAnyway: 'Save anyway',
+      dismiss: 'Dismiss',
     },
     pagination: {
       pages: 'Pagination',
@@ -467,6 +493,32 @@ const en = {
     unsavedChanges: 'You have unsaved changes',
     noChanges: 'No changes yet',
     noChangesHint: 'Make a change to enable saving',
+    pagination: {
+      page: 'Page',
+    },
+    optionForm: {
+      createTitle: 'New option',
+      editTitle: 'Edit option',
+      name: 'Name',
+      description: 'Description',
+      descriptionPlaceholder: 'Describe when to use this option…',
+      errors: {
+        nameRequired: 'Enter a name',
+        nameTooLong: 'Max {{max}} characters',
+        descriptionTooLong: 'Max {{max}} characters',
+      },
+    },
+    reassign: {
+      title: 'Reassign contacts',
+      description:
+        '{{count}} contacts use “{{name}}”. Move them to another option before deleting it.',
+      target: 'Move to…',
+      confirm: 'Reassign & delete',
+      done: '{{count}} contacts reassigned',
+      errors: {
+        targetRequired: 'Pick where to move the contacts',
+      },
+    },
     discard: 'Discard',
     back: 'Back',
     comingSoon: 'This section is on the way. We are still building it.',
@@ -495,6 +547,7 @@ const en = {
       contacts: {
         status: 'Status',
         sources: 'Sources',
+        types: 'Types',
         tags: 'Tags',
       },
     },
@@ -503,12 +556,17 @@ const en = {
         'Statuses describe where each contact stands. Rename, recolor and reorder them, or add your own.',
       sourceDescription:
         'Sources track where contacts come from. Rename, recolor and reorder them, or add your own.',
+      typesDescription:
+        'Types classify what each contact is to your business. Rename, recolor and reorder them, or add your own.',
       statusAddPlaceholder: 'New status name',
       sourceAddPlaceholder: 'New source name',
+      typesAddPlaceholder: 'New type name',
       add: 'Add',
       remove: 'Remove option',
       reorder: 'Drag to reorder',
       pickColor: 'Pick a color',
+      inUse: '{{count}} contacts',
+      toggle: 'Show or hide in the CRM',
       systemHint: 'Default option — rename or recolor it, but it cannot be deleted.',
     },
     tags: {

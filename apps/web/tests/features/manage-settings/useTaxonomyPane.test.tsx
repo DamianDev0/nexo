@@ -1,7 +1,8 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { ContactTaxonomy } from '@repo/shared-types'
+import type { TaxonomyKind } from '@/features/manage-settings/lib/taxonomy-edit'
+import type { ContactTaxonomy, ContactTaxonomyUsage } from '@repo/shared-types'
 
 import { useTaxonomyPane } from '@/features/manage-settings/model/useTaxonomyPane'
 
@@ -9,11 +10,54 @@ const handleAdd = vi.fn()
 const handlePatch = vi.fn()
 const handleRemove = vi.fn()
 const handleReorder = vi.fn()
+const reassignMutate = vi.fn()
 
 const TAXONOMY: ContactTaxonomy = {
-  statuses: [{ key: 'new', label: 'Nuevo', color: '#3B82F6', order: 1, isSystem: true }],
-  sources: [{ key: 'manual', label: 'Manual', color: '#22C55E', order: 1, isSystem: true }],
+  statuses: [
+    {
+      key: 'new',
+      label: 'Nuevo',
+      description: null,
+      color: '#60A5FA',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+    {
+      key: 'vip',
+      label: 'VIP',
+      description: null,
+      color: '#F87171',
+      order: 2,
+      isSystem: false,
+      enabled: true,
+    },
+  ],
+  sources: [
+    {
+      key: 'manual',
+      label: 'Manual',
+      description: null,
+      color: '#4ADE80',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
+  types: [
+    {
+      key: 'customer',
+      label: 'Cliente',
+      description: null,
+      color: '#A78BFA',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
 }
+
+let usage: ContactTaxonomyUsage = { statuses: {}, sources: {}, types: {}, tags: {} }
 
 let contacts = {
   taxonomy: TAXONOMY as ContactTaxonomy | null,
@@ -24,15 +68,24 @@ let contacts = {
   handleReorder,
 }
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue ?? key,
+  }),
+}))
+
 vi.mock('@/features/manage-settings/model/settings-context', () => ({
   useManageSettings: () => ({ contacts }),
 }))
 
+vi.mock('@/features/manage-settings/query/useTaxonomyUsage', () => ({
+  useTaxonomyUsage: () => usage,
+  useReassignTaxonomy: () => ({ mutate: reassignMutate, isPending: false }),
+}))
+
 beforeEach(() => {
-  handleAdd.mockClear()
-  handlePatch.mockClear()
-  handleRemove.mockClear()
-  handleReorder.mockClear()
+  vi.clearAllMocks()
+  usage = { statuses: {}, sources: {}, types: {}, tags: {} }
   contacts = {
     taxonomy: TAXONOMY,
     isLoading: false,
@@ -44,128 +97,97 @@ beforeEach(() => {
 })
 
 describe('useTaxonomyPane', () => {
-  it('exposes namespace status and the statuses options for kind statuses', () => {
-    const { result } = renderHook(() => useTaxonomyPane('statuses'))
+  it.each([
+    ['statuses', 'status'],
+    ['sources', 'source'],
+    ['types', 'types'],
+  ] as Array<[TaxonomyKind, string]>)('maps kind %s to namespace %s', (kind, namespace) => {
+    const { result } = renderHook(() => useTaxonomyPane(kind))
 
-    expect(result.current.namespace).toBe('status')
-    expect(result.current.options).toEqual(TAXONOMY.statuses)
+    expect(result.current.namespace).toBe(namespace)
+    expect(result.current.options).toEqual(TAXONOMY[kind])
   })
 
-  it('exposes namespace source and the sources options for kind sources', () => {
-    const { result } = renderHook(() => useTaxonomyPane('sources'))
+  it('falls back to empty options while taxonomy is null', () => {
+    contacts = { ...contacts, taxonomy: null, isLoading: true }
 
-    expect(result.current.namespace).toBe('source')
-    expect(result.current.options).toEqual(TAXONOMY.sources)
-  })
-
-  it('falls back to an empty options array when the taxonomy has not loaded', () => {
-    contacts.taxonomy = null
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
     expect(result.current.options).toEqual([])
-  })
-
-  it('reflects isLoading from the contacts controller', () => {
-    contacts.isLoading = true
-    const { result } = renderHook(() => useTaxonomyPane('statuses'))
-
     expect(result.current.isLoading).toBe(true)
   })
 
-  it('starts with an empty newLabel', () => {
+  it('creates an option through the editor with name and description', () => {
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    expect(result.current.newLabel).toBe('')
+    act(() => result.current.editor.openCreate())
+    expect(result.current.editor.open).toBe(true)
+    expect(result.current.editor.editing).toBeNull()
+
+    act(() => result.current.editor.onSubmit({ name: 'Dormido', description: 'Sin contacto' }))
+
+    expect(handleAdd).toHaveBeenCalledWith('statuses', 'Dormido', 'Sin contacto')
   })
 
-  it('updates newLabel as the user types', () => {
+  it('edits an option through the editor patching label and description', () => {
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    act(() => result.current.setNewLabel('Contactado'))
+    act(() => result.current.actions.onEdit('vip'))
+    expect(result.current.editor.editing).toEqual({ name: 'VIP', description: '' })
 
-    expect(result.current.newLabel).toBe('Contactado')
-  })
+    act(() => result.current.editor.onSubmit({ name: 'VIP Gold', description: 'Alto valor' }))
 
-  it('handleAdd does nothing when the trimmed label is empty', () => {
-    const { result } = renderHook(() => useTaxonomyPane('statuses'))
-
-    act(() => result.current.setNewLabel('   '))
-    act(() => result.current.handleAdd())
-
-    expect(handleAdd).not.toHaveBeenCalled()
-    expect(result.current.newLabel).toBe('   ')
-  })
-
-  it('handleAdd does nothing while the taxonomy is loading', () => {
-    contacts.isLoading = true
-    const { result } = renderHook(() => useTaxonomyPane('statuses'))
-
-    act(() => result.current.setNewLabel('Contactado'))
-    act(() => result.current.handleAdd())
-
-    expect(handleAdd).not.toHaveBeenCalled()
-  })
-
-  it('handleAdd calls contacts.handleAdd with the kind and trimmed label, then clears newLabel', () => {
-    const { result } = renderHook(() => useTaxonomyPane('sources'))
-
-    act(() => result.current.setNewLabel('  Ads  '))
-    act(() => result.current.handleAdd())
-
-    expect(handleAdd).toHaveBeenCalledWith('sources', 'Ads')
-    expect(result.current.newLabel).toBe('')
-  })
-
-  it('actions.onPatch forwards the kind, key and patch to contacts.handlePatch', () => {
-    const { result } = renderHook(() => useTaxonomyPane('statuses'))
-
-    act(() => result.current.actions.onPatch('new', { label: 'Nuevo!' }))
-
-    expect(handlePatch).toHaveBeenCalledWith('statuses', 'new', { label: 'Nuevo!' })
-  })
-
-  it('actions recompute for the new kind after the pane switches tabs', () => {
-    const { result, rerender } = renderHook(({ kind }) => useTaxonomyPane(kind), {
-      initialProps: { kind: 'statuses' as const },
+    expect(handlePatch).toHaveBeenCalledWith('statuses', 'vip', {
+      label: 'VIP Gold',
+      description: 'Alto valor',
     })
-
-    rerender({ kind: 'sources' as const })
-    act(() => result.current.actions.onPatch('manual', { label: 'Manual!' }))
-
-    expect(handlePatch).toHaveBeenCalledWith('sources', 'manual', { label: 'Manual!' })
   })
 
-  it('actions.onRemove forwards the kind and key to contacts.handleRemove', () => {
-    const { result } = renderHook(() => useTaxonomyPane('sources'))
-
-    act(() => result.current.actions.onRemove('manual'))
-
-    expect(handleRemove).toHaveBeenCalledWith('sources', 'manual')
-  })
-
-  it('dnd.handleDragEnd calls contacts.handleReorder through the kind-bound callback', () => {
+  it('removes directly when no contacts use the option', () => {
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    act(() =>
-      result.current.dnd.handleDragEnd({
-        active: { id: 'b' },
-        over: { id: 'a' },
-      } as never),
-    )
+    act(() => result.current.actions.onRemove('vip'))
 
-    expect(handleReorder).toHaveBeenCalledWith('statuses', 'b', 'a')
+    expect(handleRemove).toHaveBeenCalledWith('statuses', 'vip')
+    expect(result.current.removal).toBeNull()
   })
 
-  it('dnd.handleDragEnd does not reorder when dropped on itself', () => {
+  it('requires reassignment when contacts use the option', () => {
+    usage = { ...usage, statuses: { vip: 3 } }
+
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    act(() =>
-      result.current.dnd.handleDragEnd({
-        active: { id: 'a' },
-        over: { id: 'a' },
-      } as never),
-    )
+    act(() => result.current.actions.onRemove('vip'))
 
-    expect(handleReorder).not.toHaveBeenCalled()
+    expect(handleRemove).not.toHaveBeenCalled()
+    expect(result.current.removal?.source).toEqual({ label: 'VIP', count: 3 })
+    expect(result.current.removal?.candidates).toEqual([
+      { key: 'new', label: 'Nuevo', color: '#60A5FA' },
+    ])
+  })
+
+  it('confirms reassignment then removes the option', () => {
+    usage = { ...usage, statuses: { vip: 3 } }
+    reassignMutate.mockImplementation((_input, opts: { onSuccess: () => void }) => opts.onSuccess())
+
+    const { result } = renderHook(() => useTaxonomyPane('statuses'))
+
+    act(() => result.current.actions.onRemove('vip'))
+    act(() => result.current.removal?.confirm('new'))
+
+    expect(reassignMutate).toHaveBeenCalledWith(
+      { kind: 'status', fromKey: 'vip', toKey: 'new' },
+      expect.anything(),
+    )
+    expect(handleRemove).toHaveBeenCalledWith('statuses', 'vip')
+    expect(result.current.removal).toBeNull()
+  })
+
+  it('exposes per-option usage counts', () => {
+    usage = { ...usage, statuses: { new: 7 } }
+
+    const { result } = renderHook(() => useTaxonomyPane('statuses'))
+
+    expect(result.current.counts).toEqual({ new: 7 })
   })
 })

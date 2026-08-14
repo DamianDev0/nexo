@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
@@ -11,16 +11,12 @@ import { moduleGroupKey } from '../lib/navigation'
 import { useStepHydration } from '../query/useStepHydration'
 import { useStepMutation } from '../query/useStepMutation'
 
-import type { SidebarConfig, SidebarModule } from '@repo/shared-types'
-
-interface NavigationFormValues {
-  modules: SidebarModule[]
-}
+import type { NavigationFormValues } from './types'
+import type { SidebarConfig } from '@repo/shared-types'
 
 export function useStepNavigation(onNext: () => void) {
   const {
     control,
-    watch,
     getValues,
     reset,
     formState: { isDirty },
@@ -31,6 +27,7 @@ export function useStepNavigation(onNext: () => void) {
   useStepHydration({
     queryKey: QUERY_KEYS.settings.navigation,
     queryFn: settingsService.getNavigation,
+    skip: isDirty,
     hydrate: useCallback(
       (config: SidebarConfig) => {
         if (config.modules.length === 0) return
@@ -39,13 +36,10 @@ export function useStepNavigation(onNext: () => void) {
       [reset],
     ),
   })
-  const watchedModules = watch('modules')
-
-  const modules = fields.map((field, index) => watchedModules[index] ?? field)
 
   const handleToggle = useCallback(
     (key: string) => {
-      const index = fields.findIndex((f) => f.key === key)
+      const index = fields.findIndex((field) => field.key === key)
       if (index < 0) return
       const current = getValues(`modules.${index}`)
       if (current.required) return
@@ -57,8 +51,8 @@ export function useStepNavigation(onNext: () => void) {
   const handleReorder = useCallback(
     (activeKey: string, overKey: string) => {
       if (moduleGroupKey(activeKey) !== moduleGroupKey(overKey)) return
-      const from = fields.findIndex((f) => f.key === activeKey)
-      const to = fields.findIndex((f) => f.key === overKey)
+      const from = fields.findIndex((field) => field.key === activeKey)
+      const to = fields.findIndex((field) => field.key === overKey)
       if (from < 0 || to < 0 || from === to) return
       move(from, to)
     },
@@ -80,13 +74,10 @@ export function useStepNavigation(onNext: () => void) {
     },
   })
 
-  return {
-    modules,
-    handleToggle,
-    handleReorder,
-    handleSave,
-    handleReset: () => reset(),
-    isDirty,
-    isPending,
-  }
+  const handleReset = useCallback(() => reset(), [reset])
+
+  return useMemo(
+    () => ({ control, handleToggle, handleReorder, handleSave, handleReset, isDirty, isPending }),
+    [control, handleToggle, handleReorder, handleSave, handleReset, isDirty, isPending],
+  )
 }

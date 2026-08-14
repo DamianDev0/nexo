@@ -39,7 +39,7 @@ export function ManageSettingsProvider({ children }: Readonly<{ children: ReactN
   const nomenclature = useStepNomenclature(onSaved)
   const navigation = useStepNavigation(onSaved)
   const appearance = useStepAppearance(onSaved)
-  const contacts = useContactTaxonomySection(onSaved)
+  const contacts = useContactTaxonomySection()
 
   const value = useMemo(
     () => ({ company, nomenclature, navigation, appearance, contacts }),

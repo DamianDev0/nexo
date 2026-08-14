@@ -31,6 +31,7 @@ export const ROUTES = {
         root: '/settings/contacts',
         status: '/settings/contacts/status',
         sources: '/settings/contacts/sources',
+        types: '/settings/contacts/types',
         tags: '/settings/contacts/tags',
       },
     },

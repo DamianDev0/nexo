@@ -16,9 +16,10 @@ const STALE_MS = 5 * 60 * 1000
 function toChoices(
   t: TFunction,
   options: ReadonlyArray<TaxonomyOption> = [],
-  namespace: 'status' | 'source',
+  namespace: 'status' | 'source' | 'types',
 ): TaxonomyChoice[] {
-  return [...options]
+  return options
+    .filter((option) => option.enabled)
     .sort((a, b) => a.order - b.order)
     .map((option) => ({
       key: option.key,
@@ -43,11 +44,14 @@ export function useContactTaxonomy() {
   return useMemo(() => {
     const statuses = toChoices(t, data?.statuses, 'status')
     const sources = toChoices(t, data?.sources, 'source')
+    const types = toChoices(t, data?.types, 'types')
     return {
       statuses,
       sources,
+      types,
       statusByKey: byKey(statuses),
       sourceByKey: byKey(sources),
+      typeByKey: byKey(types),
       isPending,
     }
   }, [t, data, isPending])

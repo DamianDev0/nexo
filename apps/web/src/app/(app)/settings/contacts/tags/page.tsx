@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
+import { getContactTaxonomyUsage } from '@/shared/api/dal/contacts'
 import { listTags } from '@/shared/api/dal/tags'
 import { getT } from '@/shared/i18n/server'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
@@ -15,7 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   const queryClient = getServerQueryClient()
-  await prefetch(queryClient, QUERY_KEYS.tags.byEntity('contact'), () => listTags('contact'))
+  await prefetch(queryClient, QUERY_KEYS.tags.page('contact', 1), () => listTags('contact'))
+  await prefetch(queryClient, QUERY_KEYS.contacts.taxonomyUsage, getContactTaxonomyUsage)
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

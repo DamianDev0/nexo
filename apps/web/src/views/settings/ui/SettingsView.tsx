@@ -7,6 +7,7 @@ import {
   StatusPane,
   TagsPane,
   ThemePane,
+  TypesPane,
   TypographyPane,
 } from '@/features/manage-settings'
 
@@ -19,6 +20,7 @@ const PANES = {
   typography: TypographyPane,
   contactStatus: StatusPane,
   contactSources: SourcesPane,
+  contactTypes: TypesPane,
   contactTags: TagsPane,
 } as const
 

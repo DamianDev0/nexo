@@ -1,5 +1,8 @@
 import { TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
 
+import { DEFAULT_PAGE_SIZE, FIRST_PAGE, PAGE_SIZE_OPTIONS } from '@/shared/config/pagination'
+
+import type { QuickFilterState } from '../config/quick-filters.constants'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { SmartListItem } from '@/shared/ui/organisms/data-table'
 import type { TFunction } from 'i18next'
@@ -38,10 +41,30 @@ export function parseListParam(value: string | null): string | null {
   return TAXONOMY_KEY_PATTERN.test(value) ? value : null
 }
 
+export interface ContactsUrlState {
+  readonly status: string | null
+  readonly search: string
+  readonly filters: QuickFilterState
+  readonly page: number
+  readonly limit: number
+}
+
+export function parsePageParam(value: string | null): number {
+  const page = Number(value)
+  return Number.isInteger(page) && page >= FIRST_PAGE ? page : FIRST_PAGE
+}
+
+export function parseLimitParam(value: string | null): number {
+  const limit = Number(value)
+  return PAGE_SIZE_OPTIONS.includes(limit) ? limit : DEFAULT_PAGE_SIZE
+}
+
 export function contactsQueryString(state: {
   status: string | null
   search: string
   filters?: Readonly<Record<string, ReadonlyArray<string>>>
+  page?: number
+  limit?: number
 }): string {
   const params = new URLSearchParams()
   if (state.status) params.set('list', state.status)
@@ -49,6 +72,8 @@ export function contactsQueryString(state: {
   for (const [key, values] of Object.entries(state.filters ?? {})) {
     if (values.length > 0) params.set(key, values.join(','))
   }
+  if (state.page && state.page > FIRST_PAGE) params.set('page', String(state.page))
+  if (state.limit && state.limit !== DEFAULT_PAGE_SIZE) params.set('limit', String(state.limit))
   const qs = params.toString()
   return qs ? `?${qs}` : ''
 }

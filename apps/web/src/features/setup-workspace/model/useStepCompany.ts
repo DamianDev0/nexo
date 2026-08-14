@@ -1,47 +1,38 @@
-import { IndustrySector } from '@repo/shared-types'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { useFormFields } from '@/shared/lib/hooks/useFormFields'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { saveGeneralAction } from '../api/setup-steps.actions'
+import { COMPANY_DEFAULT_VALUES } from '../config/company.constants'
 import { useStepHydration } from '../query/useStepHydration'
 import { useStepMutation } from '../query/useStepMutation'
 
+import type { CompanyFormValues } from './types'
 import type { GeneralSettings } from '@repo/shared-types'
-
-interface CompanyFormValues {
-  phone: string
-  website: string
-  sector: IndustrySector
-}
-
-const DEFAULT_VALUES: CompanyFormValues = {
-  phone: '',
-  website: '',
-  sector: IndustrySector.TECNOLOGIA,
-}
 
 export function useStepCompany(onNext: () => void) {
   const {
-    watch,
+    control,
     setValue,
     getValues,
     reset,
     formState: { isDirty },
-  } = useForm<CompanyFormValues>({ defaultValues: DEFAULT_VALUES })
-  const values = watch()
+  } = useForm<CompanyFormValues>({ defaultValues: COMPANY_DEFAULT_VALUES })
+  const { bindField } = useFormFields(setValue)
 
   useStepHydration({
     queryKey: QUERY_KEYS.settings.general,
     queryFn: settingsService.getGeneral,
+    skip: isDirty,
     hydrate: useCallback(
       (data: GeneralSettings) =>
         reset({
           phone: data.business.phone ?? '',
           website: data.business.website ?? '',
-          sector: data.industry.sector ?? DEFAULT_VALUES.sector,
+          sector: data.industry.sector ?? COMPANY_DEFAULT_VALUES.sector,
         }),
       [reset],
     ),
@@ -54,18 +45,13 @@ export function useStepCompany(onNext: () => void) {
       return result.data
     },
     onNext,
+    onSuccess: () => reset(getValues(), { keepValues: true }),
   })
 
-  return {
-    phone: values.phone,
-    setPhone: (v: string) => setValue('phone', v, { shouldDirty: true }),
-    website: values.website,
-    setWebsite: (v: string) => setValue('website', v, { shouldDirty: true }),
-    sector: values.sector,
-    setSector: (v: IndustrySector) => setValue('sector', v, { shouldDirty: true }),
-    handleSave,
-    handleReset: () => reset(),
-    isDirty,
-    isPending,
-  }
+  const handleReset = useCallback(() => reset(), [reset])
+
+  return useMemo(
+    () => ({ control, bindField, handleSave, handleReset, isDirty, isPending }),
+    [control, bindField, handleSave, handleReset, isDirty, isPending],
+  )
 }

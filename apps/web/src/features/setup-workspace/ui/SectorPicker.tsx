@@ -20,7 +20,7 @@ export function SectorPicker({ value, onSelect }: Readonly<SectorPickerProps>) {
 
   return (
     <div className="mt-6">
-      <Label className="text-xs text-muted-foreground">
+      <Label className="text-xs font-semibold text-body">
         {t('onboarding.steps.company.sector')}
       </Label>
       <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 xl:grid-cols-5">

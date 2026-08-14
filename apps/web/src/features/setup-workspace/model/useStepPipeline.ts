@@ -1,64 +1,38 @@
-import { STAGE_COLOR_OPTIONS } from '@repo/shared-utils'
 import { t } from 'i18next'
-import { useCallback, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { useFormFields } from '@/shared/lib/hooks/useFormFields'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { createPipelineAction } from '../api/setup-steps.actions'
+import { PIPELINE_DEFAULT_VALUES, PIPELINE_STAGE_DEFAULT } from '../config/pipeline.constants'
 import { useStepHydration } from '../query/useStepHydration'
 import { useStepMutation } from '../query/useStepMutation'
 
+import type { PipelineFormValues, Stage } from './types'
 import type { Pipeline } from '@repo/shared-types'
-
-interface Stage {
-  name: string
-  color: string
-  probability: number
-}
-
-interface PipelineFormValues {
-  pipelineName: string
-  stages: Stage[]
-}
-
-const DEFAULT_VALUES: PipelineFormValues = {
-  pipelineName: 'Sales Pipeline',
-  stages: [
-    { name: 'MQL', color: STAGE_COLOR_OPTIONS[0], probability: 10 },
-    { name: 'SQL', color: STAGE_COLOR_OPTIONS[1], probability: 25 },
-    { name: 'Demo Scheduled', color: STAGE_COLOR_OPTIONS[3], probability: 40 },
-    { name: 'Proposal', color: STAGE_COLOR_OPTIONS[4], probability: 60 },
-    { name: 'Negotiation', color: STAGE_COLOR_OPTIONS[5], probability: 80 },
-    { name: 'Closed Won', color: STAGE_COLOR_OPTIONS[6], probability: 100 },
-  ],
-}
-
-function newStage(): Stage {
-  return { name: 'New Stage', color: STAGE_COLOR_OPTIONS[9], probability: 50 }
-}
 
 export function useStepPipeline(onNext: () => void) {
   const {
     control,
-    watch,
     setValue,
     getValues,
     reset,
     formState: { isDirty },
-  } = useForm<PipelineFormValues>({
-    defaultValues: DEFAULT_VALUES,
-  })
+  } = useForm<PipelineFormValues>({ defaultValues: PIPELINE_DEFAULT_VALUES })
   const { fields, append, remove, move } = useFieldArray({ control, name: 'stages' })
+  const { setField, bindField } = useFormFields(setValue)
   const existingPipelineId = useRef<string | null>(null)
 
   useStepHydration({
     queryKey: QUERY_KEYS.settings.pipelines,
     queryFn: settingsService.getPipelines,
+    skip: isDirty,
     hydrate: useCallback(
       (pipelines: Pipeline[]) => {
-        const existing = pipelines.find((p) => p.isDefault) ?? pipelines[0]
+        const existing = pipelines.find((pipeline) => pipeline.isDefault) ?? pipelines[0]
         if (!existing) return
         existingPipelineId.current = existing.id
         reset({
@@ -71,16 +45,13 @@ export function useStepPipeline(onNext: () => void) {
       [reset],
     ),
   })
-  const watchedStages = watch('stages')
 
-  const stages = fields.map((field, index) => ({
-    ...(watchedStages[index] ?? field),
-    id: field.id,
-  }))
+  const indexOf = useCallback(
+    (id: string) => fields.findIndex((field) => field.id === id),
+    [fields],
+  )
 
-  const indexOf = useCallback((id: string) => fields.findIndex((f) => f.id === id), [fields])
-
-  const handleAddStage = useCallback(() => append(newStage()), [append])
+  const handleAddStage = useCallback(() => append(PIPELINE_STAGE_DEFAULT), [append])
 
   const handleRemoveStage = useCallback(
     (id: string) => {
@@ -94,14 +65,12 @@ export function useStepPipeline(onNext: () => void) {
     (id: string, patch: Partial<Stage>) => {
       const index = indexOf(id)
       if (index < 0) return
-      if (patch.name !== undefined)
-        setValue(`stages.${index}.name`, patch.name, { shouldDirty: true })
-      if (patch.color !== undefined)
-        setValue(`stages.${index}.color`, patch.color, { shouldDirty: true })
+      if (patch.name !== undefined) setField(`stages.${index}.name`, patch.name)
+      if (patch.color !== undefined) setField(`stages.${index}.color`, patch.color)
       if (patch.probability !== undefined)
-        setValue(`stages.${index}.probability`, patch.probability, { shouldDirty: true })
+        setField(`stages.${index}.probability`, patch.probability)
     },
-    [indexOf, setValue],
+    [indexOf, setField],
   )
 
   const handleReorderStages = useCallback(
@@ -119,28 +88,38 @@ export function useStepPipeline(onNext: () => void) {
       const form = getValues()
       const result = await createPipelineAction({
         name: form.pipelineName,
-        stages: form.stages.map((s) => ({
-          name: s.name,
-          color: s.color,
-          probability: s.probability,
-        })),
+        stages: form.stages.map(({ name, color, probability }) => ({ name, color, probability })),
       })
       if (!result.ok) throw new Error(result.error)
       return result.data
     },
     onNext,
     errorTitle: t('auth.toasts.pipelineFailed'),
+    onSuccess: () => reset(getValues(), { keepValues: true }),
   })
 
-  return {
-    pipelineName: watch('pipelineName'),
-    setPipelineName: (v: string) => setValue('pipelineName', v),
-    stages,
-    handleAddStage,
-    handleRemoveStage,
-    handleUpdateStage,
-    handleReorderStages,
-    handleSave,
-    isPending,
-  }
+  return useMemo(
+    () => ({
+      control,
+      fields,
+      bindField,
+      handleAddStage,
+      handleRemoveStage,
+      handleUpdateStage,
+      handleReorderStages,
+      handleSave,
+      isPending,
+    }),
+    [
+      control,
+      fields,
+      bindField,
+      handleAddStage,
+      handleRemoveStage,
+      handleUpdateStage,
+      handleReorderStages,
+      handleSave,
+      isPending,
+    ],
+  )
 }

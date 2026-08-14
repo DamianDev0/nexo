@@ -2,13 +2,16 @@ import { flexRender } from '@tanstack/react-table'
 import { act, render, renderHook, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse, http } from 'msw'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CONTACTS_FIXTURE } from '../../msw/handlers'
 import { API, createMswServer } from '../../msw/test-server'
+import { resetUrl } from '../../next-navigation-mock'
 import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import { useContactsBoard } from '@/features/manage-contacts/model/useContactsBoard'
+
+vi.mock('next/navigation', () => import('../../next-navigation-mock'))
 
 function BoardActionsCell({ contactId }: Readonly<{ contactId: string }>) {
   const board = useContactsBoard()
@@ -46,8 +49,8 @@ function boardHandlers() {
       HttpResponse.json({
         data: {
           statuses: [
-            { key: 'new', label: 'Nuevo', color: '#3B82F6' },
-            { key: 'qualified', label: 'Calificado', color: '#22C55E' },
+            { key: 'new', label: 'Nuevo', color: '#3B82F6', order: 1, enabled: true },
+            { key: 'qualified', label: 'Calificado', color: '#22C55E', order: 2, enabled: true },
           ],
           sources: [],
         },
@@ -59,6 +62,7 @@ function boardHandlers() {
 const store = new Map<string, string>()
 
 beforeEach(() => {
+  resetUrl()
   store.clear()
   Object.defineProperty(window, 'localStorage', {
     configurable: true,

@@ -1,8 +1,4 @@
 [
-  "src/features/setup-workspace/ui/StepAppearance.tsx:53 :: className repeated from src/features/manage-settings/ui/sections/appearance/AppearanceShell.tsx:17",
-  "src/features/setup-workspace/ui/StepNomenclature.tsx:43 :: className repeated from src/features/manage-settings/ui/sections/NomenclatureSettings.tsx:19",
-  "src/features/setup-workspace/ui/StepNomenclature.tsx:45 :: className repeated from src/features/manage-settings/ui/sections/NomenclatureSettings.tsx:21",
-  "src/features/setup-workspace/ui/StepNomenclature.tsx:48 :: className repeated from src/features/manage-settings/ui/sections/NomenclatureSettings.tsx:21",
   "src/features/setup-workspace/ui/StepTeam.tsx:88 :: className repeated from src/features/setup-workspace/ui/StepPipeline.tsx:93",
   "src/features/setup-workspace/ui/WizardLayout.tsx:78 :: className repeated from src/entities/session/ui/AuthGuard.tsx:40",
   "src/features/setup-workspace/ui/WizardLayout.tsx:153 :: className repeated from src/entities/session/ui/AuthGuard.tsx:40",

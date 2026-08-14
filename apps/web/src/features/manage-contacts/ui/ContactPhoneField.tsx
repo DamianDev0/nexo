@@ -10,7 +10,7 @@ import { FieldError } from '@/shared/ui/molecules/field-error'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/shadcn/input-group'
 import { Label } from '@/shared/ui/shadcn/label'
 
-import type { ContactFormValues } from '../model/contact-form.schema'
+import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { Control } from 'react-hook-form'
 
 interface ContactPhoneFieldProps {
@@ -18,6 +18,7 @@ interface ContactPhoneFieldProps {
   readonly name: 'phone' | 'whatsapp'
   readonly label: string
   readonly disabled?: boolean
+  readonly onBlur?: () => void
 }
 
 export function ContactPhoneField({
@@ -25,6 +26,7 @@ export function ContactPhoneField({
   name,
   label,
   disabled = false,
+  onBlur,
 }: Readonly<ContactPhoneFieldProps>) {
   const { t } = useTranslation()
   const isWhatsapp = name === 'whatsapp'
@@ -35,7 +37,7 @@ export function ContactPhoneField({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <Label className="text-xs text-muted-foreground">{label}</Label>
+          <Label className="text-xs font-semibold text-body">{label}</Label>
           <InputGroup
             className="mt-1.5 bg-surface-input aria-disabled:opacity-60"
             aria-disabled={disabled}
@@ -58,7 +60,10 @@ export function ContactPhoneField({
               disabled={disabled}
               value={formatCOPhone(field.value)}
               onChange={(event) => field.onChange(phoneDigits(event.target.value))}
-              onBlur={field.onBlur}
+              onBlur={() => {
+                field.onBlur()
+                onBlur?.()
+              }}
             />
           </InputGroup>
           <FieldError message={fieldState.error?.message} />

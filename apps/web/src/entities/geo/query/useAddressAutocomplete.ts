@@ -6,26 +6,26 @@ import geoService from '@/shared/api/services/geo.service'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
-import type { Municipality } from '@repo/shared-types'
+import type { AddressSuggestion } from '@repo/shared-types'
 
-const MIN_TERM_LENGTH = 2
-const STALE_MS = 60 * 60 * 1000
+const MIN_TERM_LENGTH = 3
+const STALE_MS = 5 * 60 * 1000
 
-export function useMunicipalitySearch(term: string, department?: string) {
+export function useAddressAutocomplete(term: string, sessionToken: string) {
   const debounced = useDebouncedValue(term)
-  const enabled = debounced.trim().length >= MIN_TERM_LENGTH
+  const normalized = debounced.trim()
+  const enabled = normalized.length >= MIN_TERM_LENGTH
 
   const { data, isFetching } = useQuery({
-    queryKey: QUERY_KEYS.geo.municipalities(debounced, department),
-    queryFn: () => geoService.searchMunicipalities(debounced, department),
+    queryKey: QUERY_KEYS.geo.addresses(normalized),
+    queryFn: () => geoService.suggestAddresses(normalized, sessionToken),
     enabled,
     staleTime: STALE_MS,
     placeholderData: keepPreviousData,
   })
 
   return {
-    municipalities: (data ?? []) as ReadonlyArray<Municipality>,
+    places: (data ?? []) as ReadonlyArray<AddressSuggestion>,
     isSearching: enabled && isFetching,
-    isIdle: !enabled,
   }
 }

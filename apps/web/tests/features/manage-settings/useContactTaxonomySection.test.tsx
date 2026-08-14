@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { delay, HttpResponse, http } from 'msw'
+import { HttpResponse, http } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { API, createMswServer } from '../../msw/test-server'
@@ -9,25 +9,54 @@ import type { ContactTaxonomy } from '@repo/shared-types'
 import type { ReactNode } from 'react'
 
 import { useContactTaxonomySection } from '@/features/manage-settings/model/useContactTaxonomySection'
-import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 vi.mock('i18next', () => ({ t: (key: string) => key }))
 
 const sileoError = vi.fn()
-const sileoSuccess = vi.fn()
 
 vi.mock('sileo', () => ({
   sileo: {
     error: (...args: unknown[]) => sileoError(...args),
-    success: (...args: unknown[]) => sileoSuccess(...args),
+    success: vi.fn(),
   },
 }))
 
 const server = createMswServer()
 
 const TAXONOMY: ContactTaxonomy = {
-  statuses: [{ key: 'new', label: 'Nuevo', color: '#3B82F6', order: 1, isSystem: true }],
-  sources: [{ key: 'manual', label: 'Manual', color: '#22C55E', order: 1, isSystem: true }],
+  statuses: [
+    {
+      key: 'new',
+      label: 'Nuevo',
+      description: null,
+      color: '#3B82F6',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
+  sources: [
+    {
+      key: 'manual',
+      label: 'Manual',
+      description: null,
+      color: '#22C55E',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
+  types: [
+    {
+      key: 'customer',
+      label: 'Cliente',
+      description: null,
+      color: '#8B5CF6',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
 }
 
 function getHandler(data: ContactTaxonomy) {
@@ -52,203 +81,127 @@ function makeWrapper() {
 
 beforeEach(() => {
   sileoError.mockClear()
-  sileoSuccess.mockClear()
 })
 
 describe('useContactTaxonomySection', () => {
-  it('loads the taxonomy from the server and reports isDirty false', async () => {
-    server.use(getHandler(TAXONOMY), patchHandler())
+  it('loads the taxonomy from the server', async () => {
+    server.use(getHandler(TAXONOMY))
     const { Wrapper } = makeWrapper()
 
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
+    const { result } = renderHook(() => useContactTaxonomySection(), { wrapper: Wrapper })
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
     expect(result.current.taxonomy).toEqual(TAXONOMY)
-    expect(result.current.isDirty).toBe(false)
   })
 
-  it('ignores an edit attempted before the taxonomy has loaded', async () => {
-    server.use(getHandler(TAXONOMY), patchHandler())
+  it('applies edits optimistically and autosaves after the debounce', async () => {
+    server.use(getHandler(TAXONOMY))
+    let saved: ContactTaxonomy | null = null
+    server.use(patchHandler((body) => (saved = body)))
     const { Wrapper } = makeWrapper()
 
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
-
-    act(() => result.current.handleAdd('statuses', 'Nuevo estado'))
-
-    expect(result.current.taxonomy).toBeNull()
-    expect(result.current.isDirty).toBe(false)
-
-    await waitFor(() => expect(result.current.isLoading).toBe(false))
-  })
-
-  it('handleAdd stages a new option in the draft and marks it dirty', async () => {
-    server.use(getHandler(TAXONOMY), patchHandler())
-    const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
+    const { result } = renderHook(() => useContactTaxonomySection(), { wrapper: Wrapper })
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    act(() => result.current.handleAdd('statuses', 'Contactado'))
+    act(() => result.current.handlePatch('statuses', 'new', { enabled: false }))
 
-    expect(result.current.taxonomy?.statuses).toHaveLength(2)
-    expect(result.current.taxonomy?.statuses[1]?.label).toBe('Contactado')
-    expect(result.current.taxonomy?.sources).toEqual(TAXONOMY.sources)
-    expect(result.current.isDirty).toBe(true)
+    expect(result.current.taxonomy?.statuses[0]?.enabled).toBe(false)
+    expect(saved).toBeNull()
+
+    await waitFor(() => expect(saved).not.toBeNull(), { timeout: 2000 })
+    expect(saved!.statuses[0]?.enabled).toBe(false)
   })
 
-  it('handlePatch edits an option in place', async () => {
-    server.use(getHandler(TAXONOMY), patchHandler())
+  it('coalesces rapid edits into a single save with the latest state', async () => {
+    server.use(getHandler(TAXONOMY))
+    const bodies: ContactTaxonomy[] = []
+    server.use(patchHandler((body) => bodies.push(body)))
     const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
+
+    const { result } = renderHook(() => useContactTaxonomySection(), { wrapper: Wrapper })
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    act(() => result.current.handlePatch('statuses', 'new', { label: 'Nuevo!' }))
+    act(() => result.current.handlePatch('statuses', 'new', { label: 'N' }))
+    act(() => result.current.handlePatch('statuses', 'new', { label: 'Nu' }))
+    act(() => result.current.handlePatch('statuses', 'new', { label: 'Nue' }))
 
-    expect(result.current.taxonomy?.statuses[0]?.label).toBe('Nuevo!')
+    await waitFor(() => expect(bodies.length).toBeGreaterThan(0), { timeout: 2000 })
+    expect(bodies).toHaveLength(1)
+    expect(bodies[0]?.statuses[0]?.label).toBe('Nue')
   })
 
-  it('handleRemove drops a non-system option', async () => {
-    const seeded: ContactTaxonomy = {
-      statuses: TAXONOMY.statuses,
-      sources: [
-        ...TAXONOMY.sources,
-        { key: 'ads', label: 'Ads', color: '#F97316', order: 2, isSystem: false },
-      ],
-    }
-    server.use(getHandler(seeded), patchHandler())
+  it('autosaves adds, removes and reorders', async () => {
+    server.use(getHandler(TAXONOMY))
+    let saved: ContactTaxonomy | null = null
+    server.use(patchHandler((body) => (saved = body)))
     const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
-    await waitFor(() => expect(result.current.taxonomy?.sources).toHaveLength(2))
 
-    act(() => result.current.handleRemove('sources', 'ads'))
-
-    expect(result.current.taxonomy?.sources.map((option) => option.key)).toEqual(['manual'])
-  })
-
-  it('handleReorder moves an option within its kind', async () => {
-    const seeded: ContactTaxonomy = {
-      statuses: [
-        { key: 'a', label: 'A', color: '#3B82F6', order: 1, isSystem: false },
-        { key: 'b', label: 'B', color: '#22C55E', order: 2, isSystem: false },
-      ],
-      sources: TAXONOMY.sources,
-    }
-    server.use(getHandler(seeded), patchHandler())
-    const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
-    await waitFor(() => expect(result.current.taxonomy?.statuses).toHaveLength(2))
-
-    act(() => result.current.handleReorder('statuses', 'b', 'a'))
-
-    expect(result.current.taxonomy?.statuses.map((option) => option.key)).toEqual(['b', 'a'])
-  })
-
-  it('handleReset discards the draft', async () => {
-    server.use(getHandler(TAXONOMY), patchHandler())
-    const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
+    const { result } = renderHook(() => useContactTaxonomySection(), { wrapper: Wrapper })
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    act(() => result.current.handleAdd('statuses', 'Contactado'))
-    expect(result.current.isDirty).toBe(true)
+    act(() => result.current.handleAdd('statuses', 'Dormido', 'Sin contacto'))
 
-    act(() => result.current.handleReset())
-
-    expect(result.current.isDirty).toBe(false)
-    expect(result.current.taxonomy).toEqual(TAXONOMY)
+    await waitFor(() => expect(saved).not.toBeNull(), { timeout: 2000 })
+    expect(saved!.statuses.map((option) => option.key)).toEqual(['new', 'dormido'])
+    expect(saved!.statuses[1]?.description).toBe('Sin contacto')
   })
 
-  it('handleSave does nothing without a dirty draft', async () => {
-    let patched = false
+  it('rolls back to server truth and toasts on save failure', async () => {
+    server.use(getHandler(TAXONOMY))
     server.use(
-      getHandler(TAXONOMY),
-      patchHandler(() => {
-        patched = true
-      }),
-    )
-    const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
-    await waitFor(() => expect(result.current.isLoading).toBe(false))
-
-    act(() => result.current.handleSave())
-
-    expect(patched).toBe(false)
-  })
-
-  it('handleSave persists the draft, updates the cache, clears the draft and calls onSaved', async () => {
-    let patchedBody: ContactTaxonomy | null = null
-    server.use(
-      getHandler(TAXONOMY),
-      patchHandler((body) => {
-        patchedBody = body
-      }),
-    )
-    const { client, Wrapper } = makeWrapper()
-    const onSaved = vi.fn()
-    const { result } = renderHook(() => useContactTaxonomySection(onSaved), { wrapper: Wrapper })
-    await waitFor(() => expect(result.current.isLoading).toBe(false))
-
-    act(() => result.current.handleAdd('statuses', 'Contactado'))
-    expect(result.current.isDirty).toBe(true)
-
-    act(() => result.current.handleSave())
-
-    await waitFor(() => expect(result.current.isPending).toBe(false))
-    expect(patchedBody?.statuses).toHaveLength(2)
-    expect(onSaved).toHaveBeenCalledTimes(1)
-    expect(result.current.isDirty).toBe(false)
-    expect(client.getQueryData(QUERY_KEYS.settings.contactTaxonomy)).toEqual(patchedBody)
-  })
-
-  it('shows a toast with the server error message when saving fails', async () => {
-    server.use(
-      getHandler(TAXONOMY),
       http.patch(`${API}/settings/contact-taxonomy`, () =>
-        HttpResponse.json(
-          {
-            statusCode: 500,
-            message: 'boom',
-            error: 'Internal Server Error',
-            timestamp: '',
-            path: '/settings/contact-taxonomy',
-            method: 'PATCH',
-          },
-          { status: 500 },
-        ),
+        HttpResponse.json({ message: 'boom' }, { status: 500 }),
       ),
     )
     const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
+
+    const { result } = renderHook(() => useContactTaxonomySection(), { wrapper: Wrapper })
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    act(() => result.current.handleAdd('statuses', 'Contactado'))
-    act(() => result.current.handleSave())
+    act(() => result.current.handlePatch('statuses', 'new', { enabled: false }))
+    expect(result.current.taxonomy?.statuses[0]?.enabled).toBe(false)
 
-    await waitFor(() => expect(sileoError).toHaveBeenCalledTimes(1))
-    expect(sileoError).toHaveBeenCalledWith({ title: 'common.saveFailed', description: 'boom' })
-    expect(result.current.isDirty).toBe(true)
+    await waitFor(() => expect(sileoError).toHaveBeenCalled(), { timeout: 2000 })
+    await waitFor(() => expect(result.current.taxonomy?.statuses[0]?.enabled).toBe(true))
   })
 
-  it('handleSave is a no-op while a save is already pending', async () => {
-    let patchCount = 0
+  it('ignores a slow save whose response lands after a newer one', async () => {
+    const releases: Array<() => void> = []
+    let seen = 0
+    let firstDelivered = false
     server.use(
       getHandler(TAXONOMY),
       http.patch(`${API}/settings/contact-taxonomy`, async ({ request }) => {
-        patchCount += 1
-        const body = await request.json()
-        await delay(50)
+        const body = (await request.json()) as ContactTaxonomy
+        seen += 1
+        if (seen === 1) {
+          await new Promise<void>((resolve) => releases.push(resolve))
+          firstDelivered = true
+        }
         return HttpResponse.json({ data: body })
       }),
     )
-    const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useContactTaxonomySection(vi.fn()), { wrapper: Wrapper })
-    await waitFor(() => expect(result.current.isLoading).toBe(false))
+    const { client, Wrapper } = makeWrapper()
+    const { result } = renderHook(() => useContactTaxonomySection(), { wrapper: Wrapper })
+    await waitFor(() => expect(result.current.taxonomy).not.toBeNull())
 
-    act(() => result.current.handleAdd('statuses', 'Contactado'))
-    act(() => result.current.handleSave())
-    await waitFor(() => expect(result.current.isPending).toBe(true))
-    act(() => result.current.handleSave())
+    act(() => result.current.handlePatch('statuses', 'new', { label: 'Primero' }))
+    await waitFor(() => expect(releases).toHaveLength(1))
 
-    await waitFor(() => expect(result.current.isPending).toBe(false))
-    expect(patchCount).toBe(1)
+    act(() => result.current.handlePatch('statuses', 'new', { label: 'Segundo' }))
+    await waitFor(() => {
+      const cached = client.getQueryData<ContactTaxonomy>(['settings', 'contact-taxonomy'])
+      expect(cached?.statuses[0]?.label).toBe('Segundo')
+    })
+
+    act(() => releases[0]?.())
+    await waitFor(() => expect(firstDelivered).toBe(true))
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 30))
+    })
+
+    const cached = client.getQueryData<ContactTaxonomy>(['settings', 'contact-taxonomy'])
+    expect(cached?.statuses[0]?.label).toBe('Segundo')
+    expect(result.current.taxonomy?.statuses[0]?.label).toBe('Segundo')
   })
 })

@@ -40,6 +40,8 @@ function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
     status: 'new',
     lifecycleStage: LifecycleStage.LEAD,
     source: 'manual',
+    type: null,
+    typeLabel: null,
     leadScore: 0,
     dataConsent: true,
     consentDate: null,

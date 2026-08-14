@@ -13,6 +13,7 @@ const pillButtonVariants = cva(
         secondary: 'bg-background text-foreground',
         tertiary: 'border border-foreground bg-card text-foreground',
         ghost: 'text-body hover:bg-muted',
+        ghostDanger: 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive',
         icon: 'rounded-full border border-border-strong bg-card text-body',
       },
       size: {
@@ -27,6 +28,7 @@ const pillButtonVariants = cva(
       { variant: 'icon', size: 'md', className: 'w-10.5 px-0' },
       { variant: 'icon', size: 'sm', className: 'w-9 px-0' },
       { variant: 'icon', size: 'xs', className: 'w-8 px-0' },
+      { variant: 'ghostDanger', size: 'xs', className: 'w-8 px-0' },
     ],
     defaultVariants: { variant: 'primary', size: 'lg' },
   },

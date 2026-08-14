@@ -32,8 +32,8 @@ export function ColorSwatchPicker({
           <ColorDot color={color} className="size-3.5" />
         </button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-auto p-2">
-        <div className="grid grid-cols-7 gap-1.5">
+      <PopoverContent align="start" className="w-auto rounded-xl p-3">
+        <div className="grid grid-cols-10 gap-2">
           {colors.map((swatch) => (
             <button
               key={swatch}
@@ -42,9 +42,9 @@ export function ColorSwatchPicker({
               aria-pressed={swatch === color}
               className={cn(
                 'size-6 rounded-full transition-transform hover:scale-110',
-                swatch === color && 'ring-2 ring-ring ring-offset-2 ring-offset-popover',
+                swatch === color && 'border-2 border-white shadow-lg dark:border-white/80',
               )}
-              style={{ backgroundColor: swatch }}
+              style={{ background: swatch }}
               onClick={() => {
                 onChange(swatch)
                 setOpen(false)

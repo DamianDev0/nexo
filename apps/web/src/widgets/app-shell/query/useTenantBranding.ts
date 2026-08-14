@@ -1,16 +1,16 @@
+'use client'
+
 import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
 
 import { useAuthStore } from '@/entities/session'
 import settingsService from '@/shared/api/services/settings.service'
-import { rememberTenantSlug, safeTenantSlug, tenantThemeHref } from '@/shared/config/tenant-cookie'
+import { safeTenantSlug, tenantThemeHref } from '@/shared/config/tenant-cookie'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 const BRANDING_STALE_MS = 5 * 60 * 1000
 
 export function useTenantBranding() {
-  const tenantSlug = useAuthStore((s) => s.tenantSlug)
-  const setTenantSlug = useAuthStore((s) => s.setTenantSlug)
+  const storedSlug = useAuthStore((state) => state.tenantSlug)
 
   const { data: general } = useQuery({
     queryKey: QUERY_KEYS.settings.general,
@@ -24,15 +24,7 @@ export function useTenantBranding() {
     staleTime: BRANDING_STALE_MS,
   })
 
-  useEffect(() => {
-    if (!tenantSlug && general?.slug) setTenantSlug(general.slug)
-  }, [tenantSlug, general?.slug, setTenantSlug])
-
-  const slug = safeTenantSlug(tenantSlug ?? general?.slug)
-
-  useEffect(() => {
-    if (slug) rememberTenantSlug(slug)
-  }, [slug])
+  const slug = safeTenantSlug(storedSlug ?? general?.slug)
 
   return {
     slug,

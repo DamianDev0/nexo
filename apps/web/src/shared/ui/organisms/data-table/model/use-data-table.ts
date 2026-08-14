@@ -14,6 +14,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { DEFAULT_PAGE_SIZE } from '@/shared/config/pagination'
 
+import type { RowData } from '@tanstack/react-table'
+
+declare module '@tanstack/react-table' {
+  // eslint-disable-next-line unused-imports/no-unused-vars -- module augmentation must repeat the upstream type parameters
+  interface ColumnMeta<TData extends RowData, TValue> {
+    grow?: boolean
+  }
+}
+
 const STORAGE_PREFIX = 'nexo.table.columnOrder.v1:'
 
 interface UseDataTableOptions<TData> {

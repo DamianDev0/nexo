@@ -1,3 +1,5 @@
-export { AddressField } from './ui/AddressField'
-export { MunicipalityCombobox } from './ui/MunicipalityCombobox'
-export { useMunicipalitySearch } from './query/useMunicipalitySearch'
+export { AddressFieldContainer as AddressField } from './ui/containers/AddressFieldContainer'
+export type { AddressPlace } from './ui/containers/AddressFieldContainer'
+export { MunicipalityComboboxContainer as MunicipalityCombobox } from './ui/containers/MunicipalityComboboxContainer'
+export { useMunicipalityFetcher } from './query/useMunicipalityFetcher'
+export { useResolveMunicipality } from './query/useResolveMunicipality'

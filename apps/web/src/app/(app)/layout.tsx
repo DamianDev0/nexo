@@ -7,7 +7,13 @@ import { prefetchAppShell } from '@/shared/query/prefetch-session'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
-import { AppSidebar, HeaderSearch, HeaderTitle, TenantThemeLoader } from '@/widgets/app-shell'
+import {
+  AppSidebar,
+  HeaderSearch,
+  HeaderSettingsLink,
+  HeaderTitle,
+  TenantThemeLoader,
+} from '@/widgets/app-shell'
 
 import { AppMotionProvider } from './AppMotionProvider'
 
@@ -37,6 +43,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
                 <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
                 <HeaderSearch />
                 <div className="flex-1" />
+                <HeaderSettingsLink />
                 <LanguageSwitcher />
                 <ThemeToggle />
               </header>

@@ -35,6 +35,7 @@ export function buildContactColumns(
       accessorFn: contactFullName,
       header: t('contacts.columns.name'),
       size: 250,
+      meta: { grow: true },
       cell: ({ row }) => (
         <span className="flex items-center gap-3">
           <AvatarSquircle

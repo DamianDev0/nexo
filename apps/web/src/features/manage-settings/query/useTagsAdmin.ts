@@ -1,22 +1,25 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
 import { sileo } from 'sileo'
 
 import tagsService from '@/shared/api/services/tags.service'
+import { COMPACT_PAGE_SIZE } from '@/shared/config/pagination'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
+import type { TagPatch } from '../model/types'
 import type { Tag } from '@repo/shared-types'
 
 const ENTITY = 'contact'
 
-export function useTagsAdmin() {
+export function useTagsAdmin(page: number) {
   const queryClient = useQueryClient()
 
   const { data, isPending } = useQuery({
-    queryKey: QUERY_KEYS.tags.byEntity(ENTITY),
-    queryFn: () => tagsService.list(ENTITY),
+    queryKey: QUERY_KEYS.tags.page(ENTITY, page),
+    queryFn: () => tagsService.list({ entityType: ENTITY, page, limit: COMPACT_PAGE_SIZE }),
+    placeholderData: keepPreviousData,
   })
 
   const invalidate = () => {
@@ -29,7 +32,7 @@ export function useTagsAdmin() {
   }
 
   const create = useMutation({
-    mutationFn: (input: { name: string; color: string }) =>
+    mutationFn: (input: { name: string; color: string; description?: string }) =>
       tagsService.create({ ...input, entityType: ENTITY }),
     onSuccess: () => {
       invalidate()
@@ -39,8 +42,13 @@ export function useTagsAdmin() {
   })
 
   const update = useMutation({
-    mutationFn: (input: { id: string; name?: string; color?: string }) =>
-      tagsService.update(input.id, { name: input.name, color: input.color }),
+    mutationFn: (input: TagPatch) =>
+      tagsService.update(input.id, {
+        name: input.name,
+        color: input.color,
+        description: input.description,
+        enabled: input.enabled,
+      }),
     onSuccess: () => {
       invalidate()
       sileo.success({ title: t('settings.saved') })
@@ -58,7 +66,8 @@ export function useTagsAdmin() {
   })
 
   return {
-    tags: data ?? [],
+    tags: data?.data ?? [],
+    total: data?.total ?? 0,
     isPending,
     create: create.mutate,
     update: update.mutate,

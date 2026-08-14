@@ -1,23 +1,24 @@
 'use client'
 
+import { useWatch } from 'react-hook-form'
+
 import { TypographySection } from '@/features/setup-workspace'
 
 import { useManageSettings } from '../../../model/settings-context'
 
 export function TypographyPane() {
-  const { appearance } = useManageSettings()
+  const { control, bindField } = useManageSettings().appearance
+  const fontFamily = useWatch({ control, name: 'fontFamily' })
+  const borderRadius = useWatch({ control, name: 'borderRadius' })
+  const density = useWatch({ control, name: 'density' })
 
   return (
     <TypographySection
-      data={{
-        fontFamily: appearance.fontFamily,
-        borderRadius: appearance.borderRadius,
-        density: appearance.density,
-      }}
+      data={{ fontFamily, borderRadius, density }}
       actions={{
-        onFontFamilyChange: appearance.setFontFamily,
-        onBorderRadiusChange: appearance.setBorderRadius,
-        onDensityChange: appearance.setDensity,
+        onFontFamilyChange: bindField('fontFamily'),
+        onBorderRadiusChange: bindField('borderRadius'),
+        onDensityChange: bindField('density'),
       }}
     />
   )

@@ -5,11 +5,12 @@ import { useForm } from 'react-hook-form'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { useFormFields } from '@/shared/lib/hooks/useFormFields'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { saveThemeAction } from '../api/setup-steps.actions'
 import { APPEARANCE_DEFAULT_VALUES as DEFAULT_VALUES } from '../config/appearance.constants'
-import { matchingPresetKey, withPreset } from '../lib/appearance'
+import { withPreset } from '../lib/appearance'
 import { derivePalette } from '../lib/palette'
 import { useStepHydration } from '../query/useStepHydration'
 import { useStepMutation } from '../query/useStepMutation'
@@ -20,25 +21,25 @@ import type {
   AppearanceFormValues,
   ColorOverrides,
   OverridableColorKey,
-  ThemeMode,
   ThemePreset,
 } from './types'
-import type { TenantTheme, ThemeConfig, ThemeTypography } from '@repo/shared-types'
+import type { TenantTheme, ThemeConfig } from '@repo/shared-types'
 
 export function useStepAppearance(onNext: () => void) {
   const queryClient = useQueryClient()
   const {
-    watch,
+    control,
     setValue,
     getValues,
     reset,
     formState: { isDirty },
   } = useForm<AppearanceFormValues>({ defaultValues: DEFAULT_VALUES })
-  const values = watch()
+  const { setField, bindField } = useFormFields(setValue)
 
   useStepHydration({
     queryKey: QUERY_KEYS.settings.theme,
     queryFn: settingsService.getTheme,
+    skip: isDirty,
     hydrate: useCallback(
       (theme: ThemeConfig) => {
         const { primary, primaryForeground: _pf, ...overrides } = theme.colors ?? {}
@@ -59,31 +60,22 @@ export function useStepAppearance(onNext: () => void) {
     ),
   })
 
-  const colors = useMemo(
-    () => derivePalette(values.primaryColor, values.colorOverrides),
-    [values.primaryColor, values.colorOverrides],
-  )
-
   const handlePrimaryChange = useCallback(
     (value: string) => {
-      setValue('primaryColor', value, { shouldDirty: true })
-      setValue('colorOverrides', {}, { shouldDirty: true })
+      setField('primaryColor', value)
+      setField('colorOverrides', {})
     },
-    [setValue],
+    [setField],
   )
 
   const handleColorOverride = useCallback(
     (key: OverridableColorKey, value: string) => {
-      setValue(
-        'colorOverrides',
-        { ...getValues('colorOverrides'), [key]: value },
-        { shouldDirty: true },
-      )
+      setField('colorOverrides', { ...getValues('colorOverrides'), [key]: value })
     },
-    [setValue, getValues],
+    [setField, getValues],
   )
 
-  const { handleLogoUpload, handleLogoRemove } = useLogoField({ setValue, getValues })
+  const { handleLogoUpload, handleLogoRemove } = useLogoField({ setField, getValues })
 
   const { handleSave, isPending } = useStepMutation({
     mutationFn: async () => {
@@ -110,6 +102,7 @@ export function useStepAppearance(onNext: () => void) {
     },
     onNext,
     onSuccess: () => {
+      reset(getValues(), { keepValues: true })
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.settings.theme })
     },
   })
@@ -117,17 +110,6 @@ export function useStepAppearance(onNext: () => void) {
   const handleApplyPreset = useCallback(
     (preset: ThemePreset) => reset(withPreset(getValues(), preset), { keepDefaultValues: true }),
     [getValues, reset],
-  )
-
-  const activePresetKey = useMemo(
-    () =>
-      matchingPresetKey({
-        primaryColor: values.primaryColor,
-        fontFamily: values.fontFamily,
-        borderRadius: values.borderRadius,
-        density: values.density,
-      }),
-    [values.primaryColor, values.fontFamily, values.borderRadius, values.density],
   )
 
   const handleRestoreTheme = useCallback(
@@ -150,37 +132,36 @@ export function useStepAppearance(onNext: () => void) {
     [getValues, reset],
   )
 
-  return {
-    primaryColor: values.primaryColor,
-    colors,
-    grainIntensity: values.grainIntensity,
-    setGrainIntensity: (v: number) => setValue('grainIntensity', v, { shouldDirty: true }),
-    darkMode: values.darkMode,
-    setDarkMode: (v: ThemeMode) => setValue('darkMode', v, { shouldDirty: true }),
-    fontFamily: values.fontFamily,
-    setFontFamily: (v: ThemeTypography['fontFamily']) =>
-      setValue('fontFamily', v, { shouldDirty: true }),
-    borderRadius: values.borderRadius,
-    setBorderRadius: (v: ThemeTypography['borderRadius']) =>
-      setValue('borderRadius', v, { shouldDirty: true }),
-    density: values.density,
-    setDensity: (v: ThemeTypography['density']) => setValue('density', v, { shouldDirty: true }),
-    productName: values.productName,
-    setProductName: (v: string) => setValue('productName', v, { shouldDirty: true }),
-    tagline: values.tagline,
-    setTagline: (v: string) => setValue('tagline', v, { shouldDirty: true }),
-    logoPreview: values.logoPreview,
-    logoFileName: values.logoFileName,
-    activePresetKey,
-    handleApplyPreset,
-    handlePrimaryChange,
-    handleColorOverride,
-    handleLogoUpload,
-    handleLogoRemove,
-    handleRestoreTheme,
-    handleSave,
-    handleReset: () => reset(),
-    isDirty,
-    isPending,
-  }
+  const handleReset = useCallback(() => reset(), [reset])
+
+  return useMemo(
+    () => ({
+      control,
+      bindField,
+      handlePrimaryChange,
+      handleColorOverride,
+      handleLogoUpload,
+      handleLogoRemove,
+      handleApplyPreset,
+      handleRestoreTheme,
+      handleSave,
+      handleReset,
+      isDirty,
+      isPending,
+    }),
+    [
+      control,
+      bindField,
+      handlePrimaryChange,
+      handleColorOverride,
+      handleLogoUpload,
+      handleLogoRemove,
+      handleApplyPreset,
+      handleRestoreTheme,
+      handleSave,
+      handleReset,
+      isDirty,
+      isPending,
+    ],
+  )
 }

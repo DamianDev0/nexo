@@ -10,7 +10,7 @@ export function ColorDot({ color, className }: Readonly<ColorDotProps>) {
     <span
       aria-hidden
       className={cn('size-2 shrink-0 rounded-full', className)}
-      style={{ backgroundColor: color }}
+      style={{ background: color }}
     />
   )
 }

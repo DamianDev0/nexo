@@ -48,14 +48,8 @@ describe('useSectionController', () => {
     expect(result.current).toBe(controllers.nomenclature)
   })
 
-  it('resolves the contacts controller outside the tags subpage', () => {
+  it('returns null for the contacts section — taxonomy autosaves without a SaveBar', () => {
     pathname = ROUTES.app.settings.contacts.status
-    const { result } = renderHook(() => useSectionController('contacts'))
-    expect(result.current).toBe(controllers.contacts)
-  })
-
-  it('returns null for the contacts section on the tags subpage', () => {
-    pathname = ROUTES.app.settings.contacts.tags
     const { result } = renderHook(() => useSectionController('contacts'))
     expect(result.current).toBeNull()
   })

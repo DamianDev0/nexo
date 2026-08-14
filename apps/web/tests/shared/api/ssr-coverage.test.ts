@@ -11,7 +11,11 @@ const PREFETCH_RE = /QUERY_KEYS\.([\w.]+?)(?:\(|,|\s|\))/g
 
 const CACHE_MUTATORS = /invalidateQueries|removeQueries|cancelQueries|refetchQueries|setQueryData/
 
-const SEARCH_AS_YOU_TYPE_KEYS = new Set(['geo.municipalities', 'geo.addresses'])
+const ON_DEMAND_ONLY_KEYS = new Set([
+  'geo.municipalities',
+  'geo.addresses',
+  'contacts.duplicateProbe',
+])
 
 function read(patterns: string[]): string {
   return globSync(patterns, { cwd: SRC, absolute: true })
@@ -39,7 +43,7 @@ describe('SSR coverage', () => {
     )
 
     const missing = [...consumed].filter(
-      (key) => !prefetched.has(key) && !SEARCH_AS_YOU_TYPE_KEYS.has(key),
+      (key) => !prefetched.has(key) && !ON_DEMAND_ONLY_KEYS.has(key),
     )
 
     expect(missing).toEqual([])

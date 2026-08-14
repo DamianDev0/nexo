@@ -1,3 +1,4 @@
+import { IndustrySector } from '@repo/shared-types'
 import { CURRENCY_OPTIONS, TIMEZONE_OPTIONS } from '@repo/shared-utils'
 
 import {
@@ -12,8 +13,8 @@ import {
   StorefrontIcon,
 } from '@/shared/ui/icons'
 
+import type { CompanyFormValues } from '../model/types'
 import type { AppIcon } from '@/shared/ui/icons'
-import type { IndustrySector } from '@repo/shared-types'
 
 export const REGIONAL_DEFAULTS = {
   timezoneDisplay: TIMEZONE_OPTIONS[0].label,
@@ -30,4 +31,10 @@ export const SECTOR_ICONS: Record<IndustrySector, AppIcon> = {
   tecnologia: CircuitryIcon,
   construccion: CraneTowerIcon,
   otros: ShapesIcon,
+}
+
+export const COMPANY_DEFAULT_VALUES: CompanyFormValues = {
+  phone: '',
+  website: '',
+  sector: IndustrySector.TECNOLOGIA,
 }

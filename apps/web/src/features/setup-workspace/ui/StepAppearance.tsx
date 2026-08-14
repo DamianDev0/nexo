@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { FileUpload } from '@/shared/ui/molecules/file-upload'
+import { PanelStack } from '@/shared/ui/molecules/panel-stack'
 import { Label } from '@/shared/ui/shadcn/label'
 
 import { useGoogleFont } from '../model/useGoogleFont'
@@ -50,7 +51,7 @@ export function StepAppearance({ data, actions, nav }: Readonly<StepAppearancePr
       aside={preview}
       asideProminent
     >
-      <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+      <PanelStack>
         <PresetsSection
           activePresetKey={data.activePresetKey}
           onApplyPreset={actions.onApplyPreset}
@@ -98,7 +99,7 @@ export function StepAppearance({ data, actions, nav }: Readonly<StepAppearancePr
         />
 
         <ModeSection darkMode={data.darkMode} onDarkModeChange={actions.onDarkModeChange} />
-      </div>
+      </PanelStack>
     </WizardStep>
   )
 }

@@ -1,6 +1,7 @@
 import { UserRole } from '@repo/shared-types'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
+import { useWatch } from 'react-hook-form'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { API, createMswServer } from '../../msw/test-server'
@@ -28,6 +29,15 @@ vi.mock('sileo', () => ({
   },
 }))
 
+function useTeamStep(onNext: () => void) {
+  const step = useStepTeam(onNext)
+  const values = useWatch({ control: step.control, name: 'invites' })
+  return {
+    ...step,
+    invites: step.fields.map((field, index) => ({ ...(values[index] ?? field), id: field.id })),
+  }
+}
+
 const server = createMswServer()
 
 beforeEach(() => {
@@ -37,14 +47,14 @@ beforeEach(() => {
 
 describe('useStepTeam', () => {
   it('starts with a single empty invite row', () => {
-    const { result } = renderHook(() => useStepTeam(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useTeamStep(vi.fn()), { wrapper })
 
     expect(result.current.invites).toHaveLength(1)
     expect(result.current.invites[0]).toMatchObject({ email: '', role: UserRole.SALES_REP })
   })
 
   it('adds a new empty row on handleAdd', () => {
-    const { result } = renderHook(() => useStepTeam(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useTeamStep(vi.fn()), { wrapper })
 
     act(() => result.current.handleAdd())
 
@@ -53,7 +63,7 @@ describe('useStepTeam', () => {
   })
 
   it('removes a row by id and ignores an unknown id', () => {
-    const { result } = renderHook(() => useStepTeam(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useTeamStep(vi.fn()), { wrapper })
     act(() => result.current.handleAdd())
     const secondId = result.current.invites[1]?.id
     if (!secondId) throw new Error('missing invite id')
@@ -66,7 +76,7 @@ describe('useStepTeam', () => {
   })
 
   it('removes the first row too, when its index is 0', () => {
-    const { result } = renderHook(() => useStepTeam(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useTeamStep(vi.fn()), { wrapper })
     act(() => result.current.handleAdd())
     const firstId = result.current.invites[0]?.id
     if (!firstId) throw new Error('missing invite id')
@@ -79,7 +89,7 @@ describe('useStepTeam', () => {
   })
 
   it('patches only the provided fields on a row and ignores an unknown id', () => {
-    const { result } = renderHook(() => useStepTeam(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useTeamStep(vi.fn()), { wrapper })
     const id = result.current.invites[0]?.id
     if (!id) throw new Error('missing invite id')
 
@@ -101,14 +111,17 @@ describe('useStepTeam', () => {
     expect(result.current.invites[0]?.email).toBe('ana@acme.co')
   })
 
-  it('regenerates the row id on every update, which would remount a row keyed by id', () => {
-    const { result } = renderHook(() => useStepTeam(vi.fn()), { wrapper })
+  it('keeps the row id stable across updates so a row keyed by id never remounts', () => {
+    const { result } = renderHook(() => useTeamStep(vi.fn()), { wrapper })
     const idBefore = result.current.invites[0]?.id
     if (!idBefore) throw new Error('missing invite id')
 
     act(() => result.current.handleUpdate(idBefore, { email: 'a@b.com' }))
+    expect(result.current.invites[0]?.id).toBe(idBefore)
 
-    expect(result.current.invites[0]?.id).not.toBe(idBefore)
+    act(() => result.current.handleUpdate(idBefore, { email: 'ab@b.com' }))
+    expect(result.current.invites[0]?.id).toBe(idBefore)
+    expect(result.current.invites[0]?.email).toBe('ab@b.com')
   })
 
   it('advances without calling the API when every row is blank', async () => {
@@ -120,7 +133,7 @@ describe('useStepTeam', () => {
       }),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepTeam(onNext), { wrapper })
+    const { result } = renderHook(() => useTeamStep(onNext), { wrapper })
 
     result.current.handleSave()
 
@@ -138,7 +151,7 @@ describe('useStepTeam', () => {
       }),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepTeam(onNext), { wrapper })
+    const { result } = renderHook(() => useTeamStep(onNext), { wrapper })
     const firstId = result.current.invites[0]?.id
     if (!firstId) throw new Error('missing invite id')
 
@@ -163,7 +176,7 @@ describe('useStepTeam', () => {
       }),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepTeam(onNext), { wrapper })
+    const { result } = renderHook(() => useTeamStep(onNext), { wrapper })
     const firstId = result.current.invites[0]?.id
     if (!firstId) throw new Error('missing invite id')
 
@@ -192,7 +205,7 @@ describe('useStepTeam', () => {
       ),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepTeam(onNext), { wrapper })
+    const { result } = renderHook(() => useTeamStep(onNext), { wrapper })
     const firstId = result.current.invites[0]?.id
     if (!firstId) throw new Error('missing invite id')
 

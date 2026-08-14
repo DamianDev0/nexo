@@ -1,12 +1,19 @@
-import { useSearchParams } from 'next/navigation'
+'use client'
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useContactList } from '@/entities/contact'
-import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from '@/shared/config/pagination'
+import { FIRST_PAGE } from '@/shared/config/pagination'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
 
-import { EMPTY_QUICK_FILTERS, type QuickFilterState } from '../config/quick-filters.constants'
-import { contactsQueryString, parseListParam } from '../lib/contact-lists'
+import {
+  contactsQueryString,
+  parseLimitParam,
+  parseListParam,
+  parsePageParam,
+  type ContactsUrlState,
+} from '../lib/contact-lists'
 import {
   clearQuickFilters,
   hasQuickFilters,
@@ -20,54 +27,69 @@ import type { ContactListItem } from '@repo/shared-types'
 const NO_ROWS: readonly ContactListItem[] = []
 
 export function useContactsTable() {
+  const router = useRouter()
+  const pathname = usePathname()
   const params = useSearchParams()
-  const [search, setSearch] = useState(() => params?.get('q') ?? '')
-  const [status, setStatus] = useState<string | null>(() =>
-    parseListParam(params?.get('list') ?? null),
-  )
-  const [filters, setFilters] = useState<QuickFilterState>(() =>
-    params ? parseQuickFilters((key) => params.get(key)) : EMPTY_QUICK_FILTERS,
-  )
-  const [page, setPage] = useState(FIRST_PAGE)
-  const [limit, setLimit] = useState(DEFAULT_PAGE_SIZE)
+
+  const urlSearch = params.get('q') ?? ''
+  const status = parseListParam(params.get('list'))
+  const page = parsePageParam(params.get('page'))
+  const limit = parseLimitParam(params.get('limit'))
+  const filters = useMemo(() => parseQuickFilters((key) => params.get(key)), [params])
+
+  const [search, setSearch] = useState(urlSearch)
+  const [syncedSearch, setSyncedSearch] = useState(urlSearch)
+
+  if (syncedSearch !== urlSearch) {
+    setSyncedSearch(urlSearch)
+    setSearch(urlSearch)
+  }
+
   const debouncedSearch = useDebouncedValue(search)
 
+  const commit = useCallback(
+    (next: Partial<ContactsUrlState>) => {
+      const state = { status, search: urlSearch, filters, page, limit, ...next }
+      router.replace(`${pathname}${contactsQueryString(state)}`, { scroll: false })
+    },
+    [router, pathname, status, urlSearch, filters, page, limit],
+  )
+
   useEffect(() => {
-    const query = contactsQueryString({ status, search: debouncedSearch, filters })
-    globalThis.history.replaceState(null, '', `${globalThis.location.pathname}${query}`)
-  }, [status, debouncedSearch, filters])
+    if (debouncedSearch.trim() === urlSearch.trim()) return
+    commit({ search: debouncedSearch, page: FIRST_PAGE })
+  }, [debouncedSearch, urlSearch, commit])
 
   const query = useMemo(
-    () => contactListQuery(debouncedSearch, status, filters, { page, limit }),
-    [debouncedSearch, status, filters, page, limit],
+    () => contactListQuery(urlSearch, status, filters, { page, limit }),
+    [urlSearch, status, filters, page, limit],
   )
 
   const { data, isPending, isFetching } = useContactList(query)
 
-  const handleSearch = useCallback((value: string) => {
-    setSearch(value)
-    setPage(FIRST_PAGE)
-  }, [])
+  const handleStatus = useCallback(
+    (value: string | null) => commit({ status: value, page: FIRST_PAGE }),
+    [commit],
+  )
 
-  const handleStatus = useCallback((value: string | null) => {
-    setStatus(value)
-    setPage(FIRST_PAGE)
-  }, [])
+  const handleToggleFilter = useCallback(
+    (filterId: string, value: string) =>
+      commit({ filters: toggleQuickFilter(filters, filterId, value), page: FIRST_PAGE }),
+    [commit, filters],
+  )
 
-  const handleToggleFilter = useCallback((filterId: string, value: string) => {
-    setFilters((current) => toggleQuickFilter(current, filterId, value))
-    setPage(FIRST_PAGE)
-  }, [])
+  const handleClearFilters = useCallback(
+    (filterId?: string) =>
+      commit({ filters: clearQuickFilters(filters, filterId), page: FIRST_PAGE }),
+    [commit, filters],
+  )
 
-  const handleClearFilters = useCallback((filterId?: string) => {
-    setFilters((current) => clearQuickFilters(current, filterId))
-    setPage(FIRST_PAGE)
-  }, [])
+  const handleLimit = useCallback(
+    (value: number) => commit({ limit: value, page: FIRST_PAGE }),
+    [commit],
+  )
 
-  const handleLimit = useCallback((value: number) => {
-    setLimit(value)
-    setPage(FIRST_PAGE)
-  }, [])
+  const handlePage = useCallback((value: number) => commit({ page: value }), [commit])
 
   const total = data?.total ?? 0
 
@@ -82,9 +104,9 @@ export function useContactsTable() {
     filters,
     isPending,
     isFetching,
-    isFiltered: Boolean(debouncedSearch.trim() || status) || hasQuickFilters(filters),
-    setPage,
-    handleSearch,
+    isFiltered: Boolean(urlSearch.trim() || status) || hasQuickFilters(filters),
+    handleSearch: setSearch,
+    handlePage,
     handleStatus,
     handleToggleFilter,
     handleClearFilters,

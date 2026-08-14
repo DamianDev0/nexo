@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
 import { useRouter } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
@@ -12,6 +12,8 @@ import { STEP_KEYS } from '../config/wizard.constants'
 
 const TOTAL_STEPS = STEP_KEYS.length
 
+const ONBOARDING_STALE_MS = 30 * 1000
+
 export function useOnboardingWizard() {
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -19,6 +21,7 @@ export function useOnboardingWizard() {
   const { data } = useQuery({
     queryKey: QUERY_KEYS.settings.onboarding,
     queryFn: () => settingsService.getOnboarding(),
+    staleTime: ONBOARDING_STALE_MS,
   })
 
   const currentStep = data?.step ?? 1
@@ -31,43 +34,46 @@ export function useOnboardingWizard() {
     onError: (err) => sileo.error({ title: t('common.saveFailed'), description: err.message }),
   })
 
-  const goToStep = useCallback(
-    (step: number) => {
-      persistStep(step)
+  const { mutate: finish } = useMutation({
+    mutationFn: () => settingsService.updateOnboarding({ step: TOTAL_STEPS, completed: true }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me })
+      sileo.success({
+        title: t('auth.toasts.setupComplete'),
+        description: t('auth.toasts.welcomeToNexo'),
+      })
+      router.push(ROUTES.app.dashboard)
     },
-    [persistStep],
+    onError: (err) => sileo.error({ title: t('common.saveFailed'), description: err.message }),
+  })
+
+  const goToStep = useCallback((step: number) => persistStep(step), [persistStep])
+
+  const nextStep = useCallback(
+    () => goToStep(Math.min(currentStep + 1, TOTAL_STEPS)),
+    [currentStep, goToStep],
   )
 
-  const nextStep = useCallback(() => {
-    goToStep(Math.min(currentStep + 1, TOTAL_STEPS))
-  }, [currentStep, goToStep])
+  const prevStep = useCallback(
+    () => goToStep(Math.max(currentStep - 1, 1)),
+    [currentStep, goToStep],
+  )
 
-  const prevStep = useCallback(() => {
-    goToStep(Math.max(currentStep - 1, 1))
-  }, [currentStep, goToStep])
+  const skipSetup = useCallback(() => goToStep(TOTAL_STEPS), [goToStep])
 
-  const skipSetup = useCallback(() => {
-    goToStep(TOTAL_STEPS)
-  }, [goToStep])
+  const completeOnboarding = useCallback(() => finish(), [finish])
 
-  const completeOnboarding = useCallback(async () => {
-    await settingsService.updateOnboarding({ step: TOTAL_STEPS, completed: true })
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me })
-    sileo.success({
-      title: t('auth.toasts.setupComplete'),
-      description: t('auth.toasts.welcomeToNexo'),
-    })
-    router.push(ROUTES.app.dashboard)
-  }, [queryClient, router])
-
-  return {
-    currentStep,
-    totalSteps: TOTAL_STEPS,
-    progressPercent: Math.round((currentStep / TOTAL_STEPS) * 100),
-    goToStep,
-    nextStep,
-    prevStep,
-    skipSetup,
-    completeOnboarding,
-  }
+  return useMemo(
+    () => ({
+      currentStep,
+      totalSteps: TOTAL_STEPS,
+      progressPercent: Math.round((currentStep / TOTAL_STEPS) * 100),
+      goToStep,
+      nextStep,
+      prevStep,
+      skipSetup,
+      completeOnboarding,
+    }),
+    [currentStep, goToStep, nextStep, prevStep, skipSetup, completeOnboarding],
+  )
 }

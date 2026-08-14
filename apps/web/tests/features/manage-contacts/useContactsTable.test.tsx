@@ -1,14 +1,17 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CONTACTS_FIXTURE } from '../../msw/handlers'
 import { API, createMswServer } from '../../msw/test-server'
+import { currentUrl, resetUrl } from '../../next-navigation-mock'
 import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import type { ApiSuccessResponse, PaginatedContacts } from '@repo/shared-types'
 
 import { useContactsTable } from '@/features/manage-contacts/model/useContactsTable'
+
+vi.mock('next/navigation', () => import('../../next-navigation-mock'))
 
 function contactsResponse(
   overrides: Partial<PaginatedContacts> = {},
@@ -31,6 +34,10 @@ function contactsResponse(
 
 const server = createMswServer()
 
+beforeEach(() => {
+  resetUrl()
+})
+
 describe('useContactsTable', () => {
   it('returns rows and total from the mocked response', async () => {
     server.use(http.get(`${API}/contacts`, () => HttpResponse.json(contactsResponse())))
@@ -41,18 +48,34 @@ describe('useContactsTable', () => {
     expect(result.current.total).toBe(2)
   })
 
-  it('resets the page to 1 when handleSearch is called', async () => {
+  it('reads the initial state from the URL instead of local state', async () => {
+    server.use(http.get(`${API}/contacts`, () => HttpResponse.json(contactsResponse())))
+
+    act(() => resetUrl())
+    const { result, rerender } = renderHook(() => useContactsTable(), { wrapper })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+
+    act(() => result.current.handleStatus('qualified'))
+    rerender()
+
+    expect(result.current.status).toBe('qualified')
+    expect(currentUrl()).toBe('list=qualified')
+  })
+
+  it('resets the page to 1 when the search commits', async () => {
     server.use(http.get(`${API}/contacts`, () => HttpResponse.json(contactsResponse())))
 
     const { result } = renderHook(() => useContactsTable(), { wrapper })
     await waitFor(() => expect(result.current.isPending).toBe(false))
 
-    act(() => result.current.setPage(3))
-    expect(result.current.page).toBe(3)
+    act(() => result.current.handlePage(3))
+    await waitFor(() => expect(result.current.page).toBe(3))
 
     act(() => result.current.handleSearch('maria'))
-    expect(result.current.page).toBe(1)
     expect(result.current.search).toBe('maria')
+
+    await waitFor(() => expect(result.current.page).toBe(1))
+    expect(currentUrl()).toBe('q=maria')
   })
 
   it('resets the page to 1 when handleStatus is called', async () => {
@@ -61,11 +84,12 @@ describe('useContactsTable', () => {
     const { result } = renderHook(() => useContactsTable(), { wrapper })
     await waitFor(() => expect(result.current.isPending).toBe(false))
 
-    act(() => result.current.setPage(2))
-    expect(result.current.page).toBe(2)
+    act(() => result.current.handlePage(2))
+    await waitFor(() => expect(result.current.page).toBe(2))
 
     act(() => result.current.handleStatus('qualified'))
-    expect(result.current.page).toBe(1)
+
+    await waitFor(() => expect(result.current.page).toBe(1))
     expect(result.current.status).toBe('qualified')
   })
 
@@ -85,7 +109,8 @@ describe('useContactsTable', () => {
     expect(urls.at(-1)?.searchParams.get('limit')).toBe('25')
     expect(result.current.totalPages).toBe(3)
 
-    act(() => result.current.setPage(2))
+    act(() => result.current.handlePage(2))
+    await waitFor(() => expect(result.current.page).toBe(2))
     act(() => result.current.handleLimit(50))
 
     await waitFor(() => expect(urls.at(-1)?.searchParams.get('limit')).toBe('50'))
@@ -93,7 +118,7 @@ describe('useContactsTable', () => {
     expect(result.current.totalPages).toBe(2)
   })
 
-  it('mirrors status and filters into the browser URL', async () => {
+  it('mirrors status and filters into the URL through the router', async () => {
     server.use(http.get(`${API}/contacts`, () => HttpResponse.json(contactsResponse())))
 
     const { result } = renderHook(() => useContactsTable(), { wrapper })
@@ -101,16 +126,31 @@ describe('useContactsTable', () => {
     expect(result.current.isFiltered).toBe(false)
 
     act(() => result.current.handleStatus('qualified'))
-    await waitFor(() => expect(globalThis.location.search).toBe('?list=qualified'))
+    await waitFor(() => expect(currentUrl()).toBe('list=qualified'))
     expect(result.current.isFiltered).toBe(true)
 
     act(() => result.current.handleToggleFilter('source', 'whatsapp'))
-    await waitFor(() => expect(globalThis.location.search).toBe('?list=qualified&source=whatsapp'))
+    await waitFor(() => expect(currentUrl()).toBe('list=qualified&source=whatsapp'))
 
     act(() => result.current.handleClearFilters())
+    await waitFor(() => expect(currentUrl()).toBe('list=qualified'))
+
     act(() => result.current.handleStatus(null))
-    await waitFor(() => expect(globalThis.location.search).toBe(''))
+    await waitFor(() => expect(currentUrl()).toBe(''))
     expect(result.current.isFiltered).toBe(false)
+  })
+
+  it('keeps the page out of the URL while it sits on the first page', async () => {
+    server.use(http.get(`${API}/contacts`, () => HttpResponse.json(contactsResponse())))
+
+    const { result } = renderHook(() => useContactsTable(), { wrapper })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+
+    act(() => result.current.handlePage(2))
+    await waitFor(() => expect(currentUrl()).toBe('page=2'))
+
+    act(() => result.current.handlePage(1))
+    await waitFor(() => expect(currentUrl()).toBe(''))
   })
 
   it('debounces the search value before it reaches the query', async () => {
@@ -126,7 +166,7 @@ describe('useContactsTable', () => {
     await waitFor(() => expect(result.current.isPending).toBe(false))
 
     act(() => result.current.handleSearch('carlos'))
-    expect(receivedQueries.every((q) => q !== 'carlos')).toBe(true)
+    expect(receivedQueries.every((query) => query !== 'carlos')).toBe(true)
 
     await waitFor(() => expect(receivedQueries).toContain('carlos'))
   })

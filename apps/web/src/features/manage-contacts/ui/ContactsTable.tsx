@@ -1,7 +1,9 @@
 'use client'
 
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
+import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
@@ -15,6 +17,7 @@ type ContactsTableProps = Readonly<Pick<ContactsBoard, 'instance' | 'lists' | 's
 
 export function ContactsTable({ instance, lists, state, actions }: ContactsTableProps) {
   const { t } = useTranslation()
+  const pageTransition = useReducedTransition(quickEase)
 
   return (
     <DataTable instance={instance} className="flex flex-1 flex-col rounded-none bg-transparent">
@@ -70,8 +73,17 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
       )}
       {!state.isPending && !state.isEmpty && (
         <>
-          <DataTable.Header />
-          <DataTable.Body />
+          <DataTable.Scroller>
+            <DataTable.Header />
+            <motion.div
+              key={state.page}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: state.isFetching ? 0.55 : 1, y: 0 }}
+              transition={pageTransition}
+            >
+              <DataTable.Body />
+            </motion.div>
+          </DataTable.Scroller>
           <ContactsPagination
             nav={{ page: state.page, totalPages: state.totalPages, limit: state.limit }}
             onPageChange={actions.onPageChange}

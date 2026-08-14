@@ -5,6 +5,7 @@ import { DataTableBulkAction, DataTableBulkBar } from './ui/bulk-bar'
 import { DataTableHeader } from './ui/header'
 import { DataTableQuickFilters } from './ui/quick-filters'
 import { DataTableRoot } from './ui/root'
+import { DataTableScroller } from './ui/scroller'
 import { selectionColumn } from './ui/selection'
 import { DataTableSkeleton } from './ui/skeleton'
 import { DataTableSmartLists } from './ui/smart-lists'
@@ -31,6 +32,7 @@ export const DataTable = Object.assign(DataTableRoot, {
   BulkAction: DataTableBulkAction,
   Header: DataTableHeader,
   Body: DataTableBody,
+  Scroller: DataTableScroller,
   Skeleton: DataTableSkeleton,
   RowTitle: DataTableRowTitle,
   Pagination: PaginationCapsule,

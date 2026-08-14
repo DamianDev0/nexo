@@ -1,8 +1,9 @@
 import { IndustrySector } from '@repo/shared-types'
-import { STAGE_COLOR_OPTIONS } from '@repo/shared-utils'
+import { TAXONOMY_COLOR_PALETTE } from '@repo/shared-types'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
+import { useWatch } from 'react-hook-form'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { API, createMswServer } from '../../msw/test-server'
@@ -46,6 +47,52 @@ beforeEach(() => {
   sileoSuccess.mockClear()
 })
 
+function useCompanyStep(onNext: () => void) {
+  const step = useStepCompany(onNext)
+  const [phone, website, sector] = useWatch({
+    control: step.control,
+    name: ['phone', 'website', 'sector'],
+  })
+  return {
+    ...step,
+    phone,
+    website,
+    sector,
+    setPhone: (value: string) => step.bindField('phone')(value),
+    setWebsite: (value: string) => step.bindField('website')(value),
+    setSector: (value: IndustrySector) => step.bindField('sector')(value),
+  }
+}
+
+function usePipelineStep(onNext: () => void) {
+  const step = useStepPipeline(onNext)
+  const [pipelineName, values] = useWatch({
+    control: step.control,
+    name: ['pipelineName', 'stages'],
+  })
+  return {
+    ...step,
+    pipelineName,
+    stages: step.fields.map((field, index) => ({ ...(values[index] ?? field), id: field.id })),
+    setPipelineName: (value: string) => step.bindField('pipelineName')(value),
+  }
+}
+
+function useNomenclatureStep(onNext: () => void) {
+  const step = useStepNomenclature(onNext)
+  const [contact, company, deal, activity] = useWatch({
+    control: step.control,
+    name: ['contact', 'company', 'deal', 'activity'],
+  })
+  return { ...step, nomen: { contact, company, deal, activity } }
+}
+
+function useNavigationStep(onNext: () => void) {
+  const step = useStepNavigation(onNext)
+  const modules = useWatch({ control: step.control, name: 'modules' })
+  return { ...step, modules }
+}
+
 const server = createMswServer()
 
 describe('useStepCompany hydration', () => {
@@ -62,7 +109,7 @@ describe('useStepCompany hydration', () => {
       ),
     )
 
-    const { result } = renderHook(() => useStepCompany(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.phone).toBe('3001234567'))
     expect(result.current.website).toBe('https://acme.co')
@@ -76,7 +123,7 @@ describe('useStepCompany hydration', () => {
       ),
     )
 
-    const { result } = renderHook(() => useStepCompany(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.sector).toBe(IndustrySector.TECNOLOGIA))
     expect(result.current.phone).toBe('')
@@ -113,7 +160,7 @@ describe('useStepPipeline hydration', () => {
   it('loads the default pipeline sorted by stage position', async () => {
     server.use(http.get(`${API}/settings/pipelines`, () => HttpResponse.json({ data: [EXISTING] })))
 
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.pipelineName).toBe('Ventas Bogotá'))
     expect(result.current.stages.map((s) => s.name)).toEqual(['Prospecto', 'Cierre'])
@@ -125,7 +172,7 @@ describe('useStepPipeline hydration', () => {
       http.get(`${API}/settings/pipelines`, () => HttpResponse.json({ data: [NO_DEFAULT] })),
     )
 
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.pipelineName).toBe('Ventas Bogotá'))
     expect(result.current.stages.map((s) => s.name)).toEqual(['Prospecto', 'Cierre'])
@@ -139,7 +186,7 @@ describe('useStepPipeline hydration', () => {
       ),
     )
 
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.pipelineName).toBe('Ventas Bogotá'))
   })
@@ -155,7 +202,7 @@ describe('useStepPipeline hydration', () => {
       }),
     )
 
-    const { result } = renderHook(() => useStepPipeline(onNext), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.pipelineName).toBe('Ventas Bogotá'))
 
     result.current.handleSave()
@@ -175,7 +222,7 @@ describe('useStepPipeline hydration', () => {
       }),
     )
 
-    const { result } = renderHook(() => useStepPipeline(onNext), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     result.current.handleSave()
@@ -195,7 +242,7 @@ describe('useStepNomenclature hydration', () => {
       ),
     )
 
-    const { result } = renderHook(() => useStepNomenclature(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNomenclatureStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.nomen.contact.singular).toBe('Paciente'))
     expect(result.current.nomen.deal.singular).toBe('Deal')
@@ -233,7 +280,7 @@ describe('useStepNavigation hydration', () => {
       ),
     )
 
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.modules).toHaveLength(2))
     expect(result.current.modules.map((m) => m.key)).toEqual(['dashboard', 'deals'])
@@ -244,7 +291,7 @@ describe('useStepNavigation hydration', () => {
       http.get(`${API}/settings/navigation`, () => HttpResponse.json({ data: { modules: [] } })),
     )
 
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(2))
   })
@@ -265,7 +312,7 @@ describe('useStepCompany', () => {
 
   it('starts each field at the module default before hydration resolves', () => {
     server.use(hydratedGeneral())
-    const { result } = renderHook(() => useStepCompany(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(vi.fn()), { wrapper })
 
     expect(result.current.phone).toBe('')
     expect(result.current.website).toBe('')
@@ -274,7 +321,7 @@ describe('useStepCompany', () => {
 
   it('marks the form dirty when a setter runs and clears it on reset', async () => {
     server.use(hydratedGeneral())
-    const { result } = renderHook(() => useStepCompany(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.phone).toBe('3001234567'))
     expect(result.current.isDirty).toBe(false)
 
@@ -296,7 +343,7 @@ describe('useStepCompany', () => {
 
   it('setWebsite alone marks the form dirty', async () => {
     server.use(hydratedGeneral())
-    const { result } = renderHook(() => useStepCompany(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.phone).toBe('3001234567'))
     expect(result.current.isDirty).toBe(false)
 
@@ -307,7 +354,7 @@ describe('useStepCompany', () => {
 
   it('setSector alone marks the form dirty', async () => {
     server.use(hydratedGeneral())
-    const { result } = renderHook(() => useStepCompany(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.phone).toBe('3001234567'))
     expect(result.current.isDirty).toBe(false)
 
@@ -326,7 +373,7 @@ describe('useStepCompany', () => {
       }),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepCompany(onNext), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.phone).toBe('3001234567'))
 
     act(() => result.current.setPhone('3009999999'))
@@ -356,7 +403,7 @@ describe('useStepCompany', () => {
       ),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepCompany(onNext), { wrapper })
+    const { result } = renderHook(() => useCompanyStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.phone).toBe('3001234567'))
 
     result.current.handleSave()
@@ -375,7 +422,7 @@ describe('useStepNavigation actions', () => {
 
   it('toggles a non-required module and leaves required modules untouched', async () => {
     server.use(emptyNavigation())
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     const contactsBefore = result.current.modules.find((m) => m.key === 'contacts')
@@ -395,7 +442,7 @@ describe('useStepNavigation actions', () => {
 
   it('ignores toggling an unknown module key', async () => {
     server.use(emptyNavigation())
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     const before = result.current.modules.map((m) => m.enabled)
@@ -405,7 +452,7 @@ describe('useStepNavigation actions', () => {
 
   it('reorders two modules within the same group', async () => {
     server.use(emptyNavigation())
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     const order = result.current.modules.map((m) => m.key)
@@ -421,7 +468,7 @@ describe('useStepNavigation actions', () => {
 
   it('refuses to reorder across different module groups', async () => {
     server.use(emptyNavigation())
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     const before = result.current.modules.map((m) => m.key)
@@ -431,7 +478,7 @@ describe('useStepNavigation actions', () => {
 
   it('is a no-op when reordering a module onto itself or an unknown key', async () => {
     server.use(emptyNavigation())
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     const before = result.current.modules.map((m) => m.key)
@@ -447,7 +494,7 @@ describe('useStepNavigation actions', () => {
 
   it('toggles the freshly-reordered module and not a stale index', async () => {
     server.use(emptyNavigation())
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     act(() => result.current.handleReorder('companies', 'contacts'))
@@ -462,7 +509,7 @@ describe('useStepNavigation actions', () => {
 
   it('reverts every module back to the hydrated baseline on handleReset', async () => {
     server.use(emptyNavigation())
-    const { result } = renderHook(() => useStepNavigation(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     act(() => result.current.handleToggle('contacts'))
@@ -493,7 +540,7 @@ describe('useStepNavigation actions', () => {
       ),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepNavigation(onNext), { wrapper })
+    const { result } = renderHook(() => useNavigationStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     act(() => result.current.handleToggle('contacts'))
@@ -517,7 +564,7 @@ describe('useStepNavigation actions', () => {
     const invalidateSpy = vi.spyOn(client, 'invalidateQueries')
     const onNext = vi.fn()
 
-    const { result } = renderHook(() => useStepNavigation(onNext), { wrapper: Wrapper })
+    const { result } = renderHook(() => useNavigationStep(onNext), { wrapper: Wrapper })
     await waitFor(() => expect(result.current.modules.length).toBeGreaterThan(0))
 
     act(() => result.current.handleReorder('companies', 'contacts'))
@@ -542,7 +589,7 @@ describe('useStepNomenclature actions', () => {
 
   it('starts from the localized defaults before hydration resolves', () => {
     server.use(hydratedNomenclature())
-    const { result } = renderHook(() => useStepNomenclature(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNomenclatureStep(vi.fn()), { wrapper })
 
     expect(result.current.nomen.contact.singular).toBe('Contact')
     expect(result.current.nomen.deal.singular).toBe('Deal')
@@ -550,7 +597,7 @@ describe('useStepNomenclature actions', () => {
 
   it('updates a single term field and marks the form dirty', async () => {
     server.use(hydratedNomenclature())
-    const { result } = renderHook(() => useStepNomenclature(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNomenclatureStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.nomen.contact.singular).toBe('Paciente'))
     expect(result.current.isDirty).toBe(false)
 
@@ -562,7 +609,7 @@ describe('useStepNomenclature actions', () => {
 
   it('applies a known preset and ignores an unknown preset key', async () => {
     server.use(hydratedNomenclature())
-    const { result } = renderHook(() => useStepNomenclature(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNomenclatureStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.nomen.contact.singular).toBe('Paciente'))
     expect(result.current.isDirty).toBe(false)
 
@@ -577,7 +624,7 @@ describe('useStepNomenclature actions', () => {
 
   it('reverts every term back to the hydrated baseline on handleReset', async () => {
     server.use(hydratedNomenclature())
-    const { result } = renderHook(() => useStepNomenclature(vi.fn()), { wrapper })
+    const { result } = renderHook(() => useNomenclatureStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.nomen.contact.singular).toBe('Paciente'))
 
     act(() => result.current.handleUpdate('company', 'singular', 'Clínica'))
@@ -607,7 +654,7 @@ describe('useStepNomenclature actions', () => {
       ),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepNomenclature(onNext), { wrapper })
+    const { result } = renderHook(() => useNomenclatureStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.nomen.contact.singular).toBe('Paciente'))
 
     result.current.handleSave()
@@ -629,7 +676,7 @@ describe('useStepNomenclature actions', () => {
     const invalidateSpy = vi.spyOn(client, 'invalidateQueries')
     const onNext = vi.fn()
 
-    const { result } = renderHook(() => useStepNomenclature(onNext), { wrapper: Wrapper })
+    const { result } = renderHook(() => useNomenclatureStep(onNext), { wrapper: Wrapper })
     await waitFor(() => expect(result.current.nomen.contact.singular).toBe('Paciente'))
 
     act(() => result.current.handleUpdate('company', 'plural', 'Cuentas'))
@@ -649,7 +696,7 @@ describe('useStepPipeline actions', () => {
 
   it('adds a new stage with the default shape', async () => {
     server.use(emptyPipelines())
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     const before = result.current.stages.length
@@ -659,14 +706,14 @@ describe('useStepPipeline actions', () => {
     const added = result.current.stages.at(-1)
     expect(added).toMatchObject({
       name: 'New Stage',
-      color: STAGE_COLOR_OPTIONS[9],
+      color: TAXONOMY_COLOR_PALETTE[9],
       probability: 50,
     })
   })
 
   it('removes a stage by id and ignores an unknown id', async () => {
     server.use(emptyPipelines())
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     const before = result.current.stages.length
@@ -681,7 +728,7 @@ describe('useStepPipeline actions', () => {
 
   it('patches only the provided stage fields', async () => {
     server.use(emptyPipelines())
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     const stage = result.current.stages[0]
@@ -721,7 +768,7 @@ describe('useStepPipeline actions', () => {
         }),
       )
       const onNext = vi.fn()
-      const { result } = renderHook(() => useStepPipeline(onNext), { wrapper })
+      const { result } = renderHook(() => usePipelineStep(onNext), { wrapper })
       await waitFor(() => expect(result.current.pipelineName).toBe('Ventas Bogotá'))
 
       const stage = result.current.stages[0]
@@ -737,7 +784,7 @@ describe('useStepPipeline actions', () => {
 
   it('updates the correct stage by id after the fields array has been reordered', async () => {
     server.use(emptyPipelines())
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     const [first, second] = result.current.stages
@@ -756,7 +803,7 @@ describe('useStepPipeline actions', () => {
 
   it('reorders stages by id and ignores an unknown id', async () => {
     server.use(emptyPipelines())
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     const [first, second] = result.current.stages
@@ -778,7 +825,7 @@ describe('useStepPipeline actions', () => {
 
   it('moves the stage that starts at index 0', async () => {
     server.use(emptyPipelines())
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     const [first, second] = result.current.stages
@@ -792,7 +839,7 @@ describe('useStepPipeline actions', () => {
 
   it('renames the pipeline through setPipelineName', async () => {
     server.use(emptyPipelines())
-    const { result } = renderHook(() => useStepPipeline(vi.fn()), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(vi.fn()), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     act(() => result.current.setPipelineName('Pipeline Bogotá'))
@@ -817,7 +864,7 @@ describe('useStepPipeline actions', () => {
       ),
     )
     const onNext = vi.fn()
-    const { result } = renderHook(() => useStepPipeline(onNext), { wrapper })
+    const { result } = renderHook(() => usePipelineStep(onNext), { wrapper })
     await waitFor(() => expect(result.current.stages.length).toBeGreaterThan(0))
 
     result.current.handleSave()
