@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 
 import { cn } from '@/shared/lib'
 import { DotsSixVerticalIcon } from '@/shared/ui/icons'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
 import type { SmartListItem } from './smart-lists'
 
@@ -123,20 +123,26 @@ export function SmartListTab({
         </span>
       )}
       {item.description ? (
-        <Tooltip delayDuration={500}>
-          <TooltipTrigger asChild>{trigger}</TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-44 px-2.5 py-1.5">
-            <p className="flex items-center justify-between gap-3 text-xs font-medium">
-              {item.label}
-              {hotkey !== undefined && (
-                <kbd className="rounded-sm bg-background/20 px-1 font-sans text-[10px] tabular-nums">
-                  {hotkey}
-                </kbd>
-              )}
-            </p>
-            <p className="text-xs leading-snug opacity-70">{item.description}</p>
-          </TooltipContent>
-        </Tooltip>
+        <HintTooltip
+          asChild
+          side="bottom"
+          delayDuration={500}
+          hint={
+            <>
+              <span className="flex items-center justify-between gap-3 font-medium">
+                {item.label}
+                {hotkey !== undefined && (
+                  <kbd className="rounded-sm bg-background/20 px-1 font-sans text-[10px] tabular-nums">
+                    {hotkey}
+                  </kbd>
+                )}
+              </span>
+              <span className="mt-0.5 block leading-snug opacity-70">{item.description}</span>
+            </>
+          }
+        >
+          {trigger}
+        </HintTooltip>
       ) : (
         trigger
       )}

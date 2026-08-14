@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { DotsSixVerticalIcon, LockIcon } from '@/shared/ui/icons'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Switch } from '@/shared/ui/shadcn/switch'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
 import { SIDEBAR_ICON_MAP } from '../../config/module-icons.constants'
 
@@ -53,17 +53,14 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
       {...handle?.attributes}
       {...handle?.listeners}
     >
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span
-            className="flex size-6 shrink-0 items-center justify-center text-muted-foreground/50 transition-colors group-hover:text-muted-foreground"
-            aria-label={t(`${s}.dragToReorder`)}
-          >
-            <DotsSixVerticalIcon className="size-4" />
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="top">{t(`${s}.dragToReorder`)}</TooltipContent>
-      </Tooltip>
+      <HintTooltip asChild hint={t(`${s}.dragToReorder`)}>
+        <span
+          className="flex size-6 shrink-0 items-center justify-center text-muted-foreground/50 transition-colors group-hover:text-muted-foreground"
+          aria-label={t(`${s}.dragToReorder`)}
+        >
+          <DotsSixVerticalIcon className="size-4" />
+        </span>
+      </HintTooltip>
 
       <div
         className={cn(

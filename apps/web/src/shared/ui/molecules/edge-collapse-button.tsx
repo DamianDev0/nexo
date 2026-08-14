@@ -2,8 +2,8 @@
 
 import { cn } from '@/shared/lib/cn'
 import { CaretLeftIcon, CaretRightIcon } from '@/shared/ui/icons'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
 interface EdgeCollapseButtonProps {
   readonly onClick: () => void
@@ -25,25 +25,22 @@ export function EdgeCollapseButton({
   const Icon = expanded ? collapseIcon : expandIcon
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={onClick}
-          aria-label={label}
-          aria-expanded={expanded}
-          className={cn(
-            'absolute top-1/2 z-20 size-6 -translate-y-1/2 rounded-full border-border bg-card p-0 text-muted-foreground shadow-xs transition-colors hover:bg-card hover:text-foreground hover:shadow-sm',
-            edge === 'left' ? '-left-3' : '-right-3',
-            className,
-          )}
-        >
-          <Icon className="size-3" />
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side={edge}>{label}</TooltipContent>
-    </Tooltip>
+    <HintTooltip asChild hint={label}>
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        onClick={onClick}
+        aria-label={label}
+        aria-expanded={expanded}
+        className={cn(
+          'absolute top-1/2 z-20 size-6 -translate-y-1/2 rounded-full border-border bg-card p-0 text-muted-foreground shadow-xs transition-colors hover:bg-card hover:text-foreground hover:shadow-sm',
+          edge === 'left' ? '-left-3' : '-right-3',
+          className,
+        )}
+      >
+        <Icon className="size-3" />
+      </Button>
+    </HintTooltip>
   )
 }

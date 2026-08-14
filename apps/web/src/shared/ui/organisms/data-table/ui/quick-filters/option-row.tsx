@@ -2,7 +2,7 @@
 
 import { CheckIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
 import type { QuickFilterOption } from './types'
 
@@ -33,11 +33,8 @@ export function OptionRow({ option, checked, onToggle }: Readonly<OptionRowProps
   if (!option.hint) return row
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>{row}</TooltipTrigger>
-      <TooltipContent side="right" className="max-w-56">
-        {option.hint}
-      </TooltipContent>
-    </Tooltip>
+    <HintTooltip asChild hint={option.hint} side="right">
+      {row}
+    </HintTooltip>
   )
 }

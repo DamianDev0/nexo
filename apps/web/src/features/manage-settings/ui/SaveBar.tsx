@@ -4,14 +4,10 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { SubmitButton } from '@/shared/ui/molecules/submit-button'
 import { Button } from '@/shared/ui/shadcn/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/shared/ui/shadcn/tooltip'
+import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 interface SaveBarProps {
   readonly onSave: () => void
@@ -57,10 +53,9 @@ export function SaveBar({ onSave, onReset, isDirty, isPending }: Readonly<SaveBa
           saveButton
         ) : (
           <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>{saveButton}</TooltipTrigger>
-              <TooltipContent side="top">{t('settings.noChangesHint')}</TooltipContent>
-            </Tooltip>
+            <HintTooltip asChild hint={t('settings.noChangesHint')}>
+              {saveButton}
+            </HintTooltip>
           </TooltipProvider>
         )}
       </div>

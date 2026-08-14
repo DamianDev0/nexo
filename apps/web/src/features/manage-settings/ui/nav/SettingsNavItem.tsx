@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { expandCollapse, smoothEase, useReducedTransition } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
 import { SettingsNavRow } from './SettingsNavRow'
 
@@ -26,20 +26,17 @@ export function SettingsNavItem({ section, pathname, isActive }: Readonly<Settin
   if (!available) {
     return (
       <li>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span
-              className={cn(
-                'flex items-center gap-2.5 px-2.5 py-1.5 text-sm',
-                'cursor-not-allowed text-muted-foreground/50',
-              )}
-            >
-              <Icon className="size-4 shrink-0 text-muted-foreground/50" />
-              {label}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side="right">{t('settings.comingSoon')}</TooltipContent>
-        </Tooltip>
+        <HintTooltip asChild hint={t('settings.comingSoon')} side="right">
+          <span
+            className={cn(
+              'flex items-center gap-2.5 px-2.5 py-1.5 text-sm',
+              'cursor-not-allowed text-muted-foreground/50',
+            )}
+          >
+            <Icon className="size-4 shrink-0 text-muted-foreground/50" />
+            {label}
+          </span>
+        </HintTooltip>
       </li>
     )
   }

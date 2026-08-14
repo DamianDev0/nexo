@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/shared/lib'
 import { DotsSixVerticalIcon, XIcon } from '@/shared/ui/icons'
 import { ColorSwatchPicker } from '@/shared/ui/molecules/color-swatch-picker'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
 import { Slider } from '@/shared/ui/shadcn/slider'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
@@ -45,22 +45,19 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
         ghost && 'scale-[1.02] shadow-xl ring-1 ring-primary/40',
       )}
     >
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-6 shrink-0 cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
-            aria-label={t(`${s}.dragToReorder`)}
-            {...handle?.attributes}
-            {...handle?.listeners}
-          >
-            <DotsSixVerticalIcon className="size-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="top">{t(`${s}.dragToReorder`)}</TooltipContent>
-      </Tooltip>
+      <HintTooltip asChild hint={t(`${s}.dragToReorder`)}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-6 shrink-0 cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
+          aria-label={t(`${s}.dragToReorder`)}
+          {...handle?.attributes}
+          {...handle?.listeners}
+        >
+          <DotsSixVerticalIcon className="size-4" />
+        </Button>
+      </HintTooltip>
 
       <ColorSwatchPicker
         color={stage.color}
@@ -76,40 +73,34 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
         onChange={(e) => actions.onUpdate(stage.id, { name: e.target.value })}
       />
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center gap-2.5">
-            <Slider
-              min={0}
-              max={100}
-              step={5}
-              value={[stage.probability]}
-              onValueChange={([v]) => actions.onUpdate(stage.id, { probability: v })}
-              className="w-24 **:data-[slot=slider-thumb]:cursor-grab **:data-[slot=slider-thumb]:active:cursor-grabbing"
-            />
-            <span className="w-9 text-right text-xs font-bold tabular-nums text-primary-deep dark:text-primary">
-              {stage.probability}%
-            </span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="top">{t(`${s}.closeProbability`)}</TooltipContent>
-      </Tooltip>
+      <HintTooltip asChild hint={t(`${s}.closeProbability`)}>
+        <div className="flex items-center gap-2.5">
+          <Slider
+            min={0}
+            max={100}
+            step={5}
+            value={[stage.probability]}
+            onValueChange={([v]) => actions.onUpdate(stage.id, { probability: v })}
+            className="w-24 **:data-[slot=slider-thumb]:cursor-grab **:data-[slot=slider-thumb]:active:cursor-grabbing"
+          />
+          <span className="w-9 text-right text-xs font-bold tabular-nums text-primary-deep dark:text-primary">
+            {stage.probability}%
+          </span>
+        </div>
+      </HintTooltip>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => actions.onRemove(stage.id)}
-            aria-label={t(`${s}.removeStage`)}
-            className="size-6 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-          >
-            <XIcon className="size-3.5" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="top">{t(`${s}.removeStage`)}</TooltipContent>
-      </Tooltip>
+      <HintTooltip asChild hint={t(`${s}.removeStage`)}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => actions.onRemove(stage.id)}
+          aria-label={t(`${s}.removeStage`)}
+          className="size-6 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+        >
+          <XIcon className="size-3.5" />
+        </Button>
+      </HintTooltip>
     </div>
   )
 }
