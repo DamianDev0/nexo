@@ -53,6 +53,12 @@ export const staggerChild: Variants = {
   animate: { opacity: 1, y: 0 },
 }
 
+export const collapseHorizontal: Variants = {
+  initial: { width: 0, opacity: 0 },
+  animate: { width: 'auto', opacity: 1 },
+  exit: { width: 0, opacity: 0 },
+}
+
 export const expandCollapse: Variants = {
   initial: { height: 0, opacity: 0 },
   animate: { height: 'auto', opacity: 1 },

@@ -3,12 +3,14 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { motion } from 'motion/react'
+import { memo } from 'react'
 
 import { cn } from '@/shared/lib'
 import { DotsSixVerticalIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
-import type { SmartListItem } from './smart-lists'
+import type { SmartListItem } from '../model/smart-list.types'
+import type { KeyboardEvent } from 'react'
 
 export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
   return (
@@ -29,20 +31,25 @@ export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
   )
 }
 
+interface SmartListTabActions {
+  readonly onSelect: (id: string) => void
+  readonly onKeyDown: (event: KeyboardEvent<HTMLElement>) => void
+}
+
 interface SmartListTabProps {
   readonly item: SmartListItem
   readonly active: boolean
   readonly sortable: boolean
   readonly hotkey?: number
-  readonly onSelect: (id: string) => void
+  readonly actions: SmartListTabActions
 }
 
-export function SmartListTab({
+function SmartListTabBase({
   item,
   active,
   sortable,
   hotkey,
-  onSelect,
+  actions,
 }: Readonly<SmartListTabProps>) {
   const {
     attributes,
@@ -57,12 +64,14 @@ export function SmartListTab({
   const trigger = (
     <button
       type="button"
-      aria-current={active || undefined}
-      onClick={() => onSelect(item.id)}
+      role="tab"
+      aria-selected={active}
+      tabIndex={active ? 0 : -1}
+      onClick={() => actions.onSelect(item.id)}
+      onKeyDown={actions.onKeyDown}
       className={cn(
-        'relative inline-flex h-14 items-center gap-2 whitespace-nowrap px-4 text-sm outline-none transition-[padding] duration-200 ease-out focus-visible:ring-2 focus-visible:ring-ring/50',
-        sortable && 'group-hover:pl-7 group-hover:pr-5',
-        sortable && isDragging && 'pl-7 pr-5',
+        'relative inline-flex h-14 items-center gap-2 whitespace-nowrap px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        sortable && 'pl-7 pr-5',
         active
           ? 'font-semibold text-foreground'
           : 'font-normal text-muted-foreground hover:text-body',
@@ -100,9 +109,12 @@ export function SmartListTab({
     <span
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
+      data-tab-id={item.id}
+      data-pinned={item.pinned === true}
       className={cn(
         'group relative inline-flex shrink-0 items-center',
         'before:absolute before:left-0 before:top-1/2 before:h-5 before:w-px before:-translate-y-1/2 before:bg-border first:before:hidden',
+        item.pinned && 'sticky left-0 z-20 bg-card',
         isDragging && 'opacity-30',
       )}
     >
@@ -149,3 +161,5 @@ export function SmartListTab({
     </span>
   )
 }
+
+export const SmartListTab = memo(SmartListTabBase)

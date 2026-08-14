@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
@@ -18,9 +19,13 @@ type ContactsTableProps = Readonly<Pick<ContactsBoard, 'instance' | 'lists' | 's
 export function ContactsTable({ instance, lists, state, actions }: ContactsTableProps) {
   const { t } = useTranslation()
   const pageTransition = useReducedTransition(quickEase)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   return (
-    <DataTable instance={instance} className="flex flex-1 flex-col rounded-none bg-transparent">
+    <DataTable
+      instance={instance}
+      className="flex min-w-0 flex-1 flex-col rounded-none bg-transparent"
+    >
       <DataTable.SmartLists
         data={lists}
         onSelect={actions.onSelectList}
@@ -43,9 +48,6 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
           placeholder={t('contacts.searchPlaceholder')}
           onChange={actions.onSearch}
         />
-        <span className="ml-auto text-sm tabular-nums text-muted-foreground">
-          {t('contacts.count', { count: state.total })}
-        </span>
       </DataTable.Toolbar>
       {state.selectedCount > 0 && (
         <DataTable.BulkBar label={t('contacts.bulk.selected', { count: state.selectedCount })}>
@@ -73,7 +75,7 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
       )}
       {!state.isPending && !state.isEmpty && (
         <>
-          <DataTable.Scroller>
+          <DataTable.Scroller ref={scrollRef} hideScrollbar className="min-h-0 flex-1">
             <DataTable.Header />
             <motion.div
               key={state.page}
@@ -86,6 +88,7 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
           </DataTable.Scroller>
           <ContactsPagination
             nav={{ page: state.page, totalPages: state.totalPages, limit: state.limit }}
+            scrollTarget={scrollRef}
             onPageChange={actions.onPageChange}
             onLimitChange={actions.onLimitChange}
           />

@@ -33,7 +33,7 @@ export function DataTableBulkAction({
       type="button"
       onClick={onClick}
       className={cn(
-        'flex h-8.5 cursor-pointer items-center rounded-full bg-card px-4 text-[13px] font-bold',
+        'flex h-8.5 cursor-pointer items-center rounded-full bg-card px-4 text-sm font-bold',
         destructive ? 'text-negative-text' : 'text-foreground',
       )}
     >

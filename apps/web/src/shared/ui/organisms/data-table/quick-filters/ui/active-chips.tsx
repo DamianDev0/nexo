@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { XIcon } from '@/shared/ui/icons'
 
-import type { QuickFilterDef } from './types'
+import type { QuickFilterDef } from '../model/types'
 
 interface ActiveChip {
   readonly filterId: string

@@ -3,6 +3,8 @@
 import { cn } from '@/shared/lib'
 import { MagnifyingGlassIcon, SlidersHorizontalIcon, XIcon } from '@/shared/ui/icons'
 
+import { DATA_TABLE_GUTTER } from '../config/table.constants'
+
 import type { ReactNode } from 'react'
 
 export function DataTableToolbar({
@@ -12,7 +14,7 @@ export function DataTableToolbar({
   return (
     <div
       data-slot="table-toolbar"
-      className={cn('flex items-center gap-2.5 px-4 pb-4 pt-4.5', className)}
+      className={cn('flex items-center gap-2 py-3', DATA_TABLE_GUTTER, className)}
     >
       {children}
     </div>
@@ -35,17 +37,17 @@ export function DataTableSearch({
   return (
     <label
       className={cn(
-        'flex h-10.5 max-w-80 flex-1 items-center gap-2 rounded-full bg-muted px-4 focus-within:ring-2 focus-within:ring-ring/50',
+        'flex h-9 max-w-72 flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/25',
         className,
       )}
     >
-      <MagnifyingGlassIcon className="size-4 shrink-0 text-faint" />
+      <MagnifyingGlassIcon className="size-3.5 shrink-0 text-muted-foreground" />
       <input
         type="search"
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
+        className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
       />
     </label>
   )
@@ -61,7 +63,7 @@ interface FilterPillProps {
 export function DataTableFilter({ label, active, onClick, onClear }: Readonly<FilterPillProps>) {
   if (active) {
     return (
-      <span className="inline-flex h-10.5 items-center gap-2 rounded-full bg-sidebar py-0 pl-4.5 pr-2 text-[15px] font-bold text-sidebar-foreground">
+      <span className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-sidebar py-0 pl-3 pr-1.5 text-sm font-semibold text-sidebar-foreground">
         <button type="button" onClick={onClick} className="cursor-pointer">
           {label}
         </button>
@@ -70,7 +72,7 @@ export function DataTableFilter({ label, active, onClick, onClear }: Readonly<Fi
             type="button"
             aria-label={`Clear ${label} filter`}
             onClick={onClear}
-            className="inline-flex size-6.5 cursor-pointer items-center justify-center rounded-full bg-sidebar-foreground/15"
+            className="inline-flex size-5.5 cursor-pointer items-center justify-center rounded-md bg-sidebar-foreground/15"
           >
             <XIcon className="size-3" />
           </button>
@@ -82,7 +84,7 @@ export function DataTableFilter({ label, active, onClick, onClear }: Readonly<Fi
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex h-10.5 cursor-pointer items-center gap-1.5 rounded-full border border-border-strong px-4.5 text-[15px] font-medium text-body hover:border-foreground"
+      className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 text-sm font-medium text-body transition-colors hover:border-border-strong hover:bg-muted"
     >
       {label}
     </button>
@@ -97,9 +99,9 @@ export function DataTableEditColumns({
     <button
       type="button"
       onClick={onClick}
-      className="ml-auto inline-flex h-10.5 cursor-pointer items-center gap-2 rounded-full border border-border-strong px-4.5 text-[15px] font-medium text-body hover:border-foreground"
+      className="ml-auto inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 text-sm font-medium text-body transition-colors hover:border-border-strong hover:bg-muted"
     >
-      <SlidersHorizontalIcon className="size-4" />
+      <SlidersHorizontalIcon className="size-3.5" />
       {label}
     </button>
   )

@@ -21,6 +21,18 @@ const es = {
     and: 'y',
     saveFailed: 'Error al guardar',
     toggleTheme: 'Cambiar tema',
+    table: {
+      selectAll: 'Seleccionar todas las filas',
+      selectRow: 'Seleccionar fila',
+    },
+    pagination: {
+      pages: 'Paginación',
+      prev: 'Página anterior',
+      next: 'Página siguiente',
+      perPage: 'Filas por página',
+      scroll: 'Desplazar columnas',
+      collapse: 'Contraer paginación',
+    },
     moreOptions: 'Más opciones',
     filters: {
       removeOne: 'Quitar {{value}}',
@@ -366,6 +378,13 @@ const es = {
       status: 'Estado',
       phone: 'Teléfono',
       city: 'Ciudad',
+      jobTitle: 'Cargo',
+      lifecycleStage: 'Etapa',
+      source: 'Fuente',
+      type: 'Tipo',
+      tags: 'Etiquetas',
+      leadScore: 'Puntaje',
+      lastContacted: 'Último contacto',
       created: 'Creado',
     },
     status: {
@@ -482,12 +501,6 @@ const es = {
       createAnyway: 'Crear de todas formas',
       saveAnyway: 'Guardar de todas formas',
       dismiss: 'Descartar',
-    },
-    pagination: {
-      pages: 'Paginación',
-      prev: 'Página anterior',
-      next: 'Página siguiente',
-      perPage: 'Filas por página',
     },
   },
   settings: {
@@ -624,6 +637,15 @@ const es = {
   },
   language: {
     switch: 'Cambiar idioma',
+  },
+  notifications: {
+    title: 'Notificaciones',
+    empty: 'Sin notificaciones',
+    swipeHint: 'desliza para descartar',
+    markAllRead: 'Marcar todas como leídas',
+  },
+  quickCreate: {
+    label: 'Crear',
   },
   entities: {
     contact: { singular: 'Contacto', plural: 'Contactos' },

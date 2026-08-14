@@ -4,7 +4,12 @@ import { Checkbox } from '../../../shadcn/checkbox'
 
 import type { ColumnDef } from '@tanstack/react-table'
 
-export function selectionColumn<TData>(): ColumnDef<TData, unknown> {
+export interface SelectionLabels {
+  readonly all: string
+  readonly row: string
+}
+
+export function selectionColumn<TData>(labels: SelectionLabels): ColumnDef<TData, unknown> {
   return {
     id: 'select',
     size: 40,
@@ -13,14 +18,14 @@ export function selectionColumn<TData>(): ColumnDef<TData, unknown> {
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(value === true)}
-        aria-label="Select all rows"
+        aria-label={labels.all}
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(value === true)}
-        aria-label="Select row"
+        aria-label={labels.row}
       />
     ),
   }

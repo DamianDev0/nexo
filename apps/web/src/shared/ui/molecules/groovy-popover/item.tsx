@@ -17,17 +17,28 @@ interface GroovyItemContent {
 interface GroovyItemProps {
   readonly content: GroovyItemContent
   readonly active?: boolean
+  readonly disabled?: boolean
   readonly onSelect?: () => void
 }
 
-export function GroovyItem({ content, active = false, onSelect }: Readonly<GroovyItemProps>) {
+export function GroovyItem({
+  content,
+  active = false,
+  disabled = false,
+  onSelect,
+}: Readonly<GroovyItemProps>) {
   const { label, icon: Icon, shortcut, trailing } = content
   return (
     <button
       type="button"
       role="menuitem"
+      disabled={disabled}
       onClick={onSelect}
-      className={cn(GROOVY_ITEM, active ? GROOVY_ITEM_ACTIVE : GROOVY_ITEM_IDLE)}
+      className={cn(
+        GROOVY_ITEM,
+        active ? GROOVY_ITEM_ACTIVE : GROOVY_ITEM_IDLE,
+        disabled && 'pointer-events-none text-disabled-fg',
+      )}
     >
       {Icon && (
         <span

@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { AvatarSquircle } from '../../atoms/avatar-squircle'
-import { BadgeSoft } from '../../atoms/badge-soft'
+import { AvatarSquircle } from '../../../atoms/avatar-squircle'
+import { BadgeSoft } from '../../../atoms/badge-soft'
+import { DataTable, selectionColumn, useDataTable } from '../index'
 
 import {
   CONTACT_ROWS,
@@ -15,13 +16,11 @@ import {
   type ContactRow,
 } from './data-table.fixtures'
 
-import { DataTable, selectionColumn, useDataTable } from './index'
-
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import type { ColumnDef } from '@tanstack/react-table'
 
 const COLUMNS: ReadonlyArray<ColumnDef<ContactRow, unknown>> = [
-  selectionColumn<ContactRow>(),
+  selectionColumn<ContactRow>({ all: 'Select all rows', row: 'Select row' }),
   {
     id: 'name',
     accessorKey: 'name',
@@ -88,25 +87,19 @@ function ContactsTable({ rows }: Readonly<{ rows: ReadonlyArray<ContactRow> }>) 
       <DataTable.Header />
       <DataTable.Body />
       <div className="flex justify-center py-5">
-        <DataTable.Pagination>
+        <DataTable.Pagination label="Pagination" collapseLabel="Collapse pagination">
           <DataTable.Pagination.Nav
             page={pageIndex + 1}
             totalPages={instance.table.getPageCount()}
             onPageChange={(page) => instance.table.setPageIndex(page - 1)}
+            labels={{ prev: 'Previous page', next: 'Next page' }}
           />
           <DataTable.Pagination.Divider />
           <DataTable.Pagination.PageSize
             value={pageSize}
             options={[10, 25, 50]}
             onChange={instance.table.setPageSize}
-          />
-          <DataTable.Pagination.Divider />
-          <DataTable.Pagination.Progress
-            value={((pageIndex + 1) / Math.max(1, instance.table.getPageCount())) * 100}
-          />
-          <DataTable.Pagination.Divider />
-          <DataTable.Pagination.JumpEnd
-            onClick={() => instance.table.setPageIndex(instance.table.getPageCount() - 1)}
+            label="Rows per page"
           />
         </DataTable.Pagination>
       </div>

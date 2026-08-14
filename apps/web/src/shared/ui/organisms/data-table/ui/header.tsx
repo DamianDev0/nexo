@@ -16,12 +16,17 @@ import { useId } from 'react'
 import { cn } from '@/shared/lib'
 import { ArrowDownIcon, ArrowUpIcon, CaretUpDownIcon } from '@/shared/ui/icons'
 
-import { useDataTableContext } from './context'
+import { DATA_TABLE_GUTTER } from '../config/table.constants'
+import { useDataTableContext } from '../model/context'
+
+import { cellAlignment } from './cell-align'
 
 function SortIndicator({ direction }: Readonly<{ direction: false | 'asc' | 'desc' }>) {
-  if (direction === 'asc') return <ArrowUpIcon className="size-3.5 shrink-0" />
-  if (direction === 'desc') return <ArrowDownIcon className="size-3.5 shrink-0" />
-  return <CaretUpDownIcon className="size-3.5 shrink-0 opacity-40" />
+  if (direction === 'asc') return <ArrowUpIcon className="size-3 shrink-0 text-foreground" />
+  if (direction === 'desc') return <ArrowDownIcon className="size-3 shrink-0 text-foreground" />
+  return (
+    <CaretUpDownIcon className="size-3 shrink-0 opacity-40 transition-opacity group-hover/th:opacity-100" />
+  )
 }
 
 function HeaderCell({ header }: Readonly<{ header: Header<unknown, unknown> }>) {
@@ -30,6 +35,8 @@ function HeaderCell({ header }: Readonly<{ header: Header<unknown, unknown> }>) 
     id: header.column.id,
     disabled: !sortable,
   })
+
+  const label = flexRender(header.column.columnDef.header, header.getContext())
 
   return (
     <div
@@ -40,25 +47,25 @@ function HeaderCell({ header }: Readonly<{ header: Header<unknown, unknown> }>) 
         transform: CSS.Translate.toString(transform),
         transition,
       }}
-      className={cn('flex min-w-0 shrink-0 items-center px-1.5', isDragging && 'z-10 opacity-60')}
+      className={cn(
+        'group/th flex min-w-0 shrink-0 items-center px-2',
+        cellAlignment(header.column.columnDef),
+        isDragging && 'z-10 opacity-60',
+      )}
     >
       {sortable ? (
         <button
           type="button"
           onClick={header.column.getToggleSortingHandler()}
-          className="flex min-w-0 cursor-pointer items-center gap-1.5 rounded-md px-1 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-faint hover:bg-muted hover:text-body"
+          className="-mx-1.5 flex min-w-0 cursor-pointer items-center gap-1 rounded-md px-1.5 py-1 text-sm font-semibold text-body transition-colors hover:bg-muted hover:text-foreground"
           {...attributes}
           {...listeners}
         >
-          <span className="truncate">
-            {flexRender(header.column.columnDef.header, header.getContext())}
-          </span>
+          <span className="truncate">{label}</span>
           <SortIndicator direction={header.column.getIsSorted()} />
         </button>
       ) : (
-        <span className="flex min-w-0 items-center truncate px-1 py-1">
-          {flexRender(header.column.columnDef.header, header.getContext())}
-        </span>
+        <span className="min-w-0 truncate py-1 text-sm font-semibold text-body">{label}</span>
       )}
     </div>
   )
@@ -90,7 +97,11 @@ export function DataTableHeader({ className }: Readonly<{ className?: string }>)
       >
         <div
           data-slot="table-header"
-          className={cn('flex h-11 items-center gap-2 border-b border-border px-4', className)}
+          className={cn(
+            'flex h-9 items-center gap-2 border-y border-border bg-muted/35',
+            DATA_TABLE_GUTTER,
+            className,
+          )}
         >
           {headerGroup.headers.map((header) => (
             <HeaderCell key={header.id} header={header} />

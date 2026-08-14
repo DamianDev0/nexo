@@ -4,7 +4,7 @@ import { CheckIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
-import type { QuickFilterOption } from './types'
+import type { QuickFilterOption } from '../model/types'
 
 interface OptionRowProps {
   readonly option: QuickFilterOption

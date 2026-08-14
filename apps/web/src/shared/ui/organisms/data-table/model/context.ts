@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react'
 
-import type { DataTableInstance } from '../model/use-data-table'
+import type { DataTableInstance } from './use-data-table'
 
 const DataTableContext = createContext<DataTableInstance<unknown> | null>(null)
 

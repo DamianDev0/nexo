@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useSmartListHotkeys } from '@/shared/ui/organisms/data-table/model/use-smart-list-hotkeys'
+import { useSmartListHotkeys } from '@/shared/ui/organisms/data-table/smart-list/model/use-smart-list-hotkeys'
 
 function press(key: string, target?: HTMLElement) {
   const event = new KeyboardEvent('keydown', { key, bubbles: true })

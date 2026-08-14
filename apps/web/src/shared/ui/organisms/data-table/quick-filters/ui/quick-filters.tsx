@@ -1,11 +1,14 @@
 'use client'
 
+import { cn } from '@/shared/lib'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
+
+import { DATA_TABLE_GUTTER } from '../../config/table.constants'
 
 import { ActiveChips } from './active-chips'
 import { QuickFilter } from './quick-filter'
 
-import type { QuickFilterDef } from './types'
+import type { QuickFilterDef } from '../model/types'
 
 interface QuickFiltersProps {
   readonly filters: ReadonlyArray<QuickFilterDef>
@@ -13,14 +16,12 @@ interface QuickFiltersProps {
   readonly onClear: (filterId?: string) => void
 }
 
-export type { QuickFilterDef, QuickFilterOption } from './types'
-
 export function DataTableQuickFilters({ filters, onToggle, onClear }: Readonly<QuickFiltersProps>) {
   return (
     <TooltipProvider delayDuration={400}>
       <div
         data-slot="table-quick-filters"
-        className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border px-4 py-2"
+        className={cn('flex flex-wrap items-center gap-x-4 gap-y-2 py-2', DATA_TABLE_GUTTER)}
       >
         <ActiveChips filters={filters} onRemove={onToggle} onClearAll={() => onClear()} />
 

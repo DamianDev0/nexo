@@ -1,7 +1,6 @@
 'use client'
 
 import { AnimatePresence, motion } from 'motion/react'
-import { Popover as PopoverPrimitive } from 'radix-ui'
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 
 import {
@@ -14,7 +13,7 @@ import {
 import { cn } from '@/shared/lib/cn'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
-import { GROOVY_ARROW, GROOVY_ARROW_SIZE, GROOVY_SIDE_OFFSET, GROOVY_SURFACE } from './constants'
+import { GROOVY_SIDE_OFFSET, GROOVY_SURFACE } from './constants'
 import { GroovyItem } from './item'
 
 import type { ComponentProps, ReactNode } from 'react'
@@ -98,13 +97,6 @@ function GroovyPopoverContent({
             transition={transition}
           >
             {children}
-            {!subtle && (
-              <PopoverPrimitive.Arrow
-                className={GROOVY_ARROW}
-                width={GROOVY_ARROW_SIZE.width}
-                height={GROOVY_ARROW_SIZE.height}
-              />
-            )}
           </motion.div>
         </PopoverContent>
       )}

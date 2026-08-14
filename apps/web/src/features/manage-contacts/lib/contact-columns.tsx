@@ -1,105 +1,149 @@
 import { formatDateCO } from '@repo/shared-utils'
 
-import { contactAvatarTone, contactFullName, contactInitials } from '@/entities/contact'
-import { AvatarSquircle } from '@/shared/ui/atoms/avatar-squircle'
+import { contactFullName } from '@/entities/contact'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
-import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { DotsThreeIcon } from '@/shared/ui/icons'
 import { DataTable, selectionColumn } from '@/shared/ui/organisms/data-table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/shadcn/dropdown-menu'
+
+import { ContactNameCell, ContactRowActions, ContactTagsCell } from './contact-cells'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { TFunction } from 'i18next'
 
+type ContactColumn = ColumnDef<ContactListItem, unknown>
+
 interface ContactRowHandlers {
   onEdit: (contact: ContactListItem) => void
   onArchive: (contact: ContactListItem) => void
 }
 
+interface ContactTaxonomyMaps {
+  readonly statusByKey: ReadonlyMap<string, TaxonomyChoice>
+  readonly sourceByKey: ReadonlyMap<string, TaxonomyChoice>
+  readonly typeByKey: ReadonlyMap<string, TaxonomyChoice>
+}
+
+interface TextColumnOptions {
+  readonly size: number
+  readonly muted?: boolean
+  readonly numeric?: boolean
+  readonly align?: 'start' | 'center' | 'end'
+  readonly value?: (contact: ContactListItem) => string | number | null
+}
+
+function labelFor(map: ReadonlyMap<string, TaxonomyChoice>, key: string | null): string | null {
+  if (!key) return null
+  return map.get(key)?.label ?? key
+}
+
+function textColumn(
+  id: string,
+  header: string,
+  { size, muted, numeric, align, value }: TextColumnOptions,
+): ContactColumn {
+  const read = value ?? ((contact: ContactListItem) => Reflect.get(contact, id) as string | null)
+
+  return {
+    id,
+    accessorFn: read,
+    header,
+    size,
+    meta: { align },
+    cell: ({ row }) => (
+      <DataTable.CellText muted={muted} numeric={numeric}>
+        {read(row.original)}
+      </DataTable.CellText>
+    ),
+  }
+}
+
 export function buildContactColumns(
   t: TFunction,
   handlers: ContactRowHandlers,
-  statusByKey: ReadonlyMap<string, TaxonomyChoice>,
-): ReadonlyArray<ColumnDef<ContactListItem, unknown>> {
+  taxonomy: ContactTaxonomyMaps,
+): ReadonlyArray<ContactColumn> {
   return [
-    selectionColumn<ContactListItem>(),
+    selectionColumn<ContactListItem>({
+      all: t('common.table.selectAll'),
+      row: t('common.table.selectRow'),
+    }),
     {
       id: 'name',
       accessorFn: contactFullName,
       header: t('contacts.columns.name'),
-      size: 250,
+      size: 240,
       meta: { grow: true },
-      cell: ({ row }) => (
-        <span className="flex items-center gap-3">
-          <AvatarSquircle
-            initials={contactInitials(row.original)}
-            tone={contactAvatarTone(row.original.id)}
-          />
-          <DataTable.RowTitle
-            title={contactFullName(row.original)}
-            subtitle={row.original.email ?? '—'}
-          />
-        </span>
-      ),
+      cell: ({ row }) => <ContactNameCell contact={row.original} />,
     },
+    textColumn('jobTitle', t('contacts.columns.jobTitle'), { size: 150 }),
     {
       id: 'status',
       accessorKey: 'status',
       header: t('contacts.columns.status'),
       size: 140,
       cell: ({ row }) => {
-        const choice = statusByKey.get(row.original.status)
+        const choice = taxonomy.statusByKey.get(row.original.status)
         return <BadgeSoft color={choice?.color}>{choice?.label ?? row.original.status}</BadgeSoft>
       },
     },
-    {
-      id: 'phone',
-      accessorFn: (row) => row.phone ?? row.whatsapp ?? '—',
-      header: t('contacts.columns.phone'),
-      size: 150,
-    },
-    {
-      id: 'city',
-      accessorFn: (row) => row.city ?? '—',
-      header: t('contacts.columns.city'),
+    textColumn('lifecycleStage', t('contacts.columns.lifecycleStage'), {
+      size: 130,
+      value: (contact) =>
+        t(`contacts.lifecycleStage.${contact.lifecycleStage}`, {
+          defaultValue: contact.lifecycleStage,
+        }),
+    }),
+    textColumn('source', t('contacts.columns.source'), {
+      size: 130,
+      muted: true,
+      value: (contact) => labelFor(taxonomy.sourceByKey, contact.source),
+    }),
+    textColumn('type', t('contacts.columns.type'), {
       size: 120,
-    },
+      muted: true,
+      value: (contact) => contact.typeLabel ?? labelFor(taxonomy.typeByKey, contact.type),
+    }),
+    textColumn('phone', t('contacts.columns.phone'), {
+      size: 140,
+      numeric: true,
+      value: (contact) => contact.phone ?? contact.whatsapp,
+    }),
+    textColumn('city', t('contacts.columns.city'), { size: 120, muted: true }),
     {
-      id: 'createdAt',
-      accessorFn: (row) => formatDateCO(row.createdAt),
-      header: t('contacts.columns.created'),
-      size: 110,
+      id: 'tags',
+      accessorFn: (row) => row.tags.join(', '),
+      header: t('contacts.columns.tags'),
+      size: 160,
+      enableSorting: false,
+      cell: ({ row }) => <ContactTagsCell tags={row.original.tags} />,
     },
+    textColumn('leadScore', t('contacts.columns.leadScore'), {
+      size: 90,
+      numeric: true,
+      align: 'end',
+    }),
+    textColumn('lastContactedAt', t('contacts.columns.lastContacted'), {
+      size: 130,
+      numeric: true,
+      value: (contact) => (contact.lastContactedAt ? formatDateCO(contact.lastContactedAt) : null),
+    }),
+    textColumn('createdAt', t('contacts.columns.created'), {
+      size: 120,
+      numeric: true,
+      value: (contact) => formatDateCO(contact.createdAt),
+    }),
     {
       id: 'actions',
-      size: 48,
+      size: 56,
       enableSorting: false,
+      meta: { align: 'end' },
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <PillButton variant="ghost" size="sm" aria-label={t('contacts.actions.open')}>
-              <DotsThreeIcon className="size-4" />
-            </PillButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handlers.onEdit(row.original)}>
-              {t('contacts.actions.edit')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => handlers.onArchive(row.original)}
-            >
-              {t('contacts.actions.archive')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ContactRowActions
+          t={t}
+          onEdit={() => handlers.onEdit(row.original)}
+          onArchive={() => handlers.onArchive(row.original)}
+        />
       ),
     },
   ]

@@ -2,7 +2,7 @@
 
 import { cn } from '@/shared/lib'
 
-import { DataTableProvider } from './context'
+import { DataTableProvider } from '../model/context'
 
 import type { DataTableInstance } from '../model/use-data-table'
 import type { ReactNode } from 'react'

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-const MAX_HOTKEYS = 9
+import { SMART_LIST_HOTKEY_LIMIT } from '../config/smart-list.constants'
 
 function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
@@ -25,7 +25,8 @@ export function useSmartListHotkeys(
       if (event.metaKey || event.ctrlKey || event.altKey || event.repeat) return
       if (isTypingTarget(event.target)) return
       const index = Number.parseInt(event.key, 10)
-      if (Number.isNaN(index) || index < 1 || index > Math.min(ids.length, MAX_HOTKEYS)) return
+      if (Number.isNaN(index) || index < 1 || index > Math.min(ids.length, SMART_LIST_HOTKEY_LIMIT))
+        return
       const id = ids[index - 1]
       if (id === undefined) return
       event.preventDefault()

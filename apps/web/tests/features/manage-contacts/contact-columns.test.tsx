@@ -19,7 +19,15 @@ function ActionsCell({
   onArchive: (contact: ContactListItem) => void
 }>) {
   const columns = [
-    ...buildContactColumns(((key: string) => key) as never, { onEdit, onArchive }, new Map()),
+    ...buildContactColumns(
+      ((key: string) => key) as never,
+      { onEdit, onArchive },
+      {
+        statusByKey: new Map(),
+        sourceByKey: new Map(),
+        typeByKey: new Map(),
+      },
+    ),
   ]
   const table = useReactTable({
     data: [contact],

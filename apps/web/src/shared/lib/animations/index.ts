@@ -4,6 +4,7 @@ export { useReducedTransition } from './useReducedTransition'
 export {
   DURATION,
   EASE_SMOOTH,
+  collapseHorizontal,
   expandCollapse,
   fade,
   fadeSlideUp,

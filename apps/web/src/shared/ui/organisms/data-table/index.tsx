@@ -1,14 +1,13 @@
 import { PaginationCapsule } from '../pagination-capsule'
 
-import { DataTableBody, DataTableRowTitle } from './ui/body'
+import { DataTableQuickFilters } from './quick-filters'
+import { DataTableSmartLists } from './smart-list'
+import { DataTableBody, DataTableCellText, DataTableRowTitle } from './ui/body'
 import { DataTableBulkAction, DataTableBulkBar } from './ui/bulk-bar'
 import { DataTableHeader } from './ui/header'
-import { DataTableQuickFilters } from './ui/quick-filters'
 import { DataTableRoot } from './ui/root'
 import { DataTableScroller } from './ui/scroller'
-import { selectionColumn } from './ui/selection'
 import { DataTableSkeleton } from './ui/skeleton'
-import { DataTableSmartLists } from './ui/smart-lists'
 import {
   DataTableEditColumns,
   DataTableFilter,
@@ -17,9 +16,10 @@ import {
 } from './ui/toolbar'
 
 export { useDataTable, type DataTableInstance } from './model/use-data-table'
-export { selectionColumn }
-export type { SmartListItem } from './ui/smart-lists'
-export type { QuickFilterDef, QuickFilterOption } from './ui/quick-filters'
+
+export type { SmartListItem } from './smart-list'
+export type { QuickFilterDef, QuickFilterOption } from './quick-filters'
+export { selectionColumn } from './ui/selection'
 
 export const DataTable = Object.assign(DataTableRoot, {
   SmartLists: DataTableSmartLists,
@@ -35,5 +35,6 @@ export const DataTable = Object.assign(DataTableRoot, {
   Scroller: DataTableScroller,
   Skeleton: DataTableSkeleton,
   RowTitle: DataTableRowTitle,
+  CellText: DataTableCellText,
   Pagination: PaginationCapsule,
 })

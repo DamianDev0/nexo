@@ -15,6 +15,7 @@ import { useArchiveContact } from '../query/useArchiveContact'
 import { useContactCounts } from '../query/useContactCounts'
 
 import { useContactsTable } from './useContactsTable'
+import { useCreateFromUrl } from './useCreateFromUrl'
 
 import type { ContactListItem } from '@repo/shared-types'
 
@@ -32,6 +33,8 @@ export function useContactsBoard() {
     null,
   )
 
+  useCreateFromUrl(sheet.openCreate)
+
   const columns = useMemo(
     () =>
       buildContactColumns(
@@ -40,9 +43,13 @@ export function useContactsBoard() {
           onEdit: sheet.openEdit,
           onArchive: (contact) => archive([contact.id]),
         },
-        taxonomy.statusByKey,
+        {
+          statusByKey: taxonomy.statusByKey,
+          sourceByKey: taxonomy.sourceByKey,
+          typeByKey: taxonomy.typeByKey,
+        },
       ),
-    [t, sheet.openEdit, archive, taxonomy.statusByKey],
+    [t, sheet.openEdit, archive, taxonomy.statusByKey, taxonomy.sourceByKey, taxonomy.typeByKey],
   )
 
   const instance = useDataTable({

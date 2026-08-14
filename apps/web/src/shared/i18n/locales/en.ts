@@ -21,6 +21,18 @@ const en = {
     and: 'and',
     saveFailed: 'Failed to save',
     toggleTheme: 'Toggle theme',
+    table: {
+      selectAll: 'Select all rows',
+      selectRow: 'Select row',
+    },
+    pagination: {
+      pages: 'Pagination',
+      prev: 'Previous page',
+      next: 'Next page',
+      perPage: 'Rows per page',
+      scroll: 'Scroll columns',
+      collapse: 'Collapse pagination',
+    },
     moreOptions: 'More options',
     filters: {
       removeOne: 'Remove {{value}}',
@@ -364,6 +376,13 @@ const en = {
       status: 'Status',
       phone: 'Phone',
       city: 'City',
+      jobTitle: 'Job title',
+      lifecycleStage: 'Lifecycle',
+      source: 'Source',
+      type: 'Type',
+      tags: 'Tags',
+      leadScore: 'Score',
+      lastContacted: 'Last contacted',
       created: 'Created',
     },
     status: {
@@ -479,12 +498,6 @@ const en = {
       createAnyway: 'Create anyway',
       saveAnyway: 'Save anyway',
       dismiss: 'Dismiss',
-    },
-    pagination: {
-      pages: 'Pagination',
-      prev: 'Previous page',
-      next: 'Next page',
-      perPage: 'Rows per page',
     },
   },
   settings: {
@@ -620,6 +633,15 @@ const en = {
   },
   language: {
     switch: 'Change language',
+  },
+  notifications: {
+    title: 'Notifications',
+    empty: 'No notifications',
+    swipeHint: 'swipe to dismiss',
+    markAllRead: 'Mark all as read',
+  },
+  quickCreate: {
+    label: 'Create',
   },
   entities: {
     contact: { singular: 'Contact', plural: 'Contacts' },
