@@ -26,6 +26,7 @@ export type ApiPaginatedResponse<T> = ApiSuccessResponse<T[]> & {
 export type ApiErrorResponse = BaseResponse & {
   message: string
   error: string
+  duplicate?: import('./contact-views').ContactDuplicatePayload
 }
 
 export type ValidationErrorDetail = {

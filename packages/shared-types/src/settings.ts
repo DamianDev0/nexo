@@ -340,21 +340,30 @@ export type TenantEmailConfig = {
 export const TAXONOMY_KEY_PATTERN = /^[a-z][a-z0-9_]{0,39}$/
 
 export const TAXONOMY_COLOR_PALETTE = [
-  '#3B82F6',
-  '#8B5CF6',
-  '#06B6D4',
-  '#22C55E',
-  '#14B8A6',
-  '#F59E0B',
-  '#F97316',
-  '#EF4444',
-  '#EC4899',
-  '#A855F7',
-  '#6366F1',
-  '#0EA5E9',
-  '#64748B',
+  '#F87171',
+  '#FB7185',
+  '#FB923C',
+  '#FBBF24',
+  '#A3E635',
+  '#4ADE80',
+  '#34D399',
+  '#2DD4BF',
+  '#22D3EE',
+  '#38BDF8',
+  '#60A5FA',
+  '#818CF8',
+  '#A78BFA',
+  '#C084FC',
+  '#F472B6',
   '#94A3B8',
+  '#9CA3AF',
+  '#6B6E8D',
+  'linear-gradient(45deg, #f6d365, #fda085)',
+  'linear-gradient(45deg, #84fab0, #8fd3f4)',
 ] as const
+
+export const SWATCH_COLOR_PATTERN =
+  /^(#[0-9A-Fa-f]{6}|linear-gradient\(45deg(, #[0-9A-Fa-f]{6}){2,3}\))$/
 
 export function taxonomyColorAt(index: number): string {
   return TAXONOMY_COLOR_PALETTE[index % TAXONOMY_COLOR_PALETTE.length] as string
@@ -362,51 +371,64 @@ export function taxonomyColorAt(index: number): string {
 
 export const DEFAULT_CONTACT_STATUS_KEY = 'new'
 
+export const TAXONOMY_DESCRIPTION_MAX = 200
+
 export type TaxonomyOption = {
   key: string
   label: string | null
+  description: string | null
   color: string
   order: number
   isSystem: boolean
+  enabled: boolean
 }
 
 export type ContactTaxonomy = {
   statuses: TaxonomyOption[]
   sources: TaxonomyOption[]
+  types: TaxonomyOption[]
 }
 
 function systemOption(key: string, color: string, order: number): TaxonomyOption {
-  return { key, label: null, color, order, isSystem: true }
+  return { key, label: null, description: null, color, order, isSystem: true, enabled: true }
 }
 
 const DEFAULT_CONTACT_STATUSES: TaxonomyOption[] = [
-  systemOption('new', '#3B82F6', 1),
-  systemOption('in_contact', '#8B5CF6', 2),
-  systemOption('qualified', '#06B6D4', 3),
+  systemOption('new', '#60A5FA', 1),
+  systemOption('in_contact', '#A78BFA', 2),
+  systemOption('qualified', '#22D3EE', 3),
   systemOption('unqualified', '#94A3B8', 4),
-  systemOption('nurturing', '#F59E0B', 5),
-  systemOption('client', '#22C55E', 6),
-  systemOption('inactive', '#64748B', 7),
-  systemOption('lost', '#EF4444', 8),
+  systemOption('nurturing', '#FBBF24', 5),
+  systemOption('client', '#4ADE80', 6),
+  systemOption('inactive', '#6B6E8D', 7),
+  systemOption('lost', '#F87171', 8),
 ]
 
 const DEFAULT_CONTACT_SOURCES: TaxonomyOption[] = [
-  systemOption('manual', '#64748B', 1),
-  systemOption('whatsapp', '#22C55E', 2),
-  systemOption('web_form', '#3B82F6', 3),
-  systemOption('referral', '#8B5CF6', 4),
-  systemOption('import', '#94A3B8', 5),
-  systemOption('email_campaign', '#F59E0B', 6),
-  systemOption('social_media', '#EC4899', 7),
-  systemOption('paid_ad', '#F97316', 8),
-  systemOption('organic_search', '#06B6D4', 9),
-  systemOption('event', '#A855F7', 10),
-  systemOption('cold_call', '#0EA5E9', 11),
-  systemOption('partner', '#14B8A6', 12),
-  systemOption('chat', '#6366F1', 13),
+  systemOption('manual', '#94A3B8', 1),
+  systemOption('whatsapp', '#4ADE80', 2),
+  systemOption('web_form', '#60A5FA', 3),
+  systemOption('referral', '#A78BFA', 4),
+  systemOption('import', '#9CA3AF', 5),
+  systemOption('email_campaign', '#FBBF24', 6),
+  systemOption('social_media', '#F472B6', 7),
+  systemOption('paid_ad', '#FB923C', 8),
+  systemOption('organic_search', '#22D3EE', 9),
+  systemOption('event', '#C084FC', 10),
+  systemOption('cold_call', '#38BDF8', 11),
+  systemOption('partner', '#2DD4BF', 12),
+  systemOption('chat', '#818CF8', 13),
+]
+
+const DEFAULT_CONTACT_TYPES: TaxonomyOption[] = [
+  systemOption('customer', '#60A5FA', 1),
+  systemOption('supplier', '#FBBF24', 2),
+  systemOption('partner', '#A78BFA', 3),
+  systemOption('other', '#9CA3AF', 4),
 ]
 
 export const DEFAULT_CONTACT_TAXONOMY: ContactTaxonomy = {
   statuses: DEFAULT_CONTACT_STATUSES,
   sources: DEFAULT_CONTACT_SOURCES,
+  types: DEFAULT_CONTACT_TYPES,
 }

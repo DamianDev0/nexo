@@ -132,19 +132,6 @@ export const BRAND_COLOR_OPTIONS = [
   { hex: '#0F172A', label: 'Slate' },
 ] as const
 
-export const STAGE_COLOR_OPTIONS = [
-  '#6366F1',
-  '#8B5CF6',
-  '#EC4899',
-  '#F59E0B',
-  '#F97316',
-  '#EF4444',
-  '#059669',
-  '#0891B2',
-  '#3B82F6',
-  '#6B7280',
-] as const
-
 export const THEME_MODE_OPTIONS = ['light', 'dark', 'system'] as const
 
 export const INVITE_ROLE_OPTIONS = [

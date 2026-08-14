@@ -10,6 +10,13 @@ export type Department = {
   name: string
 }
 
+export type AddressSuggestion = {
+  description: string
+  mainText: string
+  secondaryText: string
+  placeId: string
+}
+
 export type NITResult = {
   isValid: boolean
   nit?: string

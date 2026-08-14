@@ -20,6 +20,8 @@ export type Contact = {
   status: string
   lifecycleStage: LifecycleStage
   source: string | null
+  type: string | null
+  typeLabel: string | null
   leadScore: number
   dataConsent: boolean
   consentDate: string | null
@@ -54,6 +56,8 @@ export type ContactInput = {
   municipioCode?: string
   status?: string
   source?: string
+  type?: string
+  typeLabel?: string
   leadScore?: number
   tags?: string[]
   companyId?: string

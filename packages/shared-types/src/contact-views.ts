@@ -45,6 +45,15 @@ export type ContactCounts = {
   byStatus: Record<string, number>
 }
 
+export type ContactTaxonomyUsage = {
+  statuses: Record<string, number>
+  sources: Record<string, number>
+  types: Record<string, number>
+  tags: Record<string, number>
+}
+
+export type TaxonomyReassignKind = 'status' | 'source' | 'type' | 'tag'
+
 export type ContactColumnType = 'name' | 'text' | 'badge' | 'tags' | 'number' | 'date' | 'user'
 
 export type ContactColumnDef = {
@@ -91,4 +100,18 @@ export type ContactDuplicatePayload = {
   severity: ContactDuplicateSeverity
   field: ContactDuplicateMatch['field']
   matches: ContactDuplicateMatch[]
+}
+
+export type ContactDuplicateProbeQuery = {
+  email?: string
+  phone?: string
+  whatsapp?: string
+  firstName?: string
+  lastName?: string
+  documentNumber?: string
+  excludeId?: string
+}
+
+export type ContactDuplicateProbeResult = {
+  duplicate: ContactDuplicatePayload | null
 }
