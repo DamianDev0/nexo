@@ -14,10 +14,11 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
-import { SlidersHorizontalIcon } from '@/shared/ui/icons'
+import { CaretRightIcon, SlidersHorizontalIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -55,10 +56,22 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="flex w-88 flex-col gap-0 p-0">
-        <SheetHeader className="gap-1 border-b border-border px-5 py-4">
-          <SheetTitle>{t('common.table.editColumns')}</SheetTitle>
-          <SheetDescription>{t('common.table.editColumnsHint')}</SheetDescription>
+      <SheetContent side="right" showCloseButton={false} className="flex w-88 flex-col gap-0 p-0">
+        <SheetHeader className="flex-row items-start gap-3 border-b border-border px-5 py-4">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <SheetTitle>{t('common.table.editColumns')}</SheetTitle>
+            <SheetDescription>{t('common.table.editColumnsHint')}</SheetDescription>
+          </div>
+          <SheetClose asChild>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label={t('common.close')}
+              className="size-7 shrink-0 text-faint hover:text-foreground"
+            >
+              <CaretRightIcon className="size-4" />
+            </Button>
+          </SheetClose>
         </SheetHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">

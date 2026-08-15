@@ -21,6 +21,7 @@ export function ColumnEditorRow({ item, onToggle }: Readonly<ColumnEditorRowProp
   const { t } = useTranslation()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
+    disabled: item.locked,
   })
 
   return (
@@ -33,16 +34,20 @@ export function ColumnEditorRow({ item, onToggle }: Readonly<ColumnEditorRowProp
         isDragging && 'z-10 border-border opacity-80 shadow-sm',
       )}
     >
-      <Button
-        variant="ghost"
-        size="icon-xs"
-        aria-label={t('common.table.reorder')}
-        className="cursor-grab text-faint hover:bg-transparent hover:text-foreground active:cursor-grabbing"
-        {...attributes}
-        {...listeners}
-      >
-        <DotsSixVerticalIcon className="size-4" />
-      </Button>
+      {item.locked ? (
+        <span className="size-7" />
+      ) : (
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          aria-label={t('common.table.reorder')}
+          className="size-7 cursor-grab text-faint hover:bg-transparent hover:text-foreground active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <DotsSixVerticalIcon className="size-4" />
+        </Button>
+      )}
 
       <span
         className={cn(

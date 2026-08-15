@@ -69,6 +69,23 @@ describe('DataTableColumnEditor', () => {
     expect(screen.getByRole('switch', { name: 'City' })).toBeInTheDocument()
   })
 
+  it('gives a locked column no drag handle, since it cannot move either', async () => {
+    setup()
+    await openDrawer()
+
+    const [locked, movable] = screen.getAllByRole('listitem')
+
+    expect(locked?.querySelector('[aria-label*="reorder"]')).toBeNull()
+    expect(movable?.querySelector('[aria-label*="reorder"]')).toBeInTheDocument()
+  })
+
+  it('closes with a collapse arrow rather than a dismissal cross', async () => {
+    setup()
+    await openDrawer()
+
+    expect(screen.getByRole('button', { name: /common.close/i })).toBeInTheDocument()
+  })
+
   it('reflects which columns are off and turns one back on', async () => {
     const { saved } = setup({ hidden: ['city'] })
     await openDrawer()
