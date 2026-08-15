@@ -8,10 +8,16 @@ import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
+import {
+  CONTACTS_PINNED_COLUMNS,
+  CONTACTS_TABLE_STORAGE_KEY,
+} from '../config/contacts-table.constants'
+import { buildBulkLabels } from '../lib/bulk-labels'
 import { buildContactColumns } from '../lib/contact-columns'
+import { buildContactHints } from '../lib/contact-hints'
 import { buildSmartLists, listIdToStatus, statusToListId } from '../lib/contact-lists'
 import { buildQuickFilterDefs } from '../lib/quick-filters'
-import { useArchiveContact } from '../query/useArchiveContact'
+import { useArchiveContacts } from '../query/useArchiveContacts'
 import { useContactCounts } from '../query/useContactCounts'
 
 import { useContactsTable } from './useContactsTable'
@@ -26,8 +32,8 @@ export function useContactsBoard() {
   const table = useContactsTable()
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
-  const { archive } = useArchiveContact()
   const sheet = useEntityEditor<ContactListItem>()
+  const { archive, isArchiving } = useArchiveContacts()
   const [listOrder, setListOrder] = useLocalStorageState<readonly string[] | null>(
     LIST_ORDER_KEY,
     null,
@@ -37,19 +43,12 @@ export function useContactsBoard() {
 
   const columns = useMemo(
     () =>
-      buildContactColumns(
-        t,
-        {
-          onEdit: sheet.openEdit,
-          onArchive: (contact) => archive([contact.id]),
-        },
-        {
-          statusByKey: taxonomy.statusByKey,
-          sourceByKey: taxonomy.sourceByKey,
-          typeByKey: taxonomy.typeByKey,
-        },
-      ),
-    [t, sheet.openEdit, archive, taxonomy.statusByKey, taxonomy.sourceByKey, taxonomy.typeByKey],
+      buildContactColumns(t, {
+        statusByKey: taxonomy.statusByKey,
+        sourceByKey: taxonomy.sourceByKey,
+        typeByKey: taxonomy.typeByKey,
+      }),
+    [t, taxonomy.statusByKey, taxonomy.sourceByKey, taxonomy.typeByKey],
   )
 
   const instance = useDataTable({
@@ -57,15 +56,17 @@ export function useContactsBoard() {
     columns,
     pageSize: table.limit,
     getRowId: (row) => row.id,
-    storageKey: 'contacts',
+    storageKey: CONTACTS_TABLE_STORAGE_KEY,
+    pinnedColumns: CONTACTS_PINNED_COLUMNS,
+    totalRows: table.total,
   })
 
-  const selectedRows = instance.table.getSelectedRowModel().rows
-
   const archiveSelected = useCallback(() => {
-    archive(selectedRows.map((row) => row.original.id))
+    const ids = instance.table.getSelectedRowModel().rows.map((row) => row.id)
+    if (ids.length === 0) return
     instance.table.resetRowSelection()
-  }, [archive, selectedRows, instance])
+    archive(ids)
+  }, [instance.table, archive])
 
   const items = useMemo(() => {
     const built = buildSmartLists(t, counts, taxonomy.statuses)
@@ -79,9 +80,22 @@ export function useContactsBoard() {
   const { handleStatus } = table
   const selectList = useCallback((id: string) => handleStatus(listIdToStatus(id)), [handleStatus])
 
+  const bulkLabels = useMemo(() => buildBulkLabels(t), [t])
+
+  const activeListId = statusToListId(table.status)
+  const listHints = useMemo(
+    () =>
+      buildContactHints(t, {
+        description: items.find((item) => item.id === activeListId)?.description,
+        counts,
+        withoutEmail: table.rows.filter((row) => !row.email).length,
+      }),
+    [t, items, activeListId, counts, table.rows],
+  )
+
   return {
     instance,
-    lists: { items, activeId: statusToListId(table.status) },
+    lists: { items, activeId: activeListId },
     state: {
       search: table.search,
       total: table.total,
@@ -92,7 +106,9 @@ export function useContactsBoard() {
       isFetching: table.isFetching,
       isFiltered: table.isFiltered,
       isEmpty: !table.isPending && table.rows.length === 0,
-      selectedCount: selectedRows.length,
+      isArchiving,
+      listHints,
+      bulkLabels,
       quickFilters: buildQuickFilterDefs(t, table.filters, taxonomy.sources),
     },
     actions: {
@@ -100,11 +116,12 @@ export function useContactsBoard() {
       onReorderLists: setListOrder,
       onSearch: table.handleSearch,
       onPageChange: table.handlePage,
+      onPrefetchPage: table.prefetchPage,
       onLimitChange: table.handleLimit,
       onCreate: sheet.openCreate,
-      onArchiveSelected: archiveSelected,
       onToggleFilter: table.handleToggleFilter,
       onClearFilters: table.handleClearFilters,
+      onArchiveSelected: archiveSelected,
     },
     sheet: { contact: sheet.editing, open: sheet.open, onOpenChange: sheet.setOpen },
   }

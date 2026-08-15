@@ -1,9 +1,9 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { useContactList } from '@/entities/contact'
+import { useContactList, usePrefetchContactList } from '@/entities/contact'
 import { FIRST_PAGE } from '@/shared/config/pagination'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
 
@@ -27,7 +27,6 @@ import type { ContactListItem } from '@repo/shared-types'
 const NO_ROWS: readonly ContactListItem[] = []
 
 export function useContactsTable() {
-  const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
 
@@ -50,9 +49,9 @@ export function useContactsTable() {
   const commit = useCallback(
     (next: Partial<ContactsUrlState>) => {
       const state = { status, search: urlSearch, filters, page, limit, ...next }
-      router.replace(`${pathname}${contactsQueryString(state)}`, { scroll: false })
+      window.history.replaceState(null, '', `${pathname}${contactsQueryString(state)}`)
     },
-    [router, pathname, status, urlSearch, filters, page, limit],
+    [pathname, status, urlSearch, filters, page, limit],
   )
 
   useEffect(() => {
@@ -92,11 +91,22 @@ export function useContactsTable() {
   const handlePage = useCallback((value: number) => commit({ page: value }), [commit])
 
   const total = data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / limit))
+
+  const prefetchList = usePrefetchContactList()
+
+  const prefetchPage = useCallback(
+    (value: number) => {
+      if (value < FIRST_PAGE || value > totalPages || value === page) return
+      prefetchList(contactListQuery(urlSearch, status, filters, { page: value, limit }))
+    },
+    [prefetchList, urlSearch, status, filters, page, limit, totalPages],
+  )
 
   return {
     rows: data?.data ?? NO_ROWS,
     total,
-    totalPages: Math.max(1, Math.ceil(total / limit)),
+    totalPages,
     page,
     limit,
     search,
@@ -107,6 +117,7 @@ export function useContactsTable() {
     isFiltered: Boolean(urlSearch.trim() || status) || hasQuickFilters(filters),
     handleSearch: setSearch,
     handlePage,
+    prefetchPage,
     handleStatus,
     handleToggleFilter,
     handleClearFilters,

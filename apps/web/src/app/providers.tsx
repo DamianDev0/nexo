@@ -7,6 +7,7 @@ import { Toaster } from 'sileo'
 
 import { TOAST_FILL_DARK, TOAST_FILL_LIGHT } from '@/shared/config/tokens/effects'
 import { createQueryClient } from '@/shared/query/query-client'
+import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 import '@/shared/i18n/config'
 
 const LIGHT_TOAST_OPTIONS = {
@@ -48,7 +49,7 @@ export function Providers({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <TooltipProvider delayDuration={400}>{children}</TooltipProvider>
         <SileoToaster />
       </QueryClientProvider>
     </ThemeProvider>

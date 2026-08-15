@@ -1,67 +1,52 @@
-import { contactAvatarTone, contactFullName, contactInitials } from '@/entities/contact'
-import { AvatarSquircle } from '@/shared/ui/atoms/avatar-squircle'
-import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
-import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { DotsThreeIcon } from '@/shared/ui/icons'
+import { contactFullName } from '@/entities/contact'
+import { cn } from '@/shared/lib/cn'
+import { ColorDot } from '@/shared/ui/atoms/color-dot'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
+import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import { DataTable } from '@/shared/ui/organisms/data-table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/shadcn/dropdown-menu'
 
+import { CONTACT_TAG_CHIP } from '../config/contacts-table.constants'
+
+import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
-import type { TFunction } from 'i18next'
 
-export const MAX_VISIBLE_TAGS = 2
+const TAG_SEPARATOR = ' · '
 
 export function ContactNameCell({ contact }: Readonly<{ contact: ContactListItem }>) {
   return (
-    <span className="flex min-w-0 items-center gap-2.5">
-      <AvatarSquircle initials={contactInitials(contact)} tone={contactAvatarTone(contact.id)} />
-      <DataTable.RowTitle title={contactFullName(contact)} subtitle={contact.email ?? undefined} />
+    <TruncateTip className="text-sm font-medium tracking-tight text-foreground">
+      {contactFullName(contact)}
+    </TruncateTip>
+  )
+}
+
+export function ContactStatusCell({
+  status,
+  choice,
+}: Readonly<{ status: string; choice?: TaxonomyChoice }>) {
+  return (
+    <span className="flex min-w-0 items-center gap-1.5">
+      {choice?.color && <ColorDot color={choice.color} />}
+      <TruncateTip>{choice?.label ?? status}</TruncateTip>
     </span>
   )
 }
 
-export function ContactTagsCell({ tags }: Readonly<{ tags: ReadonlyArray<string> }>) {
-  if (tags.length === 0) return <DataTable.CellText>{null}</DataTable.CellText>
+export function ContactTagsCell({
+  tags,
+  label,
+}: Readonly<{ tags: ReadonlyArray<string>; label: (count: number) => string }>) {
+  const [only] = tags
 
-  const hidden = tags.length - MAX_VISIBLE_TAGS
+  if (only === undefined) return <DataTable.CellText>{null}</DataTable.CellText>
 
   return (
-    <span className="flex min-w-0 items-center gap-1">
-      {tags.slice(0, MAX_VISIBLE_TAGS).map((tag) => (
-        <BadgeSoft key={tag}>{tag}</BadgeSoft>
-      ))}
-      {hidden > 0 && (
-        <span className="shrink-0 text-xs tabular-nums text-muted-foreground">+{hidden}</span>
-      )}
+    <span className="flex min-w-0 items-center">
+      <HintTooltip asChild hint={tags.join(TAG_SEPARATOR)}>
+        <span className={cn(CONTACT_TAG_CHIP, 'min-w-0 cursor-pointer truncate')}>
+          {tags.length === 1 ? only : label(tags.length)}
+        </span>
+      </HintTooltip>
     </span>
-  )
-}
-
-interface ContactRowActionsProps {
-  readonly t: TFunction
-  readonly onEdit: () => void
-  readonly onArchive: () => void
-}
-
-export function ContactRowActions({ t, onEdit, onArchive }: Readonly<ContactRowActionsProps>) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <PillButton variant="ghost" size="sm" aria-label={t('contacts.actions.open')}>
-          <DotsThreeIcon className="size-4" />
-        </PillButton>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={onEdit}>{t('contacts.actions.edit')}</DropdownMenuItem>
-        <DropdownMenuItem variant="destructive" onClick={onArchive}>
-          {t('contacts.actions.archive')}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }

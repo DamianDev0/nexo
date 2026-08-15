@@ -7,7 +7,6 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
-import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { groupModules } from '../lib/navigation'
 import { useHighlightKey } from '../model/useHighlightKey'
@@ -49,42 +48,40 @@ export function StepNavigation({ data, actions, nav }: Readonly<StepNavigationPr
       nav={{ ...nav, footerNote: t(`${s}.optionalNote`) }}
       aside={<SidebarPreview modules={data} highlightKey={focus.key} />}
     >
-      <TooltipProvider delayDuration={400}>
-        <DndContext
-          sensors={dnd.sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
-          onDragStart={dnd.handleDragStart}
-          onDragEnd={dnd.handleDragEnd}
-          onDragCancel={dnd.handleDragCancel}
-        >
-          <div className="flex flex-col gap-5">
-            {groups.map((group) => (
-              <div key={group.key}>
-                <div className="mb-2 flex items-center gap-3 px-1">
-                  <p className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-                    {t(`nav.groups.${group.key}`)}
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-                <SortableContext
-                  items={group.modules.map((m) => m.key)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="flex flex-col gap-1.5">
-                    {group.modules.map((module) => (
-                      <SortableModule key={module.key} module={module} actions={rowActions} />
-                    ))}
-                  </div>
-                </SortableContext>
+      <DndContext
+        sensors={dnd.sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToVerticalAxis]}
+        onDragStart={dnd.handleDragStart}
+        onDragEnd={dnd.handleDragEnd}
+        onDragCancel={dnd.handleDragCancel}
+      >
+        <div className="flex flex-col gap-5">
+          {groups.map((group) => (
+            <div key={group.key}>
+              <div className="mb-2 flex items-center gap-3 px-1">
+                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+                  {t(`nav.groups.${group.key}`)}
+                </p>
+                <div className="h-px flex-1 bg-border" />
               </div>
-            ))}
-          </div>
-          <DragOverlay modifiers={[restrictToVerticalAxis]}>
-            {activeModule ? <ModuleRow module={activeModule} actions={rowActions} ghost /> : null}
-          </DragOverlay>
-        </DndContext>
-      </TooltipProvider>
+              <SortableContext
+                items={group.modules.map((m) => m.key)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="flex flex-col gap-1.5">
+                  {group.modules.map((module) => (
+                    <SortableModule key={module.key} module={module} actions={rowActions} />
+                  ))}
+                </div>
+              </SortableContext>
+            </div>
+          ))}
+        </div>
+        <DragOverlay modifiers={[restrictToVerticalAxis]}>
+          {activeModule ? <ModuleRow module={activeModule} actions={rowActions} ghost /> : null}
+        </DragOverlay>
+      </DndContext>
     </WizardStep>
   )
 }

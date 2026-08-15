@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { XIcon } from '@/shared/ui/icons'
+import { Button } from '@/shared/ui/shadcn/button'
 
 import type { QuickFilterDef } from '../model/types'
 
@@ -55,26 +56,28 @@ export function ActiveChips({ filters, onRemove, onClearAll }: Readonly<ActiveCh
           >
             <span className="truncate text-muted-foreground">{chip.filterLabel}</span>
             <span className="truncate font-semibold text-foreground">{chip.valueLabel}</span>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon-xs"
               aria-label={t('common.filters.removeOne', { value: chip.valueLabel })}
               onClick={() => onRemove(chip.filterId, chip.value)}
-              className="flex size-5 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+              className="size-5 rounded-full text-muted-foreground hover:bg-background hover:text-foreground"
             >
               <XIcon className="size-3" />
-            </button>
+            </Button>
           </motion.span>
         ))}
       </AnimatePresence>
 
       {chips.length > 1 && (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onClearAll}
-          className="h-7 shrink-0 rounded-full px-2.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="h-7 rounded-full px-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           {t('common.filters.clearAll', { count: chips.length })}
-        </button>
+        </Button>
       )}
     </div>
   )

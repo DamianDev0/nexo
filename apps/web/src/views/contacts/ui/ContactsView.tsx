@@ -2,7 +2,7 @@ import { ContactsBoard } from '@/features/manage-contacts'
 
 export function ContactsView() {
   return (
-    <div className="flex min-h-full w-full min-w-0 flex-col">
+    <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
       <ContactsBoard />
     </div>
   )

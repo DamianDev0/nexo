@@ -7,7 +7,6 @@ import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { SubmitButton } from '@/shared/ui/molecules/submit-button'
 import { Button } from '@/shared/ui/shadcn/button'
-import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 interface SaveBarProps {
   readonly onSave: () => void
@@ -52,11 +51,9 @@ export function SaveBar({ onSave, onReset, isDirty, isPending }: Readonly<SaveBa
         {canSave ? (
           saveButton
         ) : (
-          <TooltipProvider>
-            <HintTooltip asChild hint={t('settings.noChangesHint')}>
-              {saveButton}
-            </HintTooltip>
-          </TooltipProvider>
+          <HintTooltip asChild hint={t('settings.noChangesHint')}>
+            {saveButton}
+          </HintTooltip>
         )}
       </div>
     </div>

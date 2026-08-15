@@ -49,7 +49,7 @@ function IconButton({ label, disabled, expanded, onClick, children }: Readonly<I
   )
 }
 
-interface RootProps {
+export interface RootProps {
   readonly label: string
   readonly collapseLabel: string
   readonly children: ReactNode
@@ -109,25 +109,32 @@ export interface NavProps {
   readonly page: number
   readonly totalPages: number
   readonly onPageChange: (page: number) => void
+  readonly onPrefetch?: (page: number) => void
   readonly labels: NavLabels
 }
 
-function Nav({ page, totalPages, onPageChange, labels }: Readonly<NavProps>) {
+function Nav({ page, totalPages, onPageChange, onPrefetch, labels }: Readonly<NavProps>) {
+  const warm = (target: number) => () => onPrefetch?.(target)
+
   return (
     <span className="inline-flex items-center gap-1">
-      <IconButton label={labels.prev} disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
-        <CaretLeftIcon className="size-4" />
-      </IconButton>
+      <span className="inline-flex" onPointerEnter={warm(page - 1)} onFocus={warm(page - 1)}>
+        <IconButton label={labels.prev} disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+          <CaretLeftIcon className="size-4" />
+        </IconButton>
+      </span>
       <span aria-current="page" className="text-sm font-medium tabular-nums text-body">
         {page} / {totalPages}
       </span>
-      <IconButton
-        label={labels.next}
-        disabled={page >= totalPages}
-        onClick={() => onPageChange(page + 1)}
-      >
-        <CaretRightIcon className="size-4" />
-      </IconButton>
+      <span className="inline-flex" onPointerEnter={warm(page + 1)} onFocus={warm(page + 1)}>
+        <IconButton
+          label={labels.next}
+          disabled={page >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+        >
+          <CaretRightIcon className="size-4" />
+        </IconButton>
+      </span>
     </span>
   )
 }

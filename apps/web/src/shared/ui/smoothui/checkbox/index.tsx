@@ -4,9 +4,11 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Checkbox as CheckboxPrimitive } from 'radix-ui'
 
 import { cn } from '@/shared/lib'
-import { SPRING_DEFAULT } from '@/shared/ui/smoothui/lib/animation'
+import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
 
 export interface CheckboxProps {
+  /** Accessible name when no visible label is associated */
+  'aria-label'?: string
   /** Whether the checkbox is checked */
   checked?: boolean
   /** Optional CSS class */
@@ -31,6 +33,7 @@ const CheckmarkPath = motion.path
 const MotionSvg = motion.svg
 
 export function SmoothCheckbox({
+  'aria-label': ariaLabel,
   checked = false,
   indeterminate = false,
   onCheckedChange,
@@ -55,6 +58,7 @@ export function SmoothCheckbox({
   return (
     <CheckboxPrimitive.Root
       aria-checked={indeterminate ? 'mixed' : checked}
+      aria-label={ariaLabel}
       checked={indeterminate ? 'indeterminate' : checked}
       className={cn(
         'peer size-4 shrink-0 rounded-[4px] border border-input shadow-xs outline-none transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-foreground data-[state=indeterminate]:border-foreground data-[state=checked]:bg-foreground data-[state=indeterminate]:bg-foreground data-[state=unchecked]:bg-background data-[state=checked]:text-background data-[state=indeterminate]:text-background dark:data-[state=unchecked]:bg-input/30 dark:aria-invalid:ring-destructive/40',
@@ -90,7 +94,7 @@ export function SmoothCheckbox({
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={3}
-              transition={shouldReduceMotion ? { duration: 0 } : SPRING_DEFAULT}
+              transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
               viewBox="0 0 24 24"
             >
               <title>Checked</title>
@@ -98,9 +102,7 @@ export function SmoothCheckbox({
                 animate={shouldReduceMotion ? {} : { pathLength: 1 }}
                 d="M20 6L9 17l-5-5"
                 initial={shouldReduceMotion ? {} : { pathLength: 0 }}
-                transition={
-                  shouldReduceMotion ? { duration: 0 } : { ...SPRING_DEFAULT, delay: 0.05 }
-                }
+                transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
               />
             </MotionSvg>
           )}
@@ -120,7 +122,7 @@ export function SmoothCheckbox({
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={3}
-              transition={shouldReduceMotion ? { duration: 0 } : SPRING_DEFAULT}
+              transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
               viewBox="0 0 24 24"
             >
               <title>Indeterminate</title>
@@ -128,9 +130,7 @@ export function SmoothCheckbox({
                 animate={shouldReduceMotion ? {} : { pathLength: 1 }}
                 d="M5 12h14"
                 initial={shouldReduceMotion ? {} : { pathLength: 0 }}
-                transition={
-                  shouldReduceMotion ? { duration: 0 } : { ...SPRING_DEFAULT, delay: 0.05 }
-                }
+                transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
               />
             </MotionSvg>
           )}

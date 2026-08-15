@@ -5,12 +5,12 @@ import { sileo } from 'sileo'
 import contactsService from '@/shared/api/services/contacts.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
-export function useArchiveContact() {
+export function useArchiveContacts() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: async (ids: string[]) => {
+    mutationFn: async (ids: readonly string[]) => {
       const results = await Promise.allSettled(ids.map((id) => contactsService.archive(id)))
       return {
         total: ids.length,
@@ -29,9 +29,7 @@ export function useArchiveContact() {
         sileo.error({ title: t('contacts.toasts.archivedPartial', { archived, total }) })
         return
       }
-      sileo.success({
-        title: t(total === 1 ? 'contacts.toasts.archived' : 'contacts.toasts.archivedMany'),
-      })
+      sileo.success({ title: t('contacts.toasts.archived', { count: total }) })
     },
     onError: (error: { message?: string }) => {
       sileo.error({ title: t('common.saveFailed'), description: error.message })

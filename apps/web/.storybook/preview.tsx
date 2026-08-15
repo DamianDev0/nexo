@@ -1,4 +1,5 @@
 import '../src/styles/globals.css'
+import '../src/shared/i18n/config'
 
 import { withNexoTheme } from './theme-decorator'
 

@@ -1,10 +1,11 @@
 'use client'
 
 import { cn } from '@/shared/lib'
+import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
-import { DataTableProvider } from '../model/context'
+import { DataTableProvider } from '../../model/context'
 
-import type { DataTableInstance } from '../model/use-data-table'
+import type { DataTableInstance } from '../../model/use-data-table'
 import type { ReactNode } from 'react'
 
 interface DataTableRootProps<TData> {
@@ -20,9 +21,11 @@ export function DataTableRoot<TData>({
 }: Readonly<DataTableRootProps<TData>>) {
   return (
     <DataTableProvider value={instance as DataTableInstance<unknown>}>
-      <div data-slot="table-root" className={cn('overflow-hidden rounded-xl bg-card', className)}>
-        {children}
-      </div>
+      <TooltipProvider delayDuration={350}>
+        <div data-slot="table-root" className={cn('overflow-hidden rounded-xl bg-card', className)}>
+          {children}
+        </div>
+      </TooltipProvider>
     </DataTableProvider>
   )
 }

@@ -1,7 +1,7 @@
 import { cn } from '@/shared/lib'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 
-import { DATA_TABLE_GUTTER } from '../config/table.constants'
+import { DATA_TABLE_GUTTER } from '../../config/table.constants'
 
 interface DataTableSkeletonProps {
   readonly rows?: number

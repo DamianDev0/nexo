@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
+
 import { cn } from '@/shared/lib'
 
-import type { ReactNode, RefObject } from 'react'
+import type { ReactNode, RefObject, UIEvent } from 'react'
 
 interface DataTableScrollerProps {
   readonly children: ReactNode
@@ -17,17 +19,26 @@ export function DataTableScroller({
   hideScrollbar,
   className,
 }: Readonly<DataTableScrollerProps>) {
+  const [scrolled, setScrolled] = useState(false)
+
+  function handleScroll(event: UIEvent<HTMLDivElement>) {
+    const next = event.currentTarget.scrollLeft > 0
+    setScrolled((prev) => (prev === next ? prev : next))
+  }
+
   return (
     <div
       ref={ref}
       data-slot="table-scroller"
+      data-scrolled={scrolled || undefined}
+      onScroll={handleScroll}
       className={cn(
-        'min-w-0 overflow-auto',
+        'group/scroller min-w-0 overflow-auto [&_[data-slot=table-container]]:overflow-visible',
         hideScrollbar && '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         className,
       )}
     >
-      <div className="min-w-max">{children}</div>
+      {children}
     </div>
   )
 }

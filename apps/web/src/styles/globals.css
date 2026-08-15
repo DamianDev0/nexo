@@ -14,6 +14,7 @@
   --shadow-e2: 0 2px 4px rgba(14, 15, 12, 0.05), 0 18px 36px -16px rgba(14, 15, 12, 0.32);
   --shadow-e3: 0 4px 8px rgba(14, 15, 12, 0.06), 0 40px 80px -32px rgba(14, 15, 12, 0.45);
   --shadow-capsule: 0 2px 4px rgba(14, 15, 12, 0.04), 0 18px 44px -22px rgba(14, 15, 12, 0.4);
+  --shadow-pin: 8px 0 10px -6px rgba(14, 15, 12, 0.16);
   --color-row-hover: var(--row-hover);
   --color-row-selected: var(--row-selected);
   --color-background: var(--background);
@@ -129,7 +130,7 @@
   --border: #dce0d9;
   --border-strong: #8b9288;
   --row-divider: #f5f7f4;
-  --row-hover: #fafbf9;
+  --row-hover: #f3f5f0;
   --row-selected: #f7fcf1;
   --input: #8b9288;
   --ring: #a5e96f;
@@ -198,7 +199,7 @@
   --border: #2a2d27;
   --border-strong: #8b9288;
   --row-divider: #1f221c;
-  --row-hover: #1d201b;
+  --row-hover: #23271f;
   --row-selected: #1e2a16;
   --input: #8b9288;
   --ring: #a5e96f;

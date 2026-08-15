@@ -1,7 +1,11 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import type { ThemeTypography } from '@repo/shared-types'
+
 import { useGoogleFont } from '@/features/setup-workspace/model/useGoogleFont'
+
+type FontFamily = ThemeTypography['fontFamily']
 
 afterEach(() => {
   document.head.querySelectorAll('link[id^="google-font-"]').forEach((link) => link.remove())
@@ -34,7 +38,7 @@ describe('useGoogleFont', () => {
 
   it('injects a new link when the font family changes', () => {
     const { rerender } = renderHook(({ fontFamily }) => useGoogleFont(fontFamily), {
-      initialProps: { fontFamily: 'inter' as const },
+      initialProps: { fontFamily: 'inter' as FontFamily },
     })
     expect(document.getElementById('google-font-inter')).not.toBeNull()
 

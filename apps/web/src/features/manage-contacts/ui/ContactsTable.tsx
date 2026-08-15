@@ -1,15 +1,15 @@
 'use client'
 
-import { motion } from 'motion/react'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 
+import { ContactsBulkActions } from './ContactsBulkActions'
+import { ContactsListHint } from './ContactsListHint'
 import { ContactsPagination } from './ContactsPagination'
 
 import type { ContactsBoard } from '../model/useContactsBoard'
@@ -18,14 +18,10 @@ type ContactsTableProps = Readonly<Pick<ContactsBoard, 'instance' | 'lists' | 's
 
 export function ContactsTable({ instance, lists, state, actions }: ContactsTableProps) {
   const { t } = useTranslation()
-  const pageTransition = useReducedTransition(quickEase)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   return (
-    <DataTable
-      instance={instance}
-      className="flex min-w-0 flex-1 flex-col rounded-none bg-transparent"
-    >
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <DataTable.SmartLists
         data={lists}
         onSelect={actions.onSelectList}
@@ -37,63 +33,81 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
           {t('contacts.lists.new')}
         </PillButton>
       </DataTable.SmartLists>
+
       <DataTable.QuickFilters
         filters={state.quickFilters}
         onToggle={actions.onToggleFilter}
         onClear={actions.onClearFilters}
+        announcement={<ContactsListHint hints={state.listHints} />}
       />
-      <DataTable.Toolbar>
-        <DataTable.Search
-          value={state.search}
-          placeholder={t('contacts.searchPlaceholder')}
-          onChange={actions.onSearch}
-        />
-      </DataTable.Toolbar>
-      {state.selectedCount > 0 && (
-        <DataTable.BulkBar label={t('contacts.bulk.selected', { count: state.selectedCount })}>
-          <DataTable.BulkAction destructive onClick={actions.onArchiveSelected}>
-            {t('contacts.bulk.archive')}
-          </DataTable.BulkAction>
-        </DataTable.BulkBar>
-      )}
-      {state.isPending && <DataTable.Skeleton />}
-      {state.isEmpty && (
-        <EmptyState
-          fill
-          icon={<UsersThreeIcon className="size-5" />}
-          title={t(state.isFiltered ? 'contacts.noResults.title' : 'contacts.empty.title')}
-          description={t(
-            state.isFiltered ? 'contacts.noResults.description' : 'contacts.empty.description',
-          )}
+
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 pb-2 pt-1">
+        <DataTable
+          instance={instance}
+          className="flex min-h-0 min-w-0 flex-1 flex-col border border-border"
         >
-          {!state.isFiltered && (
-            <PillButton size="md" onClick={actions.onCreate}>
-              {t('contacts.empty.cta')}
-            </PillButton>
-          )}
-        </EmptyState>
-      )}
-      {!state.isPending && !state.isEmpty && (
-        <>
-          <DataTable.Scroller ref={scrollRef} hideScrollbar className="min-h-0 flex-1">
-            <DataTable.Header />
-            <motion.div
-              key={state.page}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: state.isFetching ? 0.55 : 1, y: 0 }}
-              transition={pageTransition}
+          <DataTable.Toolbar
+            bulk={{
+              labels: state.bulkLabels,
+              actions: (
+                <ContactsBulkActions
+                  onArchive={actions.onArchiveSelected}
+                  disabled={state.isArchiving}
+                />
+              ),
+            }}
+          >
+            <DataTable.Search
+              value={state.search}
+              placeholder={t('contacts.searchPlaceholder')}
+              onChange={actions.onSearch}
+            />
+            <DataTable.Density className="ml-auto" />
+          </DataTable.Toolbar>
+
+          {state.isPending && <DataTable.Skeleton />}
+
+          {state.isEmpty && (
+            <EmptyState
+              fill
+              icon={<UsersThreeIcon className="size-5" />}
+              title={t(state.isFiltered ? 'contacts.noResults.title' : 'contacts.empty.title')}
+              description={t(
+                state.isFiltered ? 'contacts.noResults.description' : 'contacts.empty.description',
+              )}
             >
-              <DataTable.Body />
-            </motion.div>
-          </DataTable.Scroller>
-          <ContactsPagination
-            nav={{ page: state.page, totalPages: state.totalPages, limit: state.limit }}
-            scrollTarget={scrollRef}
-            onPageChange={actions.onPageChange}
-            onLimitChange={actions.onLimitChange}
-          />
-        </>
-      )}
-    </DataTable>
+              {!state.isFiltered && (
+                <PillButton size="md" onClick={actions.onCreate}>
+                  {t('contacts.empty.cta')}
+                </PillButton>
+              )}
+            </EmptyState>
+          )}
+
+          {!state.isPending && !state.isEmpty && (
+            <>
+              <DataTable.Scroller ref={scrollRef} hideScrollbar className="min-h-0 flex-1">
+                <DataTable.Grid>
+                  <DataTable.Header />
+                  <DataTable.Body pageKey={state.page} dimmed={state.isFetching} />
+                </DataTable.Grid>
+              </DataTable.Scroller>
+              <ContactsPagination
+                nav={{
+                  page: state.page,
+                  totalPages: state.totalPages,
+                  limit: state.limit,
+                  total: state.total,
+                }}
+                scrollTarget={scrollRef}
+                onPageChange={actions.onPageChange}
+                onPrefetchPage={actions.onPrefetchPage}
+                onLimitChange={actions.onLimitChange}
+              />
+            </>
+          )}
+        </DataTable>
+      </div>
+    </div>
   )
 }

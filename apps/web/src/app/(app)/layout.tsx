@@ -7,7 +7,6 @@ import { prefetchAppShell } from '@/shared/query/prefetch-session'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/ui/shadcn/sidebar'
-import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 import {
   AppSidebar,
   HeaderBreadcrumb,
@@ -46,19 +45,17 @@ export default async function AppLayout({ children }: Readonly<{ children: React
                 <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
                 <HeaderSearch />
                 <div className="flex-1" />
-                <TooltipProvider delayDuration={400}>
-                  <div className="flex items-center gap-0.5">
-                    <HeaderQuickCreate />
-                    <HeaderSettingsLink />
-                    <HeaderNotifications />
-                    <LanguageSwitcher />
-                    <ThemeToggle />
-                  </div>
-                </TooltipProvider>
+                <div className="flex items-center gap-0.5">
+                  <HeaderQuickCreate />
+                  <HeaderSettingsLink />
+                  <HeaderNotifications />
+                  <LanguageSwitcher />
+                  <ThemeToggle />
+                </div>
               </header>
               <div
                 id={APP_SCROLL_ID}
-                className="min-h-0 min-w-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]"
+                className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto [scrollbar-gutter:stable] [&>*]:shrink-0"
               >
                 {children}
               </div>

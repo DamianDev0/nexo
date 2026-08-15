@@ -10,7 +10,6 @@ import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
 import { PlusIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Input } from '@/shared/ui/shadcn/input'
-import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { SortableStage } from './pipeline/SortableStage'
 import { StageRow, type Stage } from './pipeline/StageRow'
@@ -61,30 +60,28 @@ export function StepPipeline({ data, actions, nav }: Readonly<StepPipelineProps>
         />
       </div>
 
-      <TooltipProvider delayDuration={400}>
-        <DndContext
-          sensors={dnd.sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-          onDragStart={dnd.handleDragStart}
-          onDragEnd={dnd.handleDragEnd}
-          onDragCancel={dnd.handleDragCancel}
+      <DndContext
+        sensors={dnd.sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+        onDragStart={dnd.handleDragStart}
+        onDragEnd={dnd.handleDragEnd}
+        onDragCancel={dnd.handleDragCancel}
+      >
+        <SortableContext
+          items={data.stages.map((st) => st.id)}
+          strategy={verticalListSortingStrategy}
         >
-          <SortableContext
-            items={data.stages.map((st) => st.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="flex flex-col gap-2">
-              {data.stages.map((stage) => (
-                <SortableStage key={stage.id} stage={stage} actions={rowActions} />
-              ))}
-            </div>
-          </SortableContext>
-          <DragOverlay modifiers={[restrictToVerticalAxis]}>
-            {activeStage ? <StageRow stage={activeStage} actions={rowActions} ghost /> : null}
-          </DragOverlay>
-        </DndContext>
-      </TooltipProvider>
+          <div className="flex flex-col gap-2">
+            {data.stages.map((stage) => (
+              <SortableStage key={stage.id} stage={stage} actions={rowActions} />
+            ))}
+          </div>
+        </SortableContext>
+        <DragOverlay modifiers={[restrictToVerticalAxis]}>
+          {activeStage ? <StageRow stage={activeStage} actions={rowActions} ghost /> : null}
+        </DragOverlay>
+      </DndContext>
 
       <Button
         type="button"

@@ -10,7 +10,6 @@ import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
-import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { useTaxonomyPane } from '../../../model/useTaxonomyPane'
 
@@ -59,49 +58,47 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
           ))}
         </div>
       ) : (
-        <TooltipProvider delayDuration={400}>
-          <DndContext
-            sensors={pane.dnd.sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragStart={pane.dnd.handleDragStart}
-            onDragEnd={pane.dnd.handleDragEnd}
-            onDragCancel={pane.dnd.handleDragCancel}
+        <DndContext
+          sensors={pane.dnd.sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragStart={pane.dnd.handleDragStart}
+          onDragEnd={pane.dnd.handleDragEnd}
+          onDragCancel={pane.dnd.handleDragCancel}
+        >
+          <SortableContext
+            items={pane.options.map((option) => option.key)}
+            strategy={verticalListSortingStrategy}
           >
-            <SortableContext
-              items={pane.options.map((option) => option.key)}
-              strategy={verticalListSortingStrategy}
-            >
-              <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
-                {pane.options.map((option) => (
-                  <SortableTaxonomyOption
-                    key={option.key}
-                    row={{
-                      option,
-                      label: pane.optionLabel(option),
-                      count: pane.counts[option.key] ?? 0,
-                    }}
-                    actions={pane.actions}
-                  />
-                ))}
-              </PagedTransition>
-            </SortableContext>
-
-            <DragOverlay modifiers={[restrictToVerticalAxis]} dropAnimation={DROP_ANIMATION}>
-              {dragged ? (
-                <TaxonomyOptionRow
-                  ghost
+            <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
+              {pane.options.map((option) => (
+                <SortableTaxonomyOption
+                  key={option.key}
                   row={{
-                    option: dragged,
-                    label: pane.optionLabel(dragged),
-                    count: pane.counts[dragged.key] ?? 0,
+                    option,
+                    label: pane.optionLabel(option),
+                    count: pane.counts[option.key] ?? 0,
                   }}
                   actions={pane.actions}
                 />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-        </TooltipProvider>
+              ))}
+            </PagedTransition>
+          </SortableContext>
+
+          <DragOverlay modifiers={[restrictToVerticalAxis]} dropAnimation={DROP_ANIMATION}>
+            {dragged ? (
+              <TaxonomyOptionRow
+                ghost
+                row={{
+                  option: dragged,
+                  label: pane.optionLabel(dragged),
+                  count: pane.counts[dragged.key] ?? 0,
+                }}
+                actions={pane.actions}
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       )}
 
       <MorphingPageDots

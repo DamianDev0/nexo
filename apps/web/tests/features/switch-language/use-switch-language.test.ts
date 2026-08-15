@@ -5,7 +5,7 @@ import { useSwitchLanguage } from '@/features/switch-language/model/use-switch-l
 
 const changeLanguage = vi.fn(async () => undefined)
 const refresh = vi.fn()
-const setLocaleAction = vi.fn(async () => undefined)
+const setLocaleAction = vi.fn<(locale: string) => Promise<void>>(async () => undefined)
 
 let resolvedLanguage: string | undefined = 'es'
 

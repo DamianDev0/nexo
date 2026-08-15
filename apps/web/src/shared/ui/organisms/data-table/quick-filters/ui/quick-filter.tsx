@@ -7,7 +7,7 @@ import { cn } from '@/shared/lib/cn'
 import { CaretDownIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { GROOVY_ITEM, GROOVY_ITEM_IDLE } from '@/shared/ui/molecules/groovy-popover/constants'
-import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
+import { Button } from '@/shared/ui/shadcn/button'
 
 import { OptionRow } from './option-row'
 
@@ -34,12 +34,13 @@ export function QuickFilter({ filter, onToggle, onClear }: Readonly<QuickFilterP
   return (
     <GroovyPopover open={open} onOpenChange={setOpen}>
       <GroovyPopover.Anchor asChild>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
           className={cn(
-            'flex h-8 shrink-0 items-center gap-1.5 px-1.5 text-sm transition-colors duration-200',
+            'h-8 gap-1.5 px-1.5 text-sm font-normal transition-colors duration-200 hover:bg-transparent',
             active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
           )}
         >
@@ -55,31 +56,29 @@ export function QuickFilter({ filter, onToggle, onClear }: Readonly<QuickFilterP
               open && 'rotate-180',
             )}
           />
-        </button>
+        </Button>
       </GroovyPopover.Anchor>
 
       <GroovyPopover.Content align="end" className="w-64">
-        <TooltipProvider delayDuration={350}>
-          <div className="flex max-h-72 flex-col gap-0.5 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {filter.options.map((option) => (
-              <OptionRow
-                key={option.value}
-                option={option}
-                checked={filter.selected.includes(option.value)}
-                onToggle={() => onToggle(option.value)}
-              />
-            ))}
-          </div>
-        </TooltipProvider>
+        <div className="flex max-h-72 flex-col gap-0.5 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {filter.options.map((option) => (
+            <OptionRow
+              key={option.value}
+              option={option}
+              checked={filter.selected.includes(option.value)}
+              onToggle={() => onToggle(option.value)}
+            />
+          ))}
+        </div>
 
         {active && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onClear}
-            className={cn(GROOVY_ITEM, GROOVY_ITEM_IDLE, 'mt-1 text-xs')}
+            className={cn(GROOVY_ITEM, GROOVY_ITEM_IDLE, 'mt-1 h-auto text-xs')}
           >
             {t('common.filters.clearOne')}
-          </button>
+          </Button>
         )}
       </GroovyPopover.Content>
     </GroovyPopover>

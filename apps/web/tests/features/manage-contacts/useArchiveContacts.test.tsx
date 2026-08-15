@@ -7,11 +7,14 @@ import { API, createMswServer } from '../../msw/test-server'
 
 import type { ReactNode } from 'react'
 
-import { useArchiveContact } from '@/features/manage-contacts/query/useArchiveContact'
+import { useArchiveContacts } from '@/features/manage-contacts/query/useArchiveContacts'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, options?: { count?: number }) =>
+      options?.count === undefined ? key : `${key}:${options.count}`,
+  }),
 }))
 
 const sileoError = vi.fn()
@@ -58,35 +61,35 @@ beforeEach(() => {
   sileoSuccess.mockClear()
 })
 
-describe('useArchiveContact', () => {
+describe('useArchiveContacts', () => {
   it('reports success when every contact is archived', async () => {
     server.use(archiveHandler())
     const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useArchiveContact(), { wrapper: Wrapper })
+    const { result } = renderHook(() => useArchiveContacts(), { wrapper: Wrapper })
 
     act(() => result.current.archive(['a', 'b']))
 
     await waitFor(() => expect(sileoSuccess).toHaveBeenCalledTimes(1))
-    expect(sileoSuccess).toHaveBeenCalledWith({ title: 'contacts.toasts.archivedMany' })
+    expect(sileoSuccess).toHaveBeenCalledWith({ title: 'contacts.toasts.archived:2' })
     expect(sileoError).not.toHaveBeenCalled()
   })
 
   it('uses the singular toast for a single contact', async () => {
     server.use(archiveHandler())
     const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useArchiveContact(), { wrapper: Wrapper })
+    const { result } = renderHook(() => useArchiveContacts(), { wrapper: Wrapper })
 
     act(() => result.current.archive(['a']))
 
     await waitFor(() =>
-      expect(sileoSuccess).toHaveBeenCalledWith({ title: 'contacts.toasts.archived' }),
+      expect(sileoSuccess).toHaveBeenCalledWith({ title: 'contacts.toasts.archived:1' }),
     )
   })
 
   it('reports the partial count when only some contacts archive', async () => {
     server.use(archiveHandler(['b']))
     const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useArchiveContact(), { wrapper: Wrapper })
+    const { result } = renderHook(() => useArchiveContacts(), { wrapper: Wrapper })
 
     act(() => result.current.archive(['a', 'b', 'c']))
 
@@ -99,7 +102,7 @@ describe('useArchiveContact', () => {
     server.use(archiveHandler(['b']))
     const { client, Wrapper } = makeWrapper()
     const invalidate = vi.spyOn(client, 'invalidateQueries')
-    const { result } = renderHook(() => useArchiveContact(), { wrapper: Wrapper })
+    const { result } = renderHook(() => useArchiveContacts(), { wrapper: Wrapper })
 
     act(() => result.current.archive(['a', 'b']))
 
@@ -111,7 +114,7 @@ describe('useArchiveContact', () => {
   it('reports a plain failure when nothing could be archived', async () => {
     server.use(archiveHandler(['a', 'b']))
     const { Wrapper } = makeWrapper()
-    const { result } = renderHook(() => useArchiveContact(), { wrapper: Wrapper })
+    const { result } = renderHook(() => useArchiveContacts(), { wrapper: Wrapper })
 
     act(() => result.current.archive(['a', 'b']))
 

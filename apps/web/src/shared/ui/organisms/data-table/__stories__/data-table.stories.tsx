@@ -5,6 +5,8 @@ import { expect, userEvent, within } from 'storybook/test'
 
 import { AvatarSquircle } from '../../../atoms/avatar-squircle'
 import { BadgeSoft } from '../../../atoms/badge-soft'
+import { TrashIcon } from '../../../icons'
+import { Button } from '../../../shadcn/button'
 import { DataTable, selectionColumn, useDataTable } from '../index'
 
 import {
@@ -26,84 +28,128 @@ const COLUMNS: ReadonlyArray<ColumnDef<ContactRow, unknown>> = [
     accessorKey: 'name',
     header: 'Name',
     size: 240,
+    meta: { lockable: true },
     cell: ({ row }) => (
-      <span className="flex items-center gap-3">
+      <span className="flex min-w-0 items-center gap-3">
         <AvatarSquircle initials={row.original.initials} tone={row.original.tone} />
-        <DataTable.RowTitle title={row.original.name} subtitle={row.original.role} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium text-foreground">
+            {row.original.name}
+          </span>
+          <span className="block truncate text-xs text-muted-foreground">{row.original.role}</span>
+        </span>
       </span>
     ),
   },
-  { id: 'company', accessorKey: 'company', header: 'Company', size: 200 },
+  {
+    id: 'company',
+    accessorKey: 'company',
+    header: 'Company',
+    size: 200,
+    cell: ({ getValue }) => <DataTable.CellText>{String(getValue())}</DataTable.CellText>,
+  },
   {
     id: 'status',
     accessorKey: 'status',
     header: 'Lead status',
     size: 130,
+    meta: { lockable: true },
     cell: ({ row }) => {
       const status = STATUS_TONE[row.original.status]
       return <BadgeSoft tone={status.tone}>{status.label}</BadgeSoft>
     },
   },
-  { id: 'email', accessorKey: 'email', header: 'Email', size: 220 },
-  { id: 'city', accessorKey: 'city', header: 'City', size: 110 },
+  {
+    id: 'email',
+    accessorKey: 'email',
+    header: 'Email',
+    size: 220,
+    meta: { grow: true },
+    cell: ({ getValue }) => <DataTable.CellText muted>{String(getValue())}</DataTable.CellText>,
+  },
+  {
+    id: 'city',
+    accessorKey: 'city',
+    header: 'City',
+    size: 120,
+    cell: ({ getValue }) => <DataTable.CellText>{String(getValue())}</DataTable.CellText>,
+  },
 ]
 
+const PINNED = ['name']
+
+const BULK_LABELS = {
+  selected: (count: number) => `${count} selected`,
+  selectAll: (total: number) => `Select all ${total}`,
+  clear: 'Clear selection',
+}
+
 function ContactsTable({ rows }: Readonly<{ rows: ReadonlyArray<ContactRow> }>) {
-  const instance = useDataTable({ data: rows, columns: COLUMNS, getRowId: (row) => row.id })
+  const instance = useDataTable({
+    data: rows,
+    columns: COLUMNS,
+    getRowId: (row) => row.id,
+    pinnedColumns: PINNED,
+  })
   const [search, setSearch] = useState('')
   const [activeList, setActiveList] = useState('all')
-  const [ownerFilter, setOwnerFilter] = useState(true)
-  const selected = instance.table.getSelectedRowModel().rows.length
   const { pageIndex, pageSize } = instance.table.getState().pagination
 
   return (
-    <DataTable instance={instance} className="min-w-4xl">
+    <div className="flex h-136 min-h-0 flex-col">
       <DataTable.SmartLists
         data={{ items: SMART_LISTS, activeId: activeList }}
         onSelect={setActiveList}
       />
-      <DataTable.Toolbar>
-        <DataTable.Search
-          value={search}
-          placeholder="Name, address, email, phone or ZIP"
-          onChange={setSearch}
-        />
-        <DataTable.Filter label="City" active={false} onClick={() => undefined} />
-        <DataTable.Filter
-          label="Owner: Camila"
-          active={ownerFilter}
-          onClick={() => setOwnerFilter(true)}
-          onClear={() => setOwnerFilter(false)}
-        />
-        <DataTable.EditColumns label="Edit columns" onClick={() => undefined} />
-      </DataTable.Toolbar>
-      {selected > 0 && (
-        <DataTable.BulkBar label={`${selected} contacts selected`}>
-          <DataTable.BulkAction>Assign owner</DataTable.BulkAction>
-          <DataTable.BulkAction>Add to list</DataTable.BulkAction>
-          <DataTable.BulkAction destructive>Delete</DataTable.BulkAction>
-        </DataTable.BulkBar>
-      )}
-      <DataTable.Header />
-      <DataTable.Body />
-      <div className="flex justify-center py-5">
-        <DataTable.Pagination label="Pagination" collapseLabel="Collapse pagination">
-          <DataTable.Pagination.Nav
-            page={pageIndex + 1}
-            totalPages={instance.table.getPageCount()}
-            onPageChange={(page) => instance.table.setPageIndex(page - 1)}
-            labels={{ prev: 'Previous page', next: 'Next page' }}
-          />
-          <DataTable.Pagination.Divider />
-          <DataTable.Pagination.PageSize
-            value={pageSize}
-            options={[10, 25, 50]}
-            onChange={instance.table.setPageSize}
-            label="Rows per page"
-          />
-        </DataTable.Pagination>
+      <div className="min-h-0 flex-1 px-4 pb-4 pt-1">
+        <DataTable
+          instance={instance}
+          className="flex h-full min-h-0 flex-col border border-border"
+        >
+          <DataTable.Toolbar
+            bulk={{
+              labels: BULK_LABELS,
+              onSelectAll: () => instance.table.toggleAllRowsSelected(true),
+              actions: (
+                <Button variant="ghost" size="icon-sm" aria-label="Archive">
+                  <TrashIcon className="size-4" />
+                </Button>
+              ),
+            }}
+          >
+            <DataTable.Search
+              value={search}
+              placeholder="Name, address, email, phone or ZIP"
+              onChange={setSearch}
+            />
+            <DataTable.Density className="ml-auto" />
+          </DataTable.Toolbar>
+          <DataTable.Scroller className="min-h-0 flex-1">
+            <DataTable.Grid>
+              <DataTable.Header />
+              <DataTable.Body />
+            </DataTable.Grid>
+          </DataTable.Scroller>
+          <div className="flex justify-center py-3">
+            <DataTable.Pagination label="Pagination" collapseLabel="Collapse pagination">
+              <DataTable.Pagination.Nav
+                page={pageIndex + 1}
+                totalPages={instance.table.getPageCount()}
+                onPageChange={(page) => instance.table.setPageIndex(page - 1)}
+                labels={{ prev: 'Previous page', next: 'Next page' }}
+              />
+              <DataTable.Pagination.Divider />
+              <DataTable.Pagination.PageSize
+                value={pageSize}
+                options={[10, 25, 50]}
+                onChange={instance.table.setPageSize}
+                label="Rows per page"
+              />
+            </DataTable.Pagination>
+          </div>
+        </DataTable>
       </div>
-    </DataTable>
+    </div>
   )
 }
 
@@ -121,12 +167,14 @@ export const Default: Story = {
   render: () => <ContactsTable rows={CONTACT_ROWS} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole('button', { name: /^Name/ }))
+    const sortByName = canvasElement.querySelector<HTMLElement>('[data-slot="table-sort"]')!
+    await userEvent.click(sortByName)
     const firstCell = canvas.getAllByText(/Andrés|Laura|Ricardo|Sofía/)[0]
     await expect(firstCell).toHaveTextContent('Andrés Gómez')
     const checkboxes = canvas.getAllByRole('checkbox', { name: 'Select row' })
     await userEvent.click(checkboxes[0]!)
-    await expect(canvas.getByText('1 contacts selected')).toBeVisible()
+    await expect(checkboxes[0]!).toBeChecked()
+    await expect(checkboxes[0]!.closest('tr')).toHaveAttribute('data-state', 'selected')
   },
 }
 

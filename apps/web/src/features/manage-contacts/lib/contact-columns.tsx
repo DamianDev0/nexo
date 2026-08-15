@@ -1,10 +1,9 @@
-import { formatDateCO } from '@repo/shared-utils'
+import { formatDateShortCO } from '@repo/shared-utils'
 
 import { contactFullName } from '@/entities/contact'
-import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { DataTable, selectionColumn } from '@/shared/ui/organisms/data-table'
 
-import { ContactNameCell, ContactRowActions, ContactTagsCell } from './contact-cells'
+import { ContactNameCell, ContactStatusCell, ContactTagsCell } from './contact-cells'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
@@ -12,11 +11,6 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { TFunction } from 'i18next'
 
 type ContactColumn = ColumnDef<ContactListItem, unknown>
-
-interface ContactRowHandlers {
-  onEdit: (contact: ContactListItem) => void
-  onArchive: (contact: ContactListItem) => void
-}
 
 interface ContactTaxonomyMaps {
   readonly statusByKey: ReadonlyMap<string, TaxonomyChoice>
@@ -26,8 +20,7 @@ interface ContactTaxonomyMaps {
 
 interface TextColumnOptions {
   readonly size: number
-  readonly muted?: boolean
-  readonly numeric?: boolean
+  readonly tone?: 'muted' | 'numeric'
   readonly align?: 'start' | 'center' | 'end'
   readonly value?: (contact: ContactListItem) => string | number | null
 }
@@ -39,19 +32,19 @@ function labelFor(map: ReadonlyMap<string, TaxonomyChoice>, key: string | null):
 
 function textColumn(
   id: string,
-  header: string,
-  { size, muted, numeric, align, value }: TextColumnOptions,
+  t: TFunction,
+  { size, tone, align, value }: TextColumnOptions,
 ): ContactColumn {
   const read = value ?? ((contact: ContactListItem) => Reflect.get(contact, id) as string | null)
 
   return {
     id,
     accessorFn: read,
-    header,
+    header: t(`contacts.columns.${id}`),
     size,
-    meta: { align },
+    meta: { align, description: t(`contacts.columnHints.${id}`) },
     cell: ({ row }) => (
-      <DataTable.CellText muted={muted} numeric={numeric}>
+      <DataTable.CellText muted={tone === 'muted'} numeric={tone === 'numeric'}>
         {read(row.original)}
       </DataTable.CellText>
     ),
@@ -60,7 +53,6 @@ function textColumn(
 
 export function buildContactColumns(
   t: TFunction,
-  handlers: ContactRowHandlers,
   taxonomy: ContactTaxonomyMaps,
 ): ReadonlyArray<ContactColumn> {
   return [
@@ -73,78 +65,72 @@ export function buildContactColumns(
       accessorFn: contactFullName,
       header: t('contacts.columns.name'),
       size: 240,
-      meta: { grow: true },
+      minSize: 180,
+      meta: { grow: true, lockable: true, description: t('contacts.columnHints.name') },
       cell: ({ row }) => <ContactNameCell contact={row.original} />,
     },
-    textColumn('jobTitle', t('contacts.columns.jobTitle'), { size: 150 }),
     {
       id: 'status',
       accessorKey: 'status',
       header: t('contacts.columns.status'),
-      size: 140,
-      cell: ({ row }) => {
-        const choice = taxonomy.statusByKey.get(row.original.status)
-        return <BadgeSoft color={choice?.color}>{choice?.label ?? row.original.status}</BadgeSoft>
-      },
+      size: 150,
+      minSize: 130,
+      meta: { lockable: true, description: t('contacts.columnHints.status') },
+      cell: ({ row }) => (
+        <ContactStatusCell
+          status={row.original.status}
+          choice={taxonomy.statusByKey.get(row.original.status)}
+        />
+      ),
     },
-    textColumn('lifecycleStage', t('contacts.columns.lifecycleStage'), {
+    textColumn('email', t, { size: 210 }),
+    textColumn('phone', t, { size: 150, tone: 'numeric' }),
+    textColumn('whatsapp', t, { size: 150, tone: 'numeric' }),
+    textColumn('documentNumber', t, { size: 150, tone: 'numeric' }),
+    textColumn('jobTitle', t, { size: 150 }),
+    textColumn('lifecycleStage', t, {
       size: 130,
       value: (contact) =>
         t(`contacts.lifecycleStage.${contact.lifecycleStage}`, {
           defaultValue: contact.lifecycleStage,
         }),
     }),
-    textColumn('source', t('contacts.columns.source'), {
+    textColumn('source', t, {
       size: 130,
-      muted: true,
+      tone: 'muted',
       value: (contact) => labelFor(taxonomy.sourceByKey, contact.source),
     }),
-    textColumn('type', t('contacts.columns.type'), {
+    textColumn('type', t, {
       size: 120,
-      muted: true,
+      tone: 'muted',
       value: (contact) => contact.typeLabel ?? labelFor(taxonomy.typeByKey, contact.type),
     }),
-    textColumn('phone', t('contacts.columns.phone'), {
-      size: 140,
-      numeric: true,
-      value: (contact) => contact.phone ?? contact.whatsapp,
-    }),
-    textColumn('city', t('contacts.columns.city'), { size: 120, muted: true }),
     {
       id: 'tags',
       accessorFn: (row) => row.tags.join(', '),
       header: t('contacts.columns.tags'),
-      size: 160,
+      size: 150,
       enableSorting: false,
-      cell: ({ row }) => <ContactTagsCell tags={row.original.tags} />,
-    },
-    textColumn('leadScore', t('contacts.columns.leadScore'), {
-      size: 90,
-      numeric: true,
-      align: 'end',
-    }),
-    textColumn('lastContactedAt', t('contacts.columns.lastContacted'), {
-      size: 130,
-      numeric: true,
-      value: (contact) => (contact.lastContactedAt ? formatDateCO(contact.lastContactedAt) : null),
-    }),
-    textColumn('createdAt', t('contacts.columns.created'), {
-      size: 120,
-      numeric: true,
-      value: (contact) => formatDateCO(contact.createdAt),
-    }),
-    {
-      id: 'actions',
-      size: 56,
-      enableSorting: false,
-      meta: { align: 'end' },
+      meta: { description: t('contacts.columnHints.tags') },
       cell: ({ row }) => (
-        <ContactRowActions
-          t={t}
-          onEdit={() => handlers.onEdit(row.original)}
-          onArchive={() => handlers.onArchive(row.original)}
+        <ContactTagsCell
+          tags={row.original.tags}
+          label={(count) => t('contacts.tagCount', { count })}
         />
       ),
     },
+    textColumn('city', t, { size: 130, tone: 'muted' }),
+    textColumn('leadScore', t, { size: 110, tone: 'numeric', align: 'end' }),
+    textColumn('lastContactedAt', t, {
+      size: 150,
+      tone: 'numeric',
+      value: (contact) =>
+        contact.lastContactedAt ? formatDateShortCO(contact.lastContactedAt) : null,
+    }),
+    textColumn('createdAt', t, {
+      size: 140,
+      tone: 'numeric',
+      value: (contact) => formatDateShortCO(contact.createdAt),
+    }),
   ]
 }

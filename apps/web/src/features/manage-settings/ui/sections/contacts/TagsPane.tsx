@@ -6,7 +6,6 @@ import { PlusIcon, TagIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
 import { Button } from '@/shared/ui/shadcn/button'
-import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import { useTagsPane } from '../../../model/useTagsPane'
 
@@ -44,18 +43,16 @@ export function TagsPane() {
         </div>
       )}
 
-      <TooltipProvider delayDuration={400}>
-        <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
-          {pane.tags.map((tag) => (
-            <TagRow
-              key={tag.id}
-              tag={tag}
-              count={pane.counts[tag.name] ?? 0}
-              actions={pane.actions}
-            />
-          ))}
-        </PagedTransition>
-      </TooltipProvider>
+      <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
+        {pane.tags.map((tag) => (
+          <TagRow
+            key={tag.id}
+            tag={tag}
+            count={pane.counts[tag.name] ?? 0}
+            actions={pane.actions}
+          />
+        ))}
+      </PagedTransition>
 
       <MorphingPageDots
         total={pane.pagination.totalPages}

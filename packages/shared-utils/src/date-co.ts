@@ -10,6 +10,22 @@ export function formatDateCO(date: Date | string): string {
   }).format(d)
 }
 
+const SHORT_DATE_CO = new Intl.DateTimeFormat('es-CO', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: CO_TIMEZONE,
+})
+
+export function formatDateShortCO(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date
+  const parts = SHORT_DATE_CO.formatToParts(d)
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((candidate) => candidate.type === type)?.value ?? ''
+
+  return `${part('day')} ${part('month').replace('.', '')} ${part('year')}`
+}
+
 export function formatDateTimeCO(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
   return new Intl.DateTimeFormat('es-CO', {

@@ -1,6 +1,8 @@
 'use client'
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
+import { Tooltip, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
+
+import { HintContent } from './hint-content'
 
 import type { ReactNode } from 'react'
 
@@ -27,14 +29,9 @@ export function HintTooltip({
       <TooltipTrigger asChild={asChild} className={asChild ? undefined : TEXT_TRIGGER}>
         {children}
       </TooltipTrigger>
-      <TooltipContent
-        side={side}
-        align={asChild ? 'center' : 'start'}
-        sideOffset={6}
-        className="max-w-64 text-pretty"
-      >
-        <span className="line-clamp-5 block whitespace-pre-line">{hint}</span>
-      </TooltipContent>
+      <HintContent side={side} align={asChild ? 'center' : 'start'}>
+        {hint}
+      </HintContent>
     </Tooltip>
   )
 }

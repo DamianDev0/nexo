@@ -8,6 +8,7 @@ import { memo } from 'react'
 import { cn } from '@/shared/lib'
 import { DotsSixVerticalIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
+import { Button } from '@/shared/ui/shadcn/button'
 
 import type { SmartListItem } from '../model/smart-list.types'
 import type { KeyboardEvent } from 'react'
@@ -62,15 +63,15 @@ function SmartListTabBase({
   } = useSortable({ id: item.id, disabled: !sortable })
 
   const trigger = (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       role="tab"
       aria-selected={active}
       tabIndex={active ? 0 : -1}
       onClick={() => actions.onSelect(item.id)}
       onKeyDown={actions.onKeyDown}
       className={cn(
-        'relative inline-flex h-14 items-center gap-2 whitespace-nowrap px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        'relative h-12 gap-2 whitespace-nowrap rounded-none px-4 text-sm hover:bg-transparent',
         sortable && 'pl-7 pr-5',
         active
           ? 'font-semibold text-foreground'
@@ -102,7 +103,7 @@ function SmartListTabBase({
           </motion.span>
         </span>
       )}
-    </button>
+    </Button>
   )
 
   return (

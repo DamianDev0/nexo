@@ -5,7 +5,14 @@ import unusedImports from 'eslint-plugin-unused-imports'
 
 export default [
   {
-    ignores: ['.next/**', 'next-env.d.ts', 'node_modules/**', 'storybook-static/**'],
+    ignores: [
+      '.next/**',
+      '.stryker-tmp/**',
+      'next-env.d.ts',
+      'node_modules/**',
+      'reports/**',
+      'storybook-static/**',
+    ],
   },
   ...nextJsConfig,
   {

@@ -6,25 +6,27 @@ import {
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type ColumnOrderState,
-  type OnChangeFn,
+  type ColumnSizingState,
   type Table,
 } from '@tanstack/react-table'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { DEFAULT_PAGE_SIZE } from '@/shared/config/pagination'
+import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 
-import type { RowData } from '@tanstack/react-table'
+import {
+  DATA_TABLE_MAX_COLUMN_WIDTH,
+  DATA_TABLE_MIN_COLUMN_WIDTH,
+  DATA_TABLE_ROW_HEIGHT,
+  DATA_TABLE_STORAGE_PREFIX,
+} from '../config/table.constants'
 
-declare module '@tanstack/react-table' {
-  // eslint-disable-next-line unused-imports/no-unused-vars -- module augmentation must repeat the upstream type parameters
-  interface ColumnMeta<TData extends RowData, TValue> {
-    grow?: boolean
-    align?: 'start' | 'center' | 'end'
-  }
-}
+import { useColumnOrder } from './column-order'
+import { useColumnPinning } from './column-pinning'
 
-const STORAGE_PREFIX = 'nexo.table.columnOrder.v1:'
+import './table-meta'
+
+export type DataTableDensity = keyof typeof DATA_TABLE_ROW_HEIGHT
 
 interface UseDataTableOptions<TData> {
   readonly data: ReadonlyArray<TData>
@@ -32,37 +34,24 @@ interface UseDataTableOptions<TData> {
   readonly pageSize?: number
   readonly getRowId?: (row: TData) => string
   readonly storageKey?: string
+  readonly pinnedColumns?: ReadonlyArray<string>
+  readonly totalRows?: number
+}
+
+export interface TableSelection {
+  readonly count: number
+  readonly total: number
+  readonly active: boolean
+  readonly clear: () => void
 }
 
 export interface DataTableInstance<TData> {
   readonly table: Table<TData>
   readonly reorderColumn: (activeId: string, overId: string) => void
-}
-
-function reconcile(stored: ReadonlyArray<string>, current: ReadonlyArray<string>): string[] {
-  const valid = new Set(current)
-  const kept = stored.filter((id) => valid.has(id))
-  const known = new Set(kept)
-  return [...kept, ...current.filter((id) => !known.has(id))]
-}
-
-function readOrder(key: string): string[] | null {
-  try {
-    const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${key}`)
-    if (!raw) return null
-    const parsed: unknown = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string') : null
-  } catch {
-    return null
-  }
-}
-
-function writeOrder(key: string, order: ReadonlyArray<string>): void {
-  try {
-    window.localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(order))
-  } catch {
-    return
-  }
+  readonly density: DataTableDensity
+  readonly setDensity: (density: DataTableDensity) => void
+  readonly rowHeight: number
+  readonly selection: TableSelection
 }
 
 export function useDataTable<TData>({
@@ -71,56 +60,59 @@ export function useDataTable<TData>({
   pageSize = DEFAULT_PAGE_SIZE,
   getRowId,
   storageKey,
+  pinnedColumns,
+  totalRows,
 }: UseDataTableOptions<TData>): DataTableInstance<TData> {
   const columnIds = useMemo(() => columns.map((column) => column.id ?? ''), [columns])
-  const [columnOrder, setColumnOrder] = useState<string[]>(columnIds)
+  const order = useColumnOrder(columnIds, storageKey)
 
-  useEffect(() => {
-    if (!storageKey) return
-    const stored = readOrder(storageKey)
-    setColumnOrder(stored ? reconcile(stored, columnIds) : columnIds)
-  }, [storageKey, columnIds])
-
-  const handleOrderChange: OnChangeFn<ColumnOrderState> = useCallback(
-    (updater) =>
-      setColumnOrder((prev) => {
-        const next = typeof updater === 'function' ? updater(prev) : updater
-        if (storageKey) writeOrder(storageKey, next)
-        return next
-      }),
-    [storageKey],
+  const [density, setDensity] = useLocalStorageState<DataTableDensity>(
+    `${DATA_TABLE_STORAGE_PREFIX}density.v1:${storageKey ?? 'default'}`,
+    'comfortable',
   )
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({})
+  const pinning = useColumnPinning(order.columnOrder, pinnedColumns)
 
   const table = useReactTable({
     data: data as TData[],
     columns: columns as ColumnDef<TData, unknown>[],
-    state: { columnOrder },
-    onColumnOrderChange: handleOrderChange,
+    state: {
+      columnOrder: order.columnOrder,
+      columnSizing,
+      columnPinning: pinning.columnPinning,
+    },
+    onColumnOrderChange: order.onColumnOrderChange,
+    onColumnSizingChange: setColumnSizing,
+    onColumnPinningChange: pinning.onColumnPinningChange,
     getRowId,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    defaultColumn: { minSize: DATA_TABLE_MIN_COLUMN_WIDTH, maxSize: DATA_TABLE_MAX_COLUMN_WIDTH },
     initialState: { pagination: { pageSize } },
     autoResetPageIndex: false,
     enableRowSelection: true,
+    enableColumnPinning: true,
+    enableColumnResizing: true,
   })
 
-  const reorderColumn = useCallback(
-    (activeId: string, overId: string) => {
-      setColumnOrder((order) => {
-        const from = order.indexOf(activeId)
-        const to = order.indexOf(overId)
-        if (from < 0 || to < 0 || from === to) return order
-        const next = [...order]
-        const moved = next.splice(from, 1)[0]
-        if (!moved) return order
-        next.splice(to, 0, moved)
-        if (storageKey) writeOrder(storageKey, next)
-        return next
-      })
-    },
-    [storageKey],
-  )
+  const selectedCount = table.getSelectedRowModel().rows.length
+  const total = totalRows ?? data.length
 
-  return { table, reorderColumn }
+  return useMemo(
+    () => ({
+      table,
+      reorderColumn: order.reorder,
+      density,
+      setDensity,
+      rowHeight: DATA_TABLE_ROW_HEIGHT[density],
+      selection: {
+        count: selectedCount,
+        total,
+        active: selectedCount > 0,
+        clear: () => table.resetRowSelection(),
+      },
+    }),
+    [table, order.reorder, density, setDensity, selectedCount, total],
+  )
 }

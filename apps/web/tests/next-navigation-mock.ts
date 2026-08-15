@@ -20,6 +20,21 @@ function subscribe(listener: () => void) {
   }
 }
 
+const nativeReplaceState = window.history.replaceState.bind(window.history)
+const nativePushState = window.history.pushState.bind(window.history)
+
+function trackHistory(
+  native: typeof nativeReplaceState,
+): (data: unknown, unused: string, url?: string | URL | null) => void {
+  return (data, unused, url) => {
+    native(data, unused, url)
+    if (url != null) write(String(url).split('?')[1] ?? '')
+  }
+}
+
+window.history.replaceState = trackHistory(nativeReplaceState)
+window.history.pushState = trackHistory(nativePushState)
+
 export function setUrl(next: string) {
   write(next)
 }
