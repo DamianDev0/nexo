@@ -35,7 +35,11 @@ const en = {
       sortDesc: 'Sort descending',
       resize: 'Adjust column width',
       columns: 'Columns',
-      columnsVisible: 'Visible columns',
+      editColumns: 'Edit columns',
+      editColumnsHint: 'Drag to reorder and switch on the ones you want to see.',
+      lockedColumn: 'Pinned column: it cannot be hidden',
+      showAllColumns: 'Show all',
+      resetWidths: 'Reset widths',
       hideColumn: 'Hide column',
       density: {
         comfortable: 'Comfortable view',

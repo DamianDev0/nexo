@@ -1,11 +1,12 @@
 import { PaginationCapsule } from '../pagination-capsule'
 
 import { DataTableBody, DataTableCellText } from './body'
+import { DataTableColumnEditor } from './column-editor'
 import { DataTableGrid, DataTableRoot, DataTableScroller, DataTableSkeleton } from './grid'
 import { DataTableHeader } from './header'
 import { DataTableQuickFilters } from './quick-filters'
 import { DataTableSmartLists } from './smart-list'
-import { DataTableColumns, DataTableDensity, DataTableSearch, DataTableToolbar } from './toolbar'
+import { DataTableDensity, DataTableSearch, DataTableToolbar } from './toolbar'
 
 export { useDataTable, type DataTableInstance } from './model/use-data-table'
 export type {
@@ -27,7 +28,7 @@ export const DataTable = Object.assign(DataTableRoot, {
   Toolbar: DataTableToolbar,
   Search: DataTableSearch,
   Density: DataTableDensity,
-  Columns: DataTableColumns,
+  Columns: DataTableColumnEditor,
   Grid: DataTableGrid,
   Header: DataTableHeader,
   Body: DataTableBody,

@@ -35,7 +35,11 @@ const es = {
       sortDesc: 'Ordenar descendente',
       resize: 'Ajustar ancho de columna',
       columns: 'Columnas',
-      columnsVisible: 'Columnas visibles',
+      editColumns: 'Editar columnas',
+      editColumnsHint: 'Arrastra para reordenar y activa las que quieras ver.',
+      lockedColumn: 'Columna fija: no se puede ocultar',
+      showAllColumns: 'Mostrar todas',
+      resetWidths: 'Restablecer anchos',
       hideColumn: 'Ocultar columna',
       selection: {
         selected_one: '{{count}} seleccionado',
