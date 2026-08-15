@@ -2,8 +2,8 @@ import { Injectable, OnApplicationBootstrap } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import { DataSource } from 'typeorm'
-import { TENANT_MIGRATIONS } from './tenant-migrations'
-import type { SchemaRow, MigrationRow } from './tenant-migration.interfaces'
+import { applyPendingMigrations } from './tenant-migration.runner'
+import type { SchemaRow } from './tenant-migration.interfaces'
 
 @Injectable()
 export class TenantMigrationService implements OnApplicationBootstrap {
@@ -54,41 +54,17 @@ export class TenantMigrationService implements OnApplicationBootstrap {
     await qr.connect()
 
     try {
-      await qr.query(`
-        CREATE TABLE IF NOT EXISTS "${schemaName}".schema_migrations (
-          id         VARCHAR(100) PRIMARY KEY,
-          applied_at TIMESTAMPTZ  DEFAULT NOW()
+      const outcome = await applyPendingMigrations(qr, schemaName)
+
+      for (const id of outcome.applied) {
+        this.logger.info({ schemaName, migration: id }, 'Migration applied')
+      }
+
+      if (outcome.failed) {
+        this.logger.error(
+          { schemaName, migration: outcome.failed.id, err: outcome.failed.error },
+          'Migration failed — skipping remaining migrations for this schema',
         )
-      `)
-
-      const applied = (await qr.query(
-        `SELECT id FROM "${schemaName}".schema_migrations`,
-      )) as MigrationRow[]
-      const appliedIds = new Set(applied.map((r) => r.id))
-
-      const pending = TENANT_MIGRATIONS.filter((m) => !appliedIds.has(m.id))
-
-      if (pending.length === 0) return
-
-      this.logger.info({ schemaName, count: pending.length }, 'Applying pending migrations')
-
-      for (const migration of pending) {
-        await qr.startTransaction()
-        try {
-          await qr.query(migration.up(schemaName))
-          await qr.query(`INSERT INTO "${schemaName}".schema_migrations (id) VALUES ($1)`, [
-            migration.id,
-          ])
-          await qr.commitTransaction()
-          this.logger.info({ schemaName, migration: migration.id }, 'Migration applied')
-        } catch (err) {
-          await qr.rollbackTransaction()
-          this.logger.error(
-            { schemaName, migration: migration.id, err },
-            'Migration failed — skipping remaining migrations for this schema',
-          )
-          break
-        }
       }
     } finally {
       await qr.release()
