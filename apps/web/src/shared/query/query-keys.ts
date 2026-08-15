@@ -7,6 +7,7 @@ export const QUERY_KEYS = {
   contacts: {
     all: ['contacts'] as const,
     counts: ['contacts', 'counts'] as const,
+    workspace: ['contacts', 'workspace'] as const,
     taxonomyUsage: ['contacts', 'taxonomy-usage'] as const,
     list: (query: ContactListQuery) => ['contacts', 'list', query] as const,
     detail: (id: string) => ['contacts', 'detail', id] as const,

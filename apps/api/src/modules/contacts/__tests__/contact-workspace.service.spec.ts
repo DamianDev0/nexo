@@ -171,6 +171,38 @@ describe('ContactWorkspaceService', () => {
       expect(params).toEqual([USER, null, { density: 'compact' }])
     })
 
+    it('merges the incoming table state into the stored one instead of replacing it', async () => {
+      qr.query
+        .mockResolvedValueOnce([
+          {
+            active_view_id: null,
+            table_state: { density: 'compact', columns: { order: ['name', 'email'] } },
+          },
+        ])
+        .mockResolvedValueOnce([])
+
+      await service.updateState(SCHEMA, USER, {
+        tableState: { columns: { widths: { name: 200 } } },
+      })
+
+      const [, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      expect(params[2]).toEqual({
+        density: 'compact',
+        columns: { order: ['name', 'email'], widths: { name: 200 } },
+      })
+    })
+
+    it('clamps persisted widths to the catalog bounds', async () => {
+      qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce([])
+
+      await service.updateState(SCHEMA, USER, {
+        tableState: { columns: { widths: { name: 5, city: 10_000 } } },
+      })
+
+      const [, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      expect(params[2]).toEqual({ columns: { widths: { name: 180, city: 480 } } })
+    })
+
     it('clears the active view when the dto sends an explicit null', async () => {
       qr.query
         .mockResolvedValueOnce([

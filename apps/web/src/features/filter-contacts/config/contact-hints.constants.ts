@@ -1,0 +1,1 @@
+export const CONTACT_HINT_ROTATION_MS = 6000

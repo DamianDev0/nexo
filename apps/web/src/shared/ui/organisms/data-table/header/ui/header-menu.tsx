@@ -6,6 +6,7 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   DotsThreeVerticalIcon,
+  EyeSlashIcon,
   LockIcon,
   LockOpenIcon,
 } from '@/shared/ui/icons'
@@ -27,6 +28,7 @@ export function HeaderMenu({ header }: Readonly<{ header: Header<unknown, unknow
   const { column } = header
   const sortable = column.getCanSort()
   const lockable = column.columnDef.meta?.lockable === true
+  const hideable = column.getCanHide()
   const pinned = Boolean(column.getIsPinned())
   const sorted = column.getIsSorted()
 
@@ -64,12 +66,19 @@ export function HeaderMenu({ header }: Readonly<{ header: Header<unknown, unknow
           </>
         )}
 
-        {sortable && lockable && <DropdownMenuSeparator />}
+        {sortable && (lockable || hideable) && <DropdownMenuSeparator />}
 
         {lockable && (
           <DropdownMenuItem onSelect={() => column.pin(pinned ? false : 'left')}>
             {pinned ? <LockOpenIcon className="size-4" /> : <LockIcon className="size-4" />}
             {t(pinned ? 'common.table.unlock' : 'common.table.lock')}
+          </DropdownMenuItem>
+        )}
+
+        {hideable && (
+          <DropdownMenuItem onSelect={() => column.toggleVisibility(false)}>
+            <EyeSlashIcon className="size-4" />
+            {t('common.table.hideColumn')}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

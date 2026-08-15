@@ -5,13 +5,16 @@ import { DataTableGrid, DataTableRoot, DataTableScroller, DataTableSkeleton } fr
 import { DataTableHeader } from './header'
 import { DataTableQuickFilters } from './quick-filters'
 import { DataTableSmartLists } from './smart-list'
-import { DataTableDensity, DataTableSearch, DataTableToolbar } from './toolbar'
+import { DataTableColumns, DataTableDensity, DataTableSearch, DataTableToolbar } from './toolbar'
 
-export {
-  useDataTable,
-  type DataTableDensity as DataTableDensityValue,
-  type DataTableInstance,
-} from './model/use-data-table'
+export { useDataTable, type DataTableInstance } from './model/use-data-table'
+export type {
+  DataTableDensity,
+  DataTableLayout,
+  DataTableLayoutBinding,
+  DataTableSort,
+  DataTableSortBinding,
+} from './model/types'
 
 export type { DataTableBulkConfig, DataTableBulkLabels } from './toolbar'
 export type { SmartListItem } from './smart-list'
@@ -24,6 +27,7 @@ export const DataTable = Object.assign(DataTableRoot, {
   Toolbar: DataTableToolbar,
   Search: DataTableSearch,
   Density: DataTableDensity,
+  Columns: DataTableColumns,
   Grid: DataTableGrid,
   Header: DataTableHeader,
   Body: DataTableBody,

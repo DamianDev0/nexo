@@ -13,7 +13,10 @@ import { API } from './test-server'
 import type {
   ApiErrorResponse,
   ApiSuccessResponse,
+  ContactColumnDef,
   ContactListItem,
+  ContactSortField,
+  ContactWorkspace,
   GeneralSettings,
   MeResponse,
   PaginatedContacts,
@@ -71,7 +74,67 @@ export const CONTACTS_FIXTURE: ContactListItem[] = [
   }),
 ]
 
+const COLUMN_KEYS = [
+  'name',
+  'status',
+  'email',
+  'phone',
+  'whatsapp',
+  'documentNumber',
+  'jobTitle',
+  'lifecycleStage',
+  'source',
+  'type',
+  'tags',
+  'city',
+  'leadScore',
+  'lastContactedAt',
+  'createdAt',
+] as const
+
+const SORT_FIELD_BY_COLUMN: Partial<Record<(typeof COLUMN_KEYS)[number], ContactSortField>> = {
+  name: 'firstName',
+  status: 'status',
+  email: 'email',
+  city: 'city',
+  leadScore: 'leadScore',
+  lastContactedAt: 'lastContactedAt',
+  createdAt: 'createdAt',
+}
+
+const HIDDEN_BY_DEFAULT = new Set<string>(['whatsapp', 'documentNumber', 'jobTitle', 'type'])
+
+export const CONTACT_COLUMNS_FIXTURE: ContactColumnDef[] = COLUMN_KEYS.map((key) => ({
+  key,
+  labelKey: `contacts.columns.${key}`,
+  hintKey: `contacts.columnHints.${key}`,
+  sortField: SORT_FIELD_BY_COLUMN[key] ?? null,
+  defaultVisible: !HIDDEN_BY_DEFAULT.has(key),
+  defaultWidth: 150,
+  minWidth: 100,
+}))
+
 export const handlers = [
+  http.get(`${API}/contacts/workspace`, () =>
+    HttpResponse.json({
+      statusCode: 200,
+      message: 'OK',
+      data: {
+        views: [],
+        activeViewId: null,
+        tableState: {},
+        columns: CONTACT_COLUMNS_FIXTURE,
+        quickFilters: { statuses: [], sources: [], lifecycleStages: [] },
+        counts: { total: CONTACTS_FIXTURE.length, byStatus: {} },
+      },
+      timestamp: new Date().toISOString(),
+      path: '/contacts/workspace',
+      method: 'GET',
+    } satisfies ApiSuccessResponse<ContactWorkspace>),
+  ),
+
+  http.patch(`${API}/contacts/workspace`, () => new HttpResponse(null, { status: 204 })),
+
   http.get(`${API}/contacts`, () =>
     HttpResponse.json({
       statusCode: 200,

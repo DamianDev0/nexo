@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { DEFAULT_CONTACT_TAXONOMY, LifecycleStage } from '@repo/shared-types'
-import type { ContactWorkspace, ContactTableState } from '@repo/shared-types'
+import type { ContactWorkspace } from '@repo/shared-types'
 import { CONTACT_COLUMN_CATALOG } from '../constants/contact-columns.catalog'
+import {
+  mergeContactTableState,
+  sanitizeContactTableState,
+} from '../mappers/contact-table-state.mapper'
 import { ContactViewsService } from './contact-views.service'
 import { ContactsService } from './contacts.service'
 import type { UpdateContactWorkspaceDto } from '../dto/contact-workspace.dto'
@@ -33,7 +37,7 @@ export class ContactWorkspaceService {
     return {
       views,
       activeViewId,
-      tableState: (state?.table_state ?? {}) as ContactTableState,
+      tableState: sanitizeContactTableState(state?.table_state),
       columns: [...CONTACT_COLUMN_CATALOG],
       quickFilters: {
         statuses: DEFAULT_CONTACT_TAXONOMY.statuses.map((option) => option.key),
@@ -53,9 +57,13 @@ export class ContactWorkspaceService {
       const existing = await this.repository.loadState(qr, userId)
       const activeViewId =
         dto.activeViewId === undefined ? (existing?.active_view_id ?? null) : dto.activeViewId
-      const tableState = dto.tableState ?? existing?.table_state ?? {}
 
-      await this.repository.upsertState(qr, userId, activeViewId, tableState)
+      await this.repository.upsertState(
+        qr,
+        userId,
+        activeViewId,
+        mergeContactTableState(existing?.table_state, dto.tableState),
+      )
     })
   }
 }

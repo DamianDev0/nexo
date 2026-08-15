@@ -24,6 +24,7 @@ export function DataTableGrid({
   className,
 }: Readonly<{ children: ReactNode; className?: string }>) {
   const { table, reorderColumn } = useDataTableContext()
+  const { columnSizing: sizing } = table.getState()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
   const dndId = useId()
 
@@ -44,8 +45,12 @@ export function DataTableGrid({
         className={cn('table-fixed border-separate border-spacing-0', className)}
       >
         <colgroup>
-          {table.getVisibleLeafColumns().map((column) => (
-            <col key={column.id} data-col-id={column.id} style={{ width: columnWidth(column) }} />
+          {(table.getHeaderGroups()[0]?.headers ?? []).map(({ column }) => (
+            <col
+              key={column.id}
+              data-col-id={column.id}
+              style={{ width: columnWidth(column, sizing) }}
+            />
           ))}
         </colgroup>
         {children}

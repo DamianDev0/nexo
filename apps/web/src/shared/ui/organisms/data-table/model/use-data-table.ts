@@ -3,38 +3,36 @@
 import {
   getCoreRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type ColumnSizingState,
+  type OnChangeFn,
+  type SortingState,
   type Table,
 } from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { DEFAULT_PAGE_SIZE } from '@/shared/config/pagination'
-import { useLocalStorageState } from '@/shared/lib/hooks/useLocalStorageState'
 
 import {
   DATA_TABLE_MAX_COLUMN_WIDTH,
   DATA_TABLE_MIN_COLUMN_WIDTH,
   DATA_TABLE_ROW_HEIGHT,
-  DATA_TABLE_STORAGE_PREFIX,
 } from '../config/table.constants'
+import { resolveUpdater } from '../lib/updater'
 
-import { useColumnOrder } from './column-order'
-import { useColumnPinning } from './column-pinning'
+import { useTableLayout } from './use-table-layout'
+
+import type { DataTableDensity, DataTableLayoutBinding, DataTableSortBinding } from './types'
 
 import './table-meta'
-
-export type DataTableDensity = keyof typeof DATA_TABLE_ROW_HEIGHT
 
 interface UseDataTableOptions<TData> {
   readonly data: ReadonlyArray<TData>
   readonly columns: ReadonlyArray<ColumnDef<TData, unknown>>
   readonly pageSize?: number
   readonly getRowId?: (row: TData) => string
-  readonly storageKey?: string
-  readonly pinnedColumns?: ReadonlyArray<string>
+  readonly layout?: DataTableLayoutBinding
+  readonly sort?: DataTableSortBinding
   readonly totalRows?: number
 }
 
@@ -59,38 +57,46 @@ export function useDataTable<TData>({
   columns,
   pageSize = DEFAULT_PAGE_SIZE,
   getRowId,
-  storageKey,
-  pinnedColumns,
+  layout,
+  sort,
   totalRows,
 }: UseDataTableOptions<TData>): DataTableInstance<TData> {
   const columnIds = useMemo(() => columns.map((column) => column.id ?? ''), [columns])
-  const order = useColumnOrder(columnIds, storageKey)
+  const { state, reorder, setDensity, ...handlers } = useTableLayout(columnIds, layout)
 
-  const [density, setDensity] = useLocalStorageState<DataTableDensity>(
-    `${DATA_TABLE_STORAGE_PREFIX}density.v1:${storageKey ?? 'default'}`,
-    'comfortable',
+  const sorting = useMemo<SortingState>(
+    () => (sort?.value ? [{ id: sort.value.field, desc: sort.value.direction === 'desc' }] : []),
+    [sort?.value],
   )
-  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({})
-  const pinning = useColumnPinning(order.columnOrder, pinnedColumns)
+
+  const onSortChange = sort?.onChange
+  const onSortingChange: OnChangeFn<SortingState> = useCallback(
+    (updater) => {
+      const [next] = resolveUpdater(updater, sorting)
+      onSortChange?.(next ? { field: next.id, direction: next.desc ? 'desc' : 'asc' } : null)
+    },
+    [onSortChange, sorting],
+  )
 
   const table = useReactTable({
     data: data as TData[],
     columns: columns as ColumnDef<TData, unknown>[],
     state: {
-      columnOrder: order.columnOrder,
-      columnSizing,
-      columnPinning: pinning.columnPinning,
+      columnOrder: state.order,
+      columnSizing: state.sizing,
+      columnPinning: state.pinning,
+      columnVisibility: state.visibility,
+      sorting,
     },
-    onColumnOrderChange: order.onColumnOrderChange,
-    onColumnSizingChange: setColumnSizing,
-    onColumnPinningChange: pinning.onColumnPinningChange,
+    ...handlers,
+    onSortingChange,
     getRowId,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     defaultColumn: { minSize: DATA_TABLE_MIN_COLUMN_WIDTH, maxSize: DATA_TABLE_MAX_COLUMN_WIDTH },
     initialState: { pagination: { pageSize } },
     autoResetPageIndex: false,
+    manualSorting: true,
     enableRowSelection: true,
     enableColumnPinning: true,
     enableColumnResizing: true,
@@ -102,10 +108,10 @@ export function useDataTable<TData>({
   return useMemo(
     () => ({
       table,
-      reorderColumn: order.reorder,
-      density,
+      reorderColumn: reorder,
+      density: state.density,
       setDensity,
-      rowHeight: DATA_TABLE_ROW_HEIGHT[density],
+      rowHeight: DATA_TABLE_ROW_HEIGHT[state.density],
       selection: {
         count: selectedCount,
         total,
@@ -113,6 +119,6 @@ export function useDataTable<TData>({
         clear: () => table.resetRowSelection(),
       },
     }),
-    [table, order.reorder, density, setDensity, selectedCount, total],
+    [table, reorder, state.density, setDensity, selectedCount, total],
   )
 }

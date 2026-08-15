@@ -20,9 +20,10 @@ export function useColumnResize(header: Header<unknown, unknown>) {
       if (event.button !== 0) return
 
       const { column } = header
+      const cell = event.currentTarget.closest('th')
       const table = event.currentTarget.closest('table')
       const col = table?.querySelector<HTMLTableColElement>(`col[data-col-id="${column.id}"]`)
-      if (!table || !col) return
+      if (!table || !col || !cell) return
 
       event.preventDefault()
       event.stopPropagation()
@@ -30,7 +31,7 @@ export function useColumnResize(header: Header<unknown, unknown>) {
       const min = column.columnDef.minSize ?? DATA_TABLE_MIN_COLUMN_WIDTH
       const max = column.columnDef.maxSize ?? DATA_TABLE_MAX_COLUMN_WIDTH
       const startX = event.clientX
-      const startWidth = column.getSize()
+      const startWidth = Math.round(cell.getBoundingClientRect().width)
       const startTotal = header.getContext().table.getTotalSize()
       let width = startWidth
 

@@ -34,6 +34,7 @@ function fakeColumn(options: {
   size?: number
 }): Column<unknown, unknown> {
   return {
+    id: 'name',
     columnDef: { meta: options.grow === true ? { grow: true } : {} },
     getIsPinned: () => options.pinned ?? false,
     getIsLastColumn: () => options.lastPinned ?? false,
@@ -43,20 +44,24 @@ function fakeColumn(options: {
 
 describe('columnWidth', () => {
   it('gives fixed columns their declared size', () => {
-    expect(columnWidth(fakeColumn({ size: 150 }))).toBe(150)
+    expect(columnWidth(fakeColumn({ size: 150 }), {})).toBe(150)
   })
 
   it('lets an unpinned grow column absorb the leftover space', () => {
-    expect(columnWidth(fakeColumn({ grow: true }))).toBeUndefined()
+    expect(columnWidth(fakeColumn({ grow: true }), {})).toBeUndefined()
   })
 
   it('keeps growing while it is the last pinned column', () => {
     expect(
-      columnWidth(fakeColumn({ grow: true, pinned: 'left', lastPinned: true })),
+      columnWidth(fakeColumn({ grow: true, pinned: 'left', lastPinned: true }), {}),
     ).toBeUndefined()
   })
 
   it('freezes its width once another column is pinned behind it', () => {
-    expect(columnWidth(fakeColumn({ grow: true, pinned: 'left', lastPinned: false }))).toBe(240)
+    expect(columnWidth(fakeColumn({ grow: true, pinned: 'left', lastPinned: false }), {})).toBe(240)
+  })
+
+  it('stops growing once the user has resized it by hand', () => {
+    expect(columnWidth(fakeColumn({ grow: true, size: 360 }), { name: 360 })).toBe(360)
   })
 })

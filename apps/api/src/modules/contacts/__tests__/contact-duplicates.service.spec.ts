@@ -112,14 +112,27 @@ describe('ContactDuplicatesService', () => {
       }
     })
 
-    it('is skipped entirely when force: true', async () => {
-      await service.assertNoDuplicates(
-        qr as never,
-        { phone: '3001234567', firstName: 'John', lastName: 'Doe' },
-        { force: true },
-      )
+    it('is waved through when force: true and the backend marked it forceable', async () => {
+      qr.query.mockResolvedValueOnce([makeDuplicateRow()])
 
-      expect(qr.query).not.toHaveBeenCalled()
+      await expect(
+        service.assertNoDuplicates(
+          qr as never,
+          { phone: '3001234567', firstName: 'John', lastName: 'Doe' },
+          { force: true },
+        ),
+      ).resolves.toBeUndefined()
+    })
+
+    it('marks soft duplicates as forceable so the client never decides that on its own', async () => {
+      qr.query.mockResolvedValueOnce([makeDuplicateRow()])
+
+      try {
+        await service.assertNoDuplicates(qr as never, { phone: '3001234567' })
+        throw new Error('expected to throw')
+      } catch (error) {
+        expect(getConflictPayload(error).canForce).toBe(true)
+      }
     })
 
     it('does not run when no probe fields are provided', async () => {

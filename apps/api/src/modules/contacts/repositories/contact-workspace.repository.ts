@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
+import type { ContactTableState } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { WorkspaceStateRow } from '../interfaces/contact-workspace-row.interfaces'
 import { sqlRows } from '@/shared/database/sql.util'
@@ -25,7 +26,7 @@ export class ContactWorkspaceRepository {
     qr: QueryRunner,
     userId: string,
     activeViewId: string | null,
-    tableState: Record<string, unknown>,
+    tableState: ContactTableState,
   ): Promise<void> {
     await qr.query(
       `INSERT INTO contact_workspace_states (user_id, active_view_id, table_state)

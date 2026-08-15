@@ -1,8 +1,10 @@
+import type { ContactSortField } from './contacts'
+
 export const CONTACT_VIEW_VISIBILITIES = ['private', 'shared'] as const
 
 export type ContactViewVisibility = (typeof CONTACT_VIEW_VISIBILITIES)[number]
 
-export const CONTACT_VIEW_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
+export const CONTACT_VIEW_DENSITIES = ['compact', 'comfortable'] as const
 
 export type ContactViewDensity = (typeof CONTACT_VIEW_DENSITIES)[number]
 
@@ -14,6 +16,14 @@ export type ContactViewSort = {
   field: string
   direction: ContactViewSortDirection
 }
+
+export const CONTACT_COLUMN_MIN_WIDTH = 90
+
+export const CONTACT_COLUMN_MAX_WIDTH = 480
+
+export const CONTACT_TABLE_MAX_COLUMNS = 60
+
+export const CONTACT_TABLE_MAX_PINNED = 10
 
 export type ContactViewColumns = {
   order?: string[]
@@ -54,14 +64,11 @@ export type ContactTaxonomyUsage = {
 
 export type TaxonomyReassignKind = 'status' | 'source' | 'type' | 'tag'
 
-export type ContactColumnType = 'name' | 'text' | 'badge' | 'tags' | 'number' | 'date' | 'user'
-
 export type ContactColumnDef = {
   key: string
   labelKey: string
-  type: ContactColumnType
-  sortable: boolean
-  editable: boolean
+  hintKey: string
+  sortField: ContactSortField | null
   defaultVisible: boolean
   defaultWidth: number
   minWidth: number
@@ -73,7 +80,11 @@ export type ContactQuickFilterOptions = {
   lifecycleStages: string[]
 }
 
-export type ContactTableState = Record<string, unknown>
+export type ContactTableState = {
+  columns?: ContactViewColumns
+  density?: ContactViewDensity
+  listOrder?: string[]
+}
 
 export type ContactWorkspace = {
   views: ContactView[]
@@ -100,6 +111,7 @@ export type ContactDuplicatePayload = {
   severity: ContactDuplicateSeverity
   field: ContactDuplicateMatch['field']
   matches: ContactDuplicateMatch[]
+  canForce: boolean
 }
 
 export type ContactDuplicateProbeQuery = {

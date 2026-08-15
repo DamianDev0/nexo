@@ -3,7 +3,7 @@ import type { QueryRunner } from 'typeorm'
 import type { ContactDuplicatePayload } from '@repo/shared-types'
 import type { DuplicateProbe } from '../interfaces/contact-duplicate-row.interfaces'
 import { ContactDuplicatesRepository } from '../repositories/contact-duplicates.repository'
-import { mapContactDuplicateMatch } from '../mappers/contact-duplicate.mapper'
+import { mapContactDuplicatePayload } from '../mappers/contact-duplicate.mapper'
 
 @Injectable()
 export class ContactDuplicatesService {
@@ -17,9 +17,8 @@ export class ContactDuplicatesService {
     const hard = await this.findHard(qr, probe, options.excludeId)
     if (hard) this.throwConflict(hard)
 
-    if (options.force) return
     const soft = await this.findSoft(qr, probe, options.excludeId)
-    if (soft) this.throwConflict(soft)
+    if (soft && !(options.force === true && soft.canForce)) this.throwConflict(soft)
   }
 
   async probe(
@@ -40,25 +39,13 @@ export class ContactDuplicatesService {
     const email = probe.email?.trim().toLowerCase()
     if (email) {
       const rows = await this.repository.findByEmail(qr, email, excludeId)
-      if (rows.length > 0) {
-        return {
-          severity: 'hard',
-          field: 'email',
-          matches: rows.map((r) => mapContactDuplicateMatch(r, 'email')),
-        }
-      }
+      if (rows.length > 0) return mapContactDuplicatePayload('hard', 'email', rows)
     }
 
     const document = probe.documentNumber?.trim()
     if (document) {
       const rows = await this.repository.findByDocumentNumber(qr, document, excludeId)
-      if (rows.length > 0) {
-        return {
-          severity: 'hard',
-          field: 'documentNumber',
-          matches: rows.map((r) => mapContactDuplicateMatch(r, 'documentNumber')),
-        }
-      }
+      if (rows.length > 0) return mapContactDuplicatePayload('hard', 'documentNumber', rows)
     }
 
     return null
@@ -74,26 +61,14 @@ export class ContactDuplicatesService {
     )
     if (phones.length > 0) {
       const rows = await this.repository.findByPhones(qr, phones, excludeId)
-      if (rows.length > 0) {
-        return {
-          severity: 'soft',
-          field: 'phone',
-          matches: rows.map((r) => mapContactDuplicateMatch(r, 'phone')),
-        }
-      }
+      if (rows.length > 0) return mapContactDuplicatePayload('soft', 'phone', rows)
     }
 
     const first = probe.firstName?.trim().toLowerCase()
     const last = probe.lastName?.trim().toLowerCase()
     if (first && last) {
       const rows = await this.repository.findByName(qr, first, last, excludeId)
-      if (rows.length > 0) {
-        return {
-          severity: 'soft',
-          field: 'name',
-          matches: rows.map((r) => mapContactDuplicateMatch(r, 'name')),
-        }
-      }
+      if (rows.length > 0) return mapContactDuplicatePayload('soft', 'name', rows)
     }
 
     return null

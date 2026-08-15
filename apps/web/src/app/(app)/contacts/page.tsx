@@ -1,9 +1,9 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
-import { prefetchContacts } from '@/features/manage-contacts'
 import { getT } from '@/shared/i18n/server'
 import { getServerQueryClient } from '@/shared/query/server-query'
 import { ContactsView } from '@/views/contacts'
+import { prefetchContacts } from '@/widgets/contacts-board'
 
 import type { Metadata } from 'next'
 

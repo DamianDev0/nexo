@@ -9,6 +9,7 @@ import type {
 } from '../dto/contact-view.dto'
 import { ContactViewsRepository } from '../repositories/contact-views.repository'
 import { mapContactView } from '../mappers/contact-view.mapper'
+import { sanitizeContactViewColumns } from '../mappers/contact-table-state.mapper'
 
 @Injectable()
 export class ContactViewsService {
@@ -35,7 +36,7 @@ export class ContactViewsService {
         name: dto.name,
         filters: dto.filters ?? {},
         advancedFilters: dto.advancedFilters ?? null,
-        columns: dto.columns ?? {},
+        columns: sanitizeContactViewColumns(dto.columns),
         sort: dto.sort ?? null,
         density: dto.density ?? 'comfortable',
         isDefault: dto.isDefault ?? false,
@@ -64,7 +65,7 @@ export class ContactViewsService {
         name: dto.name ?? existing.name,
         filters: dto.filters ?? existing.filters,
         advancedFilters: dto.advancedFilters ?? existing.advanced_filters,
-        columns: dto.columns ?? existing.columns,
+        columns: sanitizeContactViewColumns(dto.columns ?? existing.columns),
         sort: dto.sort ?? existing.sort,
         density: dto.density ?? existing.density,
         isDefault: dto.isDefault ?? existing.is_default,
@@ -90,7 +91,7 @@ export class ContactViewsService {
         name: dto.name ?? `${source.name} (copy)`,
         filters: source.filters,
         advancedFilters: source.advanced_filters,
-        columns: source.columns,
+        columns: sanitizeContactViewColumns(source.columns),
         sort: source.sort,
         density: source.density,
         position,

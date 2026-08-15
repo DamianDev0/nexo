@@ -18,6 +18,8 @@ import {
 } from 'class-validator'
 
 import {
+  CONTACT_TABLE_MAX_COLUMNS,
+  CONTACT_TABLE_MAX_PINNED,
   CONTACT_VIEW_DENSITIES,
   CONTACT_VIEW_SORT_DIRECTIONS,
   CONTACT_VIEW_VISIBILITIES,
@@ -37,13 +39,13 @@ export class ContactViewColumnsDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(60)
+  @ArrayMaxSize(CONTACT_TABLE_MAX_COLUMNS)
   order?: string[]
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(60)
+  @ArrayMaxSize(CONTACT_TABLE_MAX_COLUMNS)
   hidden?: string[]
 
   @IsOptional()
@@ -53,13 +55,13 @@ export class ContactViewColumnsDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(10)
+  @ArrayMaxSize(CONTACT_TABLE_MAX_PINNED)
   pinnedLeft?: string[]
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(10)
+  @ArrayMaxSize(CONTACT_TABLE_MAX_PINNED)
   pinnedRight?: string[]
 }
 

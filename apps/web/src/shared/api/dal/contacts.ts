@@ -7,6 +7,7 @@ import type {
   ContactCounts,
   ContactListQuery,
   ContactTaxonomyUsage,
+  ContactWorkspace,
   PaginatedContacts,
 } from '@repo/shared-types'
 
@@ -39,6 +40,9 @@ export const listContacts = (query: ContactListQuery) =>
 
 export const getContactCounts = () =>
   apiFetch<ContactCounts>('/contacts/counts', { tags: [CACHE_TAGS.contacts] })
+
+export const getContactWorkspace = () =>
+  apiFetch<ContactWorkspace>('/contacts/workspace', { cache: 'no-store' })
 
 export const getContactTaxonomyUsage = () =>
   apiFetch<ContactTaxonomyUsage>('/contacts/taxonomy-usage', { tags: [CACHE_TAGS.contacts] })

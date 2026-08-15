@@ -76,7 +76,7 @@ const COLUMNS: ReadonlyArray<ColumnDef<ContactRow, unknown>> = [
   },
 ]
 
-const PINNED = ['name']
+const LAYOUT = { value: { pinnedLeft: ['name'] }, onChange: () => undefined }
 
 const BULK_LABELS = {
   selected: (count: number) => `${count} selected`,
@@ -89,7 +89,7 @@ function ContactsTable({ rows }: Readonly<{ rows: ReadonlyArray<ContactRow> }>) 
     data: rows,
     columns: COLUMNS,
     getRowId: (row) => row.id,
-    pinnedColumns: PINNED,
+    layout: LAYOUT,
   })
   const [search, setSearch] = useState('')
   const [activeList, setActiveList] = useState('all')

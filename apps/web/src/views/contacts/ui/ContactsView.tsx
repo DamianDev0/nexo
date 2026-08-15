@@ -1,4 +1,4 @@
-import { ContactsBoard } from '@/features/manage-contacts'
+import { ContactsBoard } from '@/widgets/contacts-board'
 
 export function ContactsView() {
   return (

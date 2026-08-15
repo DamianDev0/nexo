@@ -1,5 +1,22 @@
-import type { ContactDuplicateMatch } from '@repo/shared-types'
+import type {
+  ContactDuplicateMatch,
+  ContactDuplicatePayload,
+  ContactDuplicateSeverity,
+} from '@repo/shared-types'
 import type { ContactDuplicateRow } from '../interfaces/contact-duplicate-row.interfaces'
+
+export function mapContactDuplicatePayload(
+  severity: ContactDuplicateSeverity,
+  field: ContactDuplicateMatch['field'],
+  rows: ContactDuplicateRow[],
+): ContactDuplicatePayload {
+  return {
+    severity,
+    field,
+    matches: rows.map((row) => mapContactDuplicateMatch(row, field)),
+    canForce: severity === 'soft',
+  }
+}
 
 export function mapContactDuplicateMatch(
   row: ContactDuplicateRow,

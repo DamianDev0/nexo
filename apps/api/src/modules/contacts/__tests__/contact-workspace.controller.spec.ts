@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { ContactWorkspaceController } from '../controllers/contact-workspace.controller'
 import { ContactWorkspaceService } from '../services/contact-workspace.service'
+import type { UpdateContactWorkspaceDto } from '../dto/contact-workspace.dto'
 import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
 import { UserRole } from '@repo/shared-types'
 import type { ContactWorkspace } from '@repo/shared-types'
@@ -53,7 +54,10 @@ describe('ContactWorkspaceController', () => {
   describe('updateState', () => {
     it('delegates to service with schema, user and dto', async () => {
       service.updateState.mockResolvedValue(undefined)
-      const dto = { activeViewId: 'view-1', tableState: { density: 'compact' } }
+      const dto: UpdateContactWorkspaceDto = {
+        activeViewId: 'view-1',
+        tableState: { density: 'compact' },
+      }
 
       await controller.updateState(mockCtx, mockUser, dto)
 

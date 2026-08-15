@@ -7,8 +7,10 @@ import type {
   ContactDuplicateProbeResult,
   ContactInput,
   ContactListQuery,
+  ContactTableState,
   ContactTaxonomyUsage,
   ContactTimeline,
+  ContactWorkspace,
   PaginatedContacts,
   TaxonomyReassignKind,
 } from '@repo/shared-types'
@@ -18,6 +20,11 @@ const contactsService = {
     request<PaginatedContacts>({ method: 'get', url: '/contacts', params }),
 
   counts: () => request<ContactCounts>({ method: 'get', url: '/contacts/counts' }),
+
+  workspace: () => request<ContactWorkspace>({ method: 'get', url: '/contacts/workspace' }),
+
+  saveTableState: (tableState: ContactTableState) =>
+    request<void>({ method: 'patch', url: '/contacts/workspace', data: { tableState } }),
 
   taxonomyUsage: () =>
     request<ContactTaxonomyUsage>({ method: 'get', url: '/contacts/taxonomy-usage' }),
