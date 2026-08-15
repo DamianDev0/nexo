@@ -20,7 +20,7 @@ const ERROR_TOAST_KEYS = {
     description: 'auth.toasts.workspaceNotFoundDesc',
   },
   invalid_credentials: { title: 'auth.toasts.loginFailed', description: null },
-  unknown: { title: 'auth.toasts.loginFailed', description: null },
+  unknown: { title: 'auth.toasts.loginFailed', description: 'auth.toasts.loginUnavailableDesc' },
 } as const
 
 export function useLoginForm() {

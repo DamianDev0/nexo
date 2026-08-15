@@ -53,11 +53,13 @@ export class UserTenantMapService implements OnApplicationBootstrap {
   }
 
   async findTenantByEmail(email: string): Promise<Tenant | null> {
-    const mapping = await this.mapRepo.findOne({
+    const mappings = await this.mapRepo.find({
       where: { email: email.toLowerCase() },
       relations: ['tenant'],
+      order: { createdAt: 'ASC' },
     })
-    return mapping?.tenant ?? null
+
+    return mappings.find((mapping) => mapping.tenant?.isActive)?.tenant ?? null
   }
 
   async backfill(): Promise<number> {

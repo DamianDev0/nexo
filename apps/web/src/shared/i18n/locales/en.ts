@@ -34,6 +34,9 @@ const en = {
       sortAsc: 'Sort ascending',
       sortDesc: 'Sort descending',
       resize: 'Adjust column width',
+      columns: 'Columns',
+      columnsVisible: 'Visible columns',
+      hideColumn: 'Hide column',
       density: {
         comfortable: 'Comfortable view',
         compact: 'Compact view',
@@ -110,6 +113,7 @@ const en = {
     mobileSubline: 'Your team is waiting.',
     toasts: {
       loginFailed: 'Login failed',
+      loginUnavailableDesc: 'We could not reach the server. Please try again in a few seconds.',
       workspaceNotFound: 'Workspace not found',
       workspaceNotFoundDesc: 'No workspace is associated with this email. Please check or sign up.',
       workspaceCreated: '{{name}} created successfully',
@@ -480,6 +484,10 @@ const en = {
     noResults: {
       title: 'No results',
       description: 'No contact matches your search. Adjust the filters and try again.',
+    },
+    unavailable: {
+      title: 'We could not load the view',
+      description: 'The column configuration never arrived. Reload the page and try again.',
     },
     form: {
       createTitle: 'New contact',

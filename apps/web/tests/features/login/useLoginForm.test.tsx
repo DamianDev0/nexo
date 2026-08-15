@@ -185,7 +185,7 @@ describe('useLoginForm', () => {
     )
   })
 
-  it('shows the login-failed toast for an unknown error', async () => {
+  it('tells the user the server is unreachable instead of blaming their email', async () => {
     loginActionMock.mockResolvedValue({ ok: false, error: 'unknown' })
     const user = userEvent.setup()
     const { Wrapper } = makeWrapper()
@@ -197,7 +197,7 @@ describe('useLoginForm', () => {
     await waitFor(() =>
       expect(sileoError).toHaveBeenCalledWith({
         title: 'auth.toasts.loginFailed',
-        description: undefined,
+        description: 'auth.toasts.loginUnavailableDesc',
       }),
     )
   })

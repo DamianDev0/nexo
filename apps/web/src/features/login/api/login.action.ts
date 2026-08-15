@@ -26,8 +26,11 @@ export async function loginAction(input: LoginFormValues): Promise<LoginActionRe
       cache: 'no-store',
     })
     slug = tenant.slug
-  } catch {
-    return { ok: false, error: 'workspace_not_found' }
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode === 404) {
+      return { ok: false, error: 'workspace_not_found' }
+    }
+    return { ok: false, error: 'unknown' }
   }
 
   try {

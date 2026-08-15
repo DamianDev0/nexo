@@ -56,7 +56,7 @@ describe('loginAction', () => {
     )
   })
 
-  it('maps a failed tenant resolution to workspace_not_found', async () => {
+  it('maps a 404 tenant resolution to workspace_not_found', async () => {
     server.use(
       http.post(`${API}/auth/resolve-tenant`, () =>
         HttpResponse.json({ ...ERROR_BODY, statusCode: 404 }, { status: 404 }),
@@ -68,6 +68,22 @@ describe('loginAction', () => {
       error: 'workspace_not_found',
     })
     expect(cookieSet).not.toHaveBeenCalled()
+  })
+
+  it('never blames the email when the API itself is down', async () => {
+    server.use(http.post(`${API}/auth/resolve-tenant`, () => HttpResponse.error()))
+
+    await expect(loginAction(CREDENTIALS)).resolves.toEqual({ ok: false, error: 'unknown' })
+  })
+
+  it('never blames the email when tenant resolution errors out server-side', async () => {
+    server.use(
+      http.post(`${API}/auth/resolve-tenant`, () =>
+        HttpResponse.json({ ...ERROR_BODY, statusCode: 500 }, { status: 500 }),
+      ),
+    )
+
+    await expect(loginAction(CREDENTIALS)).resolves.toEqual({ ok: false, error: 'unknown' })
   })
 
   it('maps a 401 login to invalid_credentials', async () => {

@@ -34,6 +34,9 @@ const es = {
       sortAsc: 'Ordenar ascendente',
       sortDesc: 'Ordenar descendente',
       resize: 'Ajustar ancho de columna',
+      columns: 'Columnas',
+      columnsVisible: 'Columnas visibles',
+      hideColumn: 'Ocultar columna',
       selection: {
         selected_one: '{{count}} seleccionado',
         selected_other: '{{count}} seleccionados',
@@ -110,6 +113,8 @@ const es = {
     mobileSubline: 'Tu equipo te espera.',
     toasts: {
       loginFailed: 'No se pudo iniciar sesión',
+      loginUnavailableDesc:
+        'No pudimos conectar con el servidor. Intenta de nuevo en unos segundos.',
       workspaceNotFound: 'Workspace no encontrado',
       workspaceNotFoundDesc: 'Ningún workspace está asociado a este correo. Verifica o regístrate.',
       workspaceCreated: '{{name}} creado exitosamente',
@@ -483,6 +488,10 @@ const es = {
       title: 'Sin resultados',
       description:
         'Ningún contacto coincide con tu búsqueda. Ajusta los filtros e intenta de nuevo.',
+    },
+    unavailable: {
+      title: 'No pudimos cargar la vista',
+      description: 'La configuración de columnas no llegó. Recarga la página e intenta de nuevo.',
     },
     form: {
       createTitle: 'Nuevo contacto',
