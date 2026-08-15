@@ -22,7 +22,7 @@ export function DataTableBody({ pageKey, dimmed, className }: Readonly<DataTable
     <motion.tbody
       key={pageKey}
       data-slot="table-body"
-      initial={{ opacity: 0 }}
+      initial={false}
       animate={{ opacity: dimmed ? 0.55 : 1 }}
       transition={transition}
       className={className}
