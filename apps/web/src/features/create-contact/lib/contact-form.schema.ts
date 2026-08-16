@@ -30,6 +30,7 @@ export function buildContactSchema(t: TFunction) {
       address: z.string().trim(),
       city: z.string().trim(),
       municipioCode: z.string().trim(),
+      avatarUrl: z.string().trim(),
       status: z.string().min(1),
       source: z.string(),
       type: z.string(),

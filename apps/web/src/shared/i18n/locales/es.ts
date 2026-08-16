@@ -503,6 +503,7 @@ const es = {
       createDescription: 'Solo el nombre es obligatorio — completa el resto cuando quieras.',
       editTitle: 'Editar contacto',
       editDescription: 'Los cambios se guardan para todo el equipo.',
+      avatar: 'Avatar',
       firstName: 'Nombre',
       firstNamePlaceholder: 'Valentina',
       lastName: 'Apellido',

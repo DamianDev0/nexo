@@ -30,6 +30,7 @@ export const UPDATABLE_FIELDS: FieldMap<UpdateContactDto> = [
   ['tags', 'tags'],
   ['companyId', 'company_id'],
   ['assignedToId', 'assigned_to_id'],
+  ['avatarUrl', 'avatar_url'],
   ['customFields', 'custom_fields'],
 ]
 
@@ -40,7 +41,7 @@ export const CONTACT_COLUMNS = `
   status, status_changed_at, lifecycle_stage, source, type, type_label, lead_score,
   data_consent, consent_date, consent_source,
   opt_out_email, opt_out_sms, opt_out_whatsapp, last_contacted_at,
-  tags, company_id, assigned_to_id,
+  avatar_url, tags, company_id, assigned_to_id,
   custom_fields, is_active, created_by, created_at, updated_at
 `
 
@@ -63,7 +64,7 @@ export const CONTACT_LIST_COLUMNS = `
   status, status_changed_at, lifecycle_stage, source, type, type_label, lead_score,
   data_consent, consent_date, consent_source,
   opt_out_email, opt_out_sms, opt_out_whatsapp, last_contacted_at,
-  tags, company_id, assigned_to_id,
+  avatar_url, tags, company_id, assigned_to_id,
   is_active, created_by, created_at, updated_at
 `
 

@@ -12,6 +12,7 @@ export const CONTACT_FORM_DEFAULTS: ContactFormValues = {
   address: '',
   city: '',
   municipioCode: '',
+  avatarUrl: '',
   status: DEFAULT_CONTACT_STATUS_KEY,
   source: '',
   type: '',

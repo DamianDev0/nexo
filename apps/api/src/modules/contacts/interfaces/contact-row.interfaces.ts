@@ -19,6 +19,7 @@ export interface ContactRow {
   country: string | null
   status: string
   status_changed_at: string | null
+  avatar_url: string | null
   lifecycle_stage: string | null
   source: string | null
   type: string | null

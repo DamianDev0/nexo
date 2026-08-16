@@ -19,6 +19,7 @@ export type Contact = {
   country: string
   status: string
   statusChangedAt: string | null
+  avatarUrl: string | null
   lifecycleStage: LifecycleStage
   source: string | null
   type: string | null
@@ -63,6 +64,7 @@ export type ContactInput = {
   tags?: string[]
   companyId?: string
   assignedToId?: string
+  avatarUrl?: string
   customFields?: Record<string, unknown>
 }
 

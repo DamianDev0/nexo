@@ -455,4 +455,11 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         WHERE status_changed_at IS NULL;
     `,
   },
+  {
+    id: '0028_contacts_avatar_url',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+    `,
+  },
 ]

@@ -22,6 +22,7 @@ const payload = (overrides: Record<string, unknown> = {}) => ({
   municipioCode: '',
   source: '',
   status: 'new',
+  avatarUrl: '',
   type: '',
   typeLabel: '',
   ...overrides,
@@ -41,6 +42,7 @@ describe('buildContactSchema', () => {
       municipioCode: '',
       source: '',
       status: 'new',
+      avatarUrl: '',
       type: '',
       typeLabel: '',
     })
@@ -64,6 +66,7 @@ describe('buildContactSchema', () => {
       municipioCode: '',
       source: '',
       status: 'new',
+      avatarUrl: '',
       type: '',
       typeLabel: '',
     })
@@ -87,6 +90,7 @@ describe('buildContactSchema', () => {
       municipioCode: '',
       source: '',
       status: 'new',
+      avatarUrl: '',
       type: '',
       typeLabel: '',
     })
@@ -142,6 +146,7 @@ describe('buildContactSchema', () => {
       city: '',
       municipioCode: '',
       status: CONTACT_FORM_DEFAULTS.status,
+      avatarUrl: '',
       source: '',
       type: '',
       typeLabel: '',
@@ -170,6 +175,7 @@ describe('buildContactSchema', () => {
       municipioCode: '11001',
       source: '',
       status: 'qualified',
+      avatarUrl: '',
       type: 'supplier',
       typeLabel: '',
     })

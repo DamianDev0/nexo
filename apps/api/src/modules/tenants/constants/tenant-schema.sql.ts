@@ -79,6 +79,7 @@ export function getTenantSchemaSQL(schema: string): string {
       country VARCHAR(3) DEFAULT 'CO',
       status VARCHAR(30) DEFAULT 'new',
       status_changed_at TIMESTAMPTZ DEFAULT NOW(),
+      avatar_url TEXT,
       lifecycle_stage VARCHAR(30) DEFAULT 'subscriber',
       source VARCHAR(50),
       type VARCHAR(30),

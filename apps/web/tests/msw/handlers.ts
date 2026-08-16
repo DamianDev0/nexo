@@ -42,6 +42,7 @@ function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
     country: 'CO',
     status: 'new',
     statusChangedAt: new Date().toISOString(),
+    avatarUrl: null,
     lifecycleStage: LifecycleStage.LEAD,
     source: 'manual',
     type: null,

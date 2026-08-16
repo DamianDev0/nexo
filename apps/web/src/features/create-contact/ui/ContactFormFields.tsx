@@ -4,8 +4,11 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { AddressField, MunicipalityCombobox, useResolveMunicipality } from '@/entities/geo'
+import { AvatarPicker } from '@/shared/ui/kokonutui/avatar-picker'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { Label } from '@/shared/ui/shadcn/label'
+
+import { CONTACT_AVATARS } from '../config/contact-avatars.constants'
 
 import { ContactPhoneFields } from './ContactPhoneFields'
 import { ContactTypeFields } from './ContactTypeFields'
@@ -46,6 +49,19 @@ export function ContactFormFields({
 
   return (
     <div className="flex flex-col gap-3.5">
+      <Controller
+        control={control}
+        name="avatarUrl"
+        render={({ field }) => (
+          <AvatarPicker
+            avatars={CONTACT_AVATARS}
+            value={field.value || null}
+            label={t('contacts.form.avatar')}
+            onChange={field.onChange}
+          />
+        )}
+      />
+
       <div className="grid grid-cols-2 gap-3.5">
         <ControlledField
           control={control}

@@ -5,6 +5,9 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react'],
   },
+  images: {
+    remotePatterns: [{ protocol: 'https', hostname: 'res.cloudinary.com' }],
+  },
   rewrites: async () => [
     {
       source: '/api/v1/:path*',

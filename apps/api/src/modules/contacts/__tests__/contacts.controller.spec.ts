@@ -28,6 +28,7 @@ const mockContact: Contact = {
   country: 'Colombia',
   status: 'new',
   statusChangedAt: null,
+  avatarUrl: null,
   lifecycleStage: LifecycleStage.LEAD,
   source: 'manual',
   type: null,

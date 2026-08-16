@@ -21,6 +21,7 @@ export function mapContactListItem(r: ContactRow): ContactListItem {
     country: r.country ?? 'CO',
     status: r.status as ContactListItem['status'],
     statusChangedAt: r.status_changed_at ?? null,
+    avatarUrl: r.avatar_url ?? null,
     lifecycleStage: (r.lifecycle_stage ?? 'subscriber') as ContactListItem['lifecycleStage'],
     source: r.source as ContactListItem['source'],
     type: r.type ?? null,

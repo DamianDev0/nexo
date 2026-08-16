@@ -42,6 +42,7 @@ function toInput(values: ContactFormValues): ContactInput {
     city: values.city || undefined,
     municipioCode: values.municipioCode || undefined,
     status: values.status,
+    avatarUrl: values.avatarUrl || undefined,
     source: values.source || undefined,
     type: values.type || undefined,
     typeLabel:
@@ -61,6 +62,7 @@ function toFormValues(contact: ContactListItem): ContactFormValues {
     city: contact.city ?? '',
     municipioCode: contact.municipioCode ?? '',
     status: contact.status,
+    avatarUrl: contact.avatarUrl ?? '',
     source: contact.source ?? '',
     type: contact.type ?? '',
     typeLabel: contact.typeLabel ?? '',

@@ -499,6 +499,7 @@ const en = {
       createDescription: 'Only the name is required — fill in the rest whenever you want.',
       editTitle: 'Edit contact',
       editDescription: 'Changes are saved for your whole team.',
+      avatar: 'Avatar',
       firstName: 'First name',
       firstNamePlaceholder: 'John',
       lastName: 'Last name',

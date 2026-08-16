@@ -1,0 +1,25 @@
+const CLOUDINARY = 'https://res.cloudinary.com/dpqbn1gqb/image/upload'
+
+export const CONTACT_AVATARS: ReadonlyArray<string> = [
+  `${CLOUDINARY}/v1774831518/peep-105_fjl53h.png`,
+  `${CLOUDINARY}/v1774831515/peep-103_os3ezs.png`,
+  `${CLOUDINARY}/v1774831515/peep-104_pcsgex.png`,
+  `${CLOUDINARY}/v1774831515/peep-101_uu9saj.png`,
+  `${CLOUDINARY}/v1774831514/peep-99_gkhlvp.png`,
+  `${CLOUDINARY}/v1774831514/peep-100_pv5o70.png`,
+  `${CLOUDINARY}/v1774831514/peep-98_xmmkpy.png`,
+  `${CLOUDINARY}/v1774831514/peep-97_cbpdkq.png`,
+  `${CLOUDINARY}/v1774831514/peep-96_rfkvkr.png`,
+  `${CLOUDINARY}/v1774831514/peep-92_pjdivx.png`,
+  `${CLOUDINARY}/v1774831514/peep-94_svqbux.png`,
+  `${CLOUDINARY}/v1774831514/peep-93_jch9fv.png`,
+  `${CLOUDINARY}/v1774831511/peep-90_vwvuzn.png`,
+  `${CLOUDINARY}/v1774831511/peep-91_bowafs.png`,
+  `${CLOUDINARY}/v1774831510/peep-88_yktuhz.png`,
+  `${CLOUDINARY}/v1774831490/peep-19_cyzzbu.png`,
+  `${CLOUDINARY}/v1774831490/peep-23_r17ugk.png`,
+  `${CLOUDINARY}/v1774831494/peep-25_dfnf4z.png`,
+  `${CLOUDINARY}/v1774831494/peep-29_d6wlzr.png`,
+  `${CLOUDINARY}/v1774831498/peep-46_n7wgms.png`,
+  `${CLOUDINARY}/v1774831499/peep-49_roxqkk.png`,
+]

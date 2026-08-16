@@ -185,6 +185,12 @@ export class CreateContactDto {
   @IsUUID()
   assignedToId?: string
 
+  @ApiPropertyOptional({ description: 'Avatar image URL', maxLength: 500 })
+  @IsOptional()
+  @IsUrl({ require_protocol: true, protocols: ['https'] })
+  @MaxLength(500)
+  avatarUrl?: string
+
   @ApiPropertyOptional({
     description: 'Tenant-defined custom field values',
     example: { industry: 'tech' },
