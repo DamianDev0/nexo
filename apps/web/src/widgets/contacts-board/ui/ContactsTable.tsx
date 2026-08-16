@@ -9,6 +9,7 @@ import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
+import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 
 import { ContactsPagination } from './ContactsPagination'
 
@@ -62,8 +63,16 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
               placeholder={t('contacts.searchPlaceholder')}
               onChange={actions.onSearch}
             />
-            <DataTable.Columns className="ml-auto" />
-            <DataTable.Density />
+            <span className="ml-auto flex items-center gap-2">
+              {state.saveStatus !== 'idle' && (
+                <BadgeMorph
+                  status={state.saveStatus}
+                  label={t(`contacts.table.save.${state.saveStatus}`)}
+                />
+              )}
+              <DataTable.Columns />
+              <DataTable.Density />
+            </span>
           </DataTable.Toolbar>
 
           {state.isPending && <DataTable.Skeleton />}

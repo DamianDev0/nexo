@@ -1,2 +1,2 @@
 export { useContactsLayout } from './model/useContactsLayout'
-export { useContactWorkspace } from './query/useContactWorkspace'
+export { useContactWorkspace, type TableSaveStatus } from './query/useContactWorkspace'

@@ -494,6 +494,13 @@ const es = {
       description:
         'Ningún contacto coincide con tu búsqueda. Ajusta los filtros e intenta de nuevo.',
     },
+    table: {
+      save: {
+        loading: 'Guardando',
+        success: 'Guardado',
+        error: 'No se guardó',
+      },
+    },
     unavailable: {
       title: 'No pudimos cargar la vista',
       description: 'La configuración de columnas no llegó. Recarga la página e intenta de nuevo.',
@@ -504,6 +511,7 @@ const es = {
       editTitle: 'Editar contacto',
       editDescription: 'Los cambios se guardan para todo el equipo.',
       avatar: 'Avatar',
+      avatarPick: 'Elige un avatar',
       firstName: 'Nombre',
       firstNamePlaceholder: 'Valentina',
       lastName: 'Apellido',

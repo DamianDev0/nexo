@@ -6,7 +6,10 @@ import { useCallback, useEffect, useRef } from 'react'
 import contactsService from '@/shared/api/services/contacts.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
-import { CONTACTS_TABLE_SAVE_DELAY_MS } from '../config/contacts-table.constants'
+import {
+  CONTACTS_TABLE_SAVED_HINT_MS,
+  CONTACTS_TABLE_SAVE_DELAY_MS,
+} from '../config/contacts-table.constants'
 
 import type { ContactTableState, ContactWorkspace } from '@repo/shared-types'
 
@@ -18,11 +21,21 @@ export function useContactWorkspace() {
   })
 }
 
+export type TableSaveStatus = 'idle' | 'loading' | 'success' | 'error'
+
+function toSaveStatus(state: { isPending: boolean; isError: boolean; isSuccess: boolean }) {
+  if (state.isPending) return 'loading'
+  if (state.isError) return 'error'
+  return state.isSuccess ? 'success' : 'idle'
+}
+
 export function useSaveContactTableState() {
   const client = useQueryClient()
-  const { mutate } = useMutation({ mutationFn: contactsService.saveTableState })
+  const mutation = useMutation({ mutationFn: contactsService.saveTableState })
   const pending = useRef<ContactTableState | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  const { mutate, reset, isSuccess } = mutation
 
   const flush = useCallback(() => {
     clearTimeout(timer.current)
@@ -33,7 +46,13 @@ export function useSaveContactTableState() {
 
   useEffect(() => flush, [flush])
 
-  return useCallback(
+  useEffect(() => {
+    if (!isSuccess) return
+    const settle = setTimeout(reset, CONTACTS_TABLE_SAVED_HINT_MS)
+    return () => clearTimeout(settle)
+  }, [isSuccess, reset])
+
+  const save = useCallback(
     (patch: ContactTableState) => {
       client.setQueryData<ContactWorkspace>(QUERY_KEYS.contacts.workspace, (previous) =>
         previous ? { ...previous, tableState: { ...previous.tableState, ...patch } } : previous,
@@ -44,4 +63,6 @@ export function useSaveContactTableState() {
     },
     [client, flush],
   )
+
+  return { save, status: toSaveStatus(mutation) as TableSaveStatus }
 }

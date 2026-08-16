@@ -39,7 +39,7 @@ export function useContactsBoard() {
 
   const catalog = workspace.data?.columns ?? NO_COLUMNS
   const { handleSort } = table
-  const { layout, sort, setListOrder } = useContactsLayout(
+  const { layout, sort, setListOrder, saveStatus } = useContactsLayout(
     catalog,
     workspace.data?.tableState ?? NO_TABLE_STATE,
     { value: table.sort, onChange: handleSort },
@@ -131,6 +131,7 @@ export function useContactsBoard() {
       isFiltered: table.isFiltered,
       isEmpty: !isPending && table.rows.length === 0,
       isUnavailable,
+      saveStatus,
       isArchiving,
       listHints,
       bulkLabels,

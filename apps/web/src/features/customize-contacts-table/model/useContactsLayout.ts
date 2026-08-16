@@ -15,7 +15,7 @@ export function useContactsLayout(
   tableState: ContactTableState,
   sorting: { value: ContactSort | null; onChange: (next: ContactSort | null) => void },
 ) {
-  const save = useSaveContactTableState()
+  const { save, status: saveStatus } = useSaveContactTableState()
 
   const onLayoutChange = useCallback(
     (next: DataTableLayout) => save(toContactTableState(next)),
@@ -43,5 +43,5 @@ export function useContactsLayout(
     [save],
   )
 
-  return { layout, sort, setListOrder }
+  return { layout, sort, setListOrder, saveStatus }
 }

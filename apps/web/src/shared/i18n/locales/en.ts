@@ -490,6 +490,13 @@ const en = {
       title: 'No results',
       description: 'No contact matches your search. Adjust the filters and try again.',
     },
+    table: {
+      save: {
+        loading: 'Saving',
+        success: 'Saved',
+        error: 'Not saved',
+      },
+    },
     unavailable: {
       title: 'We could not load the view',
       description: 'The column configuration never arrived. Reload the page and try again.',
@@ -500,6 +507,7 @@ const en = {
       editTitle: 'Edit contact',
       editDescription: 'Changes are saved for your whole team.',
       avatar: 'Avatar',
+      avatarPick: 'Pick an avatar',
       firstName: 'First name',
       firstNamePlaceholder: 'John',
       lastName: 'Last name',

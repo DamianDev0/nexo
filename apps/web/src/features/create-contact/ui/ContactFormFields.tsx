@@ -56,7 +56,7 @@ export function ContactFormFields({
           <AvatarPicker
             avatars={CONTACT_AVATARS}
             value={field.value || null}
-            label={t('contacts.form.avatar')}
+            labels={{ trigger: t('contacts.form.avatar'), title: t('contacts.form.avatarPick') }}
             onChange={field.onChange}
           />
         )}

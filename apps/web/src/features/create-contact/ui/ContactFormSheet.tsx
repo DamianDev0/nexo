@@ -59,27 +59,30 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
           </SheetDescription>
         </SheetHeader>
         <form
-          className="flex flex-1 flex-col overflow-y-auto px-6 py-5"
+          className="flex min-h-0 flex-1 flex-col"
           onSubmit={(event) => {
             event.preventDefault()
             void handleSubmit(event)
           }}
         >
-          <ContactFormFields
-            control={form.control}
-            setValue={form.setValue}
-            taxonomy={taxonomy}
-            onProbeField={(field) => {
-              void probeField(field)
-            }}
-          />
-          <ContactDuplicateNotice
-            notice={duplicateNotice}
-            isEdit={isEdit}
-            onConfirm={confirmDuplicate}
-            onDismiss={dismissDuplicate}
-          />
-          <SheetFooter className="-mx-6 -mb-5 mt-auto flex-row items-center justify-end gap-2 border-t border-border px-6 py-3">
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+            <ContactFormFields
+              control={form.control}
+              setValue={form.setValue}
+              taxonomy={taxonomy}
+              onProbeField={(field) => {
+                void probeField(field)
+              }}
+            />
+            <ContactDuplicateNotice
+              notice={duplicateNotice}
+              isEdit={isEdit}
+              onConfirm={confirmDuplicate}
+              onDismiss={dismissDuplicate}
+            />
+          </div>
+
+          <SheetFooter className="flex-row items-center justify-end gap-2 border-t border-border px-6 py-3">
             <PillButton variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </PillButton>

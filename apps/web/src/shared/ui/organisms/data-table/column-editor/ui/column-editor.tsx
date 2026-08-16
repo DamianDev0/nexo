@@ -75,7 +75,7 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-1 flex-col overflow-y-auto px-6 py-5">
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
           <ul className="flex flex-col gap-0.5">
             {pinnedItems.map((item) => (
               <ColumnEditorRow key={item.id} item={item} onToggle={toggle} />
@@ -100,17 +100,17 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
               </ul>
             </SortableContext>
           </DndContext>
-
-          <SheetFooter className="-mx-6 -mb-5 mt-auto flex-row items-center justify-between gap-2 border-t border-border px-6 py-3">
-            <PillButton variant="ghost" size="sm" className="gap-1.5" onClick={resetWidths}>
-              <ArrowCounterClockwiseIcon className="size-4" />
-              {t('common.table.resetWidths')}
-            </PillButton>
-            <PillButton size="sm" onClick={showAll}>
-              {t('common.table.showAllColumns')}
-            </PillButton>
-          </SheetFooter>
         </div>
+
+        <SheetFooter className="flex-row items-center justify-between gap-2 border-t border-border px-6 py-3">
+          <PillButton variant="ghost" size="sm" className="gap-1.5" onClick={resetWidths}>
+            <ArrowCounterClockwiseIcon className="size-4" />
+            {t('common.table.resetWidths')}
+          </PillButton>
+          <PillButton size="sm" onClick={showAll}>
+            {t('common.table.showAllColumns')}
+          </PillButton>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   )
