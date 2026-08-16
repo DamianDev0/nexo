@@ -34,7 +34,7 @@ export function ContactNameCell({
 
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <Avatar size="sm" variant="soft" className={cn(dense ? 'size-7' : 'size-9')}>
+      <Avatar size="sm" variant="soft" className={cn('rounded-full', dense ? 'size-7' : 'size-9')}>
         {contact.avatarUrl && <Avatar.Image src={contact.avatarUrl} alt="" className="bg-muted" />}
         <Avatar.Fallback aria-label={name} className="bg-transparent dark:bg-transparent">
           <AvatarGradient seed={contact.email ?? contact.id} />
