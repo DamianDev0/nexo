@@ -67,3 +67,24 @@ export function timeAgoCO(date: Date | string): string {
 
   return formatDateCO(d)
 }
+
+const RELATIVE_UNITS: ReadonlyArray<readonly [Intl.RelativeTimeFormatUnit, number]> = [
+  ['year', 365 * 24 * 60 * 60],
+  ['month', 30 * 24 * 60 * 60],
+  ['day', 24 * 60 * 60],
+  ['hour', 60 * 60],
+  ['minute', 60],
+]
+
+export function timeAgo(date: Date | string, locale: string): string {
+  const d = typeof date === 'string' ? new Date(date) : date
+  const seconds = Math.round((d.getTime() - Date.now()) / 1000)
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+
+  for (const [unit, size] of RELATIVE_UNITS) {
+    const value = Math.trunc(seconds / size)
+    if (value !== 0) return format.format(value, unit)
+  }
+
+  return format.format(0, 'minute')
+}

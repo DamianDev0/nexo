@@ -204,11 +204,16 @@ export class ContactsRepository {
     const values: unknown[] = changes.map((change) => change.value)
     const updates = changes.map((change, index) => `${change.column} = $${index + 1}`)
 
+    updates.push('updated_at = NOW()')
+    if (changes.some((change) => change.column === 'status')) {
+      updates.push('status_changed_at = NOW()')
+    }
+
     values.push(contactId)
     const rows = await sqlRows<ContactRow[]>(
       qr,
       `UPDATE contacts
-       SET ${updates.join(', ')}, updated_at = NOW()
+       SET ${updates.join(', ')}
        WHERE id = $${values.length}
        RETURNING ${CONTACT_COLUMNS}`,
       values,

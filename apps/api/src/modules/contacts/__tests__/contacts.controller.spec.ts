@@ -27,6 +27,7 @@ const mockContact: Contact = {
   municipioCode: null,
   country: 'Colombia',
   status: 'new',
+  statusChangedAt: null,
   lifecycleStage: LifecycleStage.LEAD,
   source: 'manual',
   type: null,

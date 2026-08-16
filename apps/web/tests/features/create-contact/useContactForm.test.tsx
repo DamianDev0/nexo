@@ -28,6 +28,7 @@ const EXISTING_CONTACT: ContactListItem = {
   municipioCode: '11001',
   country: 'CO',
   status: 'qualified',
+  statusChangedAt: '2026-08-01T00:00:00.000Z',
   lifecycleStage: LifecycleStage.LEAD,
   source: 'manual',
   type: 'customer',

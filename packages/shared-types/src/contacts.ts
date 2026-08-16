@@ -18,6 +18,7 @@ export type Contact = {
   municipioCode: string | null
   country: string
   status: string
+  statusChangedAt: string | null
   lifecycleStage: LifecycleStage
   source: string | null
   type: string | null

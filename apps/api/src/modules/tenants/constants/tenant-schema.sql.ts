@@ -78,6 +78,7 @@ export function getTenantSchemaSQL(schema: string): string {
       municipio_code VARCHAR(5),
       country VARCHAR(3) DEFAULT 'CO',
       status VARCHAR(30) DEFAULT 'new',
+      status_changed_at TIMESTAMPTZ DEFAULT NOW(),
       lifecycle_stage VARCHAR(30) DEFAULT 'subscriber',
       source VARCHAR(50),
       type VARCHAR(30),

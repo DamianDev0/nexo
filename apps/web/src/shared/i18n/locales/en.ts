@@ -545,6 +545,7 @@ const en = {
     toasts: {
       created: 'Contact created',
       updated: 'Contact updated',
+      statusUpdated: 'Status updated',
       archived_one: 'Contact archived',
       archived_other: 'Contacts archived',
       archivedPartial: 'Archived {{archived}} of {{total}} contacts',

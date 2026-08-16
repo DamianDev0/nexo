@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { buildContactColumns } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { buildBulkLabels, useArchiveContacts } from '@/features/archive-contacts'
+import { useChangeContactStatus } from '@/features/change-contact-status'
 import { useCreateFromUrl } from '@/features/create-contact'
 import { useContactsLayout, useContactWorkspace } from '@/features/customize-contacts-table'
 import {
@@ -26,7 +27,7 @@ const NO_COLUMNS: ReadonlyArray<ContactColumnDef> = []
 const NO_TABLE_STATE: ContactTableState = {}
 
 export function useContactsBoard() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const table = useContactsTable()
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
@@ -44,17 +45,30 @@ export function useContactsBoard() {
     { value: table.sort, onChange: handleSort },
   )
 
+  const changeStatus = useChangeContactStatus()
   const columns = useMemo(
     () =>
       buildContactColumns(catalog, {
         t,
+        locale: i18n.language,
+        statuses: taxonomy.statuses,
+        onStatusChange: changeStatus,
         taxonomy: {
           statusByKey: taxonomy.statusByKey,
           sourceByKey: taxonomy.sourceByKey,
           typeByKey: taxonomy.typeByKey,
         },
       }),
-    [catalog, t, taxonomy.statusByKey, taxonomy.sourceByKey, taxonomy.typeByKey],
+    [
+      catalog,
+      t,
+      i18n.language,
+      taxonomy.statuses,
+      changeStatus,
+      taxonomy.statusByKey,
+      taxonomy.sourceByKey,
+      taxonomy.typeByKey,
+    ],
   )
 
   const instance = useDataTable({

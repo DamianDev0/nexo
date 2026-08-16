@@ -11,6 +11,7 @@ import { contactCellRenderer } from '@/entities/contact/lib/contact-column-cells
 
 const CONTEXT: ContactColumnContext = {
   t: ((key: string) => key) as never,
+  locale: 'es-CO',
   taxonomy: {
     statusByKey: new Map([['new', { key: 'new', label: 'Nuevo', color: '#3B82F6' }]]),
     sourceByKey: new Map([['manual', { key: 'manual', label: 'Manual', color: '#64748B' }]]),
@@ -58,5 +59,34 @@ describe('contactCellRenderer', () => {
     renderCell('jobTitle', { jobTitle: 'Gerente' })
 
     expect(screen.getByText('Gerente')).toBeInTheDocument()
+  })
+})
+
+describe('refined cells', () => {
+  it('tells how long the contact has sat in its current status', () => {
+    const since = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+    renderCell('status', { status: 'new', statusChangedAt: since })
+
+    expect(screen.getByText('Nuevo')).toBeInTheDocument()
+    expect(screen.getByText('hace 3 días')).toBeInTheDocument()
+  })
+
+  it('reads the last activity as elapsed time, not a bare date', () => {
+    const when = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+    renderCell('lastContactedAt', { lastContactedAt: when })
+
+    expect(screen.getByText('hace 2 horas')).toBeInTheDocument()
+  })
+
+  it('leaves a lead score of zero as an empty marker instead of a loud badge', () => {
+    renderCell('leadScore', { leadScore: 0 })
+
+    expect(screen.getByText('—')).toBeInTheDocument()
+  })
+
+  it('shows a real score as a badge', () => {
+    renderCell('leadScore', { leadScore: 82 })
+
+    expect(screen.getByText('82')).toBeInTheDocument()
   })
 })

@@ -445,4 +445,14 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ADD COLUMN IF NOT EXISTS enabled BOOLEAN NOT NULL DEFAULT true;
     `,
   },
+  {
+    id: '0027_contacts_status_changed_at',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS status_changed_at TIMESTAMPTZ;
+      UPDATE "${schema}".contacts
+        SET status_changed_at = COALESCE(updated_at, created_at)
+        WHERE status_changed_at IS NULL;
+    `,
+  },
 ]

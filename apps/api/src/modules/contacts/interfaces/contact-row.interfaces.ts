@@ -18,6 +18,7 @@ export interface ContactRow {
   municipio_code: string | null
   country: string | null
   status: string
+  status_changed_at: string | null
   lifecycle_stage: string | null
   source: string | null
   type: string | null

@@ -11,6 +11,7 @@ import { buildContactColumns } from '@/entities/contact/lib/contact-columns'
 
 const CONTEXT = {
   t: ((key: string) => key) as never,
+  locale: 'es-CO',
   taxonomy: { statusByKey: new Map(), sourceByKey: new Map(), typeByKey: new Map() },
 }
 

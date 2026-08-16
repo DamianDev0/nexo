@@ -25,7 +25,7 @@ describe('ContactNameCell', () => {
 
 describe('ContactStatusCell', () => {
   it('falls back to the raw status key when the taxonomy has no match', () => {
-    render(<ContactStatusCell status={CONTACT.status} />, { wrapper })
+    render(<ContactStatusCell contact={CONTACT} options={[]} locale="es-CO" />, { wrapper })
 
     expect(screen.getByText(CONTACT.status)).toBeInTheDocument()
   })
@@ -33,7 +33,9 @@ describe('ContactStatusCell', () => {
   it('prefers the taxonomy label', () => {
     render(
       <ContactStatusCell
-        status={CONTACT.status}
+        contact={CONTACT}
+        options={[]}
+        locale="es-CO"
         choice={{ key: CONTACT.status, label: 'Calificado', color: '#a5e96f' }}
       />,
       { wrapper },

@@ -2,7 +2,14 @@ import { formatDateShortCO } from '@repo/shared-utils'
 
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
-import { ContactNameCell, ContactStatusCell, ContactTagsCell } from './contact-cells'
+import {
+  ContactNameCell,
+  ContactRelativeCell,
+  ContactScoreCell,
+  ContactStageCell,
+  ContactStatusCell,
+  ContactTagsCell,
+} from './contact-cells'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
@@ -18,6 +25,9 @@ export type ContactTaxonomyMaps = {
 export type ContactColumnContext = {
   readonly t: TFunction
   readonly taxonomy: ContactTaxonomyMaps
+  readonly locale: string
+  readonly statuses?: ReadonlyArray<TaxonomyChoice>
+  readonly onStatusChange?: (contactId: string, status: string) => void
 }
 
 export type ContactCellRenderer = (
@@ -44,8 +54,14 @@ function labelFor(map: ReadonlyMap<string, TaxonomyChoice>, key: string | null):
 
 const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
   name: (contact) => <ContactNameCell contact={contact} />,
-  status: (contact, { taxonomy }) => (
-    <ContactStatusCell status={contact.status} choice={taxonomy.statusByKey.get(contact.status)} />
+  status: (contact, { taxonomy, locale, statuses, onStatusChange }) => (
+    <ContactStatusCell
+      contact={contact}
+      choice={taxonomy.statusByKey.get(contact.status)}
+      options={statuses ?? []}
+      locale={locale}
+      onChange={onStatusChange}
+    />
   ),
   tags: (contact, { t }) => (
     <ContactTagsCell tags={contact.tags} label={(count) => t('contacts.tagCount', { count })} />
@@ -53,19 +69,21 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
   phone: (contact) => numeric(contact.phone),
   whatsapp: (contact) => numeric(contact.whatsapp),
   documentNumber: (contact) => numeric(contact.documentNumber),
-  leadScore: (contact) => numeric(contact.leadScore),
+  leadScore: (contact) => <ContactScoreCell score={contact.leadScore} />,
   city: (contact) => muted(contact.city),
   source: (contact, { taxonomy }) => muted(labelFor(taxonomy.sourceByKey, contact.source)),
   type: (contact, { taxonomy }) =>
     muted(contact.typeLabel ?? labelFor(taxonomy.typeByKey, contact.type)),
-  lifecycleStage: (contact, { t }) =>
-    text(
-      t(`contacts.lifecycleStage.${contact.lifecycleStage}`, {
+  lifecycleStage: (contact, { t }) => (
+    <ContactStageCell
+      label={t(`contacts.lifecycleStage.${contact.lifecycleStage}`, {
         defaultValue: contact.lifecycleStage,
-      }),
-    ),
-  lastContactedAt: (contact) =>
-    numeric(contact.lastContactedAt ? formatDateShortCO(contact.lastContactedAt) : null),
+      })}
+    />
+  ),
+  lastContactedAt: (contact, { locale }) => (
+    <ContactRelativeCell iso={contact.lastContactedAt} locale={locale} />
+  ),
   createdAt: (contact) => numeric(formatDateShortCO(contact.createdAt)),
 }
 

@@ -20,6 +20,7 @@ export function mapContactListItem(r: ContactRow): ContactListItem {
     municipioCode: r.municipio_code,
     country: r.country ?? 'CO',
     status: r.status as ContactListItem['status'],
+    statusChangedAt: r.status_changed_at ?? null,
     lifecycleStage: (r.lifecycle_stage ?? 'subscriber') as ContactListItem['lifecycleStage'],
     source: r.source as ContactListItem['source'],
     type: r.type ?? null,

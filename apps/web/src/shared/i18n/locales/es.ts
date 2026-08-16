@@ -549,6 +549,7 @@ const es = {
     toasts: {
       created: 'Contacto creado',
       updated: 'Contacto actualizado',
+      statusUpdated: 'Estado actualizado',
       archived_one: 'Contacto archivado',
       archived_other: 'Contactos archivados',
       archivedPartial: 'Se archivaron {{archived}} de {{total}} contactos',

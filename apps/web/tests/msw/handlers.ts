@@ -41,6 +41,7 @@ function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
     municipioCode: null,
     country: 'CO',
     status: 'new',
+    statusChangedAt: new Date().toISOString(),
     lifecycleStage: LifecycleStage.LEAD,
     source: 'manual',
     type: null,
