@@ -3,12 +3,11 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { CONTACT_AVATARS } from '@/entities/contact'
 import { AddressField, MunicipalityCombobox, useResolveMunicipality } from '@/entities/geo'
 import { AvatarPicker } from '@/shared/ui/kokonutui/avatar-picker'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { Label } from '@/shared/ui/shadcn/label'
-
-import { CONTACT_AVATARS } from '../config/contact-avatars.constants'
 
 import { ContactPhoneFields } from './ContactPhoneFields'
 import { ContactTypeFields } from './ContactTypeFields'

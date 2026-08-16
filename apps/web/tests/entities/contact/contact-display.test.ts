@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   contactAvatarTone,
+  contactAvatarUrl,
   contactFullName,
   contactInitials,
 } from '@/entities/contact/lib/contact-display'
@@ -53,5 +54,33 @@ describe('contactAvatarTone', () => {
   it('folds every character into the hash, not just the first', () => {
     expect(contactAvatarTone('contact-1')).toBe('info')
     expect(contactAvatarTone('contact-2')).toBe('warning')
+  })
+})
+
+describe('contactAvatarUrl', () => {
+  it('gives every contact a face without anyone choosing one', () => {
+    const url = contactAvatarUrl({ id: 'contact-1', avatarUrl: null })
+
+    expect(url).toMatch(/^https:\/\/res\.cloudinary\.com\//)
+  })
+
+  it('keeps the same face for the same contact across renders', () => {
+    const first = contactAvatarUrl({ id: 'contact-42', avatarUrl: null })
+    const second = contactAvatarUrl({ id: 'contact-42', avatarUrl: null })
+
+    expect(first).toBe(second)
+  })
+
+  it('spreads different contacts across the catalogue', () => {
+    const ids = Array.from({ length: 24 }, (_, index) => `contact-${index}`)
+    const faces = new Set(ids.map((id) => contactAvatarUrl({ id, avatarUrl: null })))
+
+    expect(faces.size).toBeGreaterThan(4)
+  })
+
+  it('lets an explicit pick win over the derived one', () => {
+    const picked = 'https://res.cloudinary.com/dpqbn1gqb/image/upload/v1/peep-1.png'
+
+    expect(contactAvatarUrl({ id: 'contact-1', avatarUrl: picked })).toBe(picked)
   })
 })

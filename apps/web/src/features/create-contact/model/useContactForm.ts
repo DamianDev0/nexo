@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { sileo } from 'sileo'
 
+import { contactAvatarUrl } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import contactsService from '@/shared/api/services/contacts.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
@@ -62,7 +63,7 @@ function toFormValues(contact: ContactListItem): ContactFormValues {
     city: contact.city ?? '',
     municipioCode: contact.municipioCode ?? '',
     status: contact.status,
-    avatarUrl: contact.avatarUrl ?? '',
+    avatarUrl: contactAvatarUrl(contact),
     source: contact.source ?? '',
     type: contact.type ?? '',
     typeLabel: contact.typeLabel ?? '',

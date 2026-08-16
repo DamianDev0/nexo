@@ -2,7 +2,6 @@ import { formatDateCO, timeAgo } from '@repo/shared-utils'
 
 import { cn } from '@/shared/lib/cn'
 import { Avatar } from '@/shared/ui/atoms/avatar'
-import { AvatarGradient } from '@/shared/ui/atoms/avatar-gradient'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { CaretDownIcon } from '@/shared/ui/icons'
@@ -19,7 +18,7 @@ import {
 
 import { CONTACT_TAG_CHIP } from '../config/contact-columns.constants'
 
-import { contactFullName } from './contact-display'
+import { contactAvatarUrl, contactFullName } from './contact-display'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
@@ -35,10 +34,8 @@ export function ContactNameCell({
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <Avatar size="sm" variant="soft" className={cn('rounded-full', dense ? 'size-7' : 'size-9')}>
-        {contact.avatarUrl && <Avatar.Image src={contact.avatarUrl} alt="" className="bg-muted" />}
-        <Avatar.Fallback aria-label={name} className="bg-transparent dark:bg-transparent">
-          <AvatarGradient seed={contact.email ?? contact.id} />
-        </Avatar.Fallback>
+        <Avatar.Image src={contactAvatarUrl(contact)} alt="" className="bg-muted" />
+        <Avatar.Fallback aria-label={name} className="bg-muted" />
       </Avatar>
       <TruncateTip className="text-sm font-medium tracking-tight text-foreground">
         {name}
