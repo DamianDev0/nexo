@@ -241,6 +241,7 @@ export class ContactsService {
       source: dto.source ?? null,
       type: dto.type ?? null,
       typeLabel: dto.type === OTHER_CONTACT_TYPE ? (dto.typeLabel ?? null) : null,
+      avatarUrl: dto.avatarUrl ?? null,
       leadScore: dto.leadScore ?? 0,
       dataConsent: dto.dataConsent ?? false,
       consentDate: dto.dataConsent ? new Date() : null,

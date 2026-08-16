@@ -156,8 +156,8 @@ export class ContactsRepository {
          data_consent, consent_date, consent_source,
          opt_out_email, opt_out_sms, opt_out_whatsapp,
          tags, company_id, assigned_to_id, custom_fields, created_by,
-         type, type_label
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31)
+         type, type_label, avatar_url
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32)
        RETURNING ${CONTACT_COLUMNS}`,
       [
         data.firstName,
@@ -191,6 +191,7 @@ export class ContactsRepository {
         data.createdBy,
         data.type,
         data.typeLabel,
+        data.avatarUrl,
       ],
     )
     return rows[0] ?? null

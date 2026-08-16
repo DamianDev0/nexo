@@ -121,6 +121,7 @@ export interface CreateContactData {
   source: string | null
   type: string | null
   typeLabel: string | null
+  avatarUrl: string | null
   leadScore: number
   dataConsent: boolean
   consentDate: Date | null

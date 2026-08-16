@@ -51,6 +51,7 @@ export function useContactsBoard() {
       buildContactColumns(catalog, {
         t,
         locale: i18n.language,
+        dense: layout.value.density === 'compact',
         statuses: taxonomy.statuses,
         onStatusChange: changeStatus,
         taxonomy: {
@@ -63,6 +64,7 @@ export function useContactsBoard() {
       catalog,
       t,
       i18n.language,
+      layout.value.density,
       taxonomy.statuses,
       changeStatus,
       taxonomy.statusByKey,

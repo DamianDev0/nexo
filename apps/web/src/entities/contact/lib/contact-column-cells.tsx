@@ -26,6 +26,7 @@ export type ContactColumnContext = {
   readonly t: TFunction
   readonly taxonomy: ContactTaxonomyMaps
   readonly locale: string
+  readonly dense?: boolean
   readonly statuses?: ReadonlyArray<TaxonomyChoice>
   readonly onStatusChange?: (contactId: string, status: string) => void
 }
@@ -53,7 +54,7 @@ function labelFor(map: ReadonlyMap<string, TaxonomyChoice>, key: string | null):
 }
 
 const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
-  name: (contact) => <ContactNameCell contact={contact} />,
+  name: (contact, { dense }) => <ContactNameCell contact={contact} dense={dense} />,
   status: (contact, { taxonomy, locale, statuses, onStatusChange }) => (
     <ContactStatusCell
       contact={contact}
