@@ -79,11 +79,14 @@ describe('DataTableColumnEditor', () => {
     expect(movable?.querySelector('[aria-label*="reorder"]')).toBeInTheDocument()
   })
 
-  it('closes with a collapse arrow rather than a dismissal cross', async () => {
+  it('collapses from the edge like the other drawers, with no dismissal cross', async () => {
     setup()
     await openDrawer()
 
-    expect(screen.getByRole('button', { name: /common.close/i })).toBeInTheDocument()
+    const collapse = screen.getByRole('button', { name: /collapsePanel/i })
+
+    expect(collapse).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.queryByRole('button', { name: /^close$/i })).not.toBeInTheDocument()
   })
 
   it('reflects which columns are off and turns one back on', async () => {

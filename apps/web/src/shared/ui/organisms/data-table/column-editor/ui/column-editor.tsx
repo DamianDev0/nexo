@@ -10,17 +10,19 @@ import {
 } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
-import { CaretRightIcon, SlidersHorizontalIcon } from '@/shared/ui/icons'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { SlidersHorizontalIcon } from '@/shared/ui/icons'
+import { EdgeCollapseButton } from '@/shared/ui/molecules/edge-collapse-button'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -33,6 +35,7 @@ import { ColumnEditorRow } from './column-editor-item'
 
 export function DataTableColumnEditor({ className }: Readonly<{ className?: string }>) {
   const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
   const { items, visibleCount, toggle, reorder, showAll, resetWidths } = useColumnEditor()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
   const dndId = useId()
@@ -42,7 +45,7 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           variant="outline"
@@ -56,25 +59,22 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="right" showCloseButton={false} className="flex w-88 flex-col gap-0 p-0">
-        <SheetHeader className="flex-row items-start gap-3 border-b border-border px-5 py-4">
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <SheetTitle>{t('common.table.editColumns')}</SheetTitle>
-            <SheetDescription>{t('common.table.editColumnsHint')}</SheetDescription>
-          </div>
-          <SheetClose asChild>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              aria-label={t('common.close')}
-              className="size-7 shrink-0 text-faint hover:text-foreground"
-            >
-              <CaretRightIcon className="size-4" />
-            </Button>
-          </SheetClose>
+      <SheetContent showCloseButton={false} className="w-full gap-0 overflow-visible sm:max-w-md">
+        <EdgeCollapseButton
+          edge="left"
+          label={t('common.table.collapsePanel')}
+          onClick={() => setOpen(false)}
+        />
+        <SheetHeader className="gap-0.5 border-b border-border px-6 pb-4 pt-5">
+          <SheetTitle className="text-lg font-bold tracking-[-0.01em]">
+            {t('common.table.editColumns')}
+          </SheetTitle>
+          <SheetDescription className="text-xs text-muted-foreground">
+            {t('common.table.editColumnsHint')}
+          </SheetDescription>
         </SheetHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+        <div className="flex flex-1 flex-col overflow-y-auto px-6 py-5">
           <DndContext
             id={dndId}
             sensors={sensors}
@@ -93,15 +93,15 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
               </ul>
             </SortableContext>
           </DndContext>
-        </div>
 
-        <div className="flex items-center gap-2 border-t border-border px-5 py-3">
-          <Button variant="outline" size="sm" onClick={showAll} className="flex-1">
-            {t('common.table.showAllColumns')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={resetWidths} className="flex-1">
-            {t('common.table.resetWidths')}
-          </Button>
+          <SheetFooter className="-mx-6 -mb-5 mt-auto flex-row items-center justify-end gap-2 border-t border-border px-6 py-3">
+            <PillButton variant="ghost" size="sm" onClick={resetWidths}>
+              {t('common.table.resetWidths')}
+            </PillButton>
+            <PillButton variant="tertiary" size="sm" onClick={showAll}>
+              {t('common.table.showAllColumns')}
+            </PillButton>
+          </SheetFooter>
         </div>
       </SheetContent>
     </Sheet>

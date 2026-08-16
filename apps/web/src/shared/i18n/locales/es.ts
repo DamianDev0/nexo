@@ -38,6 +38,7 @@ const es = {
       editColumns: 'Editar columnas',
       editColumnsHint: 'Arrastra para reordenar y activa las que quieras ver.',
       lockedColumn: 'Columna fija: no se puede ocultar',
+      collapsePanel: 'Ocultar panel',
       showAllColumns: 'Mostrar todas',
       resetWidths: 'Restablecer anchos',
       hideColumn: 'Ocultar columna',

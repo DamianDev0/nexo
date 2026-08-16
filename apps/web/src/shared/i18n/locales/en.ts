@@ -38,6 +38,7 @@ const en = {
       editColumns: 'Edit columns',
       editColumnsHint: 'Drag to reorder and switch on the ones you want to see.',
       lockedColumn: 'Pinned column: it cannot be hidden',
+      collapsePanel: 'Hide panel',
       showAllColumns: 'Show all',
       resetWidths: 'Reset widths',
       hideColumn: 'Hide column',
