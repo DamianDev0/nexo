@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { SlidersHorizontalIcon } from '@/shared/ui/icons'
+import { ArrowCounterClockwiseIcon, SlidersHorizontalIcon } from '@/shared/ui/icons'
 import { EdgeCollapseButton } from '@/shared/ui/molecules/edge-collapse-button'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
@@ -36,7 +36,8 @@ import { ColumnEditorRow } from './column-editor-item'
 export function DataTableColumnEditor({ className }: Readonly<{ className?: string }>) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const { items, visibleCount, toggle, reorder, showAll, resetWidths } = useColumnEditor()
+  const { pinnedItems, sortableItems, visibleCount, toggle, reorder, showAll, resetWidths } =
+    useColumnEditor()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
   const dndId = useId()
 
@@ -75,6 +76,12 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
         </SheetHeader>
 
         <div className="flex flex-1 flex-col overflow-y-auto px-6 py-5">
+          <ul className="flex flex-col gap-0.5">
+            {pinnedItems.map((item) => (
+              <ColumnEditorRow key={item.id} item={item} onToggle={toggle} />
+            ))}
+          </ul>
+
           <DndContext
             id={dndId}
             sensors={sensors}
@@ -83,22 +90,23 @@ export function DataTableColumnEditor({ className }: Readonly<{ className?: stri
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={items.map((item) => item.id)}
+              items={sortableItems.map((item) => item.id)}
               strategy={verticalListSortingStrategy}
             >
               <ul className="flex flex-col gap-0.5">
-                {items.map((item) => (
+                {sortableItems.map((item) => (
                   <ColumnEditorRow key={item.id} item={item} onToggle={toggle} />
                 ))}
               </ul>
             </SortableContext>
           </DndContext>
 
-          <SheetFooter className="-mx-6 -mb-5 mt-auto flex-row items-center justify-end gap-2 border-t border-border px-6 py-3">
-            <PillButton variant="ghost" size="sm" onClick={resetWidths}>
+          <SheetFooter className="-mx-6 -mb-5 mt-auto flex-row items-center justify-between gap-2 border-t border-border px-6 py-3">
+            <PillButton variant="ghost" size="sm" className="gap-1.5" onClick={resetWidths}>
+              <ArrowCounterClockwiseIcon className="size-4" />
               {t('common.table.resetWidths')}
             </PillButton>
-            <PillButton variant="tertiary" size="sm" onClick={showAll}>
+            <PillButton size="sm" onClick={showAll}>
               {t('common.table.showAllColumns')}
             </PillButton>
           </SheetFooter>

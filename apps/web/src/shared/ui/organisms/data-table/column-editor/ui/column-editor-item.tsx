@@ -21,7 +21,7 @@ export function ColumnEditorRow({ item, onToggle }: Readonly<ColumnEditorRowProp
   const { t } = useTranslation()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
-    disabled: item.locked,
+    disabled: item.pinned,
   })
 
   return (
@@ -34,7 +34,7 @@ export function ColumnEditorRow({ item, onToggle }: Readonly<ColumnEditorRowProp
         isDragging && 'z-10 border-border opacity-80 shadow-sm',
       )}
     >
-      {item.locked ? (
+      {item.pinned ? (
         <span className="size-7" />
       ) : (
         <Button

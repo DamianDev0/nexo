@@ -10,6 +10,7 @@ export interface ColumnEditorItem {
   readonly label: string
   readonly visible: boolean
   readonly locked: boolean
+  readonly pinned: boolean
 }
 
 export function useColumnEditor() {
@@ -21,13 +22,17 @@ export function useColumnEditor() {
   const items: ColumnEditorItem[] = table
     .getAllLeafColumns()
     .filter((column) => column.id !== DATA_TABLE_SELECTION_ID)
-    .sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
     .map((column) => ({
       id: column.id,
       label: column.columnDef.meta?.label ?? column.id,
       visible: column.getIsVisible(),
       locked: !column.getCanHide(),
+      pinned: column.getIsPinned() === 'left',
     }))
+    .sort((a, b) => {
+      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
+      return (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0)
+    })
 
   const toggle = useCallback(
     (id: string, visible: boolean) => table.getColumn(id)?.toggleVisibility(visible),
@@ -42,7 +47,8 @@ export function useColumnEditor() {
   const resetWidths = useCallback(() => table.resetColumnSizing(), [table])
 
   return {
-    items,
+    pinnedItems: items.filter((item) => item.pinned),
+    sortableItems: items.filter((item) => !item.pinned),
     visibleCount: items.filter((item) => item.visible).length,
     toggle,
     reorder: reorderColumn,

@@ -2,6 +2,7 @@ export type { Icon as AppIcon, IconProps, IconWeight } from '@phosphor-icons/rea
 
 export {
   AddressBookIcon,
+  ArrowCounterClockwiseIcon,
   ArrowDownIcon,
   ArrowRightIcon,
   ArrowUpIcon,

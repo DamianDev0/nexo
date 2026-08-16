@@ -15,7 +15,7 @@ const COLUMNS: ReadonlyArray<ColumnDef<Row, unknown>> = [
   { id: 'score', accessorKey: 'score', meta: { label: 'Score' } },
 ]
 
-function setup(layout: { hidden?: string[]; order?: string[] } = {}) {
+function setup(layout: { hidden?: string[]; order?: string[]; pinnedLeft?: string[] } = {}) {
   const saved: unknown[] = []
   const { result } = renderHook(() =>
     useDataTable<Row>({
@@ -69,14 +69,32 @@ describe('DataTableColumnEditor', () => {
     expect(screen.getByRole('switch', { name: 'City' })).toBeInTheDocument()
   })
 
-  it('gives a locked column no drag handle, since it cannot move either', async () => {
+  it('still lets an unhideable column be reordered — locked is about visibility', async () => {
     setup()
     await openDrawer()
 
-    const [locked, movable] = screen.getAllByRole('listitem')
+    const [unhideable] = screen.getAllByRole('listitem')
 
-    expect(locked?.querySelector('[aria-label*="reorder"]')).toBeNull()
+    expect(unhideable?.querySelector('[aria-label*="reorder"]')).toBeInTheDocument()
+  })
+
+  it('gives a pinned column no drag handle, because the table always draws it first', async () => {
+    setup({ pinnedLeft: ['name'] })
+    await openDrawer()
+
+    const [pinned, movable] = screen.getAllByRole('listitem')
+
+    expect(pinned?.querySelector('[aria-label*="reorder"]')).toBeNull()
     expect(movable?.querySelector('[aria-label*="reorder"]')).toBeInTheDocument()
+  })
+
+  it('anchors pinned columns above the sortable ones, mirroring the table', async () => {
+    setup({ pinnedLeft: ['city'] })
+    await openDrawer()
+
+    const labels = screen.getAllByRole('listitem').map((item) => item.textContent)
+
+    expect(labels[0]).toContain('City')
   })
 
   it('collapses from the edge like the other drawers, with no dismissal cross', async () => {
