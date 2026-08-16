@@ -21,7 +21,7 @@ export function AvatarPicker({ avatars, value, labels, onChange }: Readonly<Avat
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -47,7 +47,7 @@ export function AvatarPicker({ avatars, value, labels, onChange }: Readonly<Avat
 
       <PopoverContent align="start" className="w-72 p-3">
         <p className="pb-2 text-xs font-medium text-muted-foreground">{labels.title}</p>
-        <ul className="grid max-h-56 grid-cols-5 gap-2 overflow-y-auto">
+        <ul className="grid max-h-52 grid-cols-5 gap-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {avatars.map((avatar) => {
             const active = avatar === value
 
