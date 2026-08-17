@@ -139,7 +139,11 @@ export class ContactsService {
     return this.db.query(schemaName, async (qr): Promise<Contact> => {
       await this.duplicates.assertNoDuplicates(qr, dto, { force })
 
-      const row = await this.repository.insert(qr, this.buildCreateData(dto, createdById))
+      const tags = await this.resolveTags(qr, dto.tags ?? [])
+      const row = await this.repository.insert(qr, {
+        ...this.buildCreateData(dto, createdById),
+        tags,
+      })
       if (!row) throw new InternalServerErrorException('Contact insert returned no row')
       const result = mapContact(row)
       this.emitAudit(
@@ -163,7 +167,9 @@ export class ContactsService {
       await this.assertContactExists(qr, contactId)
       await this.duplicates.assertNoDuplicates(qr, dto, { force, excludeId: contactId })
 
-      const changes = this.buildUpdateChanges(dto)
+      const sanitized =
+        dto.tags === undefined ? dto : { ...dto, tags: await this.resolveTags(qr, dto.tags) }
+      const changes = this.buildUpdateChanges(sanitized)
       if (!changes.length) return this.fetchContactOrFail(qr, contactId)
 
       const row = await this.repository.updateById(qr, contactId, changes)
@@ -207,6 +213,26 @@ export class ContactsService {
         deals: dealRows.map((d) => mapContactDeal(d)),
       }
     })
+  }
+
+  private async resolveTags(qr: QueryRunner, tags: string[]): Promise<string[]> {
+    if (tags.length === 0) return []
+
+    const names = await this.repository.findEnabledTagNames(qr)
+    const canonicalByLower = new Map(names.map((name) => [name.toLowerCase(), name]))
+
+    const resolved: string[] = []
+    const unknown: string[] = []
+    for (const tag of tags) {
+      const canonical = canonicalByLower.get(tag.trim().toLowerCase())
+      if (!canonical) unknown.push(tag)
+      else if (!resolved.includes(canonical)) resolved.push(canonical)
+    }
+
+    if (unknown.length > 0) {
+      throw new BadRequestException(`Unknown contact tags: ${unknown.join(', ')}`)
+    }
+    return resolved
   }
 
   private async assertContactExists(qr: QueryRunner, contactId: string): Promise<void> {

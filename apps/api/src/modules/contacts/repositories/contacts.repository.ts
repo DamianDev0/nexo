@@ -228,6 +228,15 @@ export class ContactsRepository {
     ])
   }
 
+  async findEnabledTagNames(qr: QueryRunner): Promise<string[]> {
+    const rows = await sqlRows<Array<{ name: string }>>(
+      qr,
+      `SELECT name FROM tags WHERE entity_type = 'contact' AND enabled = true`,
+      [],
+    )
+    return rows.map((row) => row.name)
+  }
+
   async findActivities(qr: QueryRunner, contactId: string): Promise<ActivityRow[]> {
     const rows = await sqlRows<ActivityRow[]>(
       qr,

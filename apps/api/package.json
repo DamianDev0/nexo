@@ -15,6 +15,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
     "seed:contacts": "ts-node -r tsconfig-paths/register scripts/seed-contacts.ts",
+    "clean:contact-tags": "ts-node -r tsconfig-paths/register scripts/clean-contact-tags.ts",
     "migrate": "ts-node -r tsconfig-paths/register scripts/migrate-all-tenants.ts",
     "migrate:dry": "ts-node -r tsconfig-paths/register scripts/migrate-all-tenants.ts --dry-run",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/data-source.ts",

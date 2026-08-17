@@ -1,7 +1,7 @@
 import { EventBusService } from '@/shared/events/event-bus.service'
 import { ContactDuplicatesService } from '../services/contact-duplicates.service'
 import { AUDIT_EVENTS, AuditAction, AuditEntityEvent } from '@/shared/events/audit.events'
-import { NotFoundException } from '@nestjs/common'
+import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ContactsService } from '../services/contacts.service'
 import { ContactsRepository } from '../repositories/contacts.repository'
@@ -186,6 +186,28 @@ describe('ContactsService', () => {
       expect(insertQuery).toContain('RETURNING')
     })
 
+    it('canonicalizes tags against the enabled catalog before inserting', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ name: 'VIP' }, { name: 'Mayorista' }])
+        .mockResolvedValueOnce([makeContactRow({ tags: ['VIP'] })])
+
+      const result = await service.create(SCHEMA, { firstName: 'Ana', tags: ['vip', 'VIP'] }, 'u-1')
+
+      expect(result.tags).toEqual(['VIP'])
+      const catalogQuery: string = qr.query.mock.calls[0][0] as string
+      expect(catalogQuery).toContain('FROM tags')
+      const insertParams: unknown[] = qr.query.mock.calls[1][1] as unknown[]
+      expect(insertParams).toContainEqual(['VIP'])
+    })
+
+    it('rejects tags that are not in the catalog', async () => {
+      qr.query.mockResolvedValueOnce([{ name: 'VIP' }])
+
+      await expect(
+        service.create(SCHEMA, { firstName: 'Ana', tags: ['fantasma'] }, 'u-1'),
+      ).rejects.toThrow(BadRequestException)
+    })
+
     it('persists customFields when provided', async () => {
       const customFields = { industry: 'tech', priority: 'high' }
       qr.query.mockResolvedValueOnce([makeContactRow({ custom_fields: customFields })])
@@ -353,6 +375,27 @@ describe('ContactsService', () => {
 
       await expect(service.update(SCHEMA, 'missing', { firstName: 'X' })).rejects.toThrow(
         NotFoundException,
+      )
+    })
+
+    it('canonicalizes tags against the catalog on update', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([{ name: 'VIP' }])
+        .mockResolvedValueOnce([makeContactRow({ tags: ['VIP'] })])
+
+      const result = await service.update(SCHEMA, 'c-1', { tags: ['vip'] })
+
+      expect(result.tags).toEqual(['VIP'])
+      const updateParams: unknown[] = qr.query.mock.calls[2][1] as unknown[]
+      expect(updateParams).toContainEqual(['VIP'])
+    })
+
+    it('rejects unknown tags on update', async () => {
+      qr.query.mockResolvedValueOnce([{ id: 'c-1' }]).mockResolvedValueOnce([{ name: 'VIP' }])
+
+      await expect(service.update(SCHEMA, 'c-1', { tags: ['fantasma'] })).rejects.toThrow(
+        BadRequestException,
       )
     })
 

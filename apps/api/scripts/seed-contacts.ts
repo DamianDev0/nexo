@@ -11,7 +11,15 @@
  * tenant's own contactTaxonomy, so the seeded rows always land in existing smart lists.
  */
 
-import { DataSource, type QueryRunner } from 'typeorm'
+import { type QueryRunner } from 'typeorm'
+
+import {
+  CONTACT_TAG_CATALOG,
+  createScriptDataSource,
+  SCHEMA_PATTERN,
+  SEED_TAG,
+  upsertContactTagCatalog,
+} from './lib/tenant-scripts'
 
 interface TenantRow {
   slug: string
@@ -35,9 +43,6 @@ interface Options {
   count: number
   purge: boolean
 }
-
-const SEED_TAG = 'seed'
-const SCHEMA_PATTERN = /^tenant_[a-z0-9_]+$/
 
 const FIRST_NAMES = [
   'Andrés',
@@ -129,7 +134,7 @@ const JOB_TITLES = [
 
 const LIFECYCLE_STAGES = ['subscriber', 'lead', 'opportunity', 'customer']
 
-const TAG_POOL = ['vip', 'frio', 'referido', 'recompra', 'mayorista', 'moroso']
+const TAG_POOL = CONTACT_TAG_CATALOG.filter((tag) => tag.name !== SEED_TAG)
 
 const FALLBACK_STATUSES = ['new']
 const FALLBACK_SOURCES = ['import']
@@ -153,17 +158,6 @@ function parseOptions(argv: string[]): Options {
   }
 
   return { tenantSlug, count, purge: argv.includes('--purge') }
-}
-
-function createDataSource(): DataSource {
-  return new DataSource({
-    type: 'postgres',
-    host: process.env.DATABASE_HOST ?? 'localhost',
-    port: Number.parseInt(process.env.DATABASE_PORT ?? '5432', 10),
-    username: process.env.DATABASE_USER ?? 'nexocrm',
-    password: process.env.DATABASE_PASSWORD ?? 'nexocrm_dev',
-    database: process.env.DATABASE_NAME ?? 'nexocrm',
-  })
 }
 
 async function findTenant(runner: QueryRunner, slug: string): Promise<TenantRow> {
@@ -200,7 +194,7 @@ function phoneNumber(index: number): string {
 }
 
 function tagsFor(index: number): string[] {
-  const extra = index % 3 === 0 ? [pick(TAG_POOL, index)] : []
+  const extra = index % 3 === 0 ? [pick(TAG_POOL, index).name] : []
   return [SEED_TAG, ...extra]
 }
 
@@ -271,7 +265,7 @@ async function purgeSeeded(runner: QueryRunner, schema: string): Promise<number>
 
 async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2))
-  const dataSource = createDataSource()
+  const dataSource = createScriptDataSource()
   await dataSource.initialize()
 
   const runner = dataSource.createQueryRunner()
@@ -287,6 +281,8 @@ async function main(): Promise<void> {
       console.log(`Removed ${removed} seeded contacts from ${schema}`)
       return
     }
+
+    await upsertContactTagCatalog(runner, schema)
 
     const rows = Array.from({ length: options.count }, (_, index) => buildRow(index, taxonomy))
     await runner.query(insertStatement(schema, rows.length), rows.flat())
