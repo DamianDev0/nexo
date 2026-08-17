@@ -20,6 +20,9 @@ const en = {
     or: 'or',
     and: 'and',
     saveFailed: 'Failed to save',
+    copy: 'Copy',
+    copied: 'Copied to clipboard',
+    copyFailed: 'Could not copy',
     toggleTheme: 'Toggle theme',
     table: {
       selectAll: 'Select all rows',
@@ -535,8 +538,6 @@ const en = {
       submitCreate: 'Create contact',
       submitEdit: 'Save changes',
     },
-    tagCount_one: '{{count}} tag',
-    tagCount_other: '{{count}} tags',
     pageRange: '{{from}}–{{to}} of {{total}} contacts',
     hints: {
       pending_one: '{{count}} new contact not worked yet',
@@ -550,6 +551,38 @@ const en = {
     },
     bulk: {
       archive: 'Archive selected',
+    },
+    rowActions: {
+      preview: 'Quick view',
+      call: 'Call',
+      whatsapp: 'Open WhatsApp',
+      email: 'Compose email',
+    },
+    tagsPopover: {
+      title: 'Tags',
+    },
+    tagCount_one: '{{count}} tag',
+    tagCount_other: '{{count}} tags',
+    optOut: {
+      email: 'Asked not to receive emails',
+      whatsapp: 'Asked not to be contacted on WhatsApp',
+    },
+    document: {
+      invalid: 'The number does not match the document type format',
+    },
+    recency: {
+      stale: 'No contact in over {{days}} days',
+    },
+    score: {
+      high: 'Score {{score}} — high interest and complete data',
+      medium: 'Score {{score}} — medium interest, there is potential',
+      low: 'Score {{score}} — little interaction so far',
+    },
+    preview: {
+      subtitle: 'Contact',
+      lastContacted: 'Last contacted {{when}}',
+      createdAt: 'Created {{when}}',
+      openFull: 'Edit contact',
     },
     toasts: {
       created: 'Contact created',

@@ -6,8 +6,13 @@ export {
 } from './lib/contact-display'
 export { CONTACT_AVATARS } from './config/contact-avatars.constants'
 export type { AvatarTone } from './lib/contact-display'
-export { buildContactColumns } from './lib/contact-columns'
-export type { ContactColumnContext, ContactTaxonomyMaps } from './lib/contact-column-cells'
+export { buildContactColumns } from './ui/columns/contact-columns'
+export type {
+  ContactColumnContext,
+  ContactRowActions,
+  ContactTaxonomyMaps,
+} from './model/types/contact-cells.types'
+export { ContactPreviewSheet } from './ui/ContactPreviewSheet'
 export {
   fromColumnSort,
   parseSortParam,

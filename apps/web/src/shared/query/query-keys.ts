@@ -1,5 +1,7 @@
 import type { ContactDuplicateProbeQuery, ContactListQuery } from '@repo/shared-types'
 
+const CONTACTS_LIST = ['contacts', 'list'] as const
+
 export const QUERY_KEYS = {
   auth: {
     me: ['auth', 'me'] as const,
@@ -9,7 +11,8 @@ export const QUERY_KEYS = {
     counts: ['contacts', 'counts'] as const,
     workspace: ['contacts', 'workspace'] as const,
     taxonomyUsage: ['contacts', 'taxonomy-usage'] as const,
-    list: (query: ContactListQuery) => ['contacts', 'list', query] as const,
+    lists: CONTACTS_LIST,
+    list: (query: ContactListQuery) => [...CONTACTS_LIST, query] as const,
     detail: (id: string) => ['contacts', 'detail', id] as const,
     duplicateProbe: (params: ContactDuplicateProbeQuery) =>
       ['contacts', 'duplicate-probe', params] as const,
@@ -31,6 +34,7 @@ export const QUERY_KEYS = {
   tags: {
     all: ['tags'] as const,
     page: (entityType: string, page: number) => ['tags', entityType, 'page', page] as const,
+    catalog: (entityType: string) => ['tags', entityType, 'catalog'] as const,
   },
   geo: {
     departments: ['geo', 'departments'] as const,

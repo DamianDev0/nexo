@@ -26,17 +26,19 @@ export function formatDateShortCO(date: Date | string): string {
   return `${part('day')} ${part('month').replace('.', '')} ${part('year')}`
 }
 
+const DATE_TIME_CO = new Intl.DateTimeFormat('es-CO', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+  timeZone: CO_TIMEZONE,
+})
+
 export function formatDateTimeCO(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat('es-CO', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZone: CO_TIMEZONE,
-  }).format(d)
+  return DATE_TIME_CO.format(d)
 }
 
 export function parseDateCO(dateString: string): Date {

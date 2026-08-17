@@ -28,3 +28,11 @@ export function formatCOPhone(value: string): string {
   const groups = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6)]
   return groups.filter(Boolean).join(' ')
 }
+
+export function formatCOPhoneIntl(value: string): string {
+  return `+${COUNTRY_CODE} ${formatCOPhone(value)}`
+}
+
+export function coPhoneE164(value: string): string {
+  return `+${COUNTRY_CODE}${phoneDigits(value)}`
+}

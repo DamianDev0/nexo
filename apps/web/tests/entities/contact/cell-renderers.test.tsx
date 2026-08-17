@@ -4,10 +4,13 @@ import { describe, expect, it } from 'vitest'
 import { CONTACTS_FIXTURE } from '../../msw/handlers'
 import { queryWrapper as wrapper } from '../../query-wrapper'
 
-import type { ContactColumnContext } from '@/entities/contact/lib/contact-column-cells'
+import type { ContactColumnContext } from '@/entities/contact/model/types/contact-cells.types'
 import type { ContactListItem } from '@repo/shared-types'
 
-import { contactCellRenderer } from '@/entities/contact/lib/contact-column-cells'
+import {
+  contactCellRenderer,
+  withContactCellLabels,
+} from '@/entities/contact/ui/columns/cell-renderers'
 
 const CONTEXT: ContactColumnContext = {
   t: ((key: string) => key) as never,
@@ -21,7 +24,7 @@ const CONTEXT: ContactColumnContext = {
 
 function renderCell(key: string, overrides: Partial<ContactListItem> = {}) {
   const contact = { ...CONTACTS_FIXTURE[0]!, ...overrides }
-  render(<>{contactCellRenderer(key)(contact, CONTEXT)}</>, { wrapper })
+  render(<>{contactCellRenderer(key)(contact, withContactCellLabels(CONTEXT))}</>, { wrapper })
 }
 
 describe('contactCellRenderer', () => {

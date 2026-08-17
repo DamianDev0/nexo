@@ -1,15 +1,14 @@
 import { contactFullName } from '@/entities/contact'
 import { selectionColumn } from '@/shared/ui/organisms/data-table'
 
-import {
-  CONTACT_COLUMN_ALIGN,
-  CONTACT_GROW_COLUMN,
-  CONTACT_LOCKABLE_COLUMNS,
-} from '../config/contact-columns.constants'
+import { CONTACT_COLUMN_ALIGN, CONTACT_GROW_COLUMN } from '../../config/contact-columns.constants'
 
-import { contactCellRenderer } from './contact-column-cells'
+import { contactCellRenderer, withContactCellLabels } from './cell-renderers'
 
-import type { ContactColumnContext } from './contact-column-cells'
+import type {
+  ContactColumnContext,
+  ContactRenderContext,
+} from '../../model/types/contact-cells.types'
 import type { ContactColumnDef, ContactListItem } from '@repo/shared-types'
 import type { ColumnDef } from '@tanstack/react-table'
 
@@ -20,7 +19,7 @@ function accessorFor(key: string): (contact: ContactListItem) => unknown {
   return (contact) => Reflect.get(contact, key)
 }
 
-function dataColumn(def: ContactColumnDef, context: ContactColumnContext): ContactColumn {
+function dataColumn(def: ContactColumnDef, context: ContactRenderContext): ContactColumn {
   const render = contactCellRenderer(def.key)
   const label = context.t(def.labelKey)
 
@@ -37,7 +36,7 @@ function dataColumn(def: ContactColumnDef, context: ContactColumnContext): Conta
       description: context.t(def.hintKey),
       align: CONTACT_COLUMN_ALIGN[def.key],
       grow: def.key === CONTACT_GROW_COLUMN,
-      lockable: CONTACT_LOCKABLE_COLUMNS.includes(def.key),
+      lockable: true,
     },
     cell: ({ row }) => render(row.original, context),
   }
@@ -47,11 +46,13 @@ export function buildContactColumns(
   catalog: ReadonlyArray<ContactColumnDef>,
   context: ContactColumnContext,
 ): ReadonlyArray<ContactColumn> {
+  const renderContext = withContactCellLabels(context)
+
   return [
     selectionColumn<ContactListItem>({
       all: context.t('common.table.selectAll'),
       row: context.t('common.table.selectRow'),
     }),
-    ...catalog.map((def) => dataColumn(def, context)),
+    ...catalog.map((def) => dataColumn(def, renderContext)),
   ]
 }

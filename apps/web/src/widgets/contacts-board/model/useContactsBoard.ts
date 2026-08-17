@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next'
 
 import { buildContactColumns } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
+import { useTagCatalog } from '@/entities/tag'
 import { buildBulkLabels, useArchiveContacts } from '@/features/archive-contacts'
-import { useChangeContactStatus } from '@/features/change-contact-status'
 import { useCreateFromUrl } from '@/features/create-contact'
 import { useContactsLayout, useContactWorkspace } from '@/features/customize-contacts-table'
 import {
@@ -21,6 +21,8 @@ import {
 import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
+import { useContactRowActions } from './useContactRowActions'
+
 import type { ContactColumnDef, ContactListItem, ContactTableState } from '@repo/shared-types'
 
 const NO_COLUMNS: ReadonlyArray<ContactColumnDef> = []
@@ -32,6 +34,7 @@ export function useContactsBoard() {
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
   const sheet = useEntityEditor<ContactListItem>()
+  const preview = useEntityEditor<ContactListItem>()
   const { archive, isArchiving } = useArchiveContacts()
   const workspace = useContactWorkspace()
 
@@ -45,7 +48,13 @@ export function useContactsBoard() {
     { value: table.sort, onChange: handleSort },
   )
 
-  const changeStatus = useChangeContactStatus()
+  const rowActions = useContactRowActions({
+    onOpen: sheet.openEdit,
+    onPreview: preview.openEdit,
+  })
+
+  const tagsByName = useTagCatalog('contact')
+
   const columns = useMemo(
     () =>
       buildContactColumns(catalog, {
@@ -53,24 +62,11 @@ export function useContactsBoard() {
         locale: i18n.language,
         dense: layout.value.density === 'compact',
         statuses: taxonomy.statuses,
-        onStatusChange: changeStatus,
-        taxonomy: {
-          statusByKey: taxonomy.statusByKey,
-          sourceByKey: taxonomy.sourceByKey,
-          typeByKey: taxonomy.typeByKey,
-        },
+        actions: rowActions,
+        taxonomy,
+        tagsByName,
       }),
-    [
-      catalog,
-      t,
-      i18n.language,
-      layout.value.density,
-      taxonomy.statuses,
-      changeStatus,
-      taxonomy.statusByKey,
-      taxonomy.sourceByKey,
-      taxonomy.typeByKey,
-    ],
+    [catalog, t, i18n.language, layout.value.density, taxonomy, rowActions, tagsByName],
   )
 
   const instance = useDataTable({
@@ -82,6 +78,16 @@ export function useContactsBoard() {
     sort,
     totalRows: table.total,
   })
+
+  const { setOpen: setPreviewOpen } = preview
+  const { openEdit } = sheet
+  const openFromPreview = useCallback(
+    (contact: ContactListItem) => {
+      setPreviewOpen(false)
+      openEdit(contact)
+    },
+    [setPreviewOpen, openEdit],
+  )
 
   const archiveSelected = useCallback(() => {
     const ids = instance.table.getSelectedRowModel().rows.map((row) => row.id)
@@ -152,6 +158,13 @@ export function useContactsBoard() {
       onArchiveSelected: archiveSelected,
     },
     sheet: { contact: sheet.editing, open: sheet.open, onOpenChange: sheet.setOpen },
+    preview: {
+      contact: preview.editing,
+      open: preview.open,
+      onOpenChange: preview.setOpen,
+      onEdit: openFromPreview,
+      taxonomy,
+    },
   }
 }
 

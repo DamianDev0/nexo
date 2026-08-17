@@ -7,7 +7,7 @@ import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import type { ContactListItem } from '@repo/shared-types'
 
-import { buildContactColumns } from '@/entities/contact/lib/contact-columns'
+import { buildContactColumns } from '@/entities/contact/ui/columns/contact-columns'
 
 const CONTEXT = {
   t: ((key: string) => key) as never,
@@ -55,14 +55,14 @@ describe('buildContactColumns', () => {
     }
   })
 
-  it('keeps phone and WhatsApp as separate columns instead of collapsing them', () => {
+  it('falls back to the WhatsApp number when the phone is missing', () => {
     const contact = { ...CONTACTS_FIXTURE[0]!, phone: null, whatsapp: '3001234567' }
 
     render(<CellUnderTest contact={contact} columnId="phone" />, { wrapper })
-    expect(screen.getByText('—')).toBeInTheDocument()
+    expect(screen.getByText('+57 300 123 4567')).toBeInTheDocument()
 
     render(<CellUnderTest contact={contact} columnId="whatsapp" />, { wrapper })
-    expect(screen.getByText('3001234567')).toBeInTheDocument()
+    expect(screen.getAllByText('+57 300 123 4567')).toHaveLength(2)
   })
 
   it('formats dates without slashes so the day and month never read ambiguously', () => {

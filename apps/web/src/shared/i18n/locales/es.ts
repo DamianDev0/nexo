@@ -20,6 +20,9 @@ const es = {
     or: 'o',
     and: 'y',
     saveFailed: 'Error al guardar',
+    copy: 'Copiar',
+    copied: 'Copiado al portapapeles',
+    copyFailed: 'No se pudo copiar',
     toggleTheme: 'Cambiar tema',
     table: {
       selectAll: 'Seleccionar todas las filas',
@@ -539,8 +542,6 @@ const es = {
       submitCreate: 'Crear contacto',
       submitEdit: 'Guardar cambios',
     },
-    tagCount_one: '{{count}} etiqueta',
-    tagCount_other: '{{count}} etiquetas',
     pageRange: '{{from}}–{{to}} de {{total}} contactos',
     hints: {
       pending_one: '{{count}} contacto nuevo sin gestionar',
@@ -554,6 +555,38 @@ const es = {
     },
     bulk: {
       archive: 'Archivar seleccionados',
+    },
+    rowActions: {
+      preview: 'Vista rápida',
+      call: 'Llamar',
+      whatsapp: 'Abrir WhatsApp',
+      email: 'Escribir email',
+    },
+    tagsPopover: {
+      title: 'Etiquetas',
+    },
+    tagCount_one: '{{count}} etiqueta',
+    tagCount_other: '{{count}} etiquetas',
+    optOut: {
+      email: 'Pidió no recibir emails',
+      whatsapp: 'Pidió no ser contactado por WhatsApp',
+    },
+    document: {
+      invalid: 'El número no coincide con el formato del tipo de documento',
+    },
+    recency: {
+      stale: 'Sin contacto hace más de {{days}} días',
+    },
+    score: {
+      high: 'Puntaje {{score}} — alto interés y datos completos',
+      medium: 'Puntaje {{score}} — interés medio, hay potencial',
+      low: 'Puntaje {{score}} — poca interacción todavía',
+    },
+    preview: {
+      subtitle: 'Contacto',
+      lastContacted: 'Último contacto {{when}}',
+      createdAt: 'Creado {{when}}',
+      openFull: 'Editar contacto',
     },
     toasts: {
       created: 'Contacto creado',
