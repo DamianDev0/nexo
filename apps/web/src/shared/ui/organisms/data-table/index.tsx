@@ -1,6 +1,12 @@
 import { PaginationCapsule } from '../pagination-capsule'
 
-import { DataTableBody, DataTableCellText } from './body'
+import {
+  DataTableBody,
+  DataTableCellAction,
+  DataTableCellFrame,
+  DataTableCellHint,
+  DataTableCellText,
+} from './body'
 import { DataTableColumnEditor } from './column-editor'
 import { DataTableGrid, DataTableRoot, DataTableScroller, DataTableSkeleton } from './grid'
 import { DataTableHeader } from './header'
@@ -35,5 +41,8 @@ export const DataTable = Object.assign(DataTableRoot, {
   Scroller: DataTableScroller,
   Skeleton: DataTableSkeleton,
   CellText: DataTableCellText,
+  CellAction: DataTableCellAction,
+  CellFrame: DataTableCellFrame,
+  CellHint: DataTableCellHint,
   Pagination: PaginationCapsule,
 })
