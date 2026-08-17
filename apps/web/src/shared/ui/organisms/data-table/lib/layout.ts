@@ -1,7 +1,7 @@
-import { DATA_TABLE_SELECTION_ID } from '../config/table.constants'
+import { DATA_TABLE_PIN_ZONE, DATA_TABLE_SELECTION_ID } from '../config/table.constants'
 
 import type { DataTableLayout, DataTableLayoutState } from '../model/types'
-import type { ColumnPinningState } from '@tanstack/react-table'
+import type { ColumnPinningState, VisibilityState } from '@tanstack/react-table'
 
 export function reconcileOrder(
   stored: ReadonlyArray<string> | undefined,
@@ -34,19 +34,59 @@ export function normalizePinning(
   return { left: [...anchored, ...rest], right: [] }
 }
 
+export function dataPins(pinning: ColumnPinningState): string[] {
+  return (pinning.left ?? []).filter((id) => id !== DATA_TABLE_SELECTION_ID)
+}
+
+export function defaultPins(
+  order: ReadonlyArray<string>,
+  visibility: VisibilityState,
+  cap = DATA_TABLE_PIN_ZONE,
+): string[] {
+  return order
+    .filter((id) => id !== DATA_TABLE_SELECTION_ID && visibility[id] !== false)
+    .slice(0, cap)
+}
+
+export function capPins(
+  pinned: ReadonlyArray<string>,
+  order: ReadonlyArray<string>,
+  cap = DATA_TABLE_PIN_ZONE,
+): string[] {
+  const rank = new Map(order.map((id, index) => [id, index]))
+  return [...new Set(pinned)].sort((a, b) => (rank.get(a) ?? 0) - (rank.get(b) ?? 0)).slice(0, cap)
+}
+
+export function moveIntoPins(
+  order: ReadonlyArray<string>,
+  id: string,
+  pinned: ReadonlyArray<string>,
+): string[] {
+  const next = order.filter((candidate) => candidate !== id)
+  const lastPinned = [...next].reverse().find((candidate) => pinned.includes(candidate))
+  const at = lastPinned === undefined ? 0 : next.indexOf(lastPinned) + 1
+
+  next.splice(Math.max(at, order.indexOf(DATA_TABLE_SELECTION_ID) + 1), 0, id)
+  return next
+}
+
 export function seedLayout(
   layout: DataTableLayout,
   columnIds: ReadonlyArray<string>,
 ): DataTableLayoutState {
   const hidden = new Set(layout.hidden ?? [])
 
+  const order = reconcileOrder(layout.order, columnIds)
+  const visibility = Object.fromEntries(
+    columnIds.filter((id) => hidden.has(id)).map((id) => [id, false] as const),
+  )
+  const pinned = layout.pinnedLeft ?? defaultPins(order, visibility)
+
   return {
-    order: reconcileOrder(layout.order, columnIds),
+    order,
     sizing: { ...layout.widths },
-    pinning: normalizePinning(layout.pinnedLeft ?? [], columnIds),
-    visibility: Object.fromEntries(
-      columnIds.filter((id) => hidden.has(id)).map((id) => [id, false] as const),
-    ),
+    pinning: normalizePinning(capPins(pinned, order), order),
+    visibility,
     density: layout.density ?? 'comfortable',
   }
 }

@@ -4,6 +4,8 @@ export const DATA_TABLE_GUTTER = 'px-4'
 
 export const DATA_TABLE_ROW_HEIGHT = { comfortable: 52, compact: 40 } as const
 
+export const DATA_TABLE_PIN_ZONE = 3
+
 export const DATA_TABLE_MIN_COLUMN_WIDTH = 90
 
 export const DATA_TABLE_MAX_COLUMN_WIDTH = 480

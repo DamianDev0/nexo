@@ -23,7 +23,7 @@ export function HeaderCell({ header }: Readonly<{ header: Header<unknown, unknow
   const { column } = header
   const { meta } = column.columnDef
   const pinned = Boolean(column.getIsPinned())
-  const movable = column.id !== DATA_TABLE_SELECTION_ID && !pinned
+  const movable = column.id !== DATA_TABLE_SELECTION_ID
 
   const {
     attributes,

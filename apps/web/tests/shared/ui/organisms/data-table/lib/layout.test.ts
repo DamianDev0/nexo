@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  capPins,
+  defaultPins,
   moveColumn,
+  moveIntoPins,
   normalizePinning,
   reconcileOrder,
   seedLayout,
@@ -15,39 +18,63 @@ describe('normalizePinning', () => {
     expect(normalizePinning([], ORDER)).toEqual({ left: ['select'], right: [] })
   })
 
-  it('keeps the selection column first when a later column is pinned', () => {
-    expect(normalizePinning(['city'], ORDER).left).toEqual(['select', 'city'])
-  })
-
-  it('never lets the selection column be dropped', () => {
-    expect(normalizePinning(['name'], ORDER).left).toEqual(['select', 'name'])
-  })
-
   it('sorts pinned columns by the current column order, not by pin time', () => {
-    expect(normalizePinning(['city', 'name', 'status'], ORDER).left).toEqual([
-      'select',
-      'name',
-      'status',
-      'city',
-    ])
-  })
-
-  it('follows a reordered table instead of the original definition order', () => {
-    const reordered = ['select', 'city', 'name', 'status', 'jobTitle']
-
-    expect(normalizePinning(['name', 'city'], reordered).left).toEqual(['select', 'city', 'name'])
+    expect(normalizePinning(['city', 'name'], ORDER).left).toEqual(['select', 'name', 'city'])
   })
 
   it('drops ids that no longer exist and de-duplicates', () => {
     expect(normalizePinning(['name', 'name', 'ghost'], ORDER).left).toEqual(['select', 'name'])
   })
 
-  it('omits the anchor when the table has no selection column', () => {
-    expect(normalizePinning(['name'], ['name', 'status']).left).toEqual(['name'])
-  })
-
   it('never pins to the right — the action rail owns that edge', () => {
     expect(normalizePinning(['name'], ORDER).right).toEqual([])
+  })
+})
+
+describe('defaultPins', () => {
+  it('pins the first three visible columns when the user has never chosen', () => {
+    expect(defaultPins(ORDER, {})).toEqual(['name', 'status', 'jobTitle'])
+  })
+
+  it('skips hidden columns so the zone always holds three visible ones', () => {
+    expect(defaultPins(ORDER, { status: false })).toEqual(['name', 'jobTitle', 'city'])
+  })
+})
+
+describe('capPins', () => {
+  it('keeps at most three pins, dropping the rightmost', () => {
+    expect(capPins(['city', 'name', 'status', 'jobTitle'], ORDER)).toEqual([
+      'name',
+      'status',
+      'jobTitle',
+    ])
+  })
+
+  it('leaves a single pin alone — the user decides how many to keep', () => {
+    expect(capPins(['city'], ORDER)).toEqual(['city'])
+    expect(capPins([], ORDER)).toEqual([])
+  })
+})
+
+describe('moveIntoPins', () => {
+  it('places a newly pinned column right after the pins it joins', () => {
+    expect(moveIntoPins(ORDER, 'city', ['name', 'status'])).toEqual([
+      'select',
+      'name',
+      'status',
+      'city',
+      'jobTitle',
+    ])
+  })
+
+  it('places the first pin right after the selection column', () => {
+    expect(moveIntoPins(ORDER, 'city', [])).toEqual([
+      'select',
+      'city',
+      'name',
+      'status',
+      'jobTitle',
+    ])
   })
 })
 
@@ -78,7 +105,7 @@ describe('seedLayout', () => {
     expect(state).toEqual({
       order: ORDER,
       sizing: {},
-      pinning: { left: ['select'], right: [] },
+      pinning: { left: ['select', 'name', 'status', 'jobTitle'], right: [] },
       visibility: {},
       density: 'comfortable',
     })
@@ -90,10 +117,16 @@ describe('seedLayout', () => {
     expect(state.visibility).toEqual({ city: false })
   })
 
-  it('anchors the selection column even when the stored pinning omits it', () => {
+  it('honours the stored pins instead of re-applying the default zone', () => {
     const state = seedLayout({ pinnedLeft: ['city'] }, ORDER)
 
     expect(state.pinning.left).toEqual(['select', 'city'])
+  })
+
+  it('lets a workspace store zero pins', () => {
+    const state = seedLayout({ pinnedLeft: [] }, ORDER)
+
+    expect(state.pinning.left).toEqual(['select'])
   })
 })
 
@@ -105,7 +138,7 @@ describe('toLayout', () => {
     expect(layout.pinnedLeft).toEqual(['name'])
   })
 
-  it('round-trips a layout through the seed', () => {
+  it('round-trips a stored layout through the seed', () => {
     const stored = {
       order: ['status', 'name', 'jobTitle', 'city'],
       hidden: ['city'],
@@ -114,7 +147,7 @@ describe('toLayout', () => {
       density: 'compact' as const,
     }
 
-    expect(toLayout(seedLayout(stored, ORDER))).toEqual({ ...stored, order: stored.order })
+    expect(toLayout(seedLayout(stored, ORDER))).toEqual(stored)
   })
 })
 

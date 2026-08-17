@@ -2,7 +2,15 @@
 
 import { useCallback, useRef, useState } from 'react'
 
-import { moveColumn, normalizePinning, seedLayout, toLayout } from '../lib/layout'
+import {
+  capPins,
+  dataPins,
+  moveColumn,
+  moveIntoPins,
+  normalizePinning,
+  seedLayout,
+  toLayout,
+} from '../lib/layout'
 import { resolveUpdater } from '../lib/updater'
 
 import type {
@@ -38,7 +46,8 @@ export function useTableLayout(
   const commit = useCallback(
     (patch: Partial<DataTableLayoutState>) => {
       const merged = { ...current.current, ...patch }
-      const next = { ...merged, pinning: normalizePinning(merged.pinning.left ?? [], merged.order) }
+      const pinned = capPins(dataPins(merged.pinning), merged.order)
+      const next = { ...merged, pinning: normalizePinning(pinned, merged.order) }
 
       current.current = next
       setState(next)
@@ -58,7 +67,20 @@ export function useTableLayout(
   )
 
   const onColumnPinningChange: OnChangeFn<DataTableLayoutState['pinning']> = useCallback(
-    (updater) => commit({ pinning: resolveUpdater(updater, current.current.pinning) }),
+    (updater) => {
+      const { order, pinning } = current.current
+      const wasPinned = dataPins(pinning)
+      const requested = dataPins(resolveUpdater(updater, pinning))
+      const added = requested.find((id) => !wasPinned.includes(id))
+
+      if (!added) {
+        commit({ pinning: normalizePinning(requested, order) })
+        return
+      }
+
+      const nextOrder = moveIntoPins(order, added, wasPinned)
+      commit({ order: nextOrder, pinning: normalizePinning(requested, nextOrder) })
+    },
     [commit],
   )
 
@@ -70,7 +92,13 @@ export function useTableLayout(
   const reorder = useCallback(
     (activeId: string, overId: string) => {
       const order = moveColumn(current.current.order, activeId, overId)
-      if (order) commit({ order })
+      if (!order) return
+
+      const pinned = dataPins(current.current.pinning)
+      const landsOnPinned = pinned.includes(overId)
+      const next = landsOnPinned ? [...pinned, activeId] : pinned.filter((id) => id !== activeId)
+
+      commit({ order, pinning: normalizePinning(next, order) })
     },
     [commit],
   )

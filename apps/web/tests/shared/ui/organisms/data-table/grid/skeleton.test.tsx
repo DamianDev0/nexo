@@ -14,7 +14,11 @@ const COLUMNS: ReadonlyArray<ColumnDef<Row, unknown>> = [
   { id: 'city', accessorKey: 'city', size: 130 },
 ]
 
-function renderSkeleton(layout?: { widths?: Record<string, number>; hidden?: string[] }) {
+function renderSkeleton(layout?: {
+  widths?: Record<string, number>
+  hidden?: string[]
+  pinnedLeft?: string[]
+}) {
   const { result } = renderHook(() =>
     useDataTable<Row>({
       data: [],
@@ -42,10 +46,16 @@ describe('DataTableSkeleton', () => {
     expect(widthsOf(container)).toEqual(['56px', '260px', '130px'])
   })
 
-  it('leaves the fluid column unsized exactly like the grid does', () => {
-    const { container } = renderSkeleton()
+  it('leaves the fluid column unsized when it is not holding up a pin', () => {
+    const { container } = renderSkeleton({ pinnedLeft: [] })
 
     expect(widthsOf(container)).toEqual(['56px', undefined, '130px'])
+  })
+
+  it('sizes the fluid column while it anchors another pinned column', () => {
+    const { container } = renderSkeleton({ pinnedLeft: ['name', 'city'] })
+
+    expect(widthsOf(container)).toEqual(['56px', '300px', '130px'])
   })
 
   it('skips columns the user hid instead of reserving space for them', () => {

@@ -6,13 +6,14 @@ import type { ColumnDef } from '@tanstack/react-table'
 
 import { DataTable, selectionColumn, useDataTable } from '@/shared/ui/organisms/data-table'
 
-type Row = { id: string; name: string; city: string; score: number }
+type Row = { id: string; name: string; city: string; score: number; stage: string }
 
 const COLUMNS: ReadonlyArray<ColumnDef<Row, unknown>> = [
   selectionColumn<Row>({ all: 'all', row: 'row' }),
   { id: 'name', accessorKey: 'name', enableHiding: false, meta: { label: 'Name' } },
   { id: 'city', accessorKey: 'city', meta: { label: 'City' } },
   { id: 'score', accessorKey: 'score', meta: { label: 'Score' } },
+  { id: 'stage', accessorKey: 'stage', meta: { label: 'Stage' } },
 ]
 
 function setup(layout: { hidden?: string[]; order?: string[]; pinnedLeft?: string[] } = {}) {
@@ -46,9 +47,9 @@ describe('DataTableColumnEditor', () => {
 
     const labels = screen.getAllByRole('listitem').map((item) => item.textContent)
 
-    expect(labels).toHaveLength(3)
+    expect(labels).toHaveLength(4)
     expect(labels[0]).toContain('Name')
-    expect(labels[2]).toContain('Score')
+    expect(labels[3]).toContain('Stage')
   })
 
   it('follows the stored order instead of the definition order', async () => {
@@ -70,7 +71,7 @@ describe('DataTableColumnEditor', () => {
   })
 
   it('still lets an unhideable column be reordered — locked is about visibility', async () => {
-    setup()
+    setup({ pinnedLeft: [] })
     await openDrawer()
 
     const [unhideable] = screen.getAllByRole('listitem')
@@ -95,6 +96,16 @@ describe('DataTableColumnEditor', () => {
     const labels = screen.getAllByRole('listitem').map((item) => item.textContent)
 
     expect(labels[0]).toContain('City')
+  })
+
+  it('pins the first three columns until the user says otherwise', async () => {
+    setup()
+    await openDrawer()
+
+    const items = screen.getAllByRole('listitem')
+
+    expect(items[2]?.querySelector('[aria-label*="reorder"]')).toBeNull()
+    expect(items[3]?.querySelector('[aria-label*="reorder"]')).toBeInTheDocument()
   })
 
   it('collapses from the edge like the other drawers, with no dismissal cross', async () => {
