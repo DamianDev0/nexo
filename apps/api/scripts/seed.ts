@@ -6,7 +6,7 @@ import { seedPlans } from '../src/modules/tenants/seeds/plans.seed'
 async function main() {
   const dataSource = new DataSource({
     type: 'postgres',
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
+
     host: process.env.DATABASE_HOST ?? 'localhost',
     port: Number.parseInt(process.env.DATABASE_PORT ?? '5432', 10),
     username: process.env.DATABASE_USER ?? 'nexocrm',

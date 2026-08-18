@@ -25,13 +25,13 @@ export class ImportFileStoreService implements OnModuleDestroy {
     return fileId
   }
 
-  getBuffer(fileId: string): Buffer {
+  getFile(fileId: string): StoredFile {
     const stored = this.store.get(fileId)
     if (!stored || stored.expiresAt < Date.now()) {
       this.store.delete(fileId)
       throw new BadRequestException('The uploaded file has expired. Please upload again.')
     }
-    return stored.buffer
+    return stored
   }
 
   removeFile(fileId: string): void {

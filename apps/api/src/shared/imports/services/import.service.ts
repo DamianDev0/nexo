@@ -1,24 +1,30 @@
 import { Injectable } from '@nestjs/common'
-import { ImportCsvParserService } from './import-csv-parser.service'
+import { ImportFileParserService } from './import-file-parser.service'
 import { ImportFieldMapperService } from './import-field-mapper.service'
 import { ImportFileStoreService } from './import-file-store.service'
-import type { AnalyzeResult, ImportRowMapper } from '../interfaces/import.interfaces'
+import type {
+  AnalyzeResult,
+  ImportFieldError,
+  ImportRowMapper,
+  UploadedImportFile,
+  ValidationPreview,
+} from '../interfaces/import.interfaces'
 
 @Injectable()
 export class ImportService {
   constructor(
-    private readonly csvParser: ImportCsvParserService,
+    private readonly parser: ImportFileParserService,
     private readonly fieldMapper: ImportFieldMapperService,
     private readonly fileStore: ImportFileStoreService,
   ) {}
 
-  async analyze(
-    file: { buffer: Buffer; originalname: string; mimetype: string; size: number },
-    mapper: ImportRowMapper,
-  ): Promise<AnalyzeResult> {
-    this.csvParser.validateFile(file)
+  async analyze(file: UploadedImportFile, mapper: ImportRowMapper): Promise<AnalyzeResult> {
+    this.parser.validateFile(file)
 
-    const { columns, sampleRows, totalRows } = await this.csvParser.analyze(file.buffer)
+    const { columns, sampleRows, totalRows } = await this.parser.analyze(
+      file.buffer,
+      file.originalname,
+    )
     const fileId = this.fileStore.storeFile(file.buffer, file.originalname)
     const suggestedMapping = this.fieldMapper.suggestMapping(columns, mapper.fieldDefs)
     const columnAnalysis = this.fieldMapper.analyzeColumns(columns, sampleRows, mapper.fieldDefs)
@@ -48,18 +54,33 @@ export class ImportService {
     }
   }
 
+  async preview(
+    fileId: string,
+    mapping: Record<string, string | null>,
+    mapper: ImportRowMapper,
+  ): Promise<ValidationPreview> {
+    const stored = this.fileStore.getFile(fileId)
+    const { sampleRows } = await this.parser.analyze(stored.buffer, stored.fileName)
+
+    return this.fieldMapper.validateSampleRows(sampleRows, mapping, mapper)
+  }
+
+  release(fileId: string): void {
+    this.fileStore.removeFile(fileId)
+  }
+
   async getRowsForExecution(
     fileId: string,
     mapping: Record<string, string | null>,
     mapper: ImportRowMapper,
   ): Promise<{
-    rows: { data: Record<string, unknown>; errors: string[] }[]
+    rows: { data: Record<string, unknown>; errors: ImportFieldError[] }[]
     cleanup: () => void
   }> {
-    const buffer = this.fileStore.getBuffer(fileId)
-    const rawRows = await this.csvParser.parseAll(buffer)
+    const stored = this.fileStore.getFile(fileId)
+    const rawRows = await this.parser.parseAll(stored.buffer, stored.fileName)
 
-    const rows = rawRows.map((raw, i) => {
+    const rows = rawRows.map((raw) => {
       const { data, errors } = this.fieldMapper.mapRow(raw, mapping, mapper)
 
       for (const def of mapper.fieldDefs) {
@@ -68,10 +89,7 @@ export class ImportService {
         }
       }
 
-      return {
-        data,
-        errors: errors.map((e) => `Row ${i + 2}: ${e.field} — ${e.message}`),
-      }
+      return { data, errors }
     })
 
     return {

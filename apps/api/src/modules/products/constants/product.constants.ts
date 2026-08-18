@@ -1,10 +1,8 @@
-import type { DuplicateStrategy, MovementType, ProductType } from '@repo/shared-types'
+import type { MovementType, ProductType } from '@repo/shared-types'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateProductDto } from '../dto/product.dto'
 
 export const PRODUCT_TYPES: readonly ProductType[] = ['product', 'service']
-
-export const DUPLICATE_STRATEGIES: readonly DuplicateStrategy[] = ['skip', 'create', 'update']
 
 export const MOVEMENT_TYPES: readonly MovementType[] = [
   'purchase',

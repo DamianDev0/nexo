@@ -18,6 +18,19 @@ export interface ImportRowMapper {
   uniqueKeyField: string | null
 }
 
+export interface ParsedFile {
+  columns: string[]
+  sampleRows: Record<string, string>[]
+  totalRows: number
+}
+
+export interface UploadedImportFile {
+  buffer: Buffer
+  originalname: string
+  mimetype: string
+  size: number
+}
+
 export interface StoredFile {
   buffer: Buffer
   fileName: string

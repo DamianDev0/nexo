@@ -12,6 +12,7 @@ export type {
   ContactRowActions,
   ContactTaxonomyMaps,
 } from './model/types/contact-cells.types'
+export { revalidateContacts } from './api/revalidate-contacts'
 export { ContactPreviewSheet } from './ui/ContactPreviewSheet'
 export {
   fromColumnSort,

@@ -10,8 +10,11 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { UserRole } from '@repo/shared-types'
 import type {
   TenantContext,
@@ -22,11 +25,16 @@ import type {
   ContactTaxonomyUsage,
   PaginatedContacts,
   ContactTimeline,
+  AnalyzeResult,
+  ImportResult,
+  ValidationPreview,
+  ValidationReport,
 } from '@repo/shared-types'
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { ContactsService } from '../services/contacts.service'
+import { ContactImportService } from '../services/contact-import.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import {
   CreateContactDto,
@@ -34,6 +42,7 @@ import {
   ContactQueryDto,
   ProbeContactDuplicatesDto,
   ReassignTaxonomyDto,
+  ExecuteContactImportDto,
 } from '../dto/contact.dto'
 
 @ApiTags('Contacts')
@@ -41,8 +50,60 @@ import {
 export class ContactsController {
   constructor(
     private readonly contactsService: ContactsService,
+    private readonly importService: ContactImportService,
     private readonly customFields: CustomFieldsValidator,
   ) {}
+
+  @Post('import/analyze')
+  @ApiEndpoint({
+    summary: 'Step 1: Upload CSV, analyze columns, suggest mappings, preview',
+    roles: [UserRole.MANAGER],
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  analyzeImport(@UploadedFile() file: Express.Multer.File): Promise<AnalyzeResult> {
+    return this.importService.analyze(file)
+  }
+
+  @Post('import/preview')
+  @ApiEndpoint({
+    summary: 'Re-validate the sample rows against the mapping the user confirmed',
+    roles: [UserRole.MANAGER],
+  })
+  previewImport(@Body() dto: ExecuteContactImportDto): Promise<ValidationPreview> {
+    return this.importService.preview(dto.fileId, dto.mapping ?? {})
+  }
+
+  @Post('import/validate')
+  @ApiEndpoint({
+    summary: 'Validate every row in the file against the confirmed mapping',
+    roles: [UserRole.MANAGER],
+  })
+  validateImport(
+    @Body() dto: ExecuteContactImportDto,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<ValidationReport> {
+    return this.importService.validate(ctx.schemaName, dto.fileId, dto.mapping ?? {})
+  }
+
+  @Post('import/execute')
+  @ApiEndpoint({
+    summary: 'Step 2: Execute import with confirmed mappings and duplicate strategy',
+    roles: [UserRole.MANAGER],
+  })
+  executeImport(
+    @Body() dto: ExecuteContactImportDto,
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<ImportResult> {
+    return this.importService.execute(
+      ctx.schemaName,
+      dto.fileId,
+      dto.mapping ?? {},
+      dto.duplicateStrategy ?? 'skip',
+      user.id,
+    )
+  }
 
   @Get()
   @ApiEndpoint({

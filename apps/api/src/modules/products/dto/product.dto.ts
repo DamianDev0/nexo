@@ -2,7 +2,8 @@ import { PartialType } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import type { DuplicateStrategy, MovementType, ProductType } from '@repo/shared-types'
 import { MAX_PAGE_SIZE } from '@repo/shared-utils'
-import { DUPLICATE_STRATEGIES, MOVEMENT_TYPES, PRODUCT_TYPES } from '../constants/product.constants'
+import { DUPLICATE_STRATEGIES } from '@/shared/imports/constants/import.constants'
+import { MOVEMENT_TYPES, PRODUCT_TYPES } from '../constants/product.constants'
 import {
   IsArray,
   IsIn,

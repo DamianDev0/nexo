@@ -69,3 +69,7 @@ apps/web/storybook-static
 
 # playwright mcp session artifacts
 .playwright-mcp/
+
+# local http session jars from manual API testing
+cookies.txt
+jar.txt

@@ -1,15 +1,18 @@
 'use client'
 
+import Link from 'next/link'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ContactsBulkActions } from '@/features/archive-contacts'
 import { ContactsListHint } from '@/features/filter-contacts'
+import { ROUTES } from '@/shared/config/routes'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
+import { CloudArrowUpIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
+import { Button } from '@/shared/ui/shadcn/button'
 
 import { ContactsPagination } from './ContactsPagination'
 
@@ -29,6 +32,17 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
         onReorder={actions.onReorderLists}
         hotkeys
       >
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="gap-1.5 rounded-md text-muted-foreground hover:text-foreground"
+        >
+          <Link href={ROUTES.app.contacts.import}>
+            <CloudArrowUpIcon className="size-4" />
+            {t('contacts.import.cta')}
+          </Link>
+        </Button>
         <PillButton size="sm" className="gap-1.5 rounded-md" onClick={actions.onCreate}>
           <PlusIcon className="size-4" />
           {t('contacts.lists.new')}

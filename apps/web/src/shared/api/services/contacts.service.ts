@@ -1,6 +1,7 @@
 import { request } from '@/shared/api/request'
 
 import type {
+  AnalyzeResult,
   Contact,
   ContactCounts,
   ContactDuplicateProbeQuery,
@@ -11,11 +12,44 @@ import type {
   ContactTaxonomyUsage,
   ContactTimeline,
   ContactWorkspace,
+  DuplicateStrategy,
+  ImportResult,
   PaginatedContacts,
   TaxonomyReassignKind,
+  ValidationPreview,
+  ValidationReport,
 } from '@repo/shared-types'
 
+export type ContactImportRun = {
+  fileId: string
+  mapping: Record<string, string | null>
+  duplicateStrategy?: DuplicateStrategy
+}
+
+function fileForm(file: File): FormData {
+  const formData = new FormData()
+  formData.append('file', file)
+  return formData
+}
+
 const contactsService = {
+  analyzeImport: (file: File) =>
+    request<AnalyzeResult>({
+      method: 'post',
+      url: '/contacts/import/analyze',
+      data: fileForm(file),
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+
+  previewImport: (data: ContactImportRun) =>
+    request<ValidationPreview>({ method: 'post', url: '/contacts/import/preview', data }),
+
+  validateImport: (data: ContactImportRun) =>
+    request<ValidationReport>({ method: 'post', url: '/contacts/import/validate', data }),
+
+  executeImport: (data: ContactImportRun) =>
+    request<ImportResult>({ method: 'post', url: '/contacts/import/execute', data }),
+
   list: (params: ContactListQuery) =>
     request<PaginatedContacts>({ method: 'get', url: '/contacts', params }),
 

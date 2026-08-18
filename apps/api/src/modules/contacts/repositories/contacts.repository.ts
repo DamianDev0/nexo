@@ -228,6 +228,25 @@ export class ContactsRepository {
     ])
   }
 
+  async findImportMatchId(
+    qr: QueryRunner,
+    email: string | null,
+    documentNumber: string | null,
+  ): Promise<string | null> {
+    if (!email && !documentNumber) return null
+
+    const rows = await sqlRows<Array<{ id: string }>>(
+      qr,
+      `SELECT id FROM contacts
+       WHERE is_active = true
+         AND (($1::text IS NOT NULL AND LOWER(email) = LOWER($1))
+           OR ($2::text IS NOT NULL AND document_number = $2))
+       LIMIT 1`,
+      [email, documentNumber],
+    )
+    return rows[0]?.id ?? null
+  }
+
   async findEnabledTagNames(qr: QueryRunner): Promise<string[]> {
     const rows = await sqlRows<Array<{ name: string }>>(
       qr,

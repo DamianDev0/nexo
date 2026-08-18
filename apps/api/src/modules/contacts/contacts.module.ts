@@ -7,6 +7,7 @@ import { ContactViewsService } from './services/contact-views.service'
 import { ContactWorkspaceController } from './controllers/contact-workspace.controller'
 import { ContactWorkspaceService } from './services/contact-workspace.service'
 import { ContactDuplicatesService } from './services/contact-duplicates.service'
+import { ContactImportService } from './services/contact-import.service'
 import { ContactsRepository } from './repositories/contacts.repository'
 import { ContactViewsRepository } from './repositories/contact-views.repository'
 import { ContactWorkspaceRepository } from './repositories/contact-workspace.repository'
@@ -20,6 +21,7 @@ import { ContactDuplicatesRepository } from './repositories/contact-duplicates.r
     ContactViewsService,
     ContactWorkspaceService,
     ContactDuplicatesService,
+    ContactImportService,
     ContactsRepository,
     ContactViewsRepository,
     ContactWorkspaceRepository,

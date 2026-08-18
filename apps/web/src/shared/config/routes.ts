@@ -7,7 +7,11 @@ export const ROUTES = {
   },
   app: {
     dashboard: '/dashboard',
-    contacts: { list: '/contacts', detail: (id: string) => `/contacts/${id}` },
+    contacts: {
+      list: '/contacts',
+      import: '/contacts/import',
+      detail: (id: string) => `/contacts/${id}`,
+    },
     companies: { list: '/companies' },
     deals: { list: '/deals' },
     activities: '/activities',

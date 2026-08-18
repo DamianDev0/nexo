@@ -55,3 +55,22 @@ export type ImportResult = {
   skipped: number
   errors: { row: number; message: string }[]
 }
+
+export type ImportIssueSeverity = 'error' | 'warning'
+
+export type ImportIssue = {
+  row: number
+  severity: ImportIssueSeverity
+  field: string | null
+  message: string
+  value: string | null
+}
+
+export type ValidationReport = {
+  totalRows: number
+  readyRows: number
+  warningRows: number
+  errorRows: number
+  issues: ImportIssue[]
+  truncatedIssues: boolean
+}

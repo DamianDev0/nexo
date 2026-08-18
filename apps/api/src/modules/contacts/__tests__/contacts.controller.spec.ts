@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { ContactsController } from '../controllers/contacts.controller'
 import { ContactsService } from '../services/contacts.service'
+import { ContactImportService } from '../services/contact-import.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
 import { LifecycleStage, UserRole } from '@repo/shared-types'
@@ -79,10 +80,13 @@ describe('ContactsController', () => {
   beforeEach(async () => {
     service = buildServiceMock()
 
+    const importService = { analyze: jest.fn(), preview: jest.fn(), execute: jest.fn() }
+
     const module = await Test.createTestingModule({
       controllers: [ContactsController],
       providers: [
         { provide: ContactsService, useValue: service },
+        { provide: ContactImportService, useValue: importService },
         { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
       ],
     }).compile()

@@ -1,7 +1,30 @@
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateContactDto } from '../dto/contact.dto'
+import type { CreateContactData } from '../interfaces/contact-row.interfaces'
 
 export const OTHER_CONTACT_TYPE = 'other'
+
+export const IMPORT_MAX_ISSUES = 200
+
+export const IMPORT_UPDATABLE_COLUMNS: ReadonlyArray<[keyof CreateContactData, string]> = [
+  ['firstName', 'first_name'],
+  ['lastName', 'last_name'],
+  ['email', 'email'],
+  ['phone', 'phone'],
+  ['whatsapp', 'whatsapp'],
+  ['documentType', 'document_type'],
+  ['documentNumber', 'document_number'],
+  ['jobTitle', 'job_title'],
+  ['address', 'address'],
+  ['city', 'city'],
+  ['department', 'department'],
+  ['status', 'status'],
+  ['lifecycleStage', 'lifecycle_stage'],
+  ['source', 'source'],
+  ['type', 'type'],
+  ['leadScore', 'lead_score'],
+  ['tags', 'tags'],
+]
 
 export const UPDATABLE_FIELDS: FieldMap<UpdateContactDto> = [
   ['firstName', 'first_name'],

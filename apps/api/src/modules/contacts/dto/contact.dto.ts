@@ -5,6 +5,7 @@ import {
   IsIn,
   IsInt,
   IsISO8601,
+  IsNotEmpty,
   IsObject,
   IsOptional,
   IsString,
@@ -18,6 +19,8 @@ import {
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PartialType, PickType } from '@nestjs/mapped-types'
+import { DUPLICATE_STRATEGIES } from '@/shared/imports/constants/import.constants'
+import type { DuplicateStrategy } from '@repo/shared-types'
 import {
   DocumentType,
   LifecycleStage,
@@ -297,4 +300,17 @@ export class ReassignTaxonomyDto {
   @IsString()
   @Length(1, 100)
   toKey: string
+}
+
+export class ExecuteContactImportDto {
+  @IsString()
+  @IsNotEmpty()
+  fileId: string
+
+  @IsOptional()
+  mapping?: Record<string, string | null>
+
+  @IsOptional()
+  @IsIn(DUPLICATE_STRATEGIES)
+  duplicateStrategy?: DuplicateStrategy
 }

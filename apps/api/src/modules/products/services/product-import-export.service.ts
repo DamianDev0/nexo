@@ -66,7 +66,7 @@ export class ProductImportExportService {
 
     for (const [i, { data, errors: rowErrors }] of rows.entries()) {
       if (rowErrors.length > 0) {
-        errors.push({ row: i + 2, message: rowErrors.join('; ') })
+        errors.push({ row: i + 2, message: rowErrors.map((e) => e.message).join('; ') })
         skipped++
         continue
       }
