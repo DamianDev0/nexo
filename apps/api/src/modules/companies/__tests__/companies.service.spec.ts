@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing'
 import { CompaniesService } from '../services/companies.service'
 import { CompaniesRepository } from '../repositories/companies.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { EventBusService } from '@/shared/events/event-bus.service'
 import { expectPageAndLimitApplied } from '@/shared/testing/crud-assertions'
 import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import type { Company, PaginatedCompanies, CompanySummary } from '@repo/shared-types'
@@ -94,6 +95,7 @@ describe('CompaniesService', () => {
         CompaniesRepository,
         { provide: TenantDbService, useValue: db },
         { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
+        { provide: EventBusService, useValue: { emit: jest.fn(), emitCrm: jest.fn() } },
       ],
     }).compile()
 

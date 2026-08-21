@@ -13,13 +13,17 @@ import type { ContactTaxonomy, TaxonomyOption, TenantContext } from '@repo/share
 import { Auth } from '@/shared/decorators/auth.decorator'
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { TenantConfigService } from '../services/tenant-config.service'
 import { UpdateContactTaxonomyDto } from '../dto/contact-taxonomy.dto'
 
 @ApiTags('Settings – Contact Taxonomy')
 @Controller('settings/contact-taxonomy')
 export class ContactTaxonomyController {
-  constructor(private readonly configService: TenantConfigService) {}
+  constructor(
+    private readonly configService: TenantConfigService,
+    private readonly audit: AuditLogService,
+  ) {}
 
   @Get()
   @ApiEndpoint({
@@ -45,11 +49,21 @@ export class ContactTaxonomyController {
     assertSystemKeysKept(current.statuses, dto.statuses, 'status')
     assertSystemKeysKept(current.sources, dto.sources, 'source')
     assertSystemKeysKept(current.types, dto.types, 'type')
+    assertSystemKeysKept(current.lifecycleStages, dto.lifecycleStages, 'lifecycle stage')
     assertUniqueKeys(dto.statuses, 'status')
     assertUniqueKeys(dto.sources, 'source')
     assertUniqueKeys(dto.types, 'type')
+    assertUniqueKeys(dto.lifecycleStages, 'lifecycle stage')
 
-    return this.configService.updateContactTaxonomy(ctx.tenantId, dto, ctx.slug)
+    const updated = await this.configService.updateContactTaxonomy(ctx.tenantId, dto, ctx.slug)
+    await this.audit.settingsUpdated(
+      ctx.tenantId,
+      undefined,
+      ctx.schemaName,
+      undefined,
+      'Contact taxonomy updated',
+    )
+    return updated
   }
 }
 

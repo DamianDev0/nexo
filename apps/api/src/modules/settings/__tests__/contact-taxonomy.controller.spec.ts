@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { ContactTaxonomyController } from '../controllers/contact-taxonomy.controller'
 import { TenantConfigService } from '../services/tenant-config.service'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { PlanName } from '@repo/shared-types'
 import type { ContactTaxonomy, TaxonomyOption, TenantContext } from '@repo/shared-types'
 
@@ -32,6 +33,7 @@ const currentTaxonomy: ContactTaxonomy = {
   statuses: [option({ key: 'new' }), option({ key: 'qualified', order: 2 })],
   sources: [option({ key: 'manual' })],
   types: [option({ key: 'customer' }), option({ key: 'other', order: 2 })],
+  lifecycleStages: [option({ key: 'lead' }), option({ key: 'customer', order: 2 })],
 }
 
 function buildServiceMock() {
@@ -51,7 +53,10 @@ describe('ContactTaxonomyController', () => {
 
     const module = await Test.createTestingModule({
       controllers: [ContactTaxonomyController],
-      providers: [{ provide: TenantConfigService, useValue: service }],
+      providers: [
+        { provide: TenantConfigService, useValue: service },
+        { provide: AuditLogService, useValue: { settingsUpdated: jest.fn() } },
+      ],
     }).compile()
 
     controller = module.get(ContactTaxonomyController)
@@ -72,6 +77,7 @@ describe('ContactTaxonomyController', () => {
         statuses: [option({ key: 'new' })],
         sources: currentTaxonomy.sources,
         types: currentTaxonomy.types,
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
@@ -84,6 +90,7 @@ describe('ContactTaxonomyController', () => {
         statuses: currentTaxonomy.statuses,
         sources: [],
         types: currentTaxonomy.types,
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
@@ -100,6 +107,7 @@ describe('ContactTaxonomyController', () => {
         ],
         sources: currentTaxonomy.sources,
         types: currentTaxonomy.types,
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
@@ -112,6 +120,7 @@ describe('ContactTaxonomyController', () => {
         statuses: currentTaxonomy.statuses,
         sources: [option({ key: 'manual' }), option({ key: 'manual', order: 2, isSystem: false })],
         types: currentTaxonomy.types,
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(/Duplicate source key/)
@@ -123,6 +132,7 @@ describe('ContactTaxonomyController', () => {
         statuses: currentTaxonomy.statuses,
         sources: currentTaxonomy.sources,
         types: [option({ key: 'customer' })],
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(BadRequestException)
@@ -135,6 +145,7 @@ describe('ContactTaxonomyController', () => {
         statuses: currentTaxonomy.statuses,
         sources: currentTaxonomy.sources,
         types: [...currentTaxonomy.types, option({ key: 'customer', order: 3, isSystem: false })],
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
 
       await expect(controller.update(dto, mockCtx)).rejects.toThrow(/Duplicate type key/)
@@ -149,6 +160,7 @@ describe('ContactTaxonomyController', () => {
         ],
         sources: currentTaxonomy.sources,
         types: currentTaxonomy.types,
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
       service.updateContactTaxonomy.mockResolvedValue(dto)
 
@@ -170,6 +182,7 @@ describe('ContactTaxonomyController', () => {
         ],
         sources: currentTaxonomy.sources,
         types: currentTaxonomy.types,
+        lifecycleStages: currentTaxonomy.lifecycleStages,
       }
       service.updateContactTaxonomy.mockResolvedValue(dto)
 

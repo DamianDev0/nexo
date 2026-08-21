@@ -21,12 +21,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { PartialType, PickType } from '@nestjs/mapped-types'
 import { DUPLICATE_STRATEGIES } from '@/shared/imports/constants/import.constants'
 import type { DuplicateStrategy } from '@repo/shared-types'
-import {
-  DocumentType,
-  LifecycleStage,
-  CONTACT_SORT_FIELDS,
-  TAXONOMY_KEY_PATTERN,
-} from '@repo/shared-types'
+import { DocumentType, CONTACT_SORT_FIELDS, TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
 import type { ContactSortField, TaxonomyReassignKind } from '@repo/shared-types'
 import { TaggedPaginationQueryDto } from '@/shared/dto/tagged-pagination-query.dto'
 
@@ -135,10 +130,11 @@ export class CreateContactDto {
   @Length(1, 50)
   typeLabel?: string
 
-  @ApiPropertyOptional({ enum: LifecycleStage })
+  @ApiPropertyOptional({ description: 'Tenant taxonomy lifecycle stage key' })
   @IsOptional()
-  @IsEnum(LifecycleStage)
-  lifecycleStage?: LifecycleStage
+  @IsString()
+  @Matches(TAXONOMY_KEY_PATTERN)
+  lifecycleStage?: string
 
   @ApiPropertyOptional({ minimum: 0, maximum: 100 })
   @IsOptional()
@@ -244,10 +240,11 @@ export class ContactQueryDto extends TaggedPaginationQueryDto {
   @IsUUID()
   companyId?: string
 
-  @ApiPropertyOptional({ enum: LifecycleStage })
+  @ApiPropertyOptional({ description: 'Tenant taxonomy lifecycle stage key' })
   @IsOptional()
-  @IsEnum(LifecycleStage)
-  lifecycleStage?: LifecycleStage
+  @IsString()
+  @Matches(TAXONOMY_KEY_PATTERN)
+  lifecycleStage?: string
 
   @ApiPropertyOptional({ description: 'Exact city match (case-insensitive)' })
   @IsOptional()
@@ -287,8 +284,8 @@ export class ContactQueryDto extends TaggedPaginationQueryDto {
 }
 
 export class ReassignTaxonomyDto {
-  @ApiProperty({ enum: ['status', 'source', 'type', 'tag'] })
-  @IsIn(['status', 'source', 'type', 'tag'])
+  @ApiProperty({ enum: ['status', 'source', 'type', 'lifecycle', 'tag'] })
+  @IsIn(['status', 'source', 'type', 'lifecycle', 'tag'])
   kind: TaxonomyReassignKind
 
   @ApiProperty()

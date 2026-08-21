@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
-import { LifecycleStage } from '@repo/shared-types'
+import { DEFAULT_CONTACT_TAXONOMY, DOMAIN_EVENTS, firstEnabledOptionKey } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { EventBusService } from '@/shared/events/event-bus.service'
 import {
@@ -19,6 +19,7 @@ import type {
   Contact,
   ContactCounts,
   ContactDuplicateProbeResult,
+  ContactTaxonomy,
   ContactTaxonomyUsage,
   TaxonomyReassignKind,
   PaginatedContacts,
@@ -94,6 +95,7 @@ export class ContactsService {
       statuses: toRecord(raw.statuses),
       sources: toRecord(raw.sources),
       types: toRecord(raw.types),
+      lifecycleStages: toRecord(raw.lifecycleStages),
       tags: toRecord(raw.tags),
     }
   }
@@ -135,26 +137,35 @@ export class ContactsService {
     dto: CreateContactDto,
     createdById: string,
     force = false,
+    taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
   ): Promise<Contact> {
-    return this.db.query(schemaName, async (qr): Promise<Contact> => {
+    this.assertTaxonomyKeys(dto, taxonomy)
+    const result = await this.db.query(schemaName, async (qr): Promise<Contact> => {
       await this.duplicates.assertNoDuplicates(qr, dto, { force })
 
       const tags = await this.resolveTags(qr, dto.tags ?? [])
       const row = await this.repository.insert(qr, {
-        ...this.buildCreateData(dto, createdById),
+        ...this.buildCreateData(dto, createdById, taxonomy),
         tags,
       })
       if (!row) throw new InternalServerErrorException('Contact insert returned no row')
-      const result = mapContact(row)
+      const created = mapContact(row)
       this.emitAudit(
         schemaName,
         AuditAction.ContactCreated,
-        result.id,
+        created.id,
         createdById,
         `Contact ${dto.firstName} created`,
       )
-      return result
+      return created
     })
+    this.eventBus.emitCrm(DOMAIN_EVENTS.CONTACT_CREATED, {
+      schemaName,
+      entityType: 'contact',
+      entityId: result.id,
+      contact: result,
+    })
+    return result
   }
 
   async update(
@@ -162,9 +173,14 @@ export class ContactsService {
     contactId: string,
     dto: UpdateContactDto,
     force = false,
+    taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
+    changedBy?: string,
   ): Promise<Contact> {
-    return this.db.transactional(schemaName, async (qr): Promise<Contact> => {
-      await this.assertContactExists(qr, contactId)
+    this.assertTaxonomyKeys(dto, taxonomy)
+    let lifecycleFrom: string | null | undefined
+    const result = await this.db.transactional(schemaName, async (qr): Promise<Contact> => {
+      const previous = await this.repository.findActiveById(qr, contactId)
+      if (!previous) throw new NotFoundException(`Contact ${contactId} not found`)
       await this.duplicates.assertNoDuplicates(qr, dto, { force, excludeId: contactId })
 
       const sanitized =
@@ -173,7 +189,17 @@ export class ContactsService {
       if (!changes.length) return this.fetchContactOrFail(qr, contactId)
 
       const row = await this.repository.updateById(qr, contactId, changes)
-      const result = mapContact(row!)
+      if (dto.lifecycleStage !== undefined && dto.lifecycleStage !== previous.lifecycle_stage) {
+        lifecycleFrom = previous.lifecycle_stage
+        await this.repository.recordLifecycleChange(
+          qr,
+          contactId,
+          previous.lifecycle_stage,
+          dto.lifecycleStage,
+          changedBy ?? null,
+        )
+      }
+      const updated = mapContact(row!)
       this.emitAudit(
         schemaName,
         AuditAction.ContactUpdated,
@@ -181,8 +207,25 @@ export class ContactsService {
         undefined,
         `Contact ${contactId} updated`,
       )
-      return result
+      return updated
     })
+    this.eventBus.emitCrm(DOMAIN_EVENTS.CONTACT_UPDATED, {
+      schemaName,
+      entityType: 'contact',
+      entityId: contactId,
+      contact: result,
+    })
+    if (lifecycleFrom !== undefined) {
+      this.eventBus.emitCrm(DOMAIN_EVENTS.CONTACT_LIFECYCLE_CHANGED, {
+        schemaName,
+        entityType: 'contact',
+        entityId: contactId,
+        fromStage: lifecycleFrom,
+        toStage: dto.lifecycleStage,
+        changedBy: changedBy ?? null,
+      })
+    }
+    return result
   }
 
   async remove(schemaName: string, contactId: string): Promise<void> {
@@ -196,6 +239,11 @@ export class ContactsService {
         undefined,
         `Contact ${contactId} deleted`,
       )
+    })
+    this.eventBus.emitCrm(DOMAIN_EVENTS.CONTACT_DELETED, {
+      schemaName,
+      entityType: 'contact',
+      entityId: contactId,
     })
   }
 
@@ -213,6 +261,26 @@ export class ContactsService {
         deals: dealRows.map((d) => mapContactDeal(d)),
       }
     })
+  }
+
+  private assertTaxonomyKeys(dto: UpdateContactDto, taxonomy: ContactTaxonomy): void {
+    const checks: Array<[string | undefined, keyof ContactTaxonomy]> = [
+      [dto.status, 'statuses'],
+      [dto.source, 'sources'],
+      [dto.type, 'types'],
+      [dto.lifecycleStage, 'lifecycleStages'],
+    ]
+
+    const invalid = checks
+      .filter(([value, kind]) => {
+        if (value === undefined) return false
+        return !taxonomy[kind].some((option) => option.enabled && option.key === value)
+      })
+      .map(([value, kind]) => `${kind}: ${value}`)
+
+    if (invalid.length > 0) {
+      throw new BadRequestException(`Unknown taxonomy keys — ${invalid.join(', ')}`)
+    }
   }
 
   private async resolveTags(qr: QueryRunner, tags: string[]): Promise<string[]> {
@@ -246,7 +314,11 @@ export class ContactsService {
     return mapContact(row)
   }
 
-  private buildCreateData(dto: CreateContactDto, createdById: string): CreateContactData {
+  private buildCreateData(
+    dto: CreateContactDto,
+    createdById: string,
+    taxonomy: ContactTaxonomy,
+  ): CreateContactData {
     return {
       firstName: dto.firstName,
       lastName: dto.lastName ?? null,
@@ -262,8 +334,8 @@ export class ContactsService {
       city: dto.city ?? null,
       department: dto.department ?? null,
       municipioCode: dto.municipioCode ?? null,
-      status: dto.status ?? 'new',
-      lifecycleStage: dto.lifecycleStage ?? LifecycleStage.SUBSCRIBER,
+      status: dto.status ?? firstEnabledOptionKey(taxonomy.statuses),
+      lifecycleStage: dto.lifecycleStage ?? firstEnabledOptionKey(taxonomy.lifecycleStages),
       source: dto.source ?? null,
       type: dto.type ?? null,
       typeLabel: dto.type === OTHER_CONTACT_TYPE ? (dto.typeLabel ?? null) : null,

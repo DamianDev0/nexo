@@ -57,11 +57,9 @@ describe('contactImportMapper', () => {
       expect(contactImportMapper.validateField('phone', '3001234567')).toBeNull()
     })
 
-    it('rejects unknown document types and lifecycle stages', () => {
+    it('rejects unknown document types', () => {
       expect(contactImportMapper.validateField('documentType', 'passport')).not.toBeNull()
       expect(contactImportMapper.validateField('documentType', 'cc')).toBeNull()
-      expect(contactImportMapper.validateField('lifecycleStage', 'prospect')).not.toBeNull()
-      expect(contactImportMapper.validateField('lifecycleStage', 'lead')).toBeNull()
     })
 
     it('keeps the lead score inside its range', () => {
@@ -72,6 +70,7 @@ describe('contactImportMapper', () => {
     it('leaves tenant taxonomy values alone — the tenant owns those keys', () => {
       expect(contactImportMapper.validateField('status', 'cualquier_estado')).toBeNull()
       expect(contactImportMapper.validateField('source', 'feria_regional')).toBeNull()
+      expect(contactImportMapper.validateField('lifecycleStage', 'etapa_propia')).toBeNull()
     })
   })
 

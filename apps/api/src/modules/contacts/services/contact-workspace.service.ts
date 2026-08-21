@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import { DEFAULT_CONTACT_TAXONOMY, LifecycleStage } from '@repo/shared-types'
-import type { ContactWorkspace } from '@repo/shared-types'
+import { CUSTOM_COLUMN_PREFIX, DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
+import type {
+  ContactColumnDef,
+  ContactTaxonomy,
+  ContactWorkspace,
+  FieldDef,
+  TaxonomyOption,
+} from '@repo/shared-types'
 import { CONTACT_COLUMN_CATALOG } from '../constants/contact-columns.catalog'
 import {
   mergeContactTableState,
@@ -12,6 +18,24 @@ import { ContactsService } from './contacts.service'
 import type { UpdateContactWorkspaceDto } from '../dto/contact-workspace.dto'
 import { ContactWorkspaceRepository } from '../repositories/contact-workspace.repository'
 
+function enabledKeys(options: TaxonomyOption[]): string[] {
+  return options.filter((option) => option.enabled).map((option) => option.key)
+}
+
+function customColumnDef(def: FieldDef): ContactColumnDef {
+  return {
+    key: `${CUSTOM_COLUMN_PREFIX}${def.key}`,
+    labelKey: '',
+    hintKey: '',
+    sortField: null,
+    defaultVisible: false,
+    defaultWidth: 150,
+    minWidth: 100,
+    custom: true,
+    label: def.label,
+  }
+}
+
 @Injectable()
 export class ContactWorkspaceService {
   constructor(
@@ -21,7 +45,12 @@ export class ContactWorkspaceService {
     private readonly contacts: ContactsService,
   ) {}
 
-  async getWorkspace(schemaName: string, userId: string): Promise<ContactWorkspace> {
+  async getWorkspace(
+    schemaName: string,
+    userId: string,
+    taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
+    customFields: FieldDef[] = [],
+  ): Promise<ContactWorkspace> {
     const [views, counts, state] = await Promise.all([
       this.views.findAll(schemaName, userId),
       this.contacts.counts(schemaName),
@@ -38,11 +67,11 @@ export class ContactWorkspaceService {
       views,
       activeViewId,
       tableState: sanitizeContactTableState(state?.table_state),
-      columns: [...CONTACT_COLUMN_CATALOG],
+      columns: [...CONTACT_COLUMN_CATALOG, ...customFields.map((def) => customColumnDef(def))],
       quickFilters: {
-        statuses: DEFAULT_CONTACT_TAXONOMY.statuses.map((option) => option.key),
-        sources: DEFAULT_CONTACT_TAXONOMY.sources.map((option) => option.key),
-        lifecycleStages: Object.values(LifecycleStage),
+        statuses: enabledKeys(taxonomy.statuses),
+        sources: enabledKeys(taxonomy.sources),
+        lifecycleStages: enabledKeys(taxonomy.lifecycleStages),
       },
       counts,
     }

@@ -1,4 +1,4 @@
-import type { ContactSortField, LifecycleStage } from '@repo/shared-types'
+import type { ContactSortField } from '@repo/shared-types'
 
 export interface ContactRow {
   id: string
@@ -72,7 +72,7 @@ export interface ContactListQuery {
   tags?: string[]
   companyId?: string
   assignedToId?: string
-  lifecycleStage?: LifecycleStage
+  lifecycleStage?: string
   city?: string
   createdFrom?: string
   createdTo?: string

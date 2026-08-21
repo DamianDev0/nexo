@@ -7,6 +7,7 @@ import { DealForecastService } from '../services/deal-forecast.service'
 import { DealsRepository } from '../repositories/deals.repository'
 import { DealItemsRepository } from '../repositories/deal-items.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { EventBusService } from '@/shared/events/event-bus.service'
 import { DealStatus } from '@repo/shared-types'
 import type { DealDetail, PaginatedDeals } from '@repo/shared-types'
 
@@ -114,6 +115,7 @@ describe('DealsService', () => {
         DealItemsRepository,
         { provide: TenantDbService, useValue: db },
         { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
+        { provide: EventBusService, useValue: { emit: jest.fn(), emitCrm: jest.fn() } },
       ],
     }).compile()
 

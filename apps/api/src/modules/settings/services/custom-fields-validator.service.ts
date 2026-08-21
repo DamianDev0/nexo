@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { activeFieldDefs } from '@repo/shared-types'
 import type { CustomFieldEntity, CustomFieldType, FieldDef } from '@repo/shared-types'
 import { TenantConfigService } from './tenant-config.service'
 
@@ -127,7 +128,7 @@ export class CustomFieldsValidator {
     entity: CustomFieldEntity,
     values: Record<string, unknown> | undefined,
   ): Promise<void> {
-    const defs = (await this.config.getCustomFields(tenantId))[entity]
+    const defs = activeFieldDefs((await this.config.getCustomFields(tenantId))[entity])
     validateCustomFields(values ?? {}, defs)
   }
 }

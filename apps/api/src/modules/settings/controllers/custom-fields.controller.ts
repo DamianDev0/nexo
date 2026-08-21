@@ -21,6 +21,7 @@ import { UserRole } from '@repo/shared-types'
 import type { TenantContext } from '@repo/shared-types'
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
+import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { TenantConfigService } from '../services/tenant-config.service'
 import {
   FieldDefDto,
@@ -49,16 +50,29 @@ function assertValidEntity(entity: string): asserts entity is CustomFieldEntity 
 @ApiTags('Settings – Custom Fields')
 @Controller('settings/custom-fields')
 export class CustomFieldsController {
-  constructor(private readonly configService: TenantConfigService) {}
+  constructor(
+    private readonly configService: TenantConfigService,
+    private readonly audit: AuditLogService,
+  ) {}
+
+  private auditChange(ctx: TenantContext, description: string): Promise<void> {
+    return this.audit.settingsUpdated(
+      ctx.tenantId,
+      undefined,
+      ctx.schemaName,
+      undefined,
+      description,
+    )
+  }
 
   @Get()
-  @ApiEndpoint({ summary: 'Get all custom fields for all entities', roles: [UserRole.ADMIN] })
+  @ApiEndpoint({ summary: 'Get all custom fields for all entities', roles: [UserRole.VIEWER] })
   getAllCustomFields(@TenantCtx() ctx: TenantContext): Promise<CustomFieldsConfig> {
     return this.configService.getCustomFields(ctx.tenantId)
   }
 
   @Get(':entity')
-  @ApiEndpoint({ summary: 'Get custom fields for a specific entity', roles: [UserRole.ADMIN] })
+  @ApiEndpoint({ summary: 'Get custom fields for a specific entity', roles: [UserRole.VIEWER] })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
   async getEntityFields(
     @Param('entity') entity: string,
@@ -94,6 +108,7 @@ export class CustomFieldsController {
     const field: FieldDef = { ...dto, order }
     const updated: CustomFieldsConfig = { ...current, [entity]: [...fields, field] }
     await this.configService.updateCustomFields(ctx.tenantId, updated, ctx.slug)
+    await this.auditChange(ctx, `Custom field "${field.key}" created on ${entity}`)
     return field
   }
 
@@ -113,7 +128,9 @@ export class CustomFieldsController {
     assertValidEntity(entity)
     const current = await this.configService.getCustomFields(ctx.tenantId)
     const updated: CustomFieldsConfig = { ...current, [entity]: dto.fields }
-    return this.configService.updateCustomFields(ctx.tenantId, updated, ctx.slug)
+    const result = await this.configService.updateCustomFields(ctx.tenantId, updated, ctx.slug)
+    await this.auditChange(ctx, `Custom fields replaced on ${entity}`)
+    return result
   }
 
   @Patch(':entity/:key')
@@ -147,18 +164,19 @@ export class CustomFieldsController {
       { ...current, [entity]: updatedFields },
       ctx.slug,
     )
+    await this.auditChange(ctx, `Custom field "${key}" updated on ${entity}`)
     return merged
   }
 
   @Delete(':entity/:key')
   @ApiEndpoint({
-    summary: 'Delete a single custom field',
+    summary: 'Archive a single custom field, keeping stored values intact',
     roles: [UserRole.ADMIN],
     status: HttpStatus.NO_CONTENT,
   })
   @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
   @ApiParam({ name: 'key', description: 'Field key' })
-  @ApiNoContentResponse({ description: 'Field deleted' })
+  @ApiNoContentResponse({ description: 'Field archived' })
   async deleteField(
     @Param('entity') entity: string,
     @Param('key') key: string,
@@ -174,9 +192,13 @@ export class CustomFieldsController {
 
     await this.configService.updateCustomFields(
       ctx.tenantId,
-      { ...current, [entity]: fields.filter((f) => f.key !== key) },
+      {
+        ...current,
+        [entity]: fields.map((f) => (f.key === key ? { ...f, isActive: false } : f)),
+      },
       ctx.slug,
     )
+    await this.auditChange(ctx, `Custom field "${key}" archived on ${entity}`)
   }
 
   @Get('permissions/:entity')
@@ -212,6 +234,8 @@ export class CustomFieldsController {
       dto.permissions.map(({ key, visibility, editable }) => [key, { visibility, editable }]),
     )
     const updated: FieldPermissionsConfig = { ...current, [entity]: entityPermissions }
-    return this.configService.updateFieldPermissions(ctx.tenantId, updated, ctx.slug)
+    const result = await this.configService.updateFieldPermissions(ctx.tenantId, updated, ctx.slug)
+    await this.auditChange(ctx, `Field permissions updated on ${entity}`)
+    return result
   }
 }

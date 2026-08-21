@@ -24,6 +24,7 @@ import { CustomFieldsValidator } from './services/custom-fields-validator.servic
 import { CustomFieldsComputer } from './services/custom-fields-computer.service'
 import { PipelineSettingsRepository } from './repositories/pipeline-settings.repository'
 import { TenantConfigRepository } from './repositories/tenant-config.repository'
+import { IndustryPresetRepository } from './repositories/industry-preset.repository'
 import { ModuleEnabledGuard } from './guards/module-enabled.guard'
 
 @Module({
@@ -52,6 +53,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     CustomFieldsComputer,
     PipelineSettingsRepository,
     TenantConfigRepository,
+    IndustryPresetRepository,
     ModuleEnabledGuard,
   ],
   exports: [

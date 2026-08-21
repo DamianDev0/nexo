@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { DOMAIN_EVENTS } from '@repo/shared-types'
+import { EventBusService } from '@/shared/events/event-bus.service'
 import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { AuditAction, AuditEntityType } from '@/modules/audit-log/interfaces/audit-log.interfaces'
 import type { ActivityListItem, CalendarActivity, PaginatedActivities } from '@repo/shared-types'
@@ -18,6 +20,7 @@ export class ActivitiesService {
   constructor(
     private readonly repository: ActivitiesRepository,
     private readonly audit: AuditLogService,
+    private readonly eventBus: EventBusService,
   ) {}
 
   async findAll(schemaName: string, query: ActivityQueryDto): Promise<PaginatedActivities> {
@@ -63,7 +66,14 @@ export class ActivitiesService {
       createdById,
       `Activity "${dto.activityType}" created`,
     )
-    return mapActivityListItem(row)
+    const result = mapActivityListItem(row)
+    this.eventBus.emitCrm(DOMAIN_EVENTS.ACTIVITY_CREATED, {
+      schemaName,
+      entityType: 'activity',
+      entityId: result.id,
+      activity: result,
+    })
+    return result
   }
 
   async update(
@@ -115,7 +125,14 @@ export class ActivitiesService {
       undefined,
       `Activity ${activityId} completed`,
     )
-    return mapActivityListItem(row)
+    const result = mapActivityListItem(row)
+    this.eventBus.emitCrm(DOMAIN_EVENTS.ACTIVITY_COMPLETED, {
+      schemaName,
+      entityType: 'activity',
+      entityId: activityId,
+      activity: result,
+    })
+    return result
   }
 
   async cancel(schemaName: string, activityId: string): Promise<ActivityListItem> {

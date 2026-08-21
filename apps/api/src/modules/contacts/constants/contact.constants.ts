@@ -88,10 +88,10 @@ export const CONTACT_LIST_COLUMNS = `
   data_consent, consent_date, consent_source,
   opt_out_email, opt_out_sms, opt_out_whatsapp, last_contacted_at,
   avatar_url, tags, company_id, assigned_to_id,
-  is_active, created_by, created_at, updated_at
+  custom_fields, is_active, created_by, created_at, updated_at
 `
 
-export type TaxonomyColumn = 'status' | 'source' | 'type'
+export type TaxonomyColumn = 'status' | 'source' | 'type' | 'lifecycle'
 
 export const TAXONOMY_USAGE_SQL: Readonly<Record<TaxonomyColumn, string>> = {
   status: `SELECT status AS key, COUNT(*)::text AS count
@@ -106,10 +106,16 @@ export const TAXONOMY_USAGE_SQL: Readonly<Record<TaxonomyColumn, string>> = {
          FROM contacts
          WHERE is_active = true AND type IS NOT NULL
          GROUP BY type`,
+  lifecycle: `SELECT lifecycle_stage AS key, COUNT(*)::text AS count
+              FROM contacts
+              WHERE is_active = true AND lifecycle_stage IS NOT NULL
+              GROUP BY lifecycle_stage`,
 }
 
 export const REASSIGN_TAXONOMY_SQL: Readonly<Record<TaxonomyColumn, string>> = {
   status: `UPDATE contacts SET status = $2, updated_at = NOW() WHERE status = $1 RETURNING id`,
   source: `UPDATE contacts SET source = $2, updated_at = NOW() WHERE source = $1 RETURNING id`,
   type: `UPDATE contacts SET type = $2, updated_at = NOW() WHERE type = $1 RETURNING id`,
+  lifecycle: `UPDATE contacts SET lifecycle_stage = $2, updated_at = NOW()
+              WHERE lifecycle_stage = $1 RETURNING id`,
 }

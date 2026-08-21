@@ -74,16 +74,18 @@ export class ContactsRepository {
     statuses: TaxonomyUsageCountRow[]
     sources: TaxonomyUsageCountRow[]
     types: TaxonomyUsageCountRow[]
+    lifecycleStages: TaxonomyUsageCountRow[]
     tags: TaxonomyUsageCountRow[]
   }> {
     return this.db.query(schemaName, async (qr) => {
       const grouped = (column: TaxonomyColumn) =>
         sqlRows<TaxonomyUsageCountRow[]>(qr, TAXONOMY_USAGE_SQL[column])
 
-      const [statuses, sources, types, tags] = await Promise.all([
+      const [statuses, sources, types, lifecycleStages, tags] = await Promise.all([
         grouped('status'),
         grouped('source'),
         grouped('type'),
+        grouped('lifecycle'),
         sqlRows<TaxonomyUsageCountRow[]>(
           qr,
           `SELECT tag AS key, COUNT(*)::text AS count
@@ -93,7 +95,7 @@ export class ContactsRepository {
         ),
       ])
 
-      return { statuses, sources, types, tags }
+      return { statuses, sources, types, lifecycleStages, tags }
     })
   }
 
@@ -134,6 +136,21 @@ export class ContactsRepository {
       [contactId],
     )
     return rows[0] ?? null
+  }
+
+  async recordLifecycleChange(
+    qr: QueryRunner,
+    contactId: string,
+    fromStage: string | null,
+    toStage: string,
+    changedBy: string | null,
+  ): Promise<void> {
+    await sqlRows(
+      qr,
+      `INSERT INTO contact_lifecycle_history (contact_id, from_stage, to_stage, source, changed_by)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [contactId, fromStage, toStage, 'manual', changedBy],
+    )
   }
 
   async existsActiveById(qr: QueryRunner, contactId: string): Promise<boolean> {

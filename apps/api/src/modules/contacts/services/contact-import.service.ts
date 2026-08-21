@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common'
+import { DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
 import type {
   AnalyzeResult,
+  ContactTaxonomy,
   DuplicateStrategy,
+  FieldDef,
   ImportResult,
   ValidationPreview,
   ValidationReport,
@@ -9,7 +12,7 @@ import type {
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { ImportService } from '@/shared/imports/services/import.service'
 import type { UploadedImportFile } from '@/shared/imports/interfaces/import.interfaces'
-import { contactImportMapper } from '../constants/contact-import.mapper'
+import { contactImportMapperFor } from '../constants/contact-import.mapper'
 import { IMPORT_MAX_ISSUES, IMPORT_UPDATABLE_COLUMNS } from '../constants/contact.constants'
 import { buildImportRows } from '../mappers/contact-import-row.mapper'
 import { ContactsRepository } from '../repositories/contacts.repository'
@@ -27,20 +30,35 @@ export class ContactImportService {
     private readonly importService: ImportService,
   ) {}
 
-  async analyze(file: UploadedImportFile): Promise<AnalyzeResult> {
-    return this.importService.analyze(file, contactImportMapper)
+  async analyze(file: UploadedImportFile, customFields: FieldDef[] = []): Promise<AnalyzeResult> {
+    return this.importService.analyze(file, contactImportMapperFor(customFields))
   }
 
-  async preview(fileId: string, mapping: Mapping): Promise<ValidationPreview> {
-    return this.importService.preview(fileId, mapping, contactImportMapper)
+  async preview(
+    fileId: string,
+    mapping: Mapping,
+    customFields: FieldDef[] = [],
+  ): Promise<ValidationPreview> {
+    return this.importService.preview(fileId, mapping, contactImportMapperFor(customFields))
   }
 
-  async validate(schemaName: string, fileId: string, mapping: Mapping): Promise<ValidationReport> {
-    const rows = await this.readRows(fileId, mapping)
+  async validate(
+    schemaName: string,
+    fileId: string,
+    mapping: Mapping,
+    taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
+    customFields: FieldDef[] = [],
+  ): Promise<ValidationReport> {
+    const rows = await this.readRows(fileId, mapping, customFields)
 
     return this.db.query(schemaName, async (qr): Promise<ValidationReport> => {
       const catalog = await this.repository.findEnabledTagNames(qr)
-      const { candidates, issues, errorRows, warningRows } = buildImportRows(rows, catalog, null)
+      const { candidates, issues, errorRows, warningRows } = buildImportRows(
+        rows,
+        catalog,
+        null,
+        taxonomy,
+      )
 
       return {
         totalRows: rows.length,
@@ -59,13 +77,20 @@ export class ContactImportService {
     mapping: Mapping,
     duplicateStrategy: DuplicateStrategy,
     createdById: string,
+    taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
+    customFields: FieldDef[] = [],
   ): Promise<ImportResult> {
-    const rows = await this.readRows(fileId, mapping)
+    const rows = await this.readRows(fileId, mapping, customFields)
 
     try {
       return await this.db.transactional(schemaName, async (qr): Promise<ImportResult> => {
         const catalog = await this.repository.findEnabledTagNames(qr)
-        const { candidates, issues, errorRows } = buildImportRows(rows, catalog, createdById)
+        const { candidates, issues, errorRows } = buildImportRows(
+          rows,
+          catalog,
+          createdById,
+          taxonomy,
+        )
         const counts = await this.writeCandidates(qr, candidates, duplicateStrategy)
 
         return {
@@ -83,11 +108,15 @@ export class ContactImportService {
     }
   }
 
-  private async readRows(fileId: string, mapping: Mapping): Promise<ImportSourceRow[]> {
+  private async readRows(
+    fileId: string,
+    mapping: Mapping,
+    customFields: FieldDef[],
+  ): Promise<ImportSourceRow[]> {
     const { rows } = await this.importService.getRowsForExecution(
       fileId,
       mapping,
-      contactImportMapper,
+      contactImportMapperFor(customFields),
     )
     return rows
   }
@@ -124,8 +153,12 @@ export class ContactImportService {
 }
 
 function toChanges(data: CreateContactData): ContactColumnChange[] {
-  return IMPORT_UPDATABLE_COLUMNS.filter(([key]) => data[key] !== null).map(([key, column]) => ({
-    column,
-    value: data[key],
-  }))
+  const changes: ContactColumnChange[] = IMPORT_UPDATABLE_COLUMNS.filter(
+    ([key]) => data[key] !== null,
+  ).map(([key, column]) => ({ column, value: data[key] }))
+
+  if (Object.keys(data.customFields).length > 0) {
+    changes.push({ column: 'custom_fields', value: data.customFields })
+  }
+  return changes
 }

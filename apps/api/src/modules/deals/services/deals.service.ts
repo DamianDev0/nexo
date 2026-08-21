@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import type { DealDetail, PaginatedDeals } from '@repo/shared-types'
+import { DOMAIN_EVENTS } from '@repo/shared-types'
+import type { DealDetail, PaginatedDeals, WebhookEvent } from '@repo/shared-types'
 import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
+import { EventBusService } from '@/shared/events/event-bus.service'
 import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { AuditAction, AuditEntityType } from '@/modules/audit-log/interfaces/audit-log.interfaces'
 import { DealsRepository } from '../repositories/deals.repository'
@@ -19,7 +21,23 @@ export class DealsService {
   constructor(
     private readonly repository: DealsRepository,
     private readonly audit: AuditLogService,
+    private readonly eventBus: EventBusService,
   ) {}
+
+  private emitDealEvent(
+    event: WebhookEvent,
+    schemaName: string,
+    deal: DealDetail,
+    extra: Record<string, unknown> = {},
+  ): void {
+    this.eventBus.emitCrm(event, {
+      schemaName,
+      entityType: 'deal',
+      entityId: deal.id,
+      deal,
+      ...extra,
+    })
+  }
 
   async findAll(schemaName: string, query: DealQueryDto): Promise<PaginatedDeals> {
     const page = query.page ?? 1
@@ -45,6 +63,7 @@ export class DealsService {
       createdById,
       `Deal "${dto.title}" created`,
     )
+    this.emitDealEvent(DOMAIN_EVENTS.DEAL_CREATED, schemaName, result)
     return result
   }
 
@@ -58,6 +77,7 @@ export class DealsService {
       undefined,
       `Deal ${dealId} updated`,
     )
+    this.emitDealEvent(DOMAIN_EVENTS.DEAL_UPDATED, schemaName, result)
     return result
   }
 
@@ -96,6 +116,10 @@ export class DealsService {
       `Deal ${dealId} moved to stage ${dto.stageId}`,
       { oldValue: { stageId: fromStageId }, newValue: { stageId: dto.stageId } },
     )
+    this.emitDealEvent(DOMAIN_EVENTS.DEAL_STAGE_CHANGED, schemaName, result, {
+      fromStageId,
+      toStageId: dto.stageId,
+    })
     return result
   }
 
@@ -109,6 +133,7 @@ export class DealsService {
       userId,
       `Deal ${dealId} marked as won`,
     )
+    this.emitDealEvent(DOMAIN_EVENTS.DEAL_WON, schemaName, result)
     return result
   }
 
@@ -130,6 +155,9 @@ export class DealsService {
       `Deal ${dealId} marked as lost`,
       { newValue: { lossReason: dto.lossReason } },
     )
+    this.emitDealEvent(DOMAIN_EVENTS.DEAL_LOST, schemaName, result, {
+      lossReason: dto.lossReason,
+    })
     return result
   }
 

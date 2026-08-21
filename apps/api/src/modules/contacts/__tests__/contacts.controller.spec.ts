@@ -3,8 +3,9 @@ import { ContactsController } from '../controllers/contacts.controller'
 import { ContactsService } from '../services/contacts.service'
 import { ContactImportService } from '../services/contact-import.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
+import { TenantConfigService } from '@/modules/settings/services/tenant-config.service'
 import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
-import { LifecycleStage, UserRole } from '@repo/shared-types'
+import { DEFAULT_CONTACT_TAXONOMY, LifecycleStage, UserRole } from '@repo/shared-types'
 import type { Contact, PaginatedContacts } from '@repo/shared-types'
 
 const mockCtx = makeTenantContext()
@@ -88,6 +89,12 @@ describe('ContactsController', () => {
         { provide: ContactsService, useValue: service },
         { provide: ContactImportService, useValue: importService },
         { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
+        {
+          provide: TenantConfigService,
+          useValue: {
+            getContactTaxonomy: jest.fn().mockResolvedValue(DEFAULT_CONTACT_TAXONOMY),
+          },
+        },
       ],
     }).compile()
 
@@ -123,7 +130,13 @@ describe('ContactsController', () => {
       const dto = { firstName: 'John', email: 'john@example.com' }
       const result = await controller.create(dto, mockCtx, mockUser, undefined)
 
-      expect(service.create).toHaveBeenCalledWith(mockCtx.schemaName, dto, mockUser.id, false)
+      expect(service.create).toHaveBeenCalledWith(
+        mockCtx.schemaName,
+        dto,
+        mockUser.id,
+        false,
+        DEFAULT_CONTACT_TAXONOMY,
+      )
       expect(result.id).toBe('c-1')
     })
   })
@@ -151,13 +164,21 @@ describe('ContactsController', () => {
       const updated = { ...mockContact, firstName: 'Jane' }
       service.update.mockResolvedValue(updated)
 
-      const result = await controller.update('c-1', { firstName: 'Jane' }, mockCtx, undefined)
+      const result = await controller.update(
+        'c-1',
+        { firstName: 'Jane' },
+        mockCtx,
+        mockUser,
+        undefined,
+      )
 
       expect(service.update).toHaveBeenCalledWith(
         mockCtx.schemaName,
         'c-1',
         { firstName: 'Jane' },
         false,
+        DEFAULT_CONTACT_TAXONOMY,
+        mockUser.id,
       )
       expect(result.firstName).toBe('Jane')
     })

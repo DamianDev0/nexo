@@ -37,6 +37,7 @@ export function mapContactListItem(r: ContactRow): ContactListItem {
     tags: r.tags,
     companyId: r.company_id,
     assignedToId: r.assigned_to_id,
+    customFields: r.custom_fields ?? {},
     isActive: r.is_active,
     createdById: r.created_by,
     createdAt: r.created_at,

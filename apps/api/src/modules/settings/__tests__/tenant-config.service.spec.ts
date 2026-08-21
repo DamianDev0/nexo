@@ -55,7 +55,12 @@ describe('TenantConfigService', () => {
         order: 1,
         isSystem: false,
       } as ContactTaxonomy['statuses'][number]
-      const cached = { statuses: [cachedOption], sources: [], types: [] } as ContactTaxonomy
+      const cached = {
+        statuses: [cachedOption],
+        sources: [],
+        types: [],
+        lifecycleStages: [],
+      } as ContactTaxonomy
       const { service, tenantRepo, cache } = buildService()
       cache.get.mockResolvedValue(cached)
 
@@ -137,7 +142,12 @@ describe('TenantConfigService', () => {
   describe('updateContactTaxonomy', () => {
     it('persists the taxonomy and invalidates both the taxonomy and slug cache entries', async () => {
       const { service, tenantRepo, cache } = buildService()
-      const taxonomy: ContactTaxonomy = { statuses: [], sources: [], types: [] }
+      const taxonomy: ContactTaxonomy = {
+        statuses: [],
+        sources: [],
+        types: [],
+        lifecycleStages: [],
+      }
 
       const result = await service.updateContactTaxonomy(TENANT_ID, taxonomy, SLUG)
 

@@ -54,6 +54,9 @@ export class FieldDefDto implements FieldDef {
   @ApiProperty() @IsBoolean() required: boolean
   @ApiProperty() @IsBoolean() unique: boolean
   @ApiProperty() @IsInt() @Min(1) order: number
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() isActive?: boolean
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() filterable?: boolean
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() sortable?: boolean
   @ApiPropertyOptional() @IsOptional() defaultValue?: unknown
   @ApiPropertyOptional() @IsOptional() @IsString() placeholder?: string
   @ApiPropertyOptional({ type: [SelectOptionDto] })

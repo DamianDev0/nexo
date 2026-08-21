@@ -314,6 +314,10 @@ function normalizeTaxonomy(stored: Partial<ContactTaxonomy> | undefined): Contac
     statuses: normalizeOptions(stored?.statuses, DEFAULT_CONTACT_TAXONOMY.statuses),
     sources: normalizeOptions(stored?.sources, DEFAULT_CONTACT_TAXONOMY.sources),
     types: normalizeOptions(stored?.types, DEFAULT_CONTACT_TAXONOMY.types),
+    lifecycleStages: normalizeOptions(
+      stored?.lifecycleStages,
+      DEFAULT_CONTACT_TAXONOMY.lifecycleStages,
+    ),
   }
 }
 

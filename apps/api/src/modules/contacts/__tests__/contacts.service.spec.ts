@@ -45,13 +45,13 @@ describe('ContactsService', () => {
   let service: ContactsService
   let db: ReturnType<typeof buildDbMock>
   let qr: ReturnType<typeof buildQrMock>
-  let eventBus: { emit: jest.Mock }
+  let eventBus: { emit: jest.Mock; emitCrm: jest.Mock }
   let duplicates: { assertNoDuplicates: jest.Mock; probe: jest.Mock }
 
   beforeEach(async () => {
     qr = buildQrMock()
     db = buildDbMock(qr)
-    eventBus = { emit: jest.fn() }
+    eventBus = { emit: jest.fn(), emitCrm: jest.fn() }
     duplicates = { assertNoDuplicates: jest.fn(), probe: jest.fn() }
 
     const module = await Test.createTestingModule({

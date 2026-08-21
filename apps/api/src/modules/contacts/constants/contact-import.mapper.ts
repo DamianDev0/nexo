@@ -1,4 +1,5 @@
-import { DocumentType, LifecycleStage } from '@repo/shared-types'
+import { DocumentType } from '@repo/shared-types'
+import type { FieldDef } from '@repo/shared-types'
 import { normalizeText, phoneDigits, validateDocumentNumber } from '@repo/shared-utils'
 import { parseIntOrZero, splitList } from '@/shared/imports/constants/import.constants'
 import type {
@@ -6,6 +7,8 @@ import type {
   ImportFieldError,
   ImportRowMapper,
 } from '@/shared/imports/interfaces/import.interfaces'
+
+export const CUSTOM_FIELD_PREFIX = 'custom:'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const MIN_PHONE_DIGITS = 7
@@ -177,12 +180,6 @@ export const contactImportMapper: ImportRowMapper = {
         }
         break
 
-      case 'lifecycleStage':
-        if (typeof value === 'string' && !isLifecycleStage(value)) {
-          return { field, message: 'Unknown lifecycle stage', value }
-        }
-        break
-
       case 'leadScore':
         if (typeof value === 'number' && (value < 0 || value > MAX_LEAD_SCORE)) {
           return { field, message: 'Lead score must be between 0 and 100', value: String(value) }
@@ -199,9 +196,14 @@ export function isDocumentType(value: string): value is DocumentType {
   return known.includes(value)
 }
 
-export function isLifecycleStage(value: string): value is LifecycleStage {
-  const known: readonly string[] = Object.values(LifecycleStage)
-  return known.includes(value)
+export function contactImportMapperFor(customFields: FieldDef[]): ImportRowMapper {
+  const customDefs: ImportFieldDef[] = customFields.map((def) => ({
+    field: `${CUSTOM_FIELD_PREFIX}${def.key}`,
+    label: def.label,
+    required: false,
+    aliases: [def.label.toLowerCase(), def.key.replaceAll('_', ' ')],
+  }))
+  return { ...contactImportMapper, fieldDefs: [...CONTACT_FIELD_DEFS, ...customDefs] }
 }
 
 export function documentNumberError(

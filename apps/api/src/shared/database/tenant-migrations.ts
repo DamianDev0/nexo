@@ -462,4 +462,21 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ADD COLUMN IF NOT EXISTS avatar_url TEXT;
     `,
   },
+  {
+    id: '0029_contact_lifecycle_history',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".contact_lifecycle_history (
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        contact_id  UUID NOT NULL REFERENCES "${schema}".contacts(id) ON DELETE CASCADE,
+        from_stage  VARCHAR(50),
+        to_stage    VARCHAR(50) NOT NULL,
+        reason      TEXT,
+        source      VARCHAR(30),
+        changed_by  UUID,
+        changed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_clh_contact"
+        ON "${schema}".contact_lifecycle_history (contact_id, changed_at DESC);
+    `,
+  },
 ]

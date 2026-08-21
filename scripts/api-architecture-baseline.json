@@ -7,6 +7,9 @@
     "sql-interpolation"
   ],
   "apps/api/src/modules/companies/controllers/companies.controller.ts": ["cross-module-import"],
+  "apps/api/src/modules/contacts/controllers/contact-workspace.controller.ts": [
+    "cross-module-import"
+  ],
   "apps/api/src/modules/contacts/controllers/contacts.controller.ts": ["cross-module-import"],
   "apps/api/src/modules/contacts/repositories/contact-duplicates.repository.ts": [
     "sql-interpolation"

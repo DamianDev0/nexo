@@ -15,8 +15,9 @@ import {
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiConsumes, ApiTags } from '@nestjs/swagger'
-import { UserRole } from '@repo/shared-types'
+import { activeFieldDefs, UserRole } from '@repo/shared-types'
 import type {
+  FieldDef,
   TenantContext,
   AuthenticatedUser,
   Contact,
@@ -36,6 +37,7 @@ import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { ContactsService } from '../services/contacts.service'
 import { ContactImportService } from '../services/contact-import.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
+import { TenantConfigService } from '@/modules/settings/services/tenant-config.service'
 import {
   CreateContactDto,
   UpdateContactDto,
@@ -52,6 +54,7 @@ export class ContactsController {
     private readonly contactsService: ContactsService,
     private readonly importService: ContactImportService,
     private readonly customFields: CustomFieldsValidator,
+    private readonly tenantConfig: TenantConfigService,
   ) {}
 
   @Post('import/analyze')
@@ -61,8 +64,11 @@ export class ContactsController {
   })
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  analyzeImport(@UploadedFile() file: Express.Multer.File): Promise<AnalyzeResult> {
-    return this.importService.analyze(file)
+  async analyzeImport(
+    @UploadedFile() file: Express.Multer.File,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<AnalyzeResult> {
+    return this.importService.analyze(file, await this.contactCustomFields(ctx.tenantId))
   }
 
   @Post('import/preview')
@@ -70,8 +76,15 @@ export class ContactsController {
     summary: 'Re-validate the sample rows against the mapping the user confirmed',
     roles: [UserRole.MANAGER],
   })
-  previewImport(@Body() dto: ExecuteContactImportDto): Promise<ValidationPreview> {
-    return this.importService.preview(dto.fileId, dto.mapping ?? {})
+  async previewImport(
+    @Body() dto: ExecuteContactImportDto,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<ValidationPreview> {
+    return this.importService.preview(
+      dto.fileId,
+      dto.mapping ?? {},
+      await this.contactCustomFields(ctx.tenantId),
+    )
   }
 
   @Post('import/validate')
@@ -79,11 +92,18 @@ export class ContactsController {
     summary: 'Validate every row in the file against the confirmed mapping',
     roles: [UserRole.MANAGER],
   })
-  validateImport(
+  async validateImport(
     @Body() dto: ExecuteContactImportDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<ValidationReport> {
-    return this.importService.validate(ctx.schemaName, dto.fileId, dto.mapping ?? {})
+    const taxonomy = await this.tenantConfig.getContactTaxonomy(ctx.tenantId)
+    return this.importService.validate(
+      ctx.schemaName,
+      dto.fileId,
+      dto.mapping ?? {},
+      taxonomy,
+      await this.contactCustomFields(ctx.tenantId),
+    )
   }
 
   @Post('import/execute')
@@ -91,18 +111,26 @@ export class ContactsController {
     summary: 'Step 2: Execute import with confirmed mappings and duplicate strategy',
     roles: [UserRole.MANAGER],
   })
-  executeImport(
+  async executeImport(
     @Body() dto: ExecuteContactImportDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<ImportResult> {
+    const taxonomy = await this.tenantConfig.getContactTaxonomy(ctx.tenantId)
     return this.importService.execute(
       ctx.schemaName,
       dto.fileId,
       dto.mapping ?? {},
       dto.duplicateStrategy ?? 'skip',
       user.id,
+      taxonomy,
+      await this.contactCustomFields(ctx.tenantId),
     )
+  }
+
+  private async contactCustomFields(tenantId: string): Promise<FieldDef[]> {
+    const config = await this.tenantConfig.getCustomFields(tenantId)
+    return activeFieldDefs(config.contacts)
   }
 
   @Get()
@@ -129,7 +157,8 @@ export class ContactsController {
     @Query('force', new ParseBoolPipe({ optional: true })) force?: boolean,
   ): Promise<Contact> {
     await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
-    return this.contactsService.create(ctx.schemaName, dto, user.id, force ?? false)
+    const taxonomy = await this.tenantConfig.getContactTaxonomy(ctx.tenantId)
+    return this.contactsService.create(ctx.schemaName, dto, user.id, force ?? false, taxonomy)
   }
 
   @Get('counts')
@@ -190,10 +219,12 @@ export class ContactsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateContactDto,
     @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('force', new ParseBoolPipe({ optional: true })) force?: boolean,
   ): Promise<Contact> {
     await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
-    return this.contactsService.update(ctx.schemaName, id, dto, force ?? false)
+    const taxonomy = await this.tenantConfig.getContactTaxonomy(ctx.tenantId)
+    return this.contactsService.update(ctx.schemaName, id, dto, force ?? false, taxonomy, user.id)
   }
 
   @Delete(':id')

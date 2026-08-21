@@ -72,4 +72,10 @@ export class UpdateContactTaxonomyDto implements ContactTaxonomy {
   @ValidateNested({ each: true })
   @Type(() => TaxonomyOptionDto)
   types: TaxonomyOptionDto[]
+
+  @ApiProperty({ type: [TaxonomyOptionDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaxonomyOptionDto)
+  lifecycleStages: TaxonomyOptionDto[]
 }

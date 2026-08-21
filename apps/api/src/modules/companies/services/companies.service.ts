@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { DOMAIN_EVENTS } from '@repo/shared-types'
 import { validateNIT, DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
+import { EventBusService } from '@/shared/events/event-bus.service'
 import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import { AuditAction, AuditEntityType } from '@/modules/audit-log/interfaces/audit-log.interfaces'
 import type { Company, PaginatedCompanies, CompanySummary } from '@repo/shared-types'
@@ -20,6 +22,7 @@ export class CompaniesService {
   constructor(
     private readonly companies: CompaniesRepository,
     private readonly audit: AuditLogService,
+    private readonly eventBus: EventBusService,
   ) {}
 
   async findAll(schemaName: string, query: CompanyQueryDto): Promise<PaginatedCompanies> {
@@ -74,6 +77,12 @@ export class CompaniesService {
       createdById,
       `Company ${dto.name} created`,
     )
+    this.eventBus.emitCrm(DOMAIN_EVENTS.COMPANY_CREATED, {
+      schemaName,
+      entityType: 'company',
+      entityId: result.id,
+      company: result,
+    })
     return result
   }
 
@@ -101,6 +110,12 @@ export class CompaniesService {
       undefined,
       `Company ${companyId} updated`,
     )
+    this.eventBus.emitCrm(DOMAIN_EVENTS.COMPANY_UPDATED, {
+      schemaName,
+      entityType: 'company',
+      entityId: companyId,
+      company: result,
+    })
     return result
   }
 
@@ -114,6 +129,11 @@ export class CompaniesService {
       undefined,
       `Company ${companyId} deleted`,
     )
+    this.eventBus.emitCrm(DOMAIN_EVENTS.COMPANY_DELETED, {
+      schemaName,
+      entityType: 'company',
+      entityId: companyId,
+    })
   }
 
   async getSummary(schemaName: string, companyId: string): Promise<CompanySummary> {

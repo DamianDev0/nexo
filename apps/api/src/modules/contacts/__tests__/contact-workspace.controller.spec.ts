@@ -2,8 +2,9 @@ import { Test } from '@nestjs/testing'
 import { ContactWorkspaceController } from '../controllers/contact-workspace.controller'
 import { ContactWorkspaceService } from '../services/contact-workspace.service'
 import type { UpdateContactWorkspaceDto } from '../dto/contact-workspace.dto'
+import { TenantConfigService } from '@/modules/settings/services/tenant-config.service'
 import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
-import { UserRole } from '@repo/shared-types'
+import { DEFAULT_CONTACT_TAXONOMY, UserRole } from '@repo/shared-types'
 import type { ContactWorkspace } from '@repo/shared-types'
 
 const mockCtx = makeTenantContext()
@@ -34,7 +35,18 @@ describe('ContactWorkspaceController', () => {
 
     const module = await Test.createTestingModule({
       controllers: [ContactWorkspaceController],
-      providers: [{ provide: ContactWorkspaceService, useValue: service }],
+      providers: [
+        { provide: ContactWorkspaceService, useValue: service },
+        {
+          provide: TenantConfigService,
+          useValue: {
+            getContactTaxonomy: jest.fn().mockResolvedValue(DEFAULT_CONTACT_TAXONOMY),
+            getCustomFields: jest
+              .fn()
+              .mockResolvedValue({ contacts: [], companies: [], deals: [] }),
+          },
+        },
+      ],
     }).compile()
 
     controller = module.get(ContactWorkspaceController)
@@ -46,7 +58,12 @@ describe('ContactWorkspaceController', () => {
 
       const result = await controller.getWorkspace(mockCtx, mockUser)
 
-      expect(service.getWorkspace).toHaveBeenCalledWith(mockCtx.schemaName, mockUser.id)
+      expect(service.getWorkspace).toHaveBeenCalledWith(
+        mockCtx.schemaName,
+        mockUser.id,
+        DEFAULT_CONTACT_TAXONOMY,
+        [],
+      )
       expect(result).toEqual(mockWorkspace)
     })
   })

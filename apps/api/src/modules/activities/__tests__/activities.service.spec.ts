@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing'
 import { ActivitiesService } from '../services/activities.service'
 import { ActivitiesRepository } from '../repositories/activities.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { EventBusService } from '@/shared/events/event-bus.service'
 import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import type { PaginatedActivities } from '@repo/shared-types'
 
@@ -54,6 +55,7 @@ describe('ActivitiesService', () => {
         ActivitiesRepository,
         { provide: TenantDbService, useValue: db },
         { provide: AuditLogService, useValue: { entityEvent: jest.fn() } },
+        { provide: EventBusService, useValue: { emit: jest.fn(), emitCrm: jest.fn() } },
       ],
     }).compile()
 
