@@ -5,6 +5,7 @@ export const DOMAIN_EVENTS = {
   CONTACT_UPDATED: 'contact.updated',
   CONTACT_DELETED: 'contact.deleted',
   CONTACT_ASSIGNED: 'contact.assigned',
+  CONTACT_LIFECYCLE_CHANGED: 'contact.lifecycle_changed',
   CONTACT_TAGGED: 'contact.tagged',
   CONTACT_IMPORTED: 'contact.imported',
   COMPANY_CREATED: 'company.created',

@@ -59,10 +59,11 @@ export type ContactTaxonomyUsage = {
   statuses: Record<string, number>
   sources: Record<string, number>
   types: Record<string, number>
+  lifecycleStages: Record<string, number>
   tags: Record<string, number>
 }
 
-export type TaxonomyReassignKind = 'status' | 'source' | 'type' | 'tag'
+export type TaxonomyReassignKind = 'status' | 'source' | 'type' | 'lifecycle' | 'tag'
 
 export type ContactColumnDef = {
   key: string
@@ -72,7 +73,11 @@ export type ContactColumnDef = {
   defaultVisible: boolean
   defaultWidth: number
   minWidth: number
+  custom?: boolean
+  label?: string | null
 }
+
+export const CUSTOM_COLUMN_PREFIX = 'custom:'
 
 export type ContactQuickFilterOptions = {
   statuses: string[]

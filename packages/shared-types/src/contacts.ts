@@ -1,4 +1,4 @@
-import type { DocumentType, LifecycleStage } from './enums'
+import type { DocumentType } from './enums'
 
 export type Contact = {
   id: string
@@ -20,7 +20,7 @@ export type Contact = {
   status: string
   statusChangedAt: string | null
   avatarUrl: string | null
-  lifecycleStage: LifecycleStage
+  lifecycleStage: string
   source: string | null
   type: string | null
   typeLabel: string | null
@@ -42,7 +42,9 @@ export type Contact = {
   updatedAt: string
 }
 
-export type ContactListItem = Omit<Contact, 'customFields'>
+export type ContactListItem = Omit<Contact, 'customFields'> & {
+  customFields?: Record<string, unknown>
+}
 
 export type ContactInput = {
   firstName: string
@@ -72,7 +74,7 @@ export type ContactListQuery = {
   q?: string
   status?: string
   source?: string
-  lifecycleStage?: LifecycleStage
+  lifecycleStage?: string
   tags?: string[]
   companyId?: string
   assignedToId?: string

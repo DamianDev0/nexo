@@ -1,3 +1,4 @@
+import { LifecycleStage } from './enums'
 import type { IndustrySector, PlanName, TaxRegime, UserRole } from './enums'
 
 export type ThemeColors = {
@@ -170,6 +171,9 @@ export type FieldDef = {
   required: boolean
   unique: boolean
   order: number
+  isActive?: boolean
+  filterable?: boolean
+  sortable?: boolean
   defaultValue?: unknown
   placeholder?: string
   options?: SelectOption[]
@@ -177,6 +181,10 @@ export type FieldDef = {
   max?: number
   formula?: string
   relationEntity?: CustomFieldEntity
+}
+
+export function activeFieldDefs(defs: FieldDef[]): FieldDef[] {
+  return defs.filter((def) => def.isActive !== false)
 }
 
 export type CustomFieldsConfig = {
@@ -387,6 +395,7 @@ export type ContactTaxonomy = {
   statuses: TaxonomyOption[]
   sources: TaxonomyOption[]
   types: TaxonomyOption[]
+  lifecycleStages: TaxonomyOption[]
 }
 
 function systemOption(key: string, color: string, order: number): TaxonomyOption {
@@ -427,8 +436,25 @@ const DEFAULT_CONTACT_TYPES: TaxonomyOption[] = [
   systemOption('other', '#9CA3AF', 4),
 ]
 
+const DEFAULT_LIFECYCLE_STAGES: TaxonomyOption[] = [
+  systemOption(LifecycleStage.SUBSCRIBER, '#94A3B8', 1),
+  systemOption(LifecycleStage.LEAD, '#60A5FA', 2),
+  systemOption(LifecycleStage.MQL, '#818CF8', 3),
+  systemOption(LifecycleStage.SQL, '#A78BFA', 4),
+  systemOption(LifecycleStage.OPPORTUNITY, '#FBBF24', 5),
+  systemOption(LifecycleStage.CUSTOMER, '#4ADE80', 6),
+  systemOption(LifecycleStage.EVANGELIST, '#F472B6', 7),
+]
+
 export const DEFAULT_CONTACT_TAXONOMY: ContactTaxonomy = {
   statuses: DEFAULT_CONTACT_STATUSES,
   sources: DEFAULT_CONTACT_SOURCES,
   types: DEFAULT_CONTACT_TYPES,
+  lifecycleStages: DEFAULT_LIFECYCLE_STAGES,
+}
+
+export function firstEnabledOptionKey(options: TaxonomyOption[]): string {
+  const enabled = options.filter((option) => option.enabled)
+  const pool = enabled.length > 0 ? enabled : options
+  return [...pool].sort((a, b) => a.order - b.order)[0]?.key ?? ''
 }
