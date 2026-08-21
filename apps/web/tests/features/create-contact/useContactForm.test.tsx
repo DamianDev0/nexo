@@ -51,7 +51,22 @@ const EXISTING_CONTACT: ContactListItem = {
   updatedAt: new Date().toISOString(),
 }
 
-const EMPTY_TAXONOMY: ContactTaxonomy = { statuses: [], sources: [], types: [] }
+const EMPTY_TAXONOMY: ContactTaxonomy = {
+  statuses: [
+    {
+      key: 'new',
+      label: null,
+      description: null,
+      color: '#60A5FA',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
+  sources: [],
+  types: [],
+  lifecycleStages: [],
+}
 
 const server = createMswServer()
 
@@ -61,9 +76,13 @@ function taxonomyHandler() {
   )
 }
 
+function customFieldsHandler() {
+  return http.get(`${API}/settings/custom-fields/contacts`, () => HttpResponse.json({ data: [] }))
+}
+
 describe('useContactForm', () => {
   it('populates the form with the contact values in edit mode', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
 
     const { result } = renderHook(() => useContactForm(EXISTING_CONTACT, vi.fn()), { wrapper })
 
@@ -78,7 +97,7 @@ describe('useContactForm', () => {
   })
 
   it('derives whatsappSameAsPhone as false when the numbers differ', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     const contact = { ...EXISTING_CONTACT, whatsapp: '3009999999' }
 
     const { result } = renderHook(() => useContactForm(contact, vi.fn()), { wrapper })
@@ -88,7 +107,7 @@ describe('useContactForm', () => {
   })
 
   it('maps null contact fields to empty form strings', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     const contact: ContactListItem = {
       ...EXISTING_CONTACT,
       lastName: null,
@@ -122,7 +141,7 @@ describe('useContactForm', () => {
   })
 
   it('serializes the full payload and resolves whatsapp from the phone', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     let receivedBody: Record<string, unknown> | null = null
     server.use(
       http.post(`${API}/contacts`, async ({ request }) => {
@@ -133,7 +152,7 @@ describe('useContactForm', () => {
 
     const onDone = vi.fn()
     const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
-    await waitFor(() => expect(result.current.taxonomy.statuses).toBeDefined())
+    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
 
     act(() => {
       result.current.form.reset({
@@ -175,7 +194,7 @@ describe('useContactForm', () => {
   })
 
   it('patches the existing contact in edit mode', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     let patchedUrl: string | null = null
     server.use(
       http.patch(`${API}/contacts/:id`, ({ request }) => {
@@ -197,7 +216,7 @@ describe('useContactForm', () => {
   })
 
   it('posts a ContactInput with source undefined when the form value is empty', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     let receivedBody: Record<string, unknown> | null = null
     server.use(
       http.post(`${API}/contacts`, async ({ request }) => {
@@ -209,7 +228,7 @@ describe('useContactForm', () => {
     const onDone = vi.fn()
     const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
 
-    await waitFor(() => expect(result.current.taxonomy.statuses).toBeDefined())
+    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
 
     act(() => {
       result.current.form.setValue('firstName', 'Carlos')
@@ -226,7 +245,7 @@ describe('useContactForm', () => {
   })
 
   it('sends the free-text typeLabel when the type is other', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     let receivedBody: Record<string, unknown> | null = null
     server.use(
       http.post(`${API}/contacts`, async ({ request }) => {
@@ -237,7 +256,7 @@ describe('useContactForm', () => {
 
     const onDone = vi.fn()
     const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
-    await waitFor(() => expect(result.current.taxonomy.types).toBeDefined())
+    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
 
     act(() => {
       result.current.form.setValue('firstName', 'Camila')
@@ -254,7 +273,7 @@ describe('useContactForm', () => {
   })
 
   it('omits typeLabel when the type is not other', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     let receivedBody: Record<string, unknown> | null = null
     server.use(
       http.post(`${API}/contacts`, async ({ request }) => {
@@ -265,7 +284,7 @@ describe('useContactForm', () => {
 
     const onDone = vi.fn()
     const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
-    await waitFor(() => expect(result.current.taxonomy.types).toBeDefined())
+    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
 
     act(() => {
       result.current.form.setValue('firstName', 'Camila')
@@ -283,7 +302,7 @@ describe('useContactForm', () => {
   })
 
   it('blocks submit when the type is other and typeLabel is empty', async () => {
-    server.use(taxonomyHandler())
+    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
     const posted = vi.fn()
     server.use(
       http.post(`${API}/contacts`, () => {
@@ -294,7 +313,7 @@ describe('useContactForm', () => {
 
     const onDone = vi.fn()
     const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
-    await waitFor(() => expect(result.current.taxonomy.types).toBeDefined())
+    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
 
     act(() => {
       result.current.form.setValue('firstName', 'Camila')

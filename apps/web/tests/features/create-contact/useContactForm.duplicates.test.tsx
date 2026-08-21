@@ -14,7 +14,22 @@ import type {
 
 import { useContactForm } from '@/features/create-contact/model/useContactForm'
 
-const EMPTY_TAXONOMY: ContactTaxonomy = { statuses: [], sources: [], types: [] }
+const EMPTY_TAXONOMY: ContactTaxonomy = {
+  statuses: [
+    {
+      key: 'new',
+      label: null,
+      description: null,
+      color: '#60A5FA',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
+  sources: [],
+  types: [],
+  lifecycleStages: [],
+}
 
 const server = createMswServer()
 
@@ -22,6 +37,10 @@ function taxonomyHandler() {
   return http.get(`${API}/settings/contact-taxonomy`, () =>
     HttpResponse.json({ data: EMPTY_TAXONOMY }),
   )
+}
+
+function customFieldsHandler() {
+  return http.get(`${API}/settings/custom-fields/contacts`, () => HttpResponse.json({ data: [] }))
 }
 
 function match(field: ContactDuplicateMatch['field']): ContactDuplicateMatch {
@@ -61,7 +80,7 @@ function renderContactForm(onDone: () => void) {
 async function submitContact(result: {
   current: ReturnType<typeof useContactForm>
 }): Promise<void> {
-  await waitFor(() => expect(result.current.taxonomy.statuses).toBeDefined())
+  await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
   act(() => {
     result.current.form.setValue('firstName', 'Camila')
     result.current.form.setValue('phone', '3001234567')
@@ -75,6 +94,7 @@ describe('useContactForm duplicates', () => {
   it('shows an inline email error on a hard duplicate and keeps the drawer open', async () => {
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       http.post(`${API}/contacts`, () =>
         conflictResponse({
           severity: 'hard',
@@ -100,6 +120,7 @@ describe('useContactForm duplicates', () => {
     const received: Array<{ force: string | null; body: Record<string, unknown> }> = []
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       http.post(`${API}/contacts`, async ({ request }) => {
         const force = new URL(request.url).searchParams.get('force')
         received.push({ force, body: (await request.json()) as Record<string, unknown> })
@@ -137,6 +158,7 @@ describe('useContactForm duplicates', () => {
   it('clears the duplicate notice when the user edits a value', async () => {
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       http.post(`${API}/contacts`, () =>
         conflictResponse({
           severity: 'soft',
@@ -161,6 +183,7 @@ describe('useContactForm duplicates', () => {
   it('surfaces a hard document duplicate as a form-level notice without force', async () => {
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       http.post(`${API}/contacts`, () =>
         conflictResponse({
           severity: 'hard',
@@ -185,6 +208,7 @@ describe('useContactForm duplicates', () => {
   it('keeps the duplicate state untouched on non-duplicate errors', async () => {
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       http.post(`${API}/contacts`, () =>
         HttpResponse.json(
           { statusCode: 500, error: 'Internal Server Error', message: 'boom' },

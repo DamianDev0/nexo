@@ -32,10 +32,12 @@ export const ROUTES = {
       },
       navigation: '/settings/navigation',
       nomenclature: '/settings/nomenclature',
+      fields: '/settings/fields',
       pipelines: '/settings/pipelines',
       contacts: {
         root: '/settings/contacts',
         status: '/settings/contacts/status',
+        lifecycle: '/settings/contacts/lifecycle',
         sources: '/settings/contacts/sources',
         types: '/settings/contacts/types',
         tags: '/settings/contacts/tags',

@@ -1,0 +1,25 @@
+'use client'
+
+import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+
+import settingsService from '@/shared/api/services/settings.service'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
+
+import type { FieldDef } from '@repo/shared-types'
+
+const STALE_MS = 5 * 60 * 1000
+
+export function useContactCustomFields(): ReadonlyArray<FieldDef> {
+  const { data } = useQuery({
+    queryKey: QUERY_KEYS.settings.customFields('contacts'),
+    queryFn: () => settingsService.getCustomFields('contacts'),
+    staleTime: STALE_MS,
+  })
+
+  return useMemo(
+    () =>
+      (data ?? []).filter((field) => field.isActive !== false).sort((a, b) => a.order - b.order),
+    [data],
+  )
+}

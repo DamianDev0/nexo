@@ -151,7 +151,7 @@ describe('buildContactSchema', () => {
       type: '',
       typeLabel: '',
     })
-    expect(CONTACT_FORM_DEFAULTS.status).not.toBe('')
+    expect(CONTACT_FORM_DEFAULTS.status).toBe('')
   })
 
   it('keeps the email value verbatim through the transform', () => {

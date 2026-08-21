@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { useEntityLabels } from '@/entities/nomenclature'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { EdgeCollapseButton } from '@/shared/ui/molecules/edge-collapse-button'
 import { SplitButton } from '@/shared/ui/molecules/split-button'
@@ -18,6 +19,7 @@ import { useContactForm } from '../model/useContactForm'
 
 import { ContactDuplicateNotice } from './ContactDuplicateNotice'
 import { ContactFormFields } from './ContactFormFields'
+import { CustomFieldsSection } from './CustomFieldsSection'
 
 import type { ContactListItem } from '@repo/shared-types'
 
@@ -29,9 +31,12 @@ interface ContactFormSheetProps {
 
 export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<ContactFormSheetProps>) {
   const { t } = useTranslation()
+  const entityLabel = useEntityLabels()
+  const entity = entityLabel('contact', 'singular')
   const {
     form,
     taxonomy,
+    customFields,
     isEdit,
     isPending,
     handleSubmit,
@@ -52,7 +57,7 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
         />
         <SheetHeader className="gap-0.5 border-b border-border px-6 pb-4 pt-5">
           <SheetTitle className="text-lg font-bold tracking-[-0.01em]">
-            {t(isEdit ? 'contacts.form.editTitle' : 'contacts.form.createTitle')}
+            {t(isEdit ? 'contacts.form.editTitle' : 'contacts.form.createTitle', { entity })}
           </SheetTitle>
           <SheetDescription className="text-xs text-muted-foreground">
             {t(isEdit ? 'contacts.form.editDescription' : 'contacts.form.createDescription')}
@@ -74,6 +79,7 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
                 void probeField(field)
               }}
             />
+            <CustomFieldsSection data={customFields} />
             <ContactDuplicateNotice
               notice={duplicateNotice}
               isEdit={isEdit}
@@ -89,7 +95,9 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
             <SplitButton
               type="submit"
               disabled={isPending}
-              label={t(isEdit ? 'contacts.form.submitEdit' : 'contacts.form.submitCreate')}
+              label={t(isEdit ? 'contacts.form.submitEdit' : 'contacts.form.submitCreate', {
+                entity,
+              })}
               actions={
                 isEdit
                   ? []

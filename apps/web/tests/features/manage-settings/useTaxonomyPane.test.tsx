@@ -55,9 +55,26 @@ const TAXONOMY: ContactTaxonomy = {
       enabled: true,
     },
   ],
+  lifecycleStages: [
+    {
+      key: 'lead',
+      label: 'Lead',
+      description: null,
+      color: '#60A5FA',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
 }
 
-let usage: ContactTaxonomyUsage = { statuses: {}, sources: {}, types: {}, tags: {} }
+let usage: ContactTaxonomyUsage = {
+  statuses: {},
+  sources: {},
+  types: {},
+  lifecycleStages: {},
+  tags: {},
+}
 
 let contacts = {
   taxonomy: TAXONOMY as ContactTaxonomy | null,
@@ -86,7 +103,7 @@ vi.mock('@/features/manage-settings/query/useTaxonomyUsage', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
-  usage = { statuses: {}, sources: {}, types: {}, tags: {} }
+  usage = { statuses: {}, sources: {}, types: {}, lifecycleStages: {}, tags: {} }
   contacts = {
     taxonomy: TAXONOMY,
     isLoading: false,

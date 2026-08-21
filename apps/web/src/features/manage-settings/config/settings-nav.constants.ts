@@ -4,6 +4,7 @@ import {
   BellIcon,
   BuildingsIcon,
   PaletteIcon,
+  ShapesIcon,
   SidebarSimpleIcon,
   StackIcon,
   TextAaIcon,
@@ -56,6 +57,7 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
         icon: TextAaIcon,
         available: true,
       },
+      { key: 'fields', href: SETTINGS.fields, icon: ShapesIcon, available: true },
       { key: 'pipelines', href: SETTINGS.pipelines, icon: StackIcon, available: false },
       {
         key: 'contacts',
@@ -64,6 +66,7 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
         available: true,
         children: [
           { key: 'status', href: SETTINGS.contacts.status },
+          { key: 'lifecycle', href: SETTINGS.contacts.lifecycle },
           { key: 'sources', href: SETTINGS.contacts.sources },
           { key: 'types', href: SETTINGS.contacts.types },
           { key: 'tags', href: SETTINGS.contacts.tags },

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { buildContactColumns } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
+import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
 import { buildBulkLabels, useArchiveContacts } from '@/features/archive-contacts'
 import { useCreateFromUrl } from '@/features/create-contact'
@@ -33,6 +34,7 @@ export function useContactsBoard() {
   const table = useContactsTable()
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
+  const terms = useEntityTerms('contact')
   const sheet = useEntityEditor<ContactListItem>()
   const preview = useEntityEditor<ContactListItem>()
   const { archive, isArchiving } = useArchiveContacts()
@@ -98,13 +100,16 @@ export function useContactsBoard() {
 
   const listOrder = workspace.data?.tableState.listOrder
   const items = useMemo(() => {
-    const built = buildSmartLists(t, counts, taxonomy.statuses)
+    const built = buildSmartLists(t, counts, taxonomy.statuses, {
+      entity: terms.lowerSingular,
+      entities: terms.lowerPlural,
+    })
     if (!listOrder) return built
     return [...built].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
       return listOrder.indexOf(a.id) - listOrder.indexOf(b.id)
     })
-  }, [t, counts, taxonomy.statuses, listOrder])
+  }, [t, counts, taxonomy.statuses, listOrder, terms])
 
   const { handleStatus } = table
   const selectList = useCallback((id: string) => handleStatus(listIdToStatus(id)), [handleStatus])
@@ -118,8 +123,9 @@ export function useContactsBoard() {
         description: items.find((item) => item.id === activeListId)?.description,
         counts,
         withoutEmail: table.rows.filter((row) => !row.email).length,
+        entityTerms: { entity: terms.lowerSingular, entities: terms.lowerPlural },
       }),
-    [t, items, activeListId, counts, table.rows],
+    [t, items, activeListId, counts, table.rows, terms],
   )
 
   const isPending = table.isPending || workspace.isPending
@@ -143,7 +149,10 @@ export function useContactsBoard() {
       isArchiving,
       listHints,
       bulkLabels,
-      quickFilters: buildQuickFilterDefs(t, table.filters, taxonomy.sources),
+      quickFilters: buildQuickFilterDefs(t, table.filters, {
+        sources: taxonomy.sources,
+        lifecycleStages: taxonomy.lifecycleStages,
+      }),
     },
     actions: {
       onSelectList: selectList,

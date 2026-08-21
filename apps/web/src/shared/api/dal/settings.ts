@@ -5,6 +5,8 @@ import { apiFetch } from '../client'
 
 import type {
   ContactTaxonomy,
+  CustomFieldEntity,
+  FieldDef,
   GeneralSettings,
   NomenclatureConfig,
   OnboardingStatus,
@@ -21,6 +23,9 @@ export const getTheme = () =>
 
 export const getContactTaxonomy = () =>
   apiFetch<ContactTaxonomy>('/settings/contact-taxonomy', { cache: 'no-store' })
+
+export const getCustomFields = (entity: CustomFieldEntity) =>
+  apiFetch<FieldDef[]>(`/settings/custom-fields/${entity}`, { cache: 'no-store' })
 
 export const getNavigation = () =>
   apiFetch<SidebarConfig>('/settings/navigation', { cache: 'no-store' })

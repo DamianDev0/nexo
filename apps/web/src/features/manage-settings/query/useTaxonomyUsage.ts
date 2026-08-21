@@ -11,7 +11,13 @@ import type { ContactTaxonomyUsage, TaxonomyReassignKind } from '@repo/shared-ty
 
 const USAGE_STALE_MS = 60 * 1000
 
-const EMPTY_USAGE: ContactTaxonomyUsage = { statuses: {}, sources: {}, types: {}, tags: {} }
+const EMPTY_USAGE: ContactTaxonomyUsage = {
+  statuses: {},
+  sources: {},
+  types: {},
+  lifecycleStages: {},
+  tags: {},
+}
 
 export function useTaxonomyUsage() {
   const { data } = useQuery({

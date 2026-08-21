@@ -21,8 +21,15 @@ const SOURCES: ReadonlyArray<TaxonomyChoice> = [
   { key: 'whatsapp', label: 'WhatsApp', color: '#22C55E' },
 ]
 
+const LIFECYCLE_STAGES: ReadonlyArray<TaxonomyChoice> = [
+  { key: LifecycleStage.SUBSCRIBER, label: 'Suscriptor', color: '#94A3B8' },
+  { key: LifecycleStage.LEAD, label: 'Lead ES', color: '#60A5FA' },
+]
+
+const CHOICES = { sources: SOURCES, lifecycleStages: LIFECYCLE_STAGES }
+
 describe('parseQuickFilters', () => {
-  it('keeps a lifecycleStage value that belongs to the enum', () => {
+  it('keeps a lifecycleStage value that matches the taxonomy key pattern', () => {
     const state = parseQuickFilters((key) =>
       key === 'lifecycleStage' ? LifecycleStage.LEAD : null,
     )
@@ -30,16 +37,16 @@ describe('parseQuickFilters', () => {
     expect(state.lifecycleStage).toEqual([LifecycleStage.LEAD])
   })
 
-  it('drops a lifecycleStage value outside the enum', () => {
+  it('drops a lifecycleStage value that does not match the taxonomy key pattern', () => {
     const state = parseQuickFilters((key) => (key === 'lifecycleStage' ? 'not-a-stage' : null))
 
     expect(state.lifecycleStage).toEqual([])
   })
 
-  it('validates lifecycleStage against the enum even when the value is a valid taxonomy key', () => {
+  it('keeps a custom lifecycleStage key because the tenant owns the catalog', () => {
     const state = parseQuickFilters((key) => (key === 'lifecycleStage' ? 'random_key' : null))
 
-    expect(state.lifecycleStage).toEqual([])
+    expect(state.lifecycleStage).toEqual(['random_key'])
   })
 
   it('keeps a source value that matches the taxonomy key pattern', () => {
@@ -116,22 +123,22 @@ describe('hasQuickFilters', () => {
 
 describe('buildQuickFilterDefs', () => {
   it('builds the source options from the provided taxonomy choices', () => {
-    const defs = buildQuickFilterDefs(t, EMPTY_QUICK_FILTERS, SOURCES)
+    const defs = buildQuickFilterDefs(t, EMPTY_QUICK_FILTERS, CHOICES)
 
     const sourceDef = defs.find((def) => def.id === 'source')
     expect(sourceDef?.options.map((o) => o.value)).toEqual(['manual', 'whatsapp'])
     expect(sourceDef?.options.map((o) => o.label)).toEqual(['Manual', 'WhatsApp'])
   })
 
-  it('builds lifecycle stage options using the translated label fallback', () => {
-    const defs = buildQuickFilterDefs(t, EMPTY_QUICK_FILTERS, SOURCES)
+  it('builds lifecycle stage options from the provided taxonomy choices', () => {
+    const defs = buildQuickFilterDefs(t, EMPTY_QUICK_FILTERS, CHOICES)
 
     const lifecycleDef = defs.find((def) => def.id === 'lifecycleStage')
-    expect(lifecycleDef?.options.map((o) => o.value)).toEqual(Object.values(LifecycleStage))
-    expect(lifecycleDef?.options[0]).toMatchObject({
-      value: LifecycleStage.SUBSCRIBER,
-      label: LifecycleStage.SUBSCRIBER,
-    })
+    expect(lifecycleDef?.options.map((o) => o.value)).toEqual([
+      LifecycleStage.SUBSCRIBER,
+      LifecycleStage.LEAD,
+    ])
+    expect(lifecycleDef?.options.map((o) => o.label)).toEqual(['Suscriptor', 'Lead ES'])
   })
 
   it('resolves labels and hints through the exact translation keys', () => {
@@ -140,12 +147,11 @@ describe('buildQuickFilterDefs', () => {
       'contacts.filters.lifecycleStage': 'Ciclo de vida',
       'common.filters.hints.source.whatsapp': 'Canal directo',
       [`common.filters.hints.lifecycleStage.${LifecycleStage.LEAD}`]: 'Pinta bien',
-      [`contacts.lifecycleStage.${LifecycleStage.LEAD}`]: 'Lead ES',
     }
     const tExact = ((key: string, opts?: { defaultValue?: string }) =>
       translations[key] ?? opts?.defaultValue ?? key) as TFunction
 
-    const defs = buildQuickFilterDefs(tExact, EMPTY_QUICK_FILTERS, SOURCES)
+    const defs = buildQuickFilterDefs(tExact, EMPTY_QUICK_FILTERS, CHOICES)
     const sourceDef = defs.find((def) => def.id === 'source')
     const lifecycleDef = defs.find((def) => def.id === 'lifecycleStage')
 

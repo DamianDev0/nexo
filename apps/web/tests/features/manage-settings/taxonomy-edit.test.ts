@@ -206,6 +206,7 @@ describe('sameTaxonomy', () => {
     statuses: [option({ key: 'new', order: 1 })],
     sources: [option({ key: 'manual', order: 1 })],
     types: [option({ key: 'customer', order: 1 })],
+    lifecycleStages: [option({ key: 'lead', order: 1 })],
   }
 
   it('returns true for equal taxonomies', () => {
@@ -213,6 +214,7 @@ describe('sameTaxonomy', () => {
       statuses: [...base.statuses],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, clone)).toBe(true)
   })
@@ -222,6 +224,7 @@ describe('sameTaxonomy', () => {
       statuses: [...base.statuses],
       sources: [...base.sources],
       types: [{ ...base.types[0]!, label: 'Cliente VIP' }],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -231,6 +234,7 @@ describe('sameTaxonomy', () => {
       statuses: [{ ...base.statuses[0]!, label: 'Nuevo!' }],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -240,6 +244,7 @@ describe('sameTaxonomy', () => {
       statuses: [{ ...base.statuses[0]!, order: 2 }],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -249,6 +254,7 @@ describe('sameTaxonomy', () => {
       statuses: [{ ...base.statuses[0]!, key: 'other' }],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -258,6 +264,7 @@ describe('sameTaxonomy', () => {
       statuses: [{ ...base.statuses[0]!, color: '#000000' }],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -267,6 +274,7 @@ describe('sameTaxonomy', () => {
       statuses: [{ ...base.statuses[0]!, isSystem: !base.statuses[0]!.isSystem }],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -276,6 +284,7 @@ describe('sameTaxonomy', () => {
       statuses: [...base.statuses, option({ key: 'extra', order: 2 })],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(base, other)).toBe(false)
   })
@@ -285,11 +294,13 @@ describe('sameTaxonomy', () => {
       statuses: [option({ key: 'new', order: 1 }), option({ key: 'client', order: 2 })],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     const other = {
       statuses: [multi.statuses[0]!, { ...multi.statuses[1]!, label: 'Cambiado' }],
       sources: [...base.sources],
       types: [...base.types],
+      lifecycleStages: [...base.lifecycleStages],
     }
     expect(sameTaxonomy(multi, other)).toBe(false)
   })

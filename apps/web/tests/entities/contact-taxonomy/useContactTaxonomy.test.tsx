@@ -54,6 +54,17 @@ function taxonomy(overrides: Partial<ContactTaxonomy> = {}): ContactTaxonomy {
         enabled: true,
       },
     ],
+    lifecycleStages: [
+      {
+        key: 'lead',
+        label: null,
+        description: null,
+        color: '#60A5FA',
+        order: 1,
+        isSystem: true,
+        enabled: true,
+      },
+    ],
     ...overrides,
   }
 }

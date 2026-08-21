@@ -2,6 +2,8 @@ import { request } from '@/shared/api/request'
 
 import type {
   ContactTaxonomy,
+  CustomFieldEntity,
+  FieldDef,
   GeneralSettings,
   OnboardingStatus,
   Pipeline,
@@ -19,6 +21,18 @@ function fileForm(file: File): FormData {
 const settingsService = {
   getContactTaxonomy: () =>
     request<ContactTaxonomy>({ method: 'get', url: '/settings/contact-taxonomy' }),
+
+  getCustomFields: (entity: CustomFieldEntity) =>
+    request<FieldDef[]>({ method: 'get', url: `/settings/custom-fields/${entity}` }),
+
+  createCustomField: (entity: CustomFieldEntity, data: FieldDef) =>
+    request<FieldDef>({ method: 'post', url: `/settings/custom-fields/${entity}`, data }),
+
+  patchCustomField: (entity: CustomFieldEntity, key: string, data: Partial<FieldDef>) =>
+    request<FieldDef>({ method: 'patch', url: `/settings/custom-fields/${entity}/${key}`, data }),
+
+  archiveCustomField: (entity: CustomFieldEntity, key: string) =>
+    request<void>({ method: 'delete', url: `/settings/custom-fields/${entity}/${key}` }),
 
   updateContactTaxonomy: (data: ContactTaxonomy) =>
     request<ContactTaxonomy>({ method: 'patch', url: '/settings/contact-taxonomy', data }),

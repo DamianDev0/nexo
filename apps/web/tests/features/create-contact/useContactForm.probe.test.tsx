@@ -15,7 +15,12 @@ import type {
 
 import { useContactForm } from '@/features/create-contact/model/useContactForm'
 
-const EMPTY_TAXONOMY: ContactTaxonomy = { statuses: [], sources: [], types: [] }
+const EMPTY_TAXONOMY: ContactTaxonomy = {
+  statuses: [],
+  sources: [],
+  types: [],
+  lifecycleStages: [],
+}
 
 const server = createMswServer()
 
@@ -23,6 +28,10 @@ function taxonomyHandler() {
   return http.get(`${API}/settings/contact-taxonomy`, () =>
     HttpResponse.json({ data: EMPTY_TAXONOMY }),
   )
+}
+
+function customFieldsHandler() {
+  return http.get(`${API}/settings/custom-fields/contacts`, () => HttpResponse.json({ data: [] }))
 }
 
 function match(field: ContactDuplicateMatch['field']): ContactDuplicateMatch {
@@ -63,6 +72,7 @@ describe('useContactForm probeField', () => {
     const urls: URL[] = []
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       probeHandler(
         { severity: 'hard', field: 'email', matches: [match('email')], canForce: false },
         (url) => urls.push(url),
@@ -89,6 +99,7 @@ describe('useContactForm probeField', () => {
     const urls: URL[] = []
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       probeHandler(null, (url) => urls.push(url)),
     )
     const contact = CONTACTS_FIXTURE[0] as ContactListItem
@@ -115,6 +126,7 @@ describe('useContactForm probeField', () => {
     const urls: URL[] = []
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       probeHandler(null, (url) => urls.push(url)),
     )
     const contact = CONTACTS_FIXTURE[0] as ContactListItem
@@ -138,6 +150,7 @@ describe('useContactForm probeField', () => {
   it('sets a phone error on a soft phone duplicate', async () => {
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       probeHandler({ severity: 'soft', field: 'phone', matches: [match('phone')], canForce: true }),
     )
     const { result } = renderContactForm()
@@ -157,6 +170,7 @@ describe('useContactForm probeField', () => {
   it('stays silent when the probe request fails', async () => {
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       http.get(`${API}/contacts/duplicates/probe`, () => HttpResponse.error()),
     )
     const { result } = renderContactForm()
@@ -175,6 +189,7 @@ describe('useContactForm probeField', () => {
   it('clears the duplicate error as soon as the field is edited again', async () => {
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       probeHandler({
         severity: 'hard',
         field: 'email',
@@ -204,6 +219,7 @@ describe('useContactForm probeField', () => {
     const releases: Array<() => void> = []
     server.use(
       taxonomyHandler(),
+      customFieldsHandler(),
       http.get(`${API}/contacts/duplicates/probe`, async () => {
         await new Promise<void>((resolve) => releases.push(resolve))
         return HttpResponse.json({

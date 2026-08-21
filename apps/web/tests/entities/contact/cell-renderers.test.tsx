@@ -19,6 +19,7 @@ const CONTEXT: ContactColumnContext = {
     statusByKey: new Map([['new', { key: 'new', label: 'Nuevo', color: '#3B82F6' }]]),
     sourceByKey: new Map([['manual', { key: 'manual', label: 'Manual', color: '#64748B' }]]),
     typeByKey: new Map(),
+    lifecycleByKey: new Map([['lead', { key: 'lead', label: 'Lead', color: '#60A5FA' }]]),
   },
 }
 

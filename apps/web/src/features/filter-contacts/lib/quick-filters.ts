@@ -2,7 +2,6 @@ import { TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
 
 import {
   EMPTY_QUICK_FILTERS,
-  LIFECYCLE_STAGE_OPTIONS,
   QUICK_FILTER_ICONS,
   QUICK_FILTER_IDS,
   type QuickFilterId,
@@ -13,14 +12,12 @@ import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { QuickFilterDef } from '@/shared/ui/organisms/data-table'
 import type { TFunction } from 'i18next'
 
-const LIFECYCLE_SET = new Set(LIFECYCLE_STAGE_OPTIONS)
-
 function isQuickFilterId(value: string): value is QuickFilterId {
   return (QUICK_FILTER_IDS as ReadonlyArray<string>).includes(value)
 }
 
-function isAllowed(id: QuickFilterId, value: string): boolean {
-  return id === 'lifecycleStage' ? LIFECYCLE_SET.has(value) : TAXONOMY_KEY_PATTERN.test(value)
+function isAllowed(_id: QuickFilterId, value: string): boolean {
+  return TAXONOMY_KEY_PATTERN.test(value)
 }
 
 export function parseQuickFilters(
@@ -59,26 +56,20 @@ export function hasQuickFilters(state: QuickFilterState): boolean {
 export function buildQuickFilterDefs(
   t: TFunction,
   state: QuickFilterState,
-  sources: ReadonlyArray<TaxonomyChoice>,
+  choices: {
+    sources: ReadonlyArray<TaxonomyChoice>
+    lifecycleStages: ReadonlyArray<TaxonomyChoice>
+  },
 ): ReadonlyArray<QuickFilterDef> {
   return QUICK_FILTER_IDS.map((id) => ({
     id,
     label: t(`contacts.filters.${id}`),
     selected: state[id],
-    options:
-      id === 'source'
-        ? sources.map((source) => ({
-            value: source.key,
-            label: source.label,
-            hint: t(`common.filters.hints.source.${source.key}`, { defaultValue: '' }) || undefined,
-            icon: QUICK_FILTER_ICONS.source,
-          }))
-        : LIFECYCLE_STAGE_OPTIONS.map((value) => ({
-            value,
-            label: t(`contacts.lifecycleStage.${value}`, { defaultValue: value }),
-            hint:
-              t(`common.filters.hints.lifecycleStage.${value}`, { defaultValue: '' }) || undefined,
-            icon: QUICK_FILTER_ICONS.lifecycleStage,
-          })),
+    options: (id === 'source' ? choices.sources : choices.lifecycleStages).map((choice) => ({
+      value: choice.key,
+      label: choice.label,
+      hint: t(`common.filters.hints.${id}.${choice.key}`, { defaultValue: '' }) || undefined,
+      icon: QUICK_FILTER_ICONS[id],
+    })),
   }))
 }

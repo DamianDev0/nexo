@@ -30,6 +30,7 @@ export const QUERY_KEYS = {
     theme: ['settings', 'theme'] as const,
     onboarding: ['settings', 'onboarding'] as const,
     contactTaxonomy: ['settings', 'contact-taxonomy'] as const,
+    customFields: (entity: string) => ['settings', 'custom-fields', entity] as const,
   },
   tags: {
     all: ['tags'] as const,

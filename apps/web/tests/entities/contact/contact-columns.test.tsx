@@ -12,7 +12,12 @@ import { buildContactColumns } from '@/entities/contact/ui/columns/contact-colum
 const CONTEXT = {
   t: ((key: string) => key) as never,
   locale: 'es-CO',
-  taxonomy: { statusByKey: new Map(), sourceByKey: new Map(), typeByKey: new Map() },
+  taxonomy: {
+    statusByKey: new Map(),
+    sourceByKey: new Map(),
+    typeByKey: new Map(),
+    lifecycleByKey: new Map(),
+  },
 }
 
 function columnsFor() {

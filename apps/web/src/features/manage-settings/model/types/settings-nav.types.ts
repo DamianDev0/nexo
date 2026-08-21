@@ -10,6 +10,7 @@ export type SettingsSectionKey =
   | 'appearance'
   | 'navigation'
   | 'nomenclature'
+  | 'fields'
   | 'pipelines'
   | 'contacts'
 

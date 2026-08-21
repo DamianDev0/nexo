@@ -1,3 +1,4 @@
+import { CUSTOM_COLUMN_PREFIX } from '@repo/shared-types'
 import { formatDateShortCO } from '@repo/shared-utils'
 
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
@@ -51,6 +52,13 @@ function numeric(value: string | number | null): ReactNode {
 function labelFor(map: ReadonlyMap<string, TaxonomyChoice>, key: string | null): string | null {
   if (!key) return null
   return map.get(key)?.label ?? key
+}
+
+function customFieldText(value: unknown): string | null {
+  if (value === null || value === undefined || value === '') return null
+  if (Array.isArray(value)) return value.map((item) => customFieldText(item) ?? '').join(', ')
+  if (typeof value === 'object') return JSON.stringify(value)
+  return typeof value === 'string' ? value : JSON.stringify(value)
 }
 
 const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
@@ -133,11 +141,9 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
   source: (contact, { taxonomy }) => muted(labelFor(taxonomy.sourceByKey, contact.source)),
   type: (contact, { taxonomy }) =>
     muted(contact.typeLabel ?? labelFor(taxonomy.typeByKey, contact.type)),
-  lifecycleStage: (contact, { t }) => (
+  lifecycleStage: (contact, { taxonomy }) => (
     <ContactStageCell
-      label={t(`contacts.lifecycleStage.${contact.lifecycleStage}`, {
-        defaultValue: contact.lifecycleStage,
-      })}
+      label={labelFor(taxonomy.lifecycleByKey, contact.lifecycleStage) ?? contact.lifecycleStage}
     />
   ),
   lastContactedAt: (contact, { locale, labels }) => (
@@ -147,5 +153,9 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
 }
 
 export function contactCellRenderer(key: string): ContactCellRenderer {
+  if (key.startsWith(CUSTOM_COLUMN_PREFIX)) {
+    const fieldKey = key.slice(CUSTOM_COLUMN_PREFIX.length)
+    return (contact) => text(customFieldText(contact.customFields?.[fieldKey]))
+  }
   return RENDERERS[key] ?? ((contact) => text(Reflect.get(contact, key) as string | null))
 }

@@ -1,5 +1,3 @@
-import { DEFAULT_CONTACT_STATUS_KEY } from '@repo/shared-types'
-
 import type { ContactFormValues } from '../lib/contact-form.schema'
 
 export const CONTACT_FORM_DEFAULTS: ContactFormValues = {
@@ -13,7 +11,7 @@ export const CONTACT_FORM_DEFAULTS: ContactFormValues = {
   city: '',
   municipioCode: '',
   avatarUrl: '',
-  status: DEFAULT_CONTACT_STATUS_KEY,
+  status: '',
   source: '',
   type: '',
   typeLabel: '',

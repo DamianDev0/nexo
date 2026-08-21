@@ -3,6 +3,7 @@
 import { formatDateTimeCO, timeAgo } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
+import { useEntityTerms } from '@/entities/nomenclature'
 import { cn } from '@/shared/lib/cn'
 import { Avatar } from '@/shared/ui/atoms/avatar'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
@@ -41,6 +42,7 @@ export function ContactPreviewSheet({
   taxonomy,
 }: Readonly<ContactPreviewSheetProps>) {
   const { t, i18n } = useTranslation()
+  const terms = useEntityTerms('contact')
   if (!contact) return null
 
   const name = contactFullName(contact)
@@ -61,7 +63,7 @@ export function ContactPreviewSheet({
                 {name}
               </SheetTitle>
               <SheetDescription className="truncate text-xs text-muted-foreground">
-                {contact.jobTitle ?? t('contacts.preview.subtitle')}
+                {contact.jobTitle ?? terms.singular}
               </SheetDescription>
             </span>
           </span>
@@ -76,9 +78,7 @@ export function ContactPreviewSheet({
               )}
             </span>
             <BadgeSoft tone="outline">
-              {t(`contacts.lifecycleStage.${contact.lifecycleStage}`, {
-                defaultValue: contact.lifecycleStage,
-              })}
+              {taxonomy.lifecycleByKey.get(contact.lifecycleStage)?.label ?? contact.lifecycleStage}
             </BadgeSoft>
           </span>
         </SheetHeader>
@@ -126,7 +126,7 @@ export function ContactPreviewSheet({
         {onEdit && (
           <SheetFooter className="border-t border-border px-6 py-4">
             <PillButton size="md" onClick={() => onEdit(contact)}>
-              {t('contacts.preview.openFull')}
+              {t('contacts.preview.openFull', { entity: terms.lowerSingular })}
             </PillButton>
           </SheetFooter>
         )}

@@ -57,6 +57,17 @@ const TAXONOMY: ContactTaxonomy = {
       enabled: true,
     },
   ],
+  lifecycleStages: [
+    {
+      key: 'lead',
+      label: 'Lead',
+      description: null,
+      color: '#60A5FA',
+      order: 1,
+      isSystem: true,
+      enabled: true,
+    },
+  ],
 }
 
 function getHandler(data: ContactTaxonomy) {

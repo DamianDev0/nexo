@@ -47,6 +47,7 @@ export type ContactTaxonomyMaps = {
   readonly statusByKey: ReadonlyMap<string, TaxonomyChoice>
   readonly sourceByKey: ReadonlyMap<string, TaxonomyChoice>
   readonly typeByKey: ReadonlyMap<string, TaxonomyChoice>
+  readonly lifecycleByKey: ReadonlyMap<string, TaxonomyChoice>
 }
 
 export type ContactColumnContext = {
