@@ -12,6 +12,8 @@ import { Input } from '@/shared/ui/shadcn/input'
 
 import type { ReactNode } from 'react'
 
+const ASYNC_SELECT_COLLISION_PADDING = 12
+
 export interface AsyncSelectSource<T> {
   readonly fetcher: (query: string) => Promise<ReadonlyArray<T>>
   readonly getValue: (option: T) => string
@@ -109,6 +111,7 @@ export function AsyncSelect<T>({
         align="start"
         autoFocusContent
         subtle
+        collisionPadding={ASYNC_SELECT_COLLISION_PADDING}
         className="w-(--radix-popover-trigger-width) p-0"
       >
         <Command shouldFilter={false}>
@@ -121,7 +124,7 @@ export function AsyncSelect<T>({
               className="rounded-b-none border-none pl-8.5 focus-visible:ring-0"
             />
           </div>
-          <CommandList className="max-h-[min(16rem,calc(var(--radix-popover-content-available-height)-3.25rem))] scroll-py-1 p-1 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <CommandList className="max-h-[min(16rem,max(9rem,calc(var(--radix-popover-content-available-height)-3.25rem)))] scroll-py-1 p-1 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {!loading && visible.length === 0 && (
               <CommandEmpty className="px-2.5 py-4 text-center text-sm text-muted-foreground">
                 {emptyContent}

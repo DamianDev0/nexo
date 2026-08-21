@@ -2,6 +2,8 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { useEntityTerms } from '@/entities/nomenclature'
+
 import { PAGE_SIZE_OPTIONS } from '@/shared/config/pagination'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
@@ -25,12 +27,18 @@ export function ContactsPagination({
   onLimitChange,
 }: Readonly<ContactsPaginationProps>) {
   const { t } = useTranslation()
+  const terms = useEntityTerms('contact')
   const range = pageRange(nav.page, nav.limit, nav.total)
 
   return (
     <div className="mt-auto flex shrink-0 items-center justify-between gap-4 px-7 py-1.5">
       <span className="truncate text-xs tabular-nums text-muted-foreground">
-        {t('contacts.pageRange', { from: range.from, to: range.to, total: range.total })}
+        {t('contacts.pageRange', {
+          from: range.from,
+          to: range.to,
+          total: range.total,
+          entities: terms.lowerPlural,
+        })}
       </span>
 
       <DataTable.Pagination

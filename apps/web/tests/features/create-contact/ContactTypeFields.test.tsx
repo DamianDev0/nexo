@@ -1,4 +1,14 @@
 import { render, screen } from '@testing-library/react'
+import { vi } from 'vitest'
+
+vi.mock('@/entities/nomenclature', () => ({
+  useEntityTerms: () => ({
+    singular: 'Contacto',
+    plural: 'Contactos',
+    lowerSingular: 'contacto',
+    lowerPlural: 'contactos',
+  }),
+}))
 import { useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 

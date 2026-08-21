@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
+import { useModuleLabels } from '@/entities/nomenclature'
 import { expandCollapse, smoothEase, useReducedTransition } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
@@ -19,9 +20,10 @@ interface SettingsNavItemProps {
 
 export function SettingsNavItem({ section, pathname, isActive }: Readonly<SettingsNavItemProps>) {
   const { t } = useTranslation()
+  const moduleLabel = useModuleLabels()
   const submenuTransition = useReducedTransition(smoothEase)
   const { key, href, icon: Icon, available, children } = section
-  const label = t(`settings.sections.${key}`)
+  const label = moduleLabel(key, `settings.sections.${key}`)
 
   if (!available) {
     return (

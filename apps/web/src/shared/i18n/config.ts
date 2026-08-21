@@ -22,7 +22,7 @@ i18n
     defaultNS: 'translation',
     interpolation: { escapeValue: false },
     detection: {
-      order: ['cookie', 'navigator'],
+      order: ['cookie'],
       caches: ['cookie'],
       lookupCookie: LOCALE_COOKIE,
       cookieMinutes: 525600,

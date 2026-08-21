@@ -15,13 +15,17 @@ export function buildSmartLists(
   t: TFunction,
   counts: Record<string, number | undefined>,
   statuses: ReadonlyArray<TaxonomyChoice>,
+  terms?: { entity: string; entities: string },
 ): ReadonlyArray<SmartListItem> {
   return [
     {
       id: LIST_ALL,
       label: t('contacts.lists.all'),
       count: counts[LIST_ALL],
-      description: t('contacts.lists.descriptions.all'),
+      description: t('contacts.lists.descriptions.all', {
+        entity: terms?.entity ?? '',
+        entities: terms?.entities ?? '',
+      }),
       pinned: true,
     },
     ...statuses.map((status) => ({

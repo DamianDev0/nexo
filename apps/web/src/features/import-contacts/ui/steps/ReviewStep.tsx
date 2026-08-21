@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useEntityLabels } from '@/entities/nomenclature'
 import { Note } from '@/shared/ui/atoms/note'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
 
@@ -21,6 +22,7 @@ interface ReviewStepProps {
 
 export function ReviewStep({ report, strategy }: Readonly<ReviewStepProps>) {
   const { t } = useTranslation()
+  const entityLabel = useEntityLabels()
   const [filter, setFilter] = useState<ImportIssueFilter>('all')
 
   const issues = filterIssues(report.issues, filter)
@@ -45,6 +47,7 @@ export function ReviewStep({ report, strategy }: Readonly<ReviewStepProps>) {
         {t(`contacts.import.review.${strategy}Summary`, {
           ready: report.readyRows,
           errors: report.errorRows,
+          entities: entityLabel('contact', 'plural'),
         })}
       </Note>
 

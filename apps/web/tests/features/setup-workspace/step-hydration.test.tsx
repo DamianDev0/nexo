@@ -245,7 +245,7 @@ describe('useStepNomenclature hydration', () => {
     const { result } = renderHook(() => useNomenclatureStep(vi.fn()), { wrapper })
 
     await waitFor(() => expect(result.current.nomen.contact.singular).toBe('Paciente'))
-    expect(result.current.nomen.deal.singular).toBe('Deal')
+    expect(result.current.nomen.deal.singular).toBe('Negocio')
   })
 })
 
@@ -591,8 +591,8 @@ describe('useStepNomenclature actions', () => {
     server.use(hydratedNomenclature())
     const { result } = renderHook(() => useNomenclatureStep(vi.fn()), { wrapper })
 
-    expect(result.current.nomen.contact.singular).toBe('Contact')
-    expect(result.current.nomen.deal.singular).toBe('Deal')
+    expect(result.current.nomen.contact.singular).toBe('Contacto')
+    expect(result.current.nomen.deal.singular).toBe('Negocio')
   })
 
   it('updates a single term field and marks the form dirty', async () => {
@@ -615,7 +615,7 @@ describe('useStepNomenclature actions', () => {
 
     act(() => result.current.handlePreset('b2b'))
     expect(result.current.nomen.contact.singular).toBe('Lead')
-    expect(result.current.nomen.deal.singular).toBe('Opportunity')
+    expect(result.current.nomen.deal.singular).toBe('Oportunidad')
     expect(result.current.isDirty).toBe(true)
 
     act(() => result.current.handlePreset('not-a-preset'))
@@ -633,7 +633,7 @@ describe('useStepNomenclature actions', () => {
     act(() => result.current.handleReset())
 
     await waitFor(() => expect(result.current.isDirty).toBe(false))
-    expect(result.current.nomen.company.singular).toBe('Company')
+    expect(result.current.nomen.company.singular).toBe('Empresa')
   })
 
   it('shows an error toast and does not advance when the API rejects the save', async () => {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useEntityLabels } from '@/entities/nomenclature'
 import { ROUTES } from '@/shared/config/routes'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { CaretLeftIcon } from '@/shared/ui/icons'
@@ -23,6 +24,8 @@ const SHELL = 'mx-auto w-full max-w-5xl px-8'
 
 export function ImportWizard() {
   const { t } = useTranslation()
+  const entityLabel = useEntityLabels()
+  const entities = entityLabel('contact', 'plural')
   const router = useRouter()
   const backToContacts = useCallback(() => router.push(ROUTES.app.contacts.list), [router])
   const { state, actions } = useContactImport(backToContacts)
@@ -35,17 +38,17 @@ export function ImportWizard() {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label={t('contacts.import.actions.backToContacts')}
+            aria-label={t('contacts.import.actions.backToContacts', { entities })}
             onClick={backToContacts}
           >
             <CaretLeftIcon className="size-4" />
           </Button>
           <div className="flex flex-col">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              {t('contacts.import.title')}
+              {t('contacts.import.title', { entities })}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {t(`contacts.import.steps.${state.step}`)}
+              {t(`contacts.import.steps.${state.step}`, { entities })}
             </p>
           </div>
         </div>
@@ -126,14 +129,17 @@ export function ImportWizard() {
               >
                 {state.isImporting
                   ? t('contacts.import.actions.importing')
-                  : t('contacts.import.actions.importCount', { count: state.report.readyRows })}
+                  : t('contacts.import.actions.importCount', {
+                      count: state.report.readyRows,
+                      entities,
+                    })}
               </PillButton>
             </>
           )}
 
           {state.step === 'done' && (
             <PillButton size="md" onClick={actions.onFinish}>
-              {t('contacts.import.actions.viewContacts')}
+              {t('contacts.import.actions.viewContacts', { entities })}
             </PillButton>
           )}
         </div>

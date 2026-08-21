@@ -4,6 +4,7 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { CONTACT_AVATARS } from '@/entities/contact'
+import { useEntityTerms } from '@/entities/nomenclature'
 import { AddressField, MunicipalityCombobox, useResolveMunicipality } from '@/entities/geo'
 import { AvatarPicker } from '@/shared/ui/kokonutui/avatar-picker'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
@@ -35,6 +36,7 @@ export function ContactFormFields({
   onProbeField,
 }: Readonly<ContactFormFieldsProps>) {
   const { t } = useTranslation()
+  const terms = useEntityTerms('contact')
   const { statuses, sources, types } = taxonomy
   const resolveMunicipality = useResolveMunicipality()
 
@@ -134,7 +136,7 @@ export function ContactFormFields({
         control={control}
         name="source"
         label={t('contacts.form.source')}
-        placeholder={t('contacts.form.sourcePlaceholder')}
+        placeholder={t('contacts.form.sourcePlaceholder', { entity: terms.lowerSingular })}
         choices={sources}
       />
       <ContactTypeFields control={control} choices={types} />

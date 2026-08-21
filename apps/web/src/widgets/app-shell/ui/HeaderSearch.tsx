@@ -38,7 +38,12 @@ export function HeaderSearch() {
         </kbd>
       </Button>
 
-      <CommandDialog open={open} onOpenChange={setOpen} title={t('nav.search')}>
+      <CommandDialog
+        open={open}
+        onOpenChange={setOpen}
+        title={t('nav.search')}
+        description={t('nav.searchCommand')}
+      >
         <CommandInput placeholder={t('nav.search')} />
         <CommandList>
           <CommandEmpty>{t('common.noResults')}</CommandEmpty>

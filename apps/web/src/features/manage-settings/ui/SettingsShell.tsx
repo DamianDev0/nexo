@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useModuleLabels } from '@/entities/nomenclature'
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
 import { useScrollTopOnChange } from '@/shared/lib/hooks/useScrollTopOnChange'
@@ -20,6 +21,7 @@ import type { ReactNode } from 'react'
 
 export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
   const { t } = useTranslation()
+  const moduleLabel = useModuleLabels()
   const pathname = usePathname()
   const scrollRef = useRef<HTMLDivElement>(null)
   const contentTransition = useReducedTransition(quickEase)
@@ -39,7 +41,9 @@ export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className={cn('shrink-0 px-8 pt-6', tabs.length > 0 && 'border-b border-border')}>
           <h1 className="text-lg font-black tracking-[-0.02em] text-foreground">
-            {section ? t(`settings.sections.${section.key}`) : t('settings.title')}
+            {section
+              ? moduleLabel(section.key, `settings.sections.${section.key}`)
+              : t('settings.title')}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t('settings.subtitle')}</p>
           {tabs.length > 0 && (

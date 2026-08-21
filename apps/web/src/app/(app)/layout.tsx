@@ -38,7 +38,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
           >
             <AppSidebar />
             <SidebarInset className="min-w-0">
-              <header className="relative z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+              <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
                 <SidebarTrigger className="-ml-1 md:hidden" />
                 <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
                 <HeaderBreadcrumb />

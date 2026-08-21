@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { useEntityTerms } from '@/entities/nomenclature'
 import { expandCollapse, quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 
@@ -21,6 +22,7 @@ interface ContactTypeFieldsProps {
 }
 
 export function ContactTypeFields({ control, choices }: Readonly<ContactTypeFieldsProps>) {
+  const terms = useEntityTerms('contact')
   const { t } = useTranslation()
   const transition = useReducedTransition(quickEase)
   const type = useWatch({ control, name: 'type' })
@@ -31,7 +33,7 @@ export function ContactTypeFields({ control, choices }: Readonly<ContactTypeFiel
         control={control}
         name="type"
         label={t('contacts.form.type')}
-        placeholder={t('contacts.form.typePlaceholder')}
+        placeholder={t('contacts.form.typePlaceholder', { entity: terms.lowerSingular })}
         choices={choices}
       />
       <AnimatePresence initial={false}>
@@ -48,7 +50,7 @@ export function ContactTypeFields({ control, choices }: Readonly<ContactTypeFiel
               control={control}
               name="typeLabel"
               label={t('contacts.form.typeOtherLabel')}
-              placeholder={t('contacts.form.typeOtherPlaceholder')}
+              placeholder={t('contacts.form.typeOtherPlaceholder', { entity: terms.lowerSingular })}
               required
             />
           </motion.div>

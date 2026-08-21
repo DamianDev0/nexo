@@ -17,23 +17,21 @@ beforeEach(() => {
 })
 
 describe('getLocale', () => {
-  it('prefers the locale cookie over the accept-language header', async () => {
+  it('honours the locale cookie', async () => {
     cookieGet.mockReturnValue({ value: 'en' })
-    headerGet.mockReturnValue('es-CO,es;q=0.9')
 
     await expect(getLocale()).resolves.toBe('en')
   })
 
-  it('ignores an invalid cookie and negotiates from the header', async () => {
+  it('ignores an invalid cookie and falls back to Spanish, never the browser language', async () => {
     cookieGet.mockReturnValue({ value: 'fr' })
     headerGet.mockReturnValue('en-US,en;q=0.9')
 
-    await expect(getLocale()).resolves.toBe('en')
+    await expect(getLocale()).resolves.toBe('es')
   })
 
-  it('defaults to es without cookie or header', async () => {
+  it('defaults to es without a cookie', async () => {
     cookieGet.mockReturnValue(undefined)
-    headerGet.mockReturnValue(null)
 
     await expect(getLocale()).resolves.toBe('es')
   })

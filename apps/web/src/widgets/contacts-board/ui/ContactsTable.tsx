@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { ContactsBulkActions } from '@/features/archive-contacts'
 import { ContactsListHint } from '@/features/filter-contacts'
+import { useEntityTerms } from '@/entities/nomenclature'
 import { ROUTES } from '@/shared/config/routes'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { CloudArrowUpIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
@@ -22,6 +23,7 @@ type ContactsTableProps = Readonly<Pick<ContactsBoard, 'instance' | 'lists' | 's
 
 export function ContactsTable({ instance, lists, state, actions }: ContactsTableProps) {
   const { t } = useTranslation()
+  const terms = useEntityTerms('contact')
   const scrollRef = useRef<HTMLDivElement>(null)
 
   return (
@@ -104,14 +106,17 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
             <EmptyState
               fill
               icon={<UsersThreeIcon className="size-5" />}
-              title={t(state.isFiltered ? 'contacts.noResults.title' : 'contacts.empty.title')}
+              title={t(state.isFiltered ? 'contacts.noResults.title' : 'contacts.empty.title', {
+                entities: terms.lowerPlural,
+              })}
               description={t(
                 state.isFiltered ? 'contacts.noResults.description' : 'contacts.empty.description',
+                { entity: terms.lowerSingular },
               )}
             >
               {!state.isFiltered && (
                 <PillButton size="md" onClick={actions.onCreate}>
-                  {t('contacts.empty.cta')}
+                  {t('contacts.empty.cta', { entity: terms.lowerSingular })}
                 </PillButton>
               )}
             </EmptyState>

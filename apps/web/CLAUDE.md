@@ -94,5 +94,5 @@ Every slice exposes `index.ts`. Never import another slice's internals.
 ## Pending (do NOT regress)
 
 - Phase 3/4: entities + Server Actions + kill axios — happens per-feature when real domain pages (contacts, deals, invoices) get built. New mutations should prefer Server Actions with zod + `revalidateTag`.
-- i18n is SSR-aware: locale = `NEXT_LOCALE` cookie > `Accept-Language` > `es`; `<html lang>` dynamic; server strings via `getT()` (`shared/i18n/server.ts`); client i18next syncs through the same cookie; switching lives in `features/switch-language`.
+- i18n is SSR-aware: locale = `NEXT_LOCALE` cookie > `es` (Spanish is the product default — browser `Accept-Language` is deliberately ignored); `<html lang>` dynamic; server strings via `getT()` (`shared/i18n/server.ts`); client i18next syncs through the same cookie; switching lives in `features/switch-language`.
 - Remaining baseline debt: 10 files >200 lines, 11 raw primitives (wizard tiles), 3 color entries (dynamic hsla + vendor var()).

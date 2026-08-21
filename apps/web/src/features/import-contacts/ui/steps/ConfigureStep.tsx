@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { useEntityLabels } from '@/entities/nomenclature'
 import { cn } from '@/shared/lib/cn'
 import { Note } from '@/shared/ui/atoms/note'
 import { CheckIcon } from '@/shared/ui/icons'
@@ -26,6 +27,11 @@ export function ConfigureStep({
   onRestart,
 }: Readonly<ConfigureStepProps>) {
   const { t } = useTranslation()
+  const entityLabel = useEntityLabels()
+  const names = {
+    entity: entityLabel('contact', 'singular'),
+    entities: entityLabel('contact', 'plural'),
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -33,7 +39,7 @@ export function ConfigureStep({
 
       <fieldset className="flex flex-col gap-2">
         <legend className="pb-2 text-sm font-medium text-foreground">
-          {t('contacts.import.strategy.title')}
+          {t('contacts.import.strategy.title', names)}
         </legend>
 
         {IMPORT_STRATEGIES.map((option) => {
@@ -59,7 +65,7 @@ export function ConfigureStep({
                   {t(`contacts.import.strategy.${option}`)}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {t(`contacts.import.strategy.${option}Hint`)}
+                  {t(`contacts.import.strategy.${option}Hint`, names)}
                 </span>
               </span>
             </OptionTile>
@@ -67,7 +73,7 @@ export function ConfigureStep({
         })}
       </fieldset>
 
-      <Note>{t('contacts.import.strategy.matchNote')}</Note>
+      <Note>{t('contacts.import.strategy.matchNote', names)}</Note>
     </div>
   )
 }
