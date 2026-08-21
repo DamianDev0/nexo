@@ -27,6 +27,14 @@ function searchBox(page: Page) {
   return page.getByPlaceholder('Nombre, email, teléfono o documento')
 }
 
+async function openSearch(page: Page): Promise<void> {
+  const toggle = page.locator('[data-slot="table-search"]').getByRole('button')
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+    await toggle.click()
+    await expect(searchBox(page)).toBeVisible()
+  }
+}
+
 test.describe('contacts › journey', () => {
   test.beforeAll(async ({ request }) => {
     workspace = await onboardWorkspace(request)
@@ -41,7 +49,7 @@ test.describe('contacts › journey', () => {
     await expect(page.getByText('Aún no hay contactos')).toBeVisible()
 
     await page.getByRole('button', { name: 'Crear contacto' }).click()
-    await expect(page.getByRole('heading', { name: 'Nuevo contacto' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /^Nuevo /i })).toBeVisible()
     await page.locator('input[name="firstName"]').fill('Valentina')
     await page.locator('input[name="lastName"]').fill('Restrepo')
     await page.locator('input[name="email"]').fill('valentina@acme.co')
@@ -49,21 +57,22 @@ test.describe('contacts › journey', () => {
     const created = page.waitForResponse(
       (res) => res.url().includes('/contacts') && res.request().method() === 'POST',
     )
-    await page.getByRole('button', { name: 'Crear contacto', exact: true }).last().click()
+    await page
+      .getByRole('button', { name: /^Crear /i })
+      .last()
+      .click()
     expect((await created).status()).toBe(201)
 
-    await expect(page.getByRole('heading', { name: 'Nuevo contacto' })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: /^Nuevo /i })).toHaveCount(0)
     await expect(page.getByText('Valentina Restrepo')).toBeVisible()
   })
 
-  test('edits the contact from the row menu', async ({ page }) => {
+  test('edits the contact from the quick preview', async ({ page }) => {
     await openContacts(page)
 
-    const row = page
-      .locator('[data-slot="table-body"] > div')
-      .filter({ hasText: 'Valentina Restrepo' })
-    await row.getByRole('button', { name: 'Abrir acciones' }).click()
-    await page.getByRole('menuitem', { name: 'Editar' }).click()
+    const row = page.getByRole('row').filter({ hasText: 'Valentina Restrepo' })
+    await row.getByRole('button', { name: 'Vista rápida' }).click()
+    await page.getByRole('button', { name: 'Editar contacto' }).click()
     await expect(page.getByRole('heading', { name: 'Editar contacto' })).toBeVisible()
 
     await page.locator('input[name="lastName"]').fill('Restrepo Vélez')
@@ -81,6 +90,7 @@ test.describe('contacts › journey', () => {
     await openContacts(page)
     await expect(page.getByText('6 contactos')).toBeVisible()
 
+    await openSearch(page)
     await searchBox(page).fill('carlos')
     await expect(page).toHaveURL(/q=carlos/)
     await expect(page.getByText('Carlos Gómez')).toBeVisible()
@@ -105,7 +115,7 @@ test.describe('contacts › journey', () => {
   test('smart lists filter by status, hotkey returns to all', async ({ page }) => {
     await openContacts(page)
 
-    await page.getByRole('button', { name: /^Calificado \d+$/ }).press('Enter')
+    await page.getByRole('tab', { name: /^Calificado \d+$/ }).press('Enter')
     await expect(page.getByText('Ana Ruiz')).toBeVisible()
     await expect(page.getByText('Luis Pérez')).toHaveCount(0)
 
@@ -128,6 +138,7 @@ test.describe('contacts › journey', () => {
     })
 
     const staleIssued = page.waitForRequest((req) => req.url().includes('q=valen'))
+    await openSearch(page)
     await searchBox(page).fill('valen')
     await staleIssued
     const staleSettled = page.waitForResponse((res) => res.url().includes('q=valen'))
@@ -142,15 +153,14 @@ test.describe('contacts › journey', () => {
   test('bulk select all archives every contact', async ({ page }) => {
     await openContacts(page)
 
-    await page.getByRole('checkbox', { name: 'Select all rows' }).click()
-    const bulkBar = page.locator('[data-slot="table-bulk-bar"]')
-    await expect(bulkBar).toContainText('6 contactos seleccionados')
+    await page.getByRole('checkbox', { name: 'Seleccionar todas las filas' }).click()
+    await expect(page.getByText('6 seleccionados')).toBeVisible()
 
     const deletions: string[] = []
     page.on('request', (req) => {
       if (req.method() === 'DELETE' && req.url().includes('/contacts/')) deletions.push(req.url())
     })
-    await bulkBar.getByRole('button', { name: 'Archivar' }).click()
+    await page.getByRole('button', { name: 'Archivar seleccionados' }).click()
 
     await expect(page.getByText('Aún no hay contactos')).toBeVisible({ timeout: 15_000 })
     expect(deletions).toHaveLength(6)
