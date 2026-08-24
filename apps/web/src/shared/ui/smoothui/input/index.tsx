@@ -62,7 +62,7 @@ export function SmoothInput({
       const hasSelection = target.selectionStart !== target.selectionEnd
       const visible = position >= paddingLeft - 1 && position <= maxX + 1
 
-      caretX.set(Math.min(position, maxX))
+      caretX.set(Math.min(position, maxX) + 1)
       caretOpacity.set(visible && !hasSelection ? 1 : 0)
     },
     [caretX, caretOpacity],
@@ -85,9 +85,11 @@ export function SmoothInput({
     }
 
     document.addEventListener('selectionchange', updateIfFocused)
+    document.fonts?.addEventListener('loadingdone', updateIfFocused)
     input.addEventListener('scroll', updateIfFocused)
     return () => {
       document.removeEventListener('selectionchange', updateIfFocused)
+      document.fonts?.removeEventListener('loadingdone', updateIfFocused)
       input.removeEventListener('scroll', updateIfFocused)
     }
   }, [updateCaret])
@@ -133,7 +135,7 @@ export function SmoothInput({
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute top-1/2 h-[0.9em] w-0.5 -translate-y-1/2 rounded-full bg-primary-deep dark:bg-primary"
+        className="pointer-events-none absolute top-1/2 h-[0.95em] w-px -translate-y-1/2 bg-foreground"
         style={{ x: springCaretX, opacity: caretOpacity }}
       />
     </div>
