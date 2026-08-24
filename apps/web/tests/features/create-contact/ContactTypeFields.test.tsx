@@ -11,6 +11,8 @@ vi.mock('@/entities/nomenclature', () => ({
   }),
 }))
 
+import { queryWrapper } from '../../query-wrapper'
+
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactFormValues } from '@/features/create-contact/lib/contact-form.schema'
 
@@ -31,19 +33,19 @@ function Harness({ type }: Readonly<{ type: string }>) {
 
 describe('ContactTypeFields', () => {
   it('renders the type select with its label', () => {
-    render(<Harness type="" />)
+    render(<Harness type="" />, { wrapper: queryWrapper })
 
     expect(screen.getByText('contacts.form.type')).toBeVisible()
   })
 
   it('hides the free-text field while the type is not other', () => {
-    render(<Harness type="customer" />)
+    render(<Harness type="customer" />, { wrapper: queryWrapper })
 
     expect(screen.queryByText('contacts.form.typeOtherLabel')).not.toBeInTheDocument()
   })
 
   it('shows the required free-text field when the type is other', () => {
-    render(<Harness type="other" />)
+    render(<Harness type="other" />, { wrapper: queryWrapper })
 
     expect(screen.getByText('contacts.form.typeOtherLabel')).toBeVisible()
     expect(screen.getByPlaceholderText('contacts.form.typeOtherPlaceholder')).toBeVisible()

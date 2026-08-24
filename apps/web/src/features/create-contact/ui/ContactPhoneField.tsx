@@ -6,9 +6,9 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { COLOMBIA_FLAG_SRC, PHONE_PREFIX, WHATSAPP_ICON_SRC } from '@/shared/config/colombia'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { FieldError } from '@/shared/ui/molecules/field-error'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/shadcn/input-group'
-import { Label } from '@/shared/ui/shadcn/label'
 
 import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { Control } from 'react-hook-form'
@@ -37,7 +37,7 @@ export function ContactPhoneField({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <Label className="text-xs font-semibold text-body">{label}</Label>
+          <FieldLabel>{label}</FieldLabel>
           <InputGroup
             className="mt-1.5 bg-surface-input aria-disabled:opacity-60"
             aria-disabled={disabled}

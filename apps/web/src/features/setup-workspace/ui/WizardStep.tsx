@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { Text } from '@/shared/ui/atoms/text'
 import { CaretLeftIcon, CaretRightIcon } from '@/shared/ui/icons'
 import { SubmitButton } from '@/shared/ui/molecules/submit-button'
 import { Button } from '@/shared/ui/shadcn/button'
@@ -66,7 +67,7 @@ export function WizardStep({
       </div>
 
       <div className="flex items-center justify-between border-t border-border bg-card px-8 py-4 lg:px-12">
-        <span className="text-xs text-muted-foreground">{nav.footerNote}</span>
+        <Text variant="hint">{nav.footerNote}</Text>
         <div className="flex items-center gap-2">
           {nav.onBack && (
             <Button variant="ghost" size="sm" onClick={nav.onBack}>

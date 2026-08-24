@@ -8,6 +8,7 @@ import { sileo } from 'sileo'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import contactsService from '@/shared/api/services/contacts.service'
+import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { CONTACT_FORM_DEFAULTS } from '../config/contact-form.constants'
@@ -134,7 +135,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
         }
         return
       }
-      sileo.error({ title: t('common.saveFailed'), description: error.message })
+      notifySaveFailed(error)
     },
   })
 

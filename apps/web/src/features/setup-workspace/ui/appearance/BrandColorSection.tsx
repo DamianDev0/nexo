@@ -2,6 +2,7 @@ import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { Text } from '@/shared/ui/atoms/text'
 import { PaletteIcon } from '@/shared/ui/icons'
 import { ArcColorPicker } from '@/shared/ui/molecules/color-picker'
 import { Button } from '@/shared/ui/shadcn/button'
@@ -50,7 +51,7 @@ export function BrandColorSection({
         ))}
       </div>
       <div className="mt-2.5 flex items-center justify-between gap-3">
-        <span className="text-xs text-muted-foreground">{colorName}</span>
+        <Text variant="hint">{colorName}</Text>
         <Popover>
           <PopoverTrigger asChild>
             <Button

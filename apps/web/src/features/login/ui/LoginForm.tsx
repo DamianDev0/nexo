@@ -2,12 +2,13 @@ import Link from 'next/link'
 import { type Control } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { AnimatedCheckbox } from '@/shared/ui/atoms/animated-checkbox'
 import { LiquidButton } from '@/shared/ui/atoms/liquid-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { AuthFooter } from '@/shared/ui/molecules/auth-footer'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { PasswordField } from '@/shared/ui/molecules/password-field'
 import { Label } from '@/shared/ui/shadcn/label'
+import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
 
 import type { LoginFormValues } from '../lib/login.schema'
 
@@ -35,7 +36,7 @@ export function LoginForm({
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
           {t('auth.logIn')}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <Text as="p" variant="muted" className="mt-1">
           {t('auth.noAccount')}{' '}
           <Link
             href="/onboarding"
@@ -43,7 +44,7 @@ export function LoginForm({
           >
             {t('auth.signUpFree')}
           </Link>
-        </p>
+        </Text>
       </div>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
@@ -69,7 +70,7 @@ export function LoginForm({
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <AnimatedCheckbox id="remember" className="border-foreground/40" />
+            <SmoothCheckbox id="remember" className="border-foreground/40" />
             <Label htmlFor="remember" className="cursor-pointer text-sm text-muted-foreground">
               {t('auth.rememberMe')}
             </Label>

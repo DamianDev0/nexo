@@ -6,6 +6,7 @@ import { sileo } from 'sileo'
 
 import tagsService from '@/shared/api/services/tags.service'
 import { COMPACT_PAGE_SIZE } from '@/shared/config/pagination'
+import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import type { TagPatch } from '../model/types'
@@ -27,9 +28,7 @@ export function useTagsAdmin(page: number) {
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
   }
 
-  const onError = (error: { message?: string }) => {
-    sileo.error({ title: t('common.saveFailed'), description: error.message })
-  }
+  const onError = (error: { message?: string }) => notifySaveFailed(error)
 
   const create = useMutation({
     mutationFn: (input: { name: string; color: string; description?: string }) =>

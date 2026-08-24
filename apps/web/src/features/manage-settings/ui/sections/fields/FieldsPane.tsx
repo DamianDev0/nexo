@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useEntityLabels } from '@/entities/nomenclature'
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
+import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon, ShapesIcon } from '@/shared/ui/icons'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
@@ -37,7 +38,9 @@ export function FieldsPane() {
   return (
     <div className="max-w-2xl">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">{t('settings.fields.description')}</p>
+        <Text as="p" variant="muted">
+          {t('settings.fields.description')}
+        </Text>
         <Button
           variant="outline"
           size="sm"
@@ -78,6 +81,7 @@ export function FieldsPane() {
 
       {!pane.isPending && pane.fields.length > 0 && (
         <DndContext
+          id="settings-fields-dnd"
           sensors={dnd.sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

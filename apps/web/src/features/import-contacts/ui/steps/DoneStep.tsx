@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { downloadCsv } from '@/shared/lib/download-csv'
+import { Text } from '@/shared/ui/atoms/text'
 import { CheckIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 
@@ -32,11 +33,11 @@ export function DoneStep({ result, report }: Readonly<DoneStepProps>) {
         <span className="text-lg font-semibold text-foreground">
           {t('contacts.import.done.title')}
         </span>
-        <span className="text-sm text-muted-foreground">
+        <Text variant="muted">
           {t('contacts.import.done.subtitle', {
             total: result.imported + result.updated + result.skipped,
           })}
-        </span>
+        </Text>
       </span>
 
       <span className="flex w-full gap-2">
@@ -48,9 +49,9 @@ export function DoneStep({ result, report }: Readonly<DoneStepProps>) {
       {issues.length > 0 && (
         <span className="flex w-full flex-col gap-2">
           <span className="flex items-center justify-between gap-2">
-            <span className="text-sm font-medium text-foreground">
+            <Text variant="strong">
               {t('contacts.import.review.needsAttention', { count: issues.length })}
-            </span>
+            </Text>
             <Button
               variant="outline"
               size="sm"

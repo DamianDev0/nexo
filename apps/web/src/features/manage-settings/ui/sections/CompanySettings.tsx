@@ -4,8 +4,8 @@ import { useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { SectorPicker } from '@/features/setup-workspace'
-import { Input } from '@/shared/ui/shadcn/input'
-import { Label } from '@/shared/ui/shadcn/label'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { useManageSettings } from '../../model/settings-context'
 
@@ -23,7 +23,7 @@ export function CompanySettings() {
     <div className="max-w-5xl">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label className="text-xs font-semibold text-body">{t(`${s}.phone`)}</Label>
+          <FieldLabel>{t(`${s}.phone`)}</FieldLabel>
           <Input
             className="mt-1.5 h-9 text-sm"
             placeholder="601 234 5678"
@@ -33,7 +33,7 @@ export function CompanySettings() {
           />
         </div>
         <div>
-          <Label className="text-xs font-semibold text-body">{t(`${s}.website`)}</Label>
+          <FieldLabel>{t(`${s}.website`)}</FieldLabel>
           <Input
             className="mt-1.5 h-9 text-sm"
             placeholder="https://yourcompany.com"

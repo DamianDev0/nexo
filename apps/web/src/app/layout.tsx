@@ -21,6 +21,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        <link href="https://api.fontshare.com" rel="preconnect" crossOrigin="anonymous" />
+        <link href="https://cdn.fontshare.com" rel="preconnect" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com" rel="preconnect" />
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossOrigin="anonymous" />
         <link
           href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap"
           rel="stylesheet"

@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/shared/lib/cn'
+import { Text } from '@/shared/ui/atoms/text'
 
 export type StatTone = 'neutral' | 'ready' | 'warning' | 'error'
 
@@ -27,7 +28,7 @@ export function StatTile({ value, label, tone = 'neutral', centered }: Readonly<
       )}
     >
       <span className={cn('text-xl font-semibold tabular-nums', TONE[tone])}>{value}</span>
-      <span className="text-xs text-muted-foreground">{label}</span>
+      <Text variant="hint">{label}</Text>
     </span>
   )
 }

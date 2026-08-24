@@ -13,7 +13,6 @@ import { CloudArrowUpIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import { ContactsPagination } from './ContactsPagination'
 
@@ -34,17 +33,12 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
         onReorder={actions.onReorderLists}
         hotkeys
       >
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="gap-1.5 rounded-md text-muted-foreground hover:text-foreground"
-        >
+        <PillButton asChild variant="ghost" size="sm" className="gap-1.5 rounded-md">
           <Link href={ROUTES.app.contacts.import}>
             <CloudArrowUpIcon className="size-4" />
             {t('contacts.import.cta')}
           </Link>
-        </Button>
+        </PillButton>
         <PillButton size="sm" className="gap-1.5 rounded-md" onClick={actions.onCreate}>
           <PlusIcon className="size-4" />
           {t('contacts.lists.new')}

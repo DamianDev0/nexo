@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { Text } from '@/shared/ui/atoms/text'
 
 import { SIDEBAR_ICON_MAP } from '../../config/module-icons.constants'
 import { groupModules } from '../../lib/navigation'
@@ -23,10 +24,8 @@ export function SidebarPreview({ modules, highlightKey }: Readonly<SidebarPrevie
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-foreground">{t(`${s}.previewTitle`)}</span>
-        <span className="text-xs text-muted-foreground">
-          {t(`${s}.modulesActive`, { count: enabledModules.length })}
-        </span>
+        <Text variant="emphasis">{t(`${s}.previewTitle`)}</Text>
+        <Text variant="hint">{t(`${s}.modulesActive`, { count: enabledModules.length })}</Text>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border shadow-sm">

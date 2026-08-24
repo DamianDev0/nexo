@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next'
 import { useEntityLabels } from '@/entities/nomenclature'
 import { ROUTES } from '@/shared/config/routes'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { CaretLeftIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 import AnimatedStepper from '@/shared/ui/smoothui/animated-stepper'
 
 import { buildStepDefs, stepIndex } from '../lib/import-steps'
@@ -35,21 +35,22 @@ export function ImportWizard() {
     <div className="flex min-h-0 flex-1 flex-col">
       <header className={`${SHELL} shrink-0 pb-6 pt-8`}>
         <div className="flex items-center gap-3">
-          <Button
+          <PillButton
             variant="ghost"
-            size="icon-sm"
+            size="xs"
+            className="w-8 px-0"
             aria-label={t('contacts.import.actions.backToContacts', { entities })}
             onClick={backToContacts}
           >
             <CaretLeftIcon className="size-4" />
-          </Button>
+          </PillButton>
           <div className="flex flex-col">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
               {t('contacts.import.title', { entities })}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <Text as="p" variant="muted">
               {t(`contacts.import.steps.${state.step}`, { entities })}
-            </p>
+            </Text>
           </div>
         </div>
 
@@ -91,9 +92,9 @@ export function ImportWizard() {
         <div className={`${SHELL} flex items-center justify-end gap-2 py-4`}>
           {state.step === 'configure' && (
             <>
-              <Button variant="ghost" onClick={actions.onRestart}>
+              <PillButton variant="ghost" size="md" onClick={actions.onRestart}>
                 {t('contacts.import.actions.changeFile')}
-              </Button>
+              </PillButton>
               <PillButton size="md" onClick={() => actions.onGoTo('map')}>
                 {t('contacts.import.actions.continue')}
               </PillButton>
@@ -102,9 +103,9 @@ export function ImportWizard() {
 
           {state.step === 'map' && (
             <>
-              <Button variant="ghost" onClick={() => actions.onGoTo('configure')}>
+              <PillButton variant="ghost" size="md" onClick={() => actions.onGoTo('configure')}>
                 {t('contacts.import.actions.back')}
-              </Button>
+              </PillButton>
               <PillButton
                 size="md"
                 disabled={!state.canContinueFromMap || state.isValidating}
@@ -119,9 +120,9 @@ export function ImportWizard() {
 
           {state.step === 'review' && state.report && (
             <>
-              <Button variant="ghost" onClick={() => actions.onGoTo('map')}>
+              <PillButton variant="ghost" size="md" onClick={() => actions.onGoTo('map')}>
                 {t('contacts.import.actions.back')}
-              </Button>
+              </PillButton>
               <PillButton
                 size="md"
                 disabled={state.report.readyRows === 0 || state.isImporting}

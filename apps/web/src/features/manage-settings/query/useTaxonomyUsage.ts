@@ -6,6 +6,7 @@ import { sileo } from 'sileo'
 
 import { useEntityTerms } from '@/entities/nomenclature'
 import contactsService from '@/shared/api/services/contacts.service'
+import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import type { ContactTaxonomyUsage, TaxonomyReassignKind } from '@repo/shared-types'
@@ -42,8 +43,6 @@ export function useReassignTaxonomy() {
         title: t('settings.reassign.done', { count: reassigned, entities: terms.lowerPlural }),
       })
     },
-    onError: (error: { message?: string }) => {
-      sileo.error({ title: t('common.saveFailed'), description: error.message })
-    },
+    onError: (error: { message?: string }) => notifySaveFailed(error),
   })
 }

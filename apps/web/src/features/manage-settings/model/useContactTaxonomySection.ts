@@ -1,11 +1,10 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { t } from 'i18next'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { AUTOSAVE_DEBOUNCE_MS, TAXONOMY_STALE_MS } from '../config/autosave.constants'
@@ -48,7 +47,7 @@ export function useContactTaxonomySection() {
     },
     onError: (error: { message?: string }, _input, context) => {
       if (context && context.save !== latestSave.current) return
-      sileo.error({ title: t('common.saveFailed'), description: error.message })
+      notifySaveFailed(error)
       setDraft(null)
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.settings.contactTaxonomy })
     },

@@ -1,10 +1,8 @@
 'use client'
 
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import { memo } from 'react'
 
-import { cn } from '@/shared/lib/cn'
+import { SortableRow } from '@/shared/ui/molecules/sortable-row'
 
 import { FieldRow } from './FieldRow'
 
@@ -17,18 +15,10 @@ interface SortableFieldRowProps {
 }
 
 function SortableFieldRowBase({ field, actions }: Readonly<SortableFieldRowProps>) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: field.key,
-  })
-
   return (
-    <div
-      ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn(isDragging && 'opacity-40')}
-    >
-      <FieldRow field={field} actions={actions} handle={{ attributes, listeners }} />
-    </div>
+    <SortableRow id={field.key}>
+      {(handle) => <FieldRow field={field} actions={actions} handle={handle} />}
+    </SortableRow>
   )
 }
 

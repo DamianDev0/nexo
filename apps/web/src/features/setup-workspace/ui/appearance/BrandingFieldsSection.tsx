@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
-import { Input } from '@/shared/ui/shadcn/input'
 import { Label } from '@/shared/ui/shadcn/label'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 interface BrandingFieldsSectionProps {
   readonly productName: string

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import { PlusIcon, XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
 import {
   Select,
   SelectContent,
@@ -11,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/shadcn/select'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { RolePermissionsMatrix } from './RolePermissionsMatrix'
 import { WizardStep, type WizardStepNav } from './WizardStep'

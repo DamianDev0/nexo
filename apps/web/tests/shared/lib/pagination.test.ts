@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pageCount, pageWindow } from '@/features/manage-settings/lib/paginate'
+import { pageCount, pageWindow } from '@/shared/lib/pagination'
 
 describe('pageCount', () => {
   it('returns 1 for an empty list', () => {

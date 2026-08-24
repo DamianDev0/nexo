@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+import { Text } from '@/shared/ui/atoms/text'
+
 import {
   DENSITY_MAP,
   GOOGLE_FONT_MAP,
@@ -43,12 +45,8 @@ export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewPr
   return (
     <div className="hidden flex-col gap-3 lg:flex">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-foreground">
-          {t('onboarding.steps.appearance.livePreview')}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          {t('onboarding.steps.appearance.updatesRealTime')}
-        </span>
+        <Text variant="emphasis">{t('onboarding.steps.appearance.livePreview')}</Text>
+        <Text variant="hint">{t('onboarding.steps.appearance.updatesRealTime')}</Text>
       </div>
 
       <div

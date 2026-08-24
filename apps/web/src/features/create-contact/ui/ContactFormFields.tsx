@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next'
 import { CONTACT_AVATARS } from '@/entities/contact'
 import { AddressField, MunicipalityCombobox, useResolveMunicipality } from '@/entities/geo'
 import { useEntityTerms } from '@/entities/nomenclature'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { AvatarPicker } from '@/shared/ui/kokonutui/avatar-picker'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
-import { Label } from '@/shared/ui/shadcn/label'
 
 import { ContactPhoneFields } from './ContactPhoneFields'
 import { ContactTypeFields } from './ContactTypeFields'
@@ -93,7 +93,7 @@ export function ContactFormFields({
         name="address"
         render={({ field }) => (
           <div>
-            <Label className="text-xs font-semibold text-body">{t('contacts.form.address')}</Label>
+            <FieldLabel>{t('contacts.form.address')}</FieldLabel>
             <div className="mt-1.5">
               <AddressField
                 value={field.value}
@@ -112,7 +112,7 @@ export function ContactFormFields({
           name="city"
           render={({ field }) => (
             <div>
-              <Label className="text-xs font-semibold text-body">{t('contacts.form.city')}</Label>
+              <FieldLabel>{t('contacts.form.city')}</FieldLabel>
               <div className="mt-1.5">
                 <MunicipalityCombobox
                   value={field.value}

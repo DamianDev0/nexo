@@ -7,6 +7,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
+import { Text } from '@/shared/ui/atoms/text'
 
 import { groupModules } from '../lib/navigation'
 import { useHighlightKey } from '../model/useHighlightKey'
@@ -49,6 +50,7 @@ export function StepNavigation({ data, actions, nav }: Readonly<StepNavigationPr
       aside={<SidebarPreview modules={data} highlightKey={focus.key} />}
     >
       <DndContext
+        id="wizard-navigation-dnd"
         sensors={dnd.sensors}
         collisionDetection={closestCenter}
         modifiers={[restrictToVerticalAxis]}
@@ -60,9 +62,9 @@ export function StepNavigation({ data, actions, nav }: Readonly<StepNavigationPr
           {groups.map((group) => (
             <div key={group.key}>
               <div className="mb-2 flex items-center gap-3 px-1">
-                <p className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+                <Text as="p" variant="caption">
                   {t(`nav.groups.${group.key}`)}
-                </p>
+                </Text>
                 <div className="h-px flex-1 bg-border" />
               </div>
               <SortableContext

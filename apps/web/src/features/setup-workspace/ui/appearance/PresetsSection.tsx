@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { OptionTile } from '@/shared/ui/molecules/option-tile'
 import { Label } from '@/shared/ui/shadcn/label'
 
@@ -61,7 +62,9 @@ export function PresetsSection({ activePresetKey, onApplyPreset }: Readonly<Pres
               )}
             </div>
             <div>
-              <p className="text-xs font-semibold text-foreground">{t(`${s}.${preset.key}`)}</p>
+              <Text as="p" variant="emphasis">
+                {t(`${s}.${preset.key}`)}
+              </Text>
               <p className="text-[10px] text-muted-foreground">
                 {GOOGLE_FONT_MAP[preset.fontFamily]} · {t(`${s}.meta.${preset.borderRadius}`)}
               </p>

@@ -6,26 +6,9 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/shared/lib/cn'
 import { CircleNotchIcon, MapPinIcon, SignpostIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
-import type { AddressOption } from '../lib/merge-address-suggestions'
-import type { KeyboardEvent } from 'react'
-
-export interface AddressFieldActions {
-  readonly onChange: (value: string) => void
-  readonly onFocus: () => void
-  readonly onBlur: () => void
-  readonly onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
-  readonly onSelect: (option: AddressOption) => void
-  readonly onHover: (index: number) => void
-}
-
-export interface AddressFieldState {
-  readonly options: ReadonlyArray<AddressOption>
-  readonly activeIndex: number
-  readonly isSearching: boolean
-  readonly open: boolean
-}
+import type { AddressFieldActions, AddressFieldState } from '../model/types/address-field.types'
 
 interface AddressFieldProps {
   readonly value: string

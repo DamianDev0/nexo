@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 
 import { COMPACT_PAGE_SIZE } from '@/shared/config/pagination'
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
+import { pageCount, pageWindow } from '@/shared/lib/pagination'
 
 import { TAXONOMY_REASSIGN_KIND } from '../config/taxonomy.constants'
-import { pageCount, pageWindow } from '../lib/paginate'
 import { optionCandidates } from '../lib/reassign-candidates'
 import { optionLabel, taxonomyNamespace } from '../lib/taxonomy-edit'
 import { useTaxonomyUsage } from '../query/useTaxonomyUsage'

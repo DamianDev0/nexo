@@ -7,9 +7,12 @@ import { useTranslation } from 'react-i18next'
 import { MAP_GLOW_DARK, MAP_GLOW_LIGHT } from '@/shared/config/tokens/effects'
 import { StaticNoise } from '@/shared/ui/atoms/static-noise'
 
-const ColombiaMap = dynamic(() => import('./ColombiaMap').then((m) => m.ColombiaMap), {
-  ssr: false,
-})
+const ColombiaMap = dynamic(
+  () => import('./containers/ColombiaMapContainer').then((m) => m.ColombiaMapContainer),
+  {
+    ssr: false,
+  },
+)
 
 export function OnboardingBranding() {
   const { t } = useTranslation()

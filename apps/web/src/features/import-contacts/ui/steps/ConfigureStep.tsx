@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useEntityLabels } from '@/entities/nomenclature'
 import { cn } from '@/shared/lib/cn'
 import { Note } from '@/shared/ui/atoms/note'
+import { Text } from '@/shared/ui/atoms/text'
 import { CheckIcon } from '@/shared/ui/icons'
 import { OptionTile } from '@/shared/ui/molecules/option-tile'
 
@@ -61,12 +62,8 @@ export function ConfigureStep({
                 {isActive && <CheckIcon className="size-2.5" />}
               </span>
               <span className="flex min-w-0 flex-col gap-0.5">
-                <span className="text-sm font-medium text-foreground">
-                  {t(`contacts.import.strategy.${option}`)}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {t(`contacts.import.strategy.${option}Hint`, names)}
-                </span>
+                <Text variant="strong">{t(`contacts.import.strategy.${option}`)}</Text>
+                <Text variant="hint">{t(`contacts.import.strategy.${option}Hint`, names)}</Text>
               </span>
             </OptionTile>
           )

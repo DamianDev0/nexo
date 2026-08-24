@@ -39,6 +39,7 @@ export function MunicipalityComboboxContainer({
 
   const source = useMemo<AsyncSelectSource<Municipality>>(
     () => ({
+      key: 'municipalities',
       fetcher,
       getValue: (municipality) => municipality.name,
       renderOption: renderMunicipality,
@@ -59,6 +60,7 @@ export function MunicipalityComboboxContainer({
         searchPlaceholder: t('common.search'),
         empty: (term) =>
           term.trim().length < MIN_TERM_LENGTH ? t('geo.typeToSearch') : t('geo.noMatches'),
+        error: t('geo.loadFailed'),
       }}
     />
   )

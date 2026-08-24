@@ -1,5 +1,6 @@
 'use client'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { ArcColorPicker } from '@/shared/ui/molecules/color-picker'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
@@ -13,7 +14,7 @@ interface ColorFieldProps {
 export function ColorField({ label, color, onChange }: Readonly<ColorFieldProps>) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-xs text-muted-foreground">{label}</span>
+      <Text variant="hint">{label}</Text>
       <Popover>
         <PopoverTrigger asChild>
           <Button

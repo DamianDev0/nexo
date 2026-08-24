@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import {
   Table,
@@ -81,12 +82,10 @@ export function MapStep({ analysis, data, onRemap }: Readonly<MapStepProps>) {
 
       <div className="flex flex-col gap-2">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-sm font-medium text-foreground">
-            {t('contacts.import.preview.title')}
-          </span>
-          <span className="text-xs text-muted-foreground">
+          <Text variant="strong">{t('contacts.import.preview.title')}</Text>
+          <Text variant="hint">
             {t('contacts.import.preview.counts', { valid: counts.valid, invalid: counts.invalid })}
-          </span>
+          </Text>
         </div>
         <ImportPreview
           preview={preview}

@@ -3,8 +3,9 @@
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { NOMENCLATURE_ENTITIES, NOMENCLATURE_PRESETS } from '../../config/nomenclature.constants'
 
@@ -32,18 +33,16 @@ export function NomenclatureFields({
     <>
       <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-x-4 gap-y-3">
         <div />
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {t(`${s}.singular`)}
-        </span>
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {t(`${s}.plural`)}
-        </span>
+        <Text variant="kicker">{t(`${s}.singular`)}</Text>
+        <Text variant="kicker">{t(`${s}.plural`)}</Text>
 
         {NOMENCLATURE_ENTITIES.map(({ key, icon: Icon }) => (
           <div key={key} className="contents">
             <div className="flex items-center gap-2">
               <Icon className="size-4 shrink-0 text-muted-foreground" />
-              <span className="text-xs font-semibold capitalize text-muted-foreground">{key}</span>
+              <Text variant="emphasis" className="text-muted-foreground">
+                {t(`${s}.defaults.${key}`)}
+              </Text>
             </div>
             <Input
               className="h-9 text-sm"

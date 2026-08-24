@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { LanguageSwitcher } from '@/features/switch-language'
 import { cn } from '@/shared/lib'
+import { Text } from '@/shared/ui/atoms/text'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { ArrowRightIcon, CheckIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
@@ -45,8 +46,12 @@ function StepItem({ index, step, currentStep, onClick }: Readonly<StepItemProps>
         {isDone ? <CheckIcon className="size-3.5" /> : stepNumber}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold text-foreground">{step.label}</p>
-        <p className="text-xs text-muted-foreground">{step.description}</p>
+        <Text as="p" variant="emphasis">
+          {step.label}
+        </Text>
+        <Text as="p" variant="hint">
+          {step.description}
+        </Text>
       </div>
       {step.optional && (
         <span className="shrink-0 rounded-full border border-border bg-background px-2 py-0.5 text-xs text-muted-foreground">
@@ -75,9 +80,7 @@ export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
         <div className="flex h-14 items-center justify-between border-b border-border px-5">
           <Link href="/" className="flex items-center gap-2">
             <div className="size-2 rounded-full bg-foreground" />
-            <span className="text-xs font-bold uppercase tracking-widest text-foreground">
-              Nexo
-            </span>
+            <Text variant="overline">Nexo</Text>
           </Link>
           <Button
             variant="ghost"
@@ -94,9 +97,9 @@ export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
             <h2 className="text-sm font-bold text-foreground">
               {t('onboarding.configureWorkspace')}
             </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <Text as="p" variant="hint" className="mt-1">
               {t('onboarding.takesLessThan5Min')}
-            </p>
+            </Text>
           </div>
 
           <div className="space-y-1.5">
@@ -131,10 +134,12 @@ export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
                 className="size-7 shrink-0 drop-shadow-sm"
               />
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-foreground">{t('onboarding.needHelp')}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <Text as="p" variant="emphasis">
+                  {t('onboarding.needHelp')}
+                </Text>
+                <Text as="p" variant="hint" className="mt-1">
                   {t('onboarding.helpDescription')}
-                </p>
+                </Text>
               </div>
             </div>
             <Link
@@ -150,9 +155,9 @@ export function WizardLayout({ rail, children }: Readonly<WizardLayoutProps>) {
 
       <main className="relative flex flex-1 flex-col overflow-hidden">
         <div className="flex h-14 items-center justify-between border-b border-border px-6 lg:hidden">
-          <span className="text-xs font-bold uppercase tracking-widest text-foreground">Nexo</span>
+          <Text variant="overline">Nexo</Text>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{stepOf}</span>
+            <Text variant="hint">{stepOf}</Text>
             <LanguageSwitcher />
             <ThemeToggle />
           </div>

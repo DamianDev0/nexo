@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
+import { Text } from '@/shared/ui/atoms/text'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
@@ -11,8 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
-import { Input } from '@/shared/ui/shadcn/input'
 import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { useFieldForm } from '../../../model/useFieldForm'
 
@@ -40,7 +41,7 @@ function CheckRow({ label, hint, checked, onChange }: Readonly<CheckRowProps>) {
     <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2.5">
       <span className="flex min-w-0 flex-col">
         <span className="text-sm text-foreground">{label}</span>
-        <span className="text-xs text-muted-foreground">{hint}</span>
+        <Text variant="hint">{hint}</Text>
       </span>
       <AnimatedToggle size="sm" checked={checked} label={label} onChange={onChange} />
     </div>

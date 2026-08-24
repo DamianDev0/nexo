@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthStore } from '@/entities/session'
+import { useAuth } from '@/entities/session'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/shared/ui/shadcn/sidebar'
 
 import { toSidebarTeam, toSidebarUser } from '../lib/sidebar-identity'
@@ -15,7 +15,7 @@ import { TeamSwitcher } from './TeamSwitcher'
 import type { ComponentProps } from 'react'
 
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
-  const user = useAuthStore((s) => s.user)
+  const { data: user } = useAuth()
   const groups = useSidebarModules()
   const branding = useTenantBranding()
 
@@ -28,7 +28,7 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
         <NavMain groups={groups} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={toSidebarUser(user)} />
+        <NavUser user={toSidebarUser(user ?? null)} />
       </SidebarFooter>
       <SidebarCollapseButton />
     </Sidebar>

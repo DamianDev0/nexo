@@ -15,6 +15,7 @@ import {
   useHighlightKey,
 } from '@/features/setup-workspace'
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
+import { Text } from '@/shared/ui/atoms/text'
 
 import { useManageSettings } from '../../model/settings-context'
 
@@ -36,6 +37,7 @@ export function NavigationSettings() {
     <div className="flex flex-col gap-6 xl:flex-row xl:gap-8">
       <div className="w-full xl:max-w-md">
         <DndContext
+          id="settings-navigation-dnd"
           sensors={dnd.sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}
@@ -47,9 +49,9 @@ export function NavigationSettings() {
             {groups.map((group) => (
               <div key={group.key}>
                 <div className="mb-2 flex items-center gap-3 px-1">
-                  <p className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+                  <Text as="p" variant="caption">
                     {t(`nav.groups.${group.key}`)}
-                  </p>
+                  </Text>
                   <div className="h-px flex-1 bg-border" />
                 </div>
                 <SortableContext

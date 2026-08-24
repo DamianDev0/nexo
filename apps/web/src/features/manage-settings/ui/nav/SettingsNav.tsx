@@ -20,7 +20,7 @@ export function SettingsNav() {
     <nav className="flex flex-col gap-6">
       <Link
         href={ROUTES.app.dashboard}
-        className="flex items-center gap-1 px-2.5 text-sm text-primary transition-colors duration-200 hover:text-primary-deep"
+        className="flex items-center gap-1 px-2.5 text-sm text-primary-deep transition-colors duration-200 hover:text-primary-deep/80 dark:text-primary dark:hover:text-primary/80"
       >
         <CaretLeftIcon className="size-3.5" />
         {t('settings.back')}

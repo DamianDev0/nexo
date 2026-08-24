@@ -14,6 +14,7 @@ const CACHE_MUTATORS = /invalidateQueries|removeQueries|cancelQueries|refetchQue
 const ON_DEMAND_ONLY_KEYS = new Set([
   'geo.municipalities',
   'geo.addresses',
+  'geo.colombiaMap',
   'contacts.duplicateProbe',
 ])
 

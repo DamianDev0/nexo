@@ -7,6 +7,7 @@ import { useContactList, usePrefetchContactList } from '@/entities/contact'
 import { parseSortParam, type ContactSort } from '@/entities/contact'
 import { FIRST_PAGE } from '@/shared/config/pagination'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
+import { pageCount } from '@/shared/lib/pagination'
 
 import {
   contactsQueryString,
@@ -98,7 +99,7 @@ export function useContactsTable() {
   )
 
   const total = data?.total ?? 0
-  const totalPages = Math.max(1, Math.ceil(total / limit))
+  const totalPages = pageCount(total, limit)
 
   const prefetchList = usePrefetchContactList()
 

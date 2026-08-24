@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { Text } from '@/shared/ui/atoms/text'
 import { DotsSixVerticalIcon, LockIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Switch } from '@/shared/ui/shadcn/switch'
@@ -72,7 +73,7 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
       </div>
 
       <div className="flex-1">
-        <span className="text-sm font-medium text-foreground">{label}</span>
+        <Text variant="strong">{label}</Text>
         {module.required && (
           <span className="ml-2 text-xs text-muted-foreground">({t(`${s}.required`)})</span>
         )}

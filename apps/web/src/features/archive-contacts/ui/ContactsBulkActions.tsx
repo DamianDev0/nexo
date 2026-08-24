@@ -2,9 +2,9 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { TrashIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
-import { Button } from '@/shared/ui/shadcn/button'
 
 interface ContactsBulkActionsProps {
   readonly onArchive: () => void
@@ -17,16 +17,15 @@ export function ContactsBulkActions({ onArchive, disabled }: Readonly<ContactsBu
 
   return (
     <HintTooltip asChild hint={label}>
-      <Button
-        variant="ghost"
-        size="icon-sm"
+      <PillButton
+        variant="ghostDanger"
+        size="xs"
         disabled={disabled}
         onClick={onArchive}
         aria-label={label}
-        className="text-faint hover:text-negative-text"
       >
         <TrashIcon className="size-4" />
-      </Button>
+      </PillButton>
     </HintTooltip>
   )
 }

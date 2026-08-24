@@ -2,8 +2,8 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { FieldError } from '@/shared/ui/molecules/field-error'
-import { Label } from '@/shared/ui/shadcn/label'
 
 import { CustomFieldInput } from './CustomFieldInput'
 
@@ -28,10 +28,10 @@ export function CustomFieldsSection({ data }: Readonly<CustomFieldsSectionProps>
       <p className="text-sm font-semibold text-foreground">{t('contacts.form.customFields')}</p>
       {data.defs.map((def) => (
         <div key={def.key} className="flex flex-col gap-1">
-          <Label className="text-xs text-muted-foreground">
+          <FieldLabel>
             {def.label}
             {def.required && <span className="text-destructive"> *</span>}
-          </Label>
+          </FieldLabel>
           <CustomFieldInput
             def={def}
             value={data.values[def.key]}

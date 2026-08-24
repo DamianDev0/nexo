@@ -4,6 +4,7 @@ import { sileo } from 'sileo'
 
 import { useEntityTerms } from '@/entities/nomenclature'
 import contactsService from '@/shared/api/services/contacts.service'
+import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 export function useArchiveContacts() {
@@ -45,9 +46,7 @@ export function useArchiveContacts() {
         }),
       })
     },
-    onError: (error: { message?: string }) => {
-      sileo.error({ title: t('common.saveFailed'), description: error.message })
-    },
+    onError: (error: { message?: string }) => notifySaveFailed(error),
   })
 
   return { archive: mutation.mutate, isArchiving: mutation.isPending }

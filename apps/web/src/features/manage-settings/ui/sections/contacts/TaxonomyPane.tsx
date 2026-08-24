@@ -6,6 +6,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
+import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
@@ -38,12 +39,12 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
   return (
     <div className="max-w-2xl">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
+        <Text as="p" variant="muted">
           {t(`settings.taxonomy.${pane.namespace}Description`, {
             entity: terms.lowerSingular,
             entities: terms.lowerPlural,
           })}
-        </p>
+        </Text>
         <Button
           variant="outline"
           size="sm"
@@ -64,6 +65,7 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
         </div>
       ) : (
         <DndContext
+          id="settings-taxonomy-dnd"
           sensors={pane.dnd.sensors}
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

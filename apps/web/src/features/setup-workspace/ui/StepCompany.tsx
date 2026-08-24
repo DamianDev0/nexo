@@ -2,10 +2,10 @@ import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
 import { COLOMBIA_FLAG_SRC, PHONE_PREFIX } from '@/shared/config/colombia'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { BankIcon, ClockIcon, LockIcon } from '@/shared/ui/icons'
-import { Input } from '@/shared/ui/shadcn/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/shadcn/input-group'
-import { Label } from '@/shared/ui/shadcn/label'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { REGIONAL_DEFAULTS } from '../config/company.constants'
 
@@ -42,7 +42,7 @@ interface ReadonlyFieldProps {
 function ReadonlyField({ label, value, icon: Icon }: Readonly<ReadonlyFieldProps>) {
   return (
     <div>
-      <Label className="text-xs font-semibold text-body">{label}</Label>
+      <FieldLabel>{label}</FieldLabel>
       <div className="mt-1.5 flex h-9 items-center gap-2.5 rounded-md border border-border/70 bg-muted/40 px-3">
         <Icon className="size-4 shrink-0 text-muted-foreground/70" />
         <span className="flex-1 truncate text-sm text-foreground/80">{value}</span>
@@ -63,7 +63,7 @@ export function StepCompany({ data, actions, nav }: Readonly<StepCompanyProps>) 
     >
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label className="text-xs font-semibold text-body">{t(`${s}.phone`)}</Label>
+          <FieldLabel>{t(`${s}.phone`)}</FieldLabel>
           <InputGroup className="mt-1.5 bg-transparent">
             <InputGroupAddon className="gap-2 border-r border-border/70 pr-2.5">
               <Image
@@ -85,7 +85,7 @@ export function StepCompany({ data, actions, nav }: Readonly<StepCompanyProps>) 
           </InputGroup>
         </div>
         <div>
-          <Label className="text-xs font-semibold text-body">{t(`${s}.website`)}</Label>
+          <FieldLabel>{t(`${s}.website`)}</FieldLabel>
           <Input
             className="mt-1.5 h-9 text-sm"
             placeholder="https://yourcompany.com"

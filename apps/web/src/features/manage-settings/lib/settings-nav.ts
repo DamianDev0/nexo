@@ -18,6 +18,16 @@ export function isSectionActive(section: SettingsSection, pathname: string): boo
   return ownsPath(section, pathname)
 }
 
+export function buildMobileNavTabs(
+  label: (key: string, fallbackKey: string) => string,
+): ReadonlyArray<SectionTab> {
+  return SECTIONS.filter((section) => section.available).map((section) => ({
+    key: section.href,
+    href: section.href,
+    label: label(section.key, `settings.sections.${section.key}`),
+  }))
+}
+
 export function buildSectionTabs(
   section: SettingsSection | null,
   t: (key: string) => string,

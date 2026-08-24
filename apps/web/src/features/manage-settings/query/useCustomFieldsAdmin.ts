@@ -5,6 +5,7 @@ import { t } from 'i18next'
 import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
+import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import type { CustomFieldEntity, FieldDef } from '@repo/shared-types'
@@ -22,9 +23,7 @@ export function useCustomFieldsAdmin(entity: CustomFieldEntity) {
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
   }
 
-  const onError = (error: { message?: string }) => {
-    sileo.error({ title: t('common.saveFailed'), description: error.message })
-  }
+  const onError = (error: { message?: string }) => notifySaveFailed(error)
 
   const create = useMutation({
     mutationFn: (field: FieldDef) => settingsService.createCustomField(entity, field),

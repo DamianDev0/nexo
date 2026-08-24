@@ -2,11 +2,10 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PlusIcon, TrashIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
-import { Label } from '@/shared/ui/shadcn/label'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import type { FieldOptionItem } from '../../../model/useFieldForm'
 
@@ -24,7 +23,7 @@ export function FieldOptionsEditor({ options, actions }: Readonly<FieldOptionsEd
 
   return (
     <div className="flex flex-col gap-2">
-      <Label className="text-xs text-muted-foreground">{t('settings.fields.optionsLabel')}</Label>
+      <FieldLabel>{t('settings.fields.optionsLabel')}</FieldLabel>
       {options.map((option) => (
         <div key={option.id} className="flex items-center gap-1.5">
           <Input
@@ -44,16 +43,16 @@ export function FieldOptionsEditor({ options, actions }: Readonly<FieldOptionsEd
           </PillButton>
         </div>
       ))}
-      <Button
+      <PillButton
         type="button"
-        variant="outline"
-        size="sm"
+        variant="tertiary"
+        size="xs"
         className="self-start gap-1.5"
         onClick={actions.onAdd}
       >
         <PlusIcon className="size-3.5" />
         {t('settings.fields.addOption')}
-      </Button>
+      </PillButton>
     </div>
   )
 }

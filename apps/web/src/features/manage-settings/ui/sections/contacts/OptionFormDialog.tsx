@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
-import { Input } from '@/shared/ui/shadcn/input'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { useOptionForm } from '../../../model/useOptionForm'
 

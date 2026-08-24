@@ -73,9 +73,8 @@ export function ReassignOptionDialog({
                   value={field.value}
                   onChange={field.onChange}
                   source={{
-                    fetcher: () => Promise.resolve(candidates),
+                    options: candidates,
                     getValue: (candidate) => candidate.key,
-                    preload: true,
                     filterFn: (candidate, query) =>
                       candidate.label.toLowerCase().includes(query.toLowerCase()),
                     renderOption: candidateOption,

@@ -3,6 +3,7 @@ import { type Control } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { LiquidButton } from '@/shared/ui/atoms/liquid-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { AuthFooter } from '@/shared/ui/molecules/auth-footer'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { PasswordField } from '@/shared/ui/molecules/password-field'
@@ -34,12 +35,12 @@ export function OnboardingForm({
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {t('auth.createAccount')}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <Text as="p" variant="muted" className="mt-1">
           {t('auth.hasAccount')}{' '}
           <Link href="/login" className="font-medium text-foreground underline underline-offset-2">
             {t('auth.logIn')}
           </Link>
-        </p>
+        </Text>
       </div>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-2">

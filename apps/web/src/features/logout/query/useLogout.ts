@@ -9,12 +9,12 @@ import { forgetTenantSlug } from '@/shared/config/tenant-cookie'
 export function useLogout() {
   const queryClient = useQueryClient()
   const router = useRouter()
-  const { clearUser } = useAuthStore()
+  const { clearSession } = useAuthStore()
 
   return useMutation({
     mutationFn: () => authService.logout(),
     onSettled: () => {
-      clearUser()
+      clearSession()
       forgetTenantSlug()
       queryClient.clear()
       router.push(ROUTES.auth.login)

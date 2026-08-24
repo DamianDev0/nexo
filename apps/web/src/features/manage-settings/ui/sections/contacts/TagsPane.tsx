@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
+import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon, TagIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
@@ -22,12 +23,12 @@ export function TagsPane() {
   return (
     <div className="max-w-2xl">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
+        <Text as="p" variant="muted">
           {t('settings.tags.description', {
             entity: terms.lowerSingular,
             entities: terms.lowerPlural,
           })}
-        </p>
+        </Text>
         <Button
           variant="outline"
           size="sm"
@@ -43,7 +44,9 @@ export function TagsPane() {
       {!pane.isPending && pane.tags.length === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-10 text-center">
           <TagIcon className="size-6 text-muted-foreground" />
-          <p className="text-sm font-medium text-foreground">{t('settings.tags.emptyTitle')}</p>
+          <Text as="p" variant="strong">
+            {t('settings.tags.emptyTitle')}
+          </Text>
           <p className="max-w-xs text-xs text-muted-foreground">
             {t('settings.tags.emptyDescription', { entities: terms.lowerPlural })}
           </p>

@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react'
 
 import { drawSvgGrid } from '@/shared/lib/svg-grid'
 
-import { ERROR_TEXT, GEOJSON_URL, MAP_CSS_VARS } from './constants'
+import { ERROR_TEXT, MAP_CSS_VARS } from './constants'
 import { drawCornerMarks, drawMap } from './draw'
 
 import type { City, MapColors } from './constants'
@@ -48,17 +48,21 @@ interface UseColombiaMapResult {
   readonly wrapRef: RefObject<HTMLDivElement | null>
 }
 
-export function useColombiaMap(): UseColombiaMapResult {
+interface UseColombiaMapInput {
+  readonly geo: FeatureCollection<Geometry> | null
+  readonly failed: boolean
+}
+
+export function useColombiaMap({ geo, failed }: UseColombiaMapInput): UseColombiaMapResult {
   const svgRef = useRef<SVGSVGElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!svgRef.current || !wrapRef.current) return
-
-    let cancelled = false
+    if (!geo && !failed) return
 
     function render() {
-      if (!svgRef.current || !wrapRef.current || cancelled) return
+      if (!svgRef.current || !wrapRef.current) return
 
       const svg = d3.select(svgRef.current)
       svg.selectAll('*').remove()
@@ -70,6 +74,18 @@ export function useColombiaMap(): UseColombiaMapResult {
       const colors = readMapColors()
       drawSvgGrid({ svg, width, height, color: colors.grid })
       drawCornerMarks(svg, width, colors.accent)
+
+      if (!geo) {
+        svg
+          .append('text')
+          .attr('x', width / 2)
+          .attr('y', height / 2)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', ERROR_TEXT.fontSize)
+          .attr('fill', colors.label)
+          .text(ERROR_TEXT.message)
+        return
+      }
 
       d3.select(wrapRef.current).selectAll('[data-slot="map-tooltip"]').remove()
       const tooltip = d3
@@ -95,26 +111,7 @@ export function useColombiaMap(): UseColombiaMapResult {
         },
       }
 
-      fetch(GEOJSON_URL)
-        .then((r) => {
-          if (!r.ok) throw new Error(`GeoJSON fetch failed: ${r.status}`)
-          return r.json() as Promise<FeatureCollection<Geometry>>
-        })
-        .then((geo) => {
-          if (!cancelled) drawMap(svg, geo, width, height, colors, interaction)
-        })
-        .catch((err: unknown) => {
-          if (cancelled) return
-          console.error('[ColombiaMap]', err)
-          svg
-            .append('text')
-            .attr('x', width / 2)
-            .attr('y', height / 2)
-            .attr('text-anchor', 'middle')
-            .attr('font-size', ERROR_TEXT.fontSize)
-            .attr('fill', colors.label)
-            .text(ERROR_TEXT.message)
-        })
+      drawMap(svg, geo, width, height, colors, interaction)
     }
 
     render()
@@ -126,10 +123,9 @@ export function useColombiaMap(): UseColombiaMapResult {
     })
 
     return () => {
-      cancelled = true
       observer.disconnect()
     }
-  }, [])
+  }, [geo, failed])
 
   return { svgRef, wrapRef }
 }

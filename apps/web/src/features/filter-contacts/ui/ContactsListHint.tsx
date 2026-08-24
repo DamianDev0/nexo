@@ -10,10 +10,7 @@ export function ContactsListHint({ hints }: Readonly<{ hints: ReadonlyArray<stri
 
   return (
     <span className="flex min-w-0 items-center gap-1.5 text-xs">
-      <LightbulbIcon
-        weight="fill"
-        className="size-3.5 shrink-0 text-primary-deep dark:text-primary"
-      />
+      <LightbulbIcon className="size-3.5 shrink-0 text-primary-deep dark:text-primary" />
       <RotatingText
         items={hints}
         intervalMs={CONTACT_HINT_ROTATION_MS}

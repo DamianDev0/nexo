@@ -4,8 +4,8 @@ import { taxonomyColorAt } from '@repo/shared-types'
 import { useCallback, useMemo } from 'react'
 
 import { COMPACT_PAGE_SIZE } from '@/shared/config/pagination'
+import { pageCount } from '@/shared/lib/pagination'
 
-import { pageCount } from '../lib/paginate'
 import { tagCandidates } from '../lib/reassign-candidates'
 import { useTagsAdmin } from '../query/useTagsAdmin'
 import { useTaxonomyUsage } from '../query/useTaxonomyUsage'

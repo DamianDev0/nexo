@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
 import { PlusIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { SortableStage } from './pipeline/SortableStage'
 import { StageRow, type Stage } from './pipeline/StageRow'
@@ -61,6 +61,7 @@ export function StepPipeline({ data, actions, nav }: Readonly<StepPipelineProps>
       </div>
 
       <DndContext
+        id="wizard-pipeline-dnd"
         sensors={dnd.sensors}
         collisionDetection={closestCenter}
         modifiers={[restrictToVerticalAxis, restrictToParentElement]}

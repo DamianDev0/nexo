@@ -1,9 +1,10 @@
 import { isValidCOPhone, phoneDigits } from '@repo/shared-utils'
+import { z } from 'zod'
 
 import type { FieldDef } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const emailSchema = z.email()
 
 function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || value === ''
@@ -26,7 +27,7 @@ export function customFieldError(def: FieldDef, value: unknown, t: TFunction): s
   if (def.type === 'phone' && !isValidCOPhone(phoneDigits(String(value)))) {
     return t('contacts.errors.phoneInvalid')
   }
-  if (def.type === 'email' && !EMAIL_PATTERN.test(String(value))) {
+  if (def.type === 'email' && !emailSchema.safeParse(String(value)).success) {
     return t('contacts.errors.emailInvalid')
   }
   if (def.type === 'url' && !isValidUrl(String(value))) {

@@ -5,8 +5,8 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
-import { Label } from '@/shared/ui/shadcn/label'
 
 import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
@@ -41,10 +41,9 @@ export function TaxonomySelectField({
 
   const source = useMemo<AsyncSelectSource<TaxonomyChoice>>(
     () => ({
-      fetcher: () => Promise.resolve(choices),
+      options: choices,
       getValue: (choice) => choice.key,
       renderOption: renderChoice,
-      preload: true,
       filterFn: (choice, query) => choice.label.toLowerCase().includes(query.toLowerCase()),
     }),
     [choices],
@@ -58,7 +57,7 @@ export function TaxonomySelectField({
         const selected = choices.find((choice) => choice.key === field.value)
         return (
           <div>
-            <Label className="text-xs font-semibold text-body">{label}</Label>
+            <FieldLabel>{label}</FieldLabel>
             <div className="mt-1.5">
               <AsyncSelect
                 value={field.value}

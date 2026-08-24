@@ -38,7 +38,7 @@ export function UploadStep({ onFile, isBusy }: Readonly<UploadStepProps>) {
         <Button
           variant="link"
           size="xs"
-          className="h-auto p-0 text-xs"
+          className="h-auto p-0 text-xs text-primary-deep dark:text-primary"
           onClick={() =>
             downloadCsv(
               buildCsvTemplate(),

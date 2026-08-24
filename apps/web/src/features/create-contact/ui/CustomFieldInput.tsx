@@ -3,8 +3,6 @@
 import { CENTAVOS_PER_PESO } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
-import { Checkbox } from '@/shared/ui/shadcn/checkbox'
-import { Input } from '@/shared/ui/shadcn/input'
 import {
   Select,
   SelectContent,
@@ -14,6 +12,8 @@ import {
 } from '@/shared/ui/shadcn/select'
 import { Switch } from '@/shared/ui/shadcn/switch'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
+import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import type { FieldDef } from '@repo/shared-types'
 
@@ -82,7 +82,7 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
       <div className="flex flex-col gap-1.5">
         {(def.options ?? []).map((option) => (
           <label key={option.value} className="flex items-center gap-2 text-sm text-body">
-            <Checkbox
+            <SmoothCheckbox
               checked={Array.isArray(value) && (value as string[]).includes(option.value)}
               onCheckedChange={() => onChange(toggleItem(value, option.value))}
               aria-label={option.label}

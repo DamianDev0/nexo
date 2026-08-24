@@ -6,6 +6,7 @@ import { sileo } from 'sileo'
 
 import settingsService from '@/shared/api/services/settings.service'
 import { ROUTES } from '@/shared/config/routes'
+import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { STEP_KEYS } from '../config/wizard.constants'
@@ -31,7 +32,7 @@ export function useOnboardingWizard() {
     onSuccess: (result) => {
       queryClient.setQueryData(QUERY_KEYS.settings.onboarding, result)
     },
-    onError: (err) => sileo.error({ title: t('common.saveFailed'), description: err.message }),
+    onError: (err) => notifySaveFailed(err),
   })
 
   const { mutate: finish } = useMutation({
@@ -44,7 +45,7 @@ export function useOnboardingWizard() {
       })
       router.push(ROUTES.app.dashboard)
     },
-    onError: (err) => sileo.error({ title: t('common.saveFailed'), description: err.message }),
+    onError: (err) => notifySaveFailed(err),
   })
 
   const goToStep = useCallback((step: number) => persistStep(step), [persistStep])
