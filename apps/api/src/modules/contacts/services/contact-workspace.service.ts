@@ -33,6 +33,8 @@ function customColumnDef(def: FieldDef): ContactColumnDef {
     minWidth: 100,
     custom: true,
     label: def.label,
+    fieldType: def.type,
+    fieldOptions: def.options,
   }
 }
 

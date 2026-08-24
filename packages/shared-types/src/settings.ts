@@ -156,6 +156,21 @@ export type CustomFieldType =
   | 'formula'
   | 'geolocation'
 
+export const RENDERABLE_FIELD_TYPES: ReadonlyArray<CustomFieldType> = [
+  'text',
+  'textarea',
+  'number',
+  'currency',
+  'date',
+  'datetime',
+  'select',
+  'multiselect',
+  'boolean',
+  'url',
+  'phone',
+  'email',
+]
+
 export type CustomFieldEntity = 'contacts' | 'companies' | 'deals'
 
 export type SelectOption = {
@@ -172,6 +187,7 @@ export type FieldDef = {
   unique: boolean
   order: number
   isActive?: boolean
+  showInForm?: boolean
   filterable?: boolean
   sortable?: boolean
   defaultValue?: unknown

@@ -62,6 +62,7 @@ export type ContactInput = {
   source?: string
   type?: string
   typeLabel?: string
+  lifecycleStage?: string
   leadScore?: number
   tags?: string[]
   companyId?: string

@@ -57,6 +57,20 @@ describe('validateCustomFields', () => {
     ).not.toThrow()
   })
 
+  it('validates phone fields with the Colombian rule', () => {
+    const defs = [def({ key: 'telefono_2', type: 'phone' })]
+    expect(() => validateCustomFields({ telefono_2: '42y73726232736723672' }, defs)).toThrow(
+      BadRequestException,
+    )
+    expect(() => validateCustomFields({ telefono_2: '300 123 4567' }, defs)).not.toThrow()
+  })
+
+  it('validates url fields', () => {
+    const defs = [def({ key: 'sitio', type: 'url' })]
+    expect(() => validateCustomFields({ sitio: 'nexo' }, defs)).toThrow(BadRequestException)
+    expect(() => validateCustomFields({ sitio: 'https://nexo.co' }, defs)).not.toThrow()
+  })
+
   it('enforces relation fields to be UUIDs', () => {
     const defs = [def({ key: 'account', type: 'relation', relationEntity: 'companies' })]
     expect(() => validateCustomFields({ account: 'not-a-uuid' }, defs)).toThrow(BadRequestException)

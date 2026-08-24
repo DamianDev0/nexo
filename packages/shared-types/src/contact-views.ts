@@ -1,4 +1,5 @@
 import type { ContactSortField } from './contacts'
+import type { CustomFieldType, SelectOption } from './settings'
 
 export const CONTACT_VIEW_VISIBILITIES = ['private', 'shared'] as const
 
@@ -75,6 +76,8 @@ export type ContactColumnDef = {
   minWidth: number
   custom?: boolean
   label?: string | null
+  fieldType?: CustomFieldType
+  fieldOptions?: SelectOption[]
 }
 
 export const CUSTOM_COLUMN_PREFIX = 'custom:'

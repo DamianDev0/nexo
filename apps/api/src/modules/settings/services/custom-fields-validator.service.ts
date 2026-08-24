@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { activeFieldDefs } from '@repo/shared-types'
+import { isValidCOPhone, phoneDigits } from '@repo/shared-utils'
 import type { CustomFieldEntity, CustomFieldType, FieldDef } from '@repo/shared-types'
 import { TenantConfigService } from './tenant-config.service'
 
@@ -65,6 +66,22 @@ function validateDate(def: FieldDef, value: unknown): string | null {
     : `"${def.label}" must be a valid date`
 }
 
+function validatePhone(def: FieldDef, value: unknown): string | null {
+  return typeof value === 'string' && isValidCOPhone(phoneDigits(value))
+    ? null
+    : `"${def.label}" must be a valid Colombian phone`
+}
+
+function validateUrl(def: FieldDef, value: unknown): string | null {
+  if (typeof value !== 'string') return `"${def.label}" must be a valid URL`
+  try {
+    new URL(value)
+    return null
+  } catch {
+    return `"${def.label}" must be a valid URL`
+  }
+}
+
 function validateRelation(def: FieldDef, value: unknown): string | null {
   return typeof value === 'string' && UUID_PATTERN.test(value)
     ? null
@@ -86,6 +103,8 @@ const VALIDATORS: Partial<Record<CustomFieldType, FieldValidator>> = {
   select: validateSelect,
   multiselect: validateMultiselect,
   email: validateEmail,
+  phone: validatePhone,
+  url: validateUrl,
   date: validateDate,
   datetime: validateDate,
   relation: validateRelation,

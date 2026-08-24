@@ -8,7 +8,7 @@ import { ContactsRepository } from '../repositories/contacts.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { expectPageAndLimitApplied } from '@/shared/testing/crud-assertions'
 import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
-import { LifecycleStage } from '@repo/shared-types'
+import { DOMAIN_EVENTS, LifecycleStage } from '@repo/shared-types'
 import type { PaginatedContacts } from '@repo/shared-types'
 
 const SCHEMA = 'tenant_acme'
@@ -397,6 +397,49 @@ describe('ContactsService', () => {
       await expect(service.update(SCHEMA, 'c-1', { tags: ['fantasma'] })).rejects.toThrow(
         BadRequestException,
       )
+    })
+
+    it('records lifecycle history in the same transaction when the stage changes', async () => {
+      qr.query
+        .mockResolvedValueOnce([makeContactRow({ lifecycle_stage: 'lead' })])
+        .mockResolvedValueOnce([makeContactRow({ lifecycle_stage: 'customer' })])
+        .mockResolvedValueOnce([])
+
+      await service.update(SCHEMA, 'c-1', { lifecycleStage: 'customer' }, false, undefined, 'u-1')
+
+      const historyCall = qr.query.mock.calls.find(([sql]) =>
+        (sql as string).includes('contact_lifecycle_history'),
+      )
+      expect(historyCall).toBeDefined()
+      expect(historyCall![0]).toContain('INSERT INTO contact_lifecycle_history')
+      expect(historyCall![1]).toEqual(['c-1', 'lead', 'customer', 'manual', 'u-1'])
+      expect(eventBus.emitCrm).toHaveBeenCalledWith(
+        DOMAIN_EVENTS.CONTACT_LIFECYCLE_CHANGED,
+        expect.objectContaining({ fromStage: 'lead', toStage: 'customer', changedBy: 'u-1' }),
+      )
+    })
+
+    it('skips lifecycle history when the stage does not change', async () => {
+      qr.query
+        .mockResolvedValueOnce([makeContactRow({ lifecycle_stage: 'lead' })])
+        .mockResolvedValueOnce([makeContactRow({ lifecycle_stage: 'lead' })])
+
+      await service.update(SCHEMA, 'c-1', { lifecycleStage: 'lead' })
+
+      const historyCall = qr.query.mock.calls.find(([sql]) =>
+        (sql as string).includes('contact_lifecycle_history'),
+      )
+      expect(historyCall).toBeUndefined()
+      expect(eventBus.emitCrm).not.toHaveBeenCalledWith(
+        DOMAIN_EVENTS.CONTACT_LIFECYCLE_CHANGED,
+        expect.anything(),
+      )
+    })
+
+    it('rejects a lifecycle stage outside the tenant catalog', async () => {
+      await expect(
+        service.update(SCHEMA, 'c-1', { lifecycleStage: 'etapa_fantasma' }),
+      ).rejects.toThrow(BadRequestException)
     })
 
     it('updates customFields when provided', async () => {
