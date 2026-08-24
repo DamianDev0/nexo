@@ -4,7 +4,7 @@ import { TAXONOMY_COLOR_PALETTE } from '@repo/shared-types'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
-import { DotsSixVerticalIcon } from '@/shared/ui/icons'
+import { DragHandle } from '@/shared/ui/atoms/drag-handle'
 import { SwatchRow } from '@/shared/ui/molecules/swatch-row'
 
 import { OptionRowActions } from './OptionRowActions'
@@ -47,16 +47,7 @@ export function TaxonomyOptionRow({
           label: t('settings.taxonomy.pickColor'),
         }}
         name={<OptionRowName name={label} description={option.description} />}
-        leading={
-          <span
-            {...handle?.attributes}
-            {...handle?.listeners}
-            className="flex size-6 shrink-0 cursor-grab touch-none items-center justify-center text-muted-foreground/60 transition-colors hover:text-muted-foreground active:cursor-grabbing"
-            aria-label={t('settings.taxonomy.reorder')}
-          >
-            <DotsSixVerticalIcon className="size-4" />
-          </span>
-        }
+        leading={<DragHandle handle={handle} label={t('settings.taxonomy.reorder')} />}
         trailing={
           <OptionRowActions
             count={count}

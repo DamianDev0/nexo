@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { IMPORT_UNMAPPED } from '@/features/import-contacts/config/import-contacts.constants'
-
 import type { ImportFieldDef, ValidationPreview } from '@repo/shared-types'
 
+import { IMPORT_UNMAPPED } from '@/features/import-contacts/config/import-contacts.constants'
 import {
   applyMapping,
   mappedFieldsInOrder,

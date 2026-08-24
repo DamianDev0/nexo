@@ -11,6 +11,15 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }))
 
+vi.mock('@/entities/nomenclature', () => ({
+  useEntityTerms: () => ({
+    singular: 'Contacto',
+    plural: 'Contactos',
+    lowerSingular: 'contacto',
+    lowerPlural: 'contactos',
+  }),
+}))
+
 const CANDIDATES: ReassignCandidate[] = [
   { key: 'new', label: 'Nuevo', color: '#60A5FA' },
   { key: 'client', label: 'Cliente', color: '#4ADE80' },

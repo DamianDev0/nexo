@@ -54,6 +54,7 @@ export type ContactColumnContext = {
   readonly t: TFunction
   readonly taxonomy: ContactTaxonomyMaps
   readonly locale: string
+  readonly entity?: string
   readonly dense?: boolean
   readonly statuses?: ReadonlyArray<TaxonomyChoice>
   readonly actions?: ContactRowActions

@@ -34,6 +34,13 @@ const settingsService = {
   archiveCustomField: (entity: CustomFieldEntity, key: string) =>
     request<void>({ method: 'delete', url: `/settings/custom-fields/${entity}/${key}` }),
 
+  replaceCustomFields: (entity: CustomFieldEntity, fields: FieldDef[]) =>
+    request<void>({
+      method: 'patch',
+      url: `/settings/custom-fields/${entity}`,
+      data: { fields },
+    }),
+
   updateContactTaxonomy: (data: ContactTaxonomy) =>
     request<ContactTaxonomy>({ method: 'patch', url: '/settings/contact-taxonomy', data }),
 

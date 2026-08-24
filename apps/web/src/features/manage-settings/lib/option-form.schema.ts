@@ -25,9 +25,9 @@ export function buildOptionFormSchema(t: TFunction) {
 
 export type OptionFormSchemaValues = z.infer<ReturnType<typeof buildOptionFormSchema>>
 
-export function buildReassignSchema(t: TFunction) {
+export function buildReassignSchema(t: TFunction, entities: string) {
   return z.object({
-    target: z.string().min(1, t('settings.reassign.errors.targetRequired')),
+    target: z.string().min(1, t('settings.reassign.errors.targetRequired', { entities })),
   })
 }
 

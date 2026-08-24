@@ -62,13 +62,14 @@ export function useContactsBoard() {
       buildContactColumns(catalog, {
         t,
         locale: i18n.language,
+        entity: terms.lowerSingular,
         dense: layout.value.density === 'compact',
         statuses: taxonomy.statuses,
         actions: rowActions,
         taxonomy,
         tagsByName,
       }),
-    [catalog, t, i18n.language, layout.value.density, taxonomy, rowActions, tagsByName],
+    [catalog, t, i18n.language, layout.value.density, taxonomy, rowActions, tagsByName, terms],
   )
 
   const instance = useDataTable({
@@ -149,10 +150,12 @@ export function useContactsBoard() {
       isArchiving,
       listHints,
       bulkLabels,
-      quickFilters: buildQuickFilterDefs(t, table.filters, {
-        sources: taxonomy.sources,
-        lifecycleStages: taxonomy.lifecycleStages,
-      }),
+      quickFilters: buildQuickFilterDefs(
+        t,
+        table.filters,
+        { sources: taxonomy.sources, lifecycleStages: taxonomy.lifecycleStages },
+        terms.lowerSingular,
+      ),
     },
     actions: {
       onSelectList: selectList,

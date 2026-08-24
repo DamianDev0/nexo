@@ -3,6 +3,7 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { useEntityTerms } from '@/entities/nomenclature'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
 import { FieldError } from '@/shared/ui/molecules/field-error'
@@ -45,15 +46,20 @@ export function ReassignOptionDialog({
   onConfirm,
 }: Readonly<ReassignOptionDialogProps>) {
   const { t } = useTranslation()
+  const terms = useEntityTerms('contact')
   const form = useReassignForm({ candidates, onConfirm })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>{t('settings.reassign.title')}</DialogTitle>
+          <DialogTitle>{t('settings.reassign.title', { entities: terms.lowerPlural })}</DialogTitle>
           <DialogDescription>
-            {t('settings.reassign.description', { count: source.count, name: source.label })}
+            {t('settings.reassign.description', {
+              count: source.count,
+              name: source.label,
+              entities: terms.lowerPlural,
+            })}
           </DialogDescription>
         </DialogHeader>
 

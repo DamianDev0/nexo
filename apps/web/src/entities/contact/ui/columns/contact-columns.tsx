@@ -5,7 +5,11 @@ import { selectionColumn } from '@/shared/ui/organisms/data-table'
 
 import { CONTACT_COLUMN_ALIGN, CONTACT_GROW_COLUMN } from '../../config/contact-columns.constants'
 
-import { contactCellRenderer, withContactCellLabels } from './cell-renderers'
+import {
+  contactCellRenderer,
+  customFieldCellRenderer,
+  withContactCellLabels,
+} from './cell-renderers'
 
 import type {
   ContactColumnContext,
@@ -26,7 +30,7 @@ function accessorFor(key: string): (contact: ContactListItem) => unknown {
 }
 
 function dataColumn(def: ContactColumnDef, context: ContactRenderContext): ContactColumn {
-  const render = contactCellRenderer(def.key)
+  const render = def.custom ? customFieldCellRenderer(def) : contactCellRenderer(def.key)
   const label = def.custom ? (def.label ?? def.key) : context.t(def.labelKey)
 
   return {
@@ -39,7 +43,9 @@ function dataColumn(def: ContactColumnDef, context: ContactRenderContext): Conta
     enableHiding: def.key !== CONTACT_GROW_COLUMN,
     meta: {
       label,
-      description: def.custom ? (def.label ?? def.key) : context.t(def.hintKey),
+      description: def.custom
+        ? (def.label ?? def.key)
+        : context.t(def.hintKey, { entity: context.entity ?? '' }),
       align: CONTACT_COLUMN_ALIGN[def.key],
       grow: def.key === CONTACT_GROW_COLUMN,
       lockable: true,

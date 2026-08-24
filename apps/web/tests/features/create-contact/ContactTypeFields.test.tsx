@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { vi } from 'vitest'
+import { useForm } from 'react-hook-form'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/entities/nomenclature', () => ({
   useEntityTerms: () => ({
@@ -9,8 +10,6 @@ vi.mock('@/entities/nomenclature', () => ({
     lowerPlural: 'contactos',
   }),
 }))
-import { useForm } from 'react-hook-form'
-import { describe, expect, it } from 'vitest'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactFormValues } from '@/features/create-contact/lib/contact-form.schema'

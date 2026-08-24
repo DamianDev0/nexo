@@ -1,3 +1,5 @@
+import { normalizeText } from '@repo/shared-utils'
+
 const TEMPLATE_HEADERS = [
   'Nombre',
   'Apellido',
@@ -30,4 +32,9 @@ const TEMPLATE_SAMPLE = [
 
 export function buildCsvTemplate(): string {
   return `${TEMPLATE_HEADERS.join(',')}\n${TEMPLATE_SAMPLE.join(',')}\n`
+}
+
+export function templateEntitiesSlug(entities: string): string {
+  const slug = normalizeText(entities).replaceAll(/[^a-z0-9]+/g, '-')
+  return slug.replaceAll(/^-|-$/g, '')
 }

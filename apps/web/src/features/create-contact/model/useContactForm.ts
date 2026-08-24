@@ -14,6 +14,7 @@ import { CONTACT_FORM_DEFAULTS } from '../config/contact-form.constants'
 import { duplicateFormField, duplicateMessage } from '../lib/contact-duplicates'
 import { toFormValues, toInput } from '../lib/contact-form-mapping'
 import { buildContactSchema, type ContactFormValues } from '../lib/contact-form.schema'
+import { validateCustomValues } from '../lib/custom-field-validation'
 import { useContactCustomFields } from '../query/useContactCustomFields'
 
 import type { ApiHandledError } from '@/shared/api/error-handler'
@@ -31,40 +32,38 @@ type ProbeFieldName = 'email' | 'phone'
 export function useContactForm(contact: ContactListItem | null, onDone: () => void) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { statuses, sources, types } = useContactTaxonomy()
+  const { statuses, sources, types, lifecycleStages } = useContactTaxonomy()
   const terms = useEntityTerms('contact')
   const customFieldDefs = useContactCustomFields()
-  const [customValues, setCustomValues] = useState<Record<string, unknown>>({})
-  const schema = useMemo(() => buildContactSchema(t), [t])
+  const [customValues, setCustomValues] = useState<Record<string, unknown>>(
+    () => contact?.customFields ?? {},
+  )
+  const [customErrors, setCustomErrors] = useState<Record<string, string>>({})
+  const schema = useMemo(() => buildContactSchema(t, terms.lowerSingular), [t, terms.lowerSingular])
+
+  const defaultStatus = statuses[0]?.key ?? ''
+  const defaultStage = lifecycleStages[0]?.key ?? ''
+  const formValues = useMemo<ContactFormValues>(
+    () =>
+      contact
+        ? toFormValues(contact)
+        : { ...CONTACT_FORM_DEFAULTS, status: defaultStatus, lifecycleStage: defaultStage },
+    [contact, defaultStage, defaultStatus],
+  )
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(schema),
     defaultValues: CONTACT_FORM_DEFAULTS,
+    values: formValues,
+    resetOptions: { keepDirtyValues: true },
     mode: 'onBlur',
   })
 
   const [pendingDuplicate, setPendingDuplicate] = useState<ContactDuplicatePayload | null>(null)
 
   useEffect(() => {
-    form.reset(contact ? toFormValues(contact) : CONTACT_FORM_DEFAULTS)
-    setCustomValues(contact?.customFields ?? {})
-  }, [contact, form])
-
-  const defaultStatus = statuses[0]?.key ?? ''
-  useEffect(() => {
-    if (!contact && defaultStatus && !form.getValues('status')) {
-      form.setValue('status', defaultStatus)
-    }
-  }, [contact, defaultStatus, form])
-
-  useEffect(() => {
-    if (!pendingDuplicate) return
-    const subscription = form.watch(() => setPendingDuplicate(null))
-    return () => subscription.unsubscribe()
-  }, [pendingDuplicate, form])
-
-  useEffect(() => {
     const subscription = form.watch((_, { name }) => {
+      setPendingDuplicate(null)
       if (name && form.getFieldState(name).error?.type === 'duplicate') form.clearErrors(name)
     })
     return () => subscription.unsubscribe()
@@ -94,7 +93,10 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
     if (form.getValues(field).trim() !== value) return
 
     if (duplicate && duplicateFormField(duplicate.field) === field) {
-      form.setError(field, { type: 'duplicate', message: duplicateMessage(t, duplicate) })
+      form.setError(field, {
+        type: 'duplicate',
+        message: duplicateMessage(t, duplicate, terms.lowerSingular),
+      })
     }
   }
 
@@ -124,7 +126,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
         if (field) {
           form.setError(field, {
             type: 'duplicate',
-            message: duplicateMessage(t, error.duplicate),
+            message: duplicateMessage(t, error.duplicate, terms.lowerSingular),
           })
         }
         if (error.duplicate.canForce || !field) {
@@ -143,6 +145,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
   }
 
   const setCustomValue = (key: string, value: unknown) => {
+    setCustomErrors(({ [key]: _cleared, ...rest }) => rest)
     setCustomValues((current) => {
       if (value === undefined || value === null || value === '') {
         const { [key]: _removed, ...rest } = current
@@ -152,20 +155,35 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
     })
   }
 
+  const submitChecked = (addAnother: boolean) =>
+    form.handleSubmit((values) => {
+      const errors = validateCustomValues(customFieldDefs, customValues, t)
+      if (Object.keys(errors).length > 0) {
+        setCustomErrors(errors)
+        return
+      }
+      mutation.mutate({ values, addAnother })
+    })
+
   return {
     form,
-    taxonomy: { statuses, sources, types },
-    customFields: { defs: customFieldDefs, values: customValues, setValue: setCustomValue },
+    taxonomy: { statuses, sources, types, lifecycleStages },
+    customFields: {
+      defs: customFieldDefs,
+      values: customValues,
+      errors: customErrors,
+      setValue: setCustomValue,
+    },
     isEdit: Boolean(contact),
     isPending: mutation.isPending,
     probeField,
-    handleSubmit: form.handleSubmit((values) => mutation.mutate({ values, addAnother: false })),
+    handleSubmit: submitChecked(false),
     submitAndAddAnother: () => {
-      void form.handleSubmit((values) => mutation.mutate({ values, addAnother: true }))()
+      void submitChecked(true)()
     },
     duplicateNotice: pendingDuplicate
       ? {
-          message: duplicateMessage(t, pendingDuplicate),
+          message: duplicateMessage(t, pendingDuplicate, terms.lowerSingular),
           canForce: pendingDuplicate.canForce,
         }
       : null,

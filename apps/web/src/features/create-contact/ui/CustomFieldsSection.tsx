@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { FieldError } from '@/shared/ui/molecules/field-error'
 import { Label } from '@/shared/ui/shadcn/label'
 
 import { CustomFieldInput } from './CustomFieldInput'
@@ -12,6 +13,7 @@ interface CustomFieldsSectionProps {
   readonly data: {
     readonly defs: ReadonlyArray<FieldDef>
     readonly values: Readonly<Record<string, unknown>>
+    readonly errors: Readonly<Record<string, string>>
     readonly setValue: (key: string, value: unknown) => void
   }
 }
@@ -23,17 +25,19 @@ export function CustomFieldsSection({ data }: Readonly<CustomFieldsSectionProps>
 
   return (
     <section className="mt-5 flex flex-col gap-3 border-t border-border pt-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {t('contacts.form.customFields')}
-      </p>
+      <p className="text-sm font-semibold text-foreground">{t('contacts.form.customFields')}</p>
       {data.defs.map((def) => (
         <div key={def.key} className="flex flex-col gap-1">
-          <Label className="text-xs text-muted-foreground">{def.label}</Label>
+          <Label className="text-xs text-muted-foreground">
+            {def.label}
+            {def.required && <span className="text-destructive"> *</span>}
+          </Label>
           <CustomFieldInput
             def={def}
             value={data.values[def.key]}
             onChange={(value) => data.setValue(def.key, value)}
           />
+          <FieldError message={data.errors[def.key]} />
         </div>
       ))}
     </section>

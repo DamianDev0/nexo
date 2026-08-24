@@ -11,7 +11,7 @@ import {
 const t = ((key: string) => key) as unknown as TFunction
 
 const optionSchema = buildOptionFormSchema(t)
-const reassignSchema = buildReassignSchema(t)
+const reassignSchema = buildReassignSchema(t, 'contactos')
 
 describe('buildOptionFormSchema', () => {
   it('trims name and description', () => {

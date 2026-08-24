@@ -25,12 +25,13 @@ const payload = (overrides: Record<string, unknown> = {}) => ({
   avatarUrl: '',
   type: '',
   typeLabel: '',
+  lifecycleStage: '',
   ...overrides,
 })
 
 describe('buildContactSchema', () => {
   it('requires firstName', () => {
-    const result = buildContactSchema(t).safeParse({
+    const result = buildContactSchema(t, 'contacto').safeParse({
       firstName: '',
       lastName: '',
       email: '',
@@ -45,6 +46,7 @@ describe('buildContactSchema', () => {
       avatarUrl: '',
       type: '',
       typeLabel: '',
+      lifecycleStage: '',
     })
 
     expect(result.success).toBe(false)
@@ -54,7 +56,7 @@ describe('buildContactSchema', () => {
   })
 
   it('rejects an invalid email', () => {
-    const result = buildContactSchema(t).safeParse({
+    const result = buildContactSchema(t, 'contacto').safeParse({
       firstName: 'Maria',
       lastName: '',
       email: 'not-an-email',
@@ -69,6 +71,7 @@ describe('buildContactSchema', () => {
       avatarUrl: '',
       type: '',
       typeLabel: '',
+      lifecycleStage: '',
     })
 
     expect(result.success).toBe(false)
@@ -78,7 +81,7 @@ describe('buildContactSchema', () => {
   })
 
   it('accepts an empty email', () => {
-    const result = buildContactSchema(t).safeParse({
+    const result = buildContactSchema(t, 'contacto').safeParse({
       firstName: 'Maria',
       lastName: '',
       email: '',
@@ -93,17 +96,20 @@ describe('buildContactSchema', () => {
       avatarUrl: '',
       type: '',
       typeLabel: '',
+      lifecycleStage: '',
     })
 
     expect(result.success).toBe(true)
   })
 
   it('rejects a whitespace-only firstName', () => {
-    expect(buildContactSchema(t).safeParse(payload({ firstName: '   ' })).success).toBe(false)
+    expect(buildContactSchema(t, 'contacto').safeParse(payload({ firstName: '   ' })).success).toBe(
+      false,
+    )
   })
 
   it('rejects an invalid Colombian phone with the translated message', () => {
-    const result = buildContactSchema(t).safeParse(payload({ phone: '123' }))
+    const result = buildContactSchema(t, 'contacto').safeParse(payload({ phone: '123' }))
 
     expect(result.success).toBe(false)
     if (!result.success) {
@@ -112,7 +118,7 @@ describe('buildContactSchema', () => {
   })
 
   it('trims fields and normalizes phones to digits', () => {
-    const result = buildContactSchema(t).safeParse(
+    const result = buildContactSchema(t, 'contacto').safeParse(
       payload({
         lastName: '  Lopez  ',
         phone: ' 300 123 4567 ',
@@ -150,20 +156,23 @@ describe('buildContactSchema', () => {
       source: '',
       type: '',
       typeLabel: '',
+      lifecycleStage: '',
     })
     expect(CONTACT_FORM_DEFAULTS.status).toBe('')
   })
 
   it('keeps the email value verbatim through the transform', () => {
-    const filled = buildContactSchema(t).safeParse(payload({ email: 'maria@nexo.test' }))
-    const empty = buildContactSchema(t).safeParse(payload())
+    const filled = buildContactSchema(t, 'contacto').safeParse(
+      payload({ email: 'maria@nexo.test' }),
+    )
+    const empty = buildContactSchema(t, 'contacto').safeParse(payload())
 
     expect(filled.success && filled.data.email).toBe('maria@nexo.test')
     expect(empty.success && empty.data.email).toBe('')
   })
 
   it('accepts a valid full payload', () => {
-    const result = buildContactSchema(t).safeParse({
+    const result = buildContactSchema(t, 'contacto').safeParse({
       firstName: 'Maria',
       lastName: 'Lopez',
       email: 'maria@nexo.test',
@@ -178,13 +187,14 @@ describe('buildContactSchema', () => {
       avatarUrl: '',
       type: 'supplier',
       typeLabel: '',
+      lifecycleStage: '',
     })
 
     expect(result.success).toBe(true)
   })
 
   it('requires typeLabel when the type is other', () => {
-    const result = buildContactSchema(t).safeParse(payload({ type: 'other' }))
+    const result = buildContactSchema(t, 'contacto').safeParse(payload({ type: 'other' }))
 
     expect(result.success).toBe(false)
     if (!result.success) {
@@ -195,12 +205,13 @@ describe('buildContactSchema', () => {
 
   it('rejects a whitespace-only typeLabel when the type is other', () => {
     expect(
-      buildContactSchema(t).safeParse(payload({ type: 'other', typeLabel: '   ' })).success,
+      buildContactSchema(t, 'contacto').safeParse(payload({ type: 'other', typeLabel: '   ' }))
+        .success,
     ).toBe(false)
   })
 
   it('accepts type other with a trimmed typeLabel', () => {
-    const result = buildContactSchema(t).safeParse(
+    const result = buildContactSchema(t, 'contacto').safeParse(
       payload({ type: 'other', typeLabel: '  Inversionista  ' }),
     )
 
@@ -211,8 +222,10 @@ describe('buildContactSchema', () => {
   })
 
   it('accepts an empty typeLabel for any non-other type', () => {
-    expect(buildContactSchema(t).safeParse(payload({ type: 'customer' })).success).toBe(true)
-    expect(buildContactSchema(t).safeParse(payload({ type: '' })).success).toBe(true)
+    expect(buildContactSchema(t, 'contacto').safeParse(payload({ type: 'customer' })).success).toBe(
+      true,
+    )
+    expect(buildContactSchema(t, 'contacto').safeParse(payload({ type: '' })).success).toBe(true)
   })
 })
 

@@ -12,10 +12,15 @@ export function duplicateMatchName(match: ContactDuplicateMatch): string {
   return [match.firstName, match.lastName].filter(Boolean).join(' ')
 }
 
-export function duplicateMessage(t: TFunction, payload: ContactDuplicatePayload): string {
+export function duplicateMessage(
+  t: TFunction,
+  payload: ContactDuplicatePayload,
+  entity: string,
+): string {
   const first = payload.matches[0]
   return t(duplicateMessageKeys[payload.field], {
     name: first ? duplicateMatchName(first) : '',
+    entity,
   })
 }
 

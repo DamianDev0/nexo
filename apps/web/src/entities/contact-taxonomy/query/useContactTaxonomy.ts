@@ -25,6 +25,7 @@ function toChoices(
       key: option.key,
       color: option.color,
       label: option.label ?? t(`contacts.${namespace}.${option.key}`, { defaultValue: option.key }),
+      description: option.description ?? null,
     }))
 }
 

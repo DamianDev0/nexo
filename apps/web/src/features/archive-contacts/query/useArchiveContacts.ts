@@ -2,11 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { sileo } from 'sileo'
 
+import { useEntityTerms } from '@/entities/nomenclature'
 import contactsService from '@/shared/api/services/contacts.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 export function useArchiveContacts() {
   const { t } = useTranslation()
+  const terms = useEntityTerms('contact')
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -26,10 +28,22 @@ export function useArchiveContacts() {
         return
       }
       if (archived < total) {
-        sileo.error({ title: t('contacts.toasts.archivedPartial', { archived, total }) })
+        sileo.error({
+          title: t('contacts.toasts.archivedPartial', {
+            archived,
+            total,
+            entities: terms.lowerPlural,
+          }),
+        })
         return
       }
-      sileo.success({ title: t('contacts.toasts.archived', { count: total }) })
+      sileo.success({
+        title: t('contacts.toasts.archived', {
+          count: total,
+          entity: terms.singular,
+          entities: terms.plural,
+        }),
+      })
     },
     onError: (error: { message?: string }) => {
       sileo.error({ title: t('common.saveFailed'), description: error.message })

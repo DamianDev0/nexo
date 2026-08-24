@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { toFormValues, toInput } from '@/features/create-contact/lib/contact-form-mapping'
-
 import type { ContactFormValues } from '@/features/create-contact/lib/contact-form.schema'
 import type { ContactListItem } from '@repo/shared-types'
+
+import { toFormValues, toInput } from '@/features/create-contact/lib/contact-form-mapping'
 
 const VALUES: ContactFormValues = {
   firstName: 'Ana',
@@ -20,6 +20,7 @@ const VALUES: ContactFormValues = {
   source: '',
   type: '',
   typeLabel: '',
+  lifecycleStage: 'lead',
 }
 
 describe('toInput', () => {
@@ -32,6 +33,11 @@ describe('toInput', () => {
 
     expect(input.customFields).toEqual({ metros_cuadrados: 120 })
     expect(input.firstName).toBe('Ana')
+  })
+
+  it('sends the lifecycle stage only when set', () => {
+    expect(toInput(VALUES, {}).lifecycleStage).toBe('lead')
+    expect(toInput({ ...VALUES, lifecycleStage: '' }, {}).lifecycleStage).toBeUndefined()
   })
 })
 
@@ -83,5 +89,6 @@ describe('toFormValues', () => {
     expect(values.firstName).toBe('Maria')
     expect(values.whatsappSameAsPhone).toBe(true)
     expect(values.status).toBe('new')
+    expect(values.lifecycleStage).toBe('lead')
   })
 })

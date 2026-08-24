@@ -60,6 +60,7 @@ export function buildQuickFilterDefs(
     sources: ReadonlyArray<TaxonomyChoice>
     lifecycleStages: ReadonlyArray<TaxonomyChoice>
   },
+  entity = '',
 ): ReadonlyArray<QuickFilterDef> {
   return QUICK_FILTER_IDS.map((id) => ({
     id,
@@ -68,7 +69,9 @@ export function buildQuickFilterDefs(
     options: (id === 'source' ? choices.sources : choices.lifecycleStages).map((choice) => ({
       value: choice.key,
       label: choice.label,
-      hint: t(`common.filters.hints.${id}.${choice.key}`, { defaultValue: '' }) || undefined,
+      hint:
+        choice.description ??
+        (t(`common.filters.hints.${id}.${choice.key}`, { defaultValue: '', entity }) || undefined),
       icon: QUICK_FILTER_ICONS[id],
     })),
   }))

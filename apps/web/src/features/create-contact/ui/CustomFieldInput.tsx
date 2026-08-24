@@ -1,5 +1,6 @@
 'use client'
 
+import { CENTAVOS_PER_PESO } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
 import { Checkbox } from '@/shared/ui/shadcn/checkbox'
@@ -93,18 +94,26 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
     )
   }
 
-  const isNumeric = def.type === 'number' || def.type === 'currency'
+  const isCurrency = def.type === 'currency'
+  const isNumeric = def.type === 'number' || isCurrency
+  const shown = value === undefined || value === null ? '' : value
   return (
     <Input
       type={INPUT_TYPE[def.type] ?? 'text'}
-      value={value === undefined || value === null ? '' : String(value)}
+      value={
+        isCurrency && typeof shown === 'number' ? String(shown / CENTAVOS_PER_PESO) : String(shown)
+      }
       onChange={(event) => {
         const raw = event.target.value
         if (!isNumeric) {
           onChange(raw)
           return
         }
-        onChange(raw === '' ? '' : Number(raw))
+        if (raw === '') {
+          onChange('')
+          return
+        }
+        onChange(isCurrency ? Math.round(Number(raw) * CENTAVOS_PER_PESO) : Number(raw))
       }}
       placeholder={def.placeholder}
       aria-label={def.label}

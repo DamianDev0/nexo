@@ -44,10 +44,41 @@ export function useCustomFieldsAdmin(entity: CustomFieldEntity) {
     onError,
   })
 
+  const patch = useMutation({
+    mutationFn: ({ key, data: patchData }: { key: string; data: Partial<FieldDef> }) =>
+      settingsService.patchCustomField(entity, key, patchData),
+    onSuccess: () => {
+      invalidate()
+      sileo.success({ title: t('settings.fields.updated') })
+    },
+    onError,
+  })
+
+  const replace = useMutation({
+    mutationFn: (fields: FieldDef[]) => settingsService.replaceCustomFields(entity, fields),
+    onMutate: async (fields) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.settings.customFields(entity) })
+      const previous = queryClient.getQueryData<FieldDef[]>(
+        QUERY_KEYS.settings.customFields(entity),
+      )
+      queryClient.setQueryData(QUERY_KEYS.settings.customFields(entity), fields)
+      return { previous }
+    },
+    onError: (error: { message?: string }, _fields, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(QUERY_KEYS.settings.customFields(entity), context.previous)
+      }
+      onError(error)
+    },
+    onSettled: invalidate,
+  })
+
   return {
     fields: data ?? [],
     isPending,
     create: create.mutate,
     archive: archive.mutate,
+    patch: patch.mutate,
+    replace: replace.mutate,
   }
 }

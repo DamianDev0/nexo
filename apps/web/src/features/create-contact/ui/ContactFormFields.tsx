@@ -4,8 +4,8 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { CONTACT_AVATARS } from '@/entities/contact'
-import { useEntityTerms } from '@/entities/nomenclature'
 import { AddressField, MunicipalityCombobox, useResolveMunicipality } from '@/entities/geo'
+import { useEntityTerms } from '@/entities/nomenclature'
 import { AvatarPicker } from '@/shared/ui/kokonutui/avatar-picker'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { Label } from '@/shared/ui/shadcn/label'
@@ -25,6 +25,7 @@ interface ContactFormFieldsProps {
     readonly statuses: ReadonlyArray<TaxonomyChoice>
     readonly sources: ReadonlyArray<TaxonomyChoice>
     readonly types: ReadonlyArray<TaxonomyChoice>
+    readonly lifecycleStages: ReadonlyArray<TaxonomyChoice>
   }
   readonly onProbeField?: (field: 'email' | 'phone') => void
 }
@@ -37,7 +38,7 @@ export function ContactFormFields({
 }: Readonly<ContactFormFieldsProps>) {
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
-  const { statuses, sources, types } = taxonomy
+  const { statuses, sources, types, lifecycleStages } = taxonomy
   const resolveMunicipality = useResolveMunicipality()
 
   const handlePlaceSelect = (secondaryText: string) => {
@@ -132,13 +133,21 @@ export function ContactFormFields({
           choices={statuses}
         />
       </div>
-      <TaxonomySelectField
-        control={control}
-        name="source"
-        label={t('contacts.form.source')}
-        placeholder={t('contacts.form.sourcePlaceholder', { entity: terms.lowerSingular })}
-        choices={sources}
-      />
+      <div className="grid grid-cols-2 gap-3.5">
+        <TaxonomySelectField
+          control={control}
+          name="source"
+          label={t('contacts.form.source')}
+          placeholder={t('contacts.form.sourcePlaceholder', { entity: terms.lowerSingular })}
+          choices={sources}
+        />
+        <TaxonomySelectField
+          control={control}
+          name="lifecycleStage"
+          label={t('contacts.form.lifecycleStage')}
+          choices={lifecycleStages}
+        />
+      </div>
       <ContactTypeFields control={control} choices={types} />
     </div>
   )

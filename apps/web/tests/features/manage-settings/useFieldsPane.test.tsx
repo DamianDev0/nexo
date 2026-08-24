@@ -64,13 +64,80 @@ describe('useFieldsPane', () => {
     const { result } = renderHook(() => useFieldsPane(), { wrapper })
     await waitFor(() => expect(result.current.isPending).toBe(false))
 
-    act(() => result.current.editor.setOpen(true))
-    act(() => result.current.onSubmit({ label: 'Tipo de techo', type: 'select' }))
+    act(() => result.current.editor.openCreate())
+    act(() =>
+      result.current.onSubmit({
+        label: 'Tipo de techo',
+        type: 'select',
+        required: true,
+        showInForm: true,
+        optionLabels: ['Teja', 'Zinc'],
+      }),
+    )
 
     await waitFor(() => expect(created).not.toBeNull())
     expect(created!.key).toBe('tipo_de_techo')
     expect(created!.type).toBe('select')
+    expect(created!.required).toBe(true)
+    expect(created!.options?.map((option) => option.label)).toEqual(['Teja', 'Zinc'])
     expect(result.current.editor.open).toBe(false)
+  })
+
+  it('patches the edited field instead of creating a new one', async () => {
+    let patchedKey: string | null = null
+    let patchBody: Partial<FieldDef> | null = null
+    server.use(
+      listHandler(FIELDS),
+      http.patch(`${API}/settings/custom-fields/contacts/:key`, async ({ params, request }) => {
+        patchedKey = params.key as string
+        patchBody = (await request.json()) as Partial<FieldDef>
+        return HttpResponse.json({ data: patchBody })
+      }),
+    )
+
+    const { result } = renderHook(() => useFieldsPane(), { wrapper })
+    await waitFor(() => expect(result.current.isPending).toBe(false))
+
+    act(() => result.current.onEdit('metros_cuadrados'))
+    expect(result.current.editor.initial?.label).toBe('Metros cuadrados')
+
+    act(() =>
+      result.current.onSubmit({
+        label: 'Área construida',
+        type: 'number',
+        required: true,
+        showInForm: true,
+        optionLabels: [],
+      }),
+    )
+
+    await waitFor(() => expect(patchedKey).toBe('metros_cuadrados'))
+    expect(patchBody).toEqual({ label: 'Área construida', required: true, showInForm: true })
+    expect(result.current.editor.open).toBe(false)
+  })
+
+  it('persists a reorder through the replace endpoint', async () => {
+    let replaced: FieldDef[] | null = null
+    const twoFields: FieldDef[] = [
+      { ...FIELDS[0]! },
+      { ...FIELDS[0]!, key: 'presupuesto', label: 'Presupuesto', order: 2 },
+    ]
+    server.use(
+      listHandler(twoFields),
+      http.patch(`${API}/settings/custom-fields/contacts`, async ({ request }) => {
+        ;({ fields: replaced } = (await request.json()) as { fields: FieldDef[] })
+        return HttpResponse.json({ data: null })
+      }),
+    )
+
+    const { result } = renderHook(() => useFieldsPane(), { wrapper })
+    await waitFor(() => expect(result.current.fields).toHaveLength(2))
+
+    act(() => result.current.onReorder('presupuesto', 'metros_cuadrados'))
+
+    await waitFor(() => expect(replaced).not.toBeNull())
+    const orders = Object.fromEntries(replaced!.map((field) => [field.key, field.order]))
+    expect(orders).toEqual({ presupuesto: 1, metros_cuadrados: 2 })
   })
 
   it('archives a field through the settings API', async () => {

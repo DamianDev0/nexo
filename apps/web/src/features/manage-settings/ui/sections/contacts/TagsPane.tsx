@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { useEntityTerms } from '@/entities/nomenclature'
 import { PlusIcon, TagIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
@@ -15,12 +16,18 @@ import { TagRow } from './TagRow'
 
 export function TagsPane() {
   const { t } = useTranslation()
+  const terms = useEntityTerms('contact')
   const pane = useTagsPane()
 
   return (
     <div className="max-w-2xl">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">{t('settings.tags.description')}</p>
+        <p className="text-sm text-muted-foreground">
+          {t('settings.tags.description', {
+            entity: terms.lowerSingular,
+            entities: terms.lowerPlural,
+          })}
+        </p>
         <Button
           variant="outline"
           size="sm"
@@ -38,7 +45,7 @@ export function TagsPane() {
           <TagIcon className="size-6 text-muted-foreground" />
           <p className="text-sm font-medium text-foreground">{t('settings.tags.emptyTitle')}</p>
           <p className="max-w-xs text-xs text-muted-foreground">
-            {t('settings.tags.emptyDescription')}
+            {t('settings.tags.emptyDescription', { entities: terms.lowerPlural })}
           </p>
         </div>
       )}

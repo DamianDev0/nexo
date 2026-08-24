@@ -13,7 +13,7 @@ function optionalPhone(t: TFunction) {
     .refine((value) => value === '' || isValidCOPhone(value), t('contacts.errors.phoneInvalid'))
 }
 
-export function buildContactSchema(t: TFunction) {
+export function buildContactSchema(t: TFunction, entity: string) {
   return z
     .object({
       firstName: z.string().trim().min(1, t('contacts.errors.firstNameRequired')),
@@ -35,13 +35,14 @@ export function buildContactSchema(t: TFunction) {
       source: z.string(),
       type: z.string(),
       typeLabel: z.string().trim(),
+      lifecycleStage: z.string(),
     })
     .superRefine((values, ctx) => {
       if (values.type === CONTACT_TYPE_OTHER_KEY && values.typeLabel === '') {
         ctx.addIssue({
           code: 'custom',
           path: ['typeLabel'],
-          message: t('contacts.errors.typeOtherRequired'),
+          message: t('contacts.errors.typeOtherRequired', { entity }),
         })
       }
     })

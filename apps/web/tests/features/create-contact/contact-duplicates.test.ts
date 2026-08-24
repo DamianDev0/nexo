@@ -41,22 +41,24 @@ describe('duplicateMatchName', () => {
 
 describe('duplicateMessage', () => {
   it('maps each duplicate field to its i18n key', () => {
-    expect(duplicateMessage(t, payload({ field: 'email' }))).toBe(
+    expect(duplicateMessage(t, payload({ field: 'email' }), 'contacto')).toBe(
       'contacts.duplicates.emailTaken|Maria Lopez',
     )
-    expect(duplicateMessage(t, payload({ field: 'documentNumber' }))).toBe(
+    expect(duplicateMessage(t, payload({ field: 'documentNumber' }), 'contacto')).toBe(
       'contacts.duplicates.documentTaken|Maria Lopez',
     )
-    expect(duplicateMessage(t, payload({ field: 'phone' }))).toBe(
+    expect(duplicateMessage(t, payload({ field: 'phone' }), 'contacto')).toBe(
       'contacts.duplicates.phoneMatch|Maria Lopez',
     )
-    expect(duplicateMessage(t, payload({ field: 'name' }))).toBe(
+    expect(duplicateMessage(t, payload({ field: 'name' }), 'contacto')).toBe(
       'contacts.duplicates.nameMatch|Maria Lopez',
     )
   })
 
   it('interpolates an empty name when there are no matches', () => {
-    expect(duplicateMessage(t, payload({ matches: [] }))).toBe('contacts.duplicates.emailTaken')
+    expect(duplicateMessage(t, payload({ matches: [] }), 'contacto')).toBe(
+      'contacts.duplicates.emailTaken',
+    )
   })
 })
 

@@ -170,6 +170,7 @@ describe('useContactForm', () => {
         source: 'manual',
         type: 'customer',
         typeLabel: '',
+        lifecycleStage: '',
       })
     })
 

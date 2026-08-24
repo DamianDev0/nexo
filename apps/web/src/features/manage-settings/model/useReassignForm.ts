@@ -5,6 +5,8 @@ import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { useEntityTerms } from '@/entities/nomenclature'
+
 import { EMPTY_REASSIGN_FORM } from '../config/option-form.constants'
 import { buildReassignSchema, type ReassignFormValues } from '../lib/option-form.schema'
 
@@ -17,7 +19,8 @@ interface UseReassignFormArgs {
 
 export function useReassignForm({ candidates, onConfirm }: UseReassignFormArgs) {
   const { t } = useTranslation()
-  const schema = useMemo(() => buildReassignSchema(t), [t])
+  const terms = useEntityTerms('contact')
+  const schema = useMemo(() => buildReassignSchema(t, terms.lowerPlural), [t, terms.lowerPlural])
 
   const form = useForm<ReassignFormValues>({
     resolver: zodResolver(schema),

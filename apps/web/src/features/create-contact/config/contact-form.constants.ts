@@ -15,4 +15,5 @@ export const CONTACT_FORM_DEFAULTS: ContactFormValues = {
   source: '',
   type: '',
   typeLabel: '',
+  lifecycleStage: '',
 }

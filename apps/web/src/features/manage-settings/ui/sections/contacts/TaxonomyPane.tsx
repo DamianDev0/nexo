@@ -5,6 +5,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useTranslation } from 'react-i18next'
 
+import { useEntityTerms } from '@/entities/nomenclature'
 import { PlusIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
@@ -29,6 +30,7 @@ const DROP_ANIMATION = {
 
 export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
   const { t } = useTranslation()
+  const terms = useEntityTerms('contact')
   const pane = useTaxonomyPane(kind)
 
   const dragged = pane.options.find((option) => option.key === pane.dnd.activeId)
@@ -37,7 +39,10 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
     <div className="max-w-2xl">
       <div className="mb-4 flex items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
-          {t(`settings.taxonomy.${pane.namespace}Description`)}
+          {t(`settings.taxonomy.${pane.namespace}Description`, {
+            entity: terms.lowerSingular,
+            entities: terms.lowerPlural,
+          })}
         </p>
         <Button
           variant="outline"

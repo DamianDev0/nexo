@@ -1,5 +1,6 @@
 'use client'
 
+import { RENDERABLE_FIELD_TYPES } from '@repo/shared-types'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
@@ -19,7 +20,14 @@ export function useContactCustomFields(): ReadonlyArray<FieldDef> {
 
   return useMemo(
     () =>
-      (data ?? []).filter((field) => field.isActive !== false).sort((a, b) => a.order - b.order),
+      (data ?? [])
+        .filter(
+          (field) =>
+            field.isActive !== false &&
+            field.showInForm !== false &&
+            RENDERABLE_FIELD_TYPES.includes(field.type),
+        )
+        .sort((a, b) => a.order - b.order),
     [data],
   )
 }

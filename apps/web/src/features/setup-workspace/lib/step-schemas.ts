@@ -20,9 +20,20 @@ export const pipelineStepSchema = z.object({
     .min(1),
 })
 
+const ENTITY_TERM_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N} .&-]*$/u
+const ENTITY_TERM_MAX = 24
+
+const entityTerm = z
+  .string()
+  .trim()
+  .min(2)
+  .max(ENTITY_TERM_MAX)
+  .regex(ENTITY_TERM_PATTERN)
+  .transform((value) => value.charAt(0).toLocaleUpperCase() + value.slice(1))
+
 const entityTermSchema = z.object({
-  singular: z.string().min(1),
-  plural: z.string().min(1),
+  singular: entityTerm,
+  plural: entityTerm,
 })
 
 export const nomenclatureStepSchema = z.object({

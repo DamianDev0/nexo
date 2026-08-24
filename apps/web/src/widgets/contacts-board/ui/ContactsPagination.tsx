@@ -3,7 +3,6 @@
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
-
 import { PAGE_SIZE_OPTIONS } from '@/shared/config/pagination'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
