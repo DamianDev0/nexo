@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Checkbox as CheckboxPrimitive } from 'radix-ui'
+import { useState } from 'react'
 
 import { cn } from '@/shared/lib'
 import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
@@ -11,6 +12,8 @@ export interface CheckboxProps {
   'aria-label'?: string
   /** Whether the checkbox is checked */
   checked?: boolean
+  /** Uncontrolled initial state, used when `checked` is absent */
+  defaultChecked?: boolean
   /** Optional CSS class */
   className?: string
   /** Whether the checkbox is disabled */
@@ -34,7 +37,8 @@ const MotionSvg = motion.svg
 
 export function SmoothCheckbox({
   'aria-label': ariaLabel,
-  checked = false,
+  checked,
+  defaultChecked = false,
   indeterminate = false,
   onCheckedChange,
   disabled = false,
@@ -45,21 +49,24 @@ export function SmoothCheckbox({
   required,
 }: CheckboxProps) {
   const shouldReduceMotion = useReducedMotion()
+  const [internal, setInternal] = useState(defaultChecked)
+  const isChecked = checked ?? internal
 
-  const derivedState = indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked'
+  const derivedState = indeterminate ? 'indeterminate' : isChecked ? 'checked' : 'unchecked'
 
   const handleChange = (state: boolean | 'indeterminate') => {
     if (state === 'indeterminate') {
       return
     }
+    setInternal(state)
     onCheckedChange?.(state)
   }
 
   return (
     <CheckboxPrimitive.Root
-      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-checked={indeterminate ? 'mixed' : isChecked}
       aria-label={ariaLabel}
-      checked={indeterminate ? 'indeterminate' : checked}
+      checked={indeterminate ? 'indeterminate' : isChecked}
       className={cn(
         'peer size-4 shrink-0 rounded-[4px] border border-input shadow-xs outline-none transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-foreground data-[state=indeterminate]:border-foreground data-[state=checked]:bg-foreground data-[state=indeterminate]:bg-foreground data-[state=unchecked]:bg-background data-[state=checked]:text-background data-[state=indeterminate]:text-background dark:data-[state=unchecked]:bg-input/30 dark:aria-invalid:ring-destructive/40',
         className,

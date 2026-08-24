@@ -1,5 +1,3 @@
-export { PageTransition } from './PageTransition'
-export { StaggerGroup, StaggerItem } from './StaggerGroup'
 export { useReducedTransition } from './useReducedTransition'
 export {
   DURATION,

@@ -17,7 +17,7 @@ app → views → widgets → features → entities → shared
 - `src/app/` — Next.js routing only. Pages are re-exports of views. `src/proxy.ts` (Next 16 renamed middleware) guards routes at edge via `access_token` cookie.
 - `src/views/<page>/` — page orchestrators (`login`, `onboarding`, `onboarding-setup`, `dashboard`).
 - `src/widgets/<block>/` — composite blocks reused across pages (`app-shell`, `auth-shell`).
-- `src/features/<verb>/` — ONE user action per slice, named as a verb: `login`, `logout`, `register-workspace`, `recover-password`, `setup-workspace`.
+- `src/features/<verb>/` — ONE user action per slice, named as a verb: `login`, `logout`, `register-workspace`, `setup-workspace`.
 - `src/entities/<noun>/` — domain mirror (`session`, `contact`, `nomenclature`).
 - `src/shared/` — domain-free: `api/` (axios http, `request<T>`, services, `dal/` server-only fetchers), `query/` (query-keys, query-client, server-query, prefetch-\*), `config/` (routes, pagination, tokens/), `i18n/`, `lib/` (cn, hooks, animations), `ui/` (`shadcn/` vendor — never modify; `atoms/`, `molecules/` custom).
 

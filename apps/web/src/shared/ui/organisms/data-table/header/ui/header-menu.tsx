@@ -42,7 +42,7 @@ export function HeaderMenu({ header }: Readonly<{ header: Header<unknown, unknow
           aria-label={t('common.table.columnMenu')}
           className={DATA_TABLE_ICON_BUTTON}
         >
-          <DotsThreeVerticalIcon className="size-3.5" weight="bold" />
+          <DotsThreeVerticalIcon className="size-3.5" strokeWidth={2.5} />
         </Button>
       </DropdownMenuTrigger>
 

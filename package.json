@@ -42,7 +42,8 @@
       "node apps/web/scripts/check-no-comments.mjs",
       "node apps/web/scripts/check-test-mirror.mjs",
       "node apps/web/scripts/check-colors.mjs",
-      "node apps/web/scripts/check-file-size.mjs"
+      "node apps/web/scripts/check-file-size.mjs",
+      "node apps/web/scripts/check-typography.mjs"
     ],
     "**/*.{ts,tsx}": [
       "prettier --write",

@@ -138,6 +138,33 @@ export default [
     },
   },
   {
+    files: [
+      'src/{features,entities,widgets,views}/*/api/**/*.{ts,tsx}',
+      'src/shared/api/dal/**/*.{ts,tsx}',
+      'src/shared/query/prefetch-*.{ts,tsx}',
+      'src/shared/query/server-query.{ts,tsx}',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: [
+                '@/shared/api/http',
+                '@/shared/api/request',
+                '@/shared/api/tenant-ref',
+                '@/shared/api/services/*',
+              ],
+              message:
+                'Server-side code must use apiFetch (@/shared/api/client). The axios layer and tenantRef are a client-only module-level singleton — importing them server-side risks cross-tenant leakage.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['src/shared/ui/{shadcn,smoothui,kokonutui,ruixen}/**'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',

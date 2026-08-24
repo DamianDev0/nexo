@@ -105,7 +105,10 @@ export function BreadcrumbIcon({
           ) : null
 
           return (
-            <li key={item.label} className="z-10 inline-flex items-center">
+            <li
+              key={item.label}
+              className={cn('z-10 items-center', isLast ? 'inline-flex' : 'hidden lg:inline-flex')}
+            >
               {isLink && item.href ? (
                 <Link
                   ref={(el: HTMLAnchorElement | null) => {

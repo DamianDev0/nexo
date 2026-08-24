@@ -1,11 +1,10 @@
-import { AnimatePresence, motion } from 'motion/react'
 import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { EyeIcon, EyeSlashIcon } from '@/shared/ui/icons'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { EyeMorph, EyeSlashMorph, MorphIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Input } from '@/shared/ui/shadcn/input'
-import { Label } from '@/shared/ui/shadcn/label'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { FieldError } from './field-error'
 import { PasswordStrengthMeter } from './password-strength'
@@ -44,7 +43,7 @@ export function PasswordField<T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <Label className="text-xs font-semibold text-body">{copy.label}</Label>
+          <FieldLabel>{copy.label}</FieldLabel>
           <div className="relative mt-1.5">
             <Input
               type={visibility.shown ? 'text' : 'password'}
@@ -62,22 +61,11 @@ export function PasswordField<T extends FieldValues>({
               onClick={visibility.onToggle}
               aria-label={visibility.shown ? t('auth.hidePassword') : t('auth.showPassword')}
             >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={visibility.shown ? 'off' : 'on'}
-                  initial={{ opacity: 0, scale: 0.6, rotate: -30 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.6, rotate: 30 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="flex"
-                >
-                  {visibility.shown ? (
-                    <EyeSlashIcon className="size-4" />
-                  ) : (
-                    <EyeIcon className="size-4" />
-                  )}
-                </motion.span>
-              </AnimatePresence>
+              <MorphIcon
+                icon={visibility.shown ? EyeSlashMorph : EyeMorph}
+                reducedMotion="user"
+                className="size-4"
+              />
             </Button>
           </div>
           {showStrength && <PasswordStrengthMeter value={field.value ?? ''} />}

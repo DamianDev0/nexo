@@ -8,17 +8,6 @@ const authService = {
 
   logout: () => request<void>({ method: 'post', url: '/auth/logout' }),
 
-  forgotPassword: async (email: string) => {
-    try {
-      await apiUrl.post('/auth/forgot-password', { email })
-    } catch {
-      return
-    }
-  },
-
-  resetPassword: (token: string, newPassword: string) =>
-    request<void>({ method: 'post', url: '/auth/reset-password', data: { token, newPassword } }),
-
   refreshToken: () => request<void>({ method: 'post', url: '/auth/refresh' }),
 
   getGoogleAuthUrl: () => `${apiUrl.defaults.baseURL}/auth/google`,

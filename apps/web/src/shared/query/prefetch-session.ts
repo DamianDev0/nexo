@@ -22,11 +22,15 @@ import { getServerQueryClient, prefetch } from './server-query'
 
 import type { QueryClient } from '@tanstack/react-query'
 
-export async function prefetchAppShell(): Promise<QueryClient> {
+async function prefetchShell(
+  options: { requireOnboarded?: boolean } | undefined,
+  extras: ReadonlyArray<Promise<void>> | ((client: QueryClient) => ReadonlyArray<Promise<void>>),
+): Promise<QueryClient> {
   const client = getServerQueryClient()
 
   const me = await getMe().catch(() => null)
   if (!me) redirect(ROUTES.auth.login)
+  if (options?.requireOnboarded && !me.onboardingCompleted) redirect(ROUTES.setup.onboarding)
 
   client.setQueryData(QUERY_KEYS.auth.me, me)
 
@@ -39,18 +43,21 @@ export async function prefetchAppShell(): Promise<QueryClient> {
     prefetch(client, QUERY_KEYS.notifications.unread(NOTIFICATION_PAGE_SIZE), () =>
       listUnreadNotifications(NOTIFICATION_PAGE_SIZE),
     ),
+    ...(typeof extras === 'function' ? extras(client) : extras),
   ])
 
   return client
 }
 
-export async function prefetchSetupWizard(): Promise<QueryClient> {
-  const client = await prefetchAppShell()
+export async function prefetchAppShell(options?: {
+  requireOnboarded?: boolean
+}): Promise<QueryClient> {
+  return prefetchShell(options, [])
+}
 
-  await Promise.all([
+export async function prefetchSetupWizard(): Promise<QueryClient> {
+  return prefetchShell(undefined, (client) => [
     prefetch(client, QUERY_KEYS.settings.onboarding, getOnboarding),
     prefetch(client, QUERY_KEYS.settings.pipelines, getPipelines),
   ])
-
-  return client
 }

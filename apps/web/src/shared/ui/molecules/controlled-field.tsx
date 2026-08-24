@@ -1,7 +1,7 @@
 import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
 
-import { Input } from '@/shared/ui/shadcn/input'
-import { Label } from '@/shared/ui/shadcn/label'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { FieldError } from './field-error'
 
@@ -36,10 +36,7 @@ export function ControlledField<T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <Label className="text-xs font-semibold text-body">
-            {label}
-            {required && <span className="text-destructive">*</span>}
-          </Label>
+          <FieldLabel required={required}>{label}</FieldLabel>
           <Input
             type={type}
             placeholder={placeholder}

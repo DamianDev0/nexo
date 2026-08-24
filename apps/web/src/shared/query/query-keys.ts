@@ -38,6 +38,7 @@ export const QUERY_KEYS = {
     catalog: (entityType: string) => ['tags', entityType, 'catalog'] as const,
   },
   geo: {
+    colombiaMap: ['geo', 'colombia-map'] as const,
     departments: ['geo', 'departments'] as const,
     municipalities: (q: string, department?: string) =>
       ['geo', 'municipalities', q, department ?? null] as const,

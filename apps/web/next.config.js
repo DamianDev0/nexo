@@ -3,7 +3,7 @@ const API_INTERNAL_URL = process.env.API_INTERNAL_URL ?? 'http://localhost:8080'
 const nextConfig = {
   allowedDevOrigins: ['http://localhost:3000'],
   experimental: {
-    optimizePackageImports: ['@phosphor-icons/react'],
+    optimizePackageImports: ['@phosphor-icons/react', 'lucide-react', 'lucide'],
   },
   images: {
     remotePatterns: [{ protocol: 'https', hostname: 'res.cloudinary.com' }],

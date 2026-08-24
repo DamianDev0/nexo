@@ -1,6 +1,4 @@
 [
-  "src/entities/session/ui/AuthGuard.tsx:9 :: import { useAuth } from '../query/useAuth'",
-  "src/entities/session/ui/GuestGuard.tsx:8 :: import { useAuth } from '../query/useAuth'",
   "src/widgets/app-shell/ui/AppSidebar.tsx:7 :: import { useSidebarModules } from '../query/useSidebarModules'",
   "src/widgets/app-shell/ui/AppSidebar.tsx:8 :: import { useTenantBranding } from '../query/useTenantBranding'",
   "src/widgets/app-shell/ui/HeaderSearch.tsx:18 :: import { useSidebarModules } from '../query/useSidebarModules'",

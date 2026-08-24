@@ -72,7 +72,7 @@ export function AvatarPicker({ avatars, value, labels, onChange }: Readonly<Avat
                   <Image src={avatar} alt="" fill sizes="64px" className="object-cover" />
                   {active && (
                     <span className="absolute inset-0 flex items-center justify-center bg-primary/30">
-                      <CheckIcon className="size-4 text-primary-foreground" weight="bold" />
+                      <CheckIcon className="size-4 text-primary-foreground" strokeWidth={3} />
                     </span>
                   )}
                 </motion.button>

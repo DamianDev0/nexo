@@ -81,10 +81,10 @@ export function FileUpload({
         />
         <div className="flex flex-col items-center gap-0.5">
           <span className="font-medium">
-            {isDragging ? 'Drop file here' : 'Click or drag to upload'}
+            {isDragging ? t('common.upload.dropHere') : t('common.upload.clickOrDrag')}
           </span>
           <span className="text-xs text-muted-foreground">
-            PNG, JPG, SVG or WebP · Max {maxSizeMb}MB
+            {t('common.upload.constraints', { size: maxSizeMb })}
           </span>
         </div>
 

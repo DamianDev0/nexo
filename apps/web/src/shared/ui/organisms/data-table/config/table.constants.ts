@@ -10,8 +10,6 @@ export const DATA_TABLE_MIN_COLUMN_WIDTH = 90
 
 export const DATA_TABLE_MAX_COLUMN_WIDTH = 480
 
-export const DATA_TABLE_STORAGE_PREFIX = 'nexo.table.'
-
 export const DATA_TABLE_ICON_BUTTON = 'size-5 text-faint hover:bg-muted hover:text-foreground'
 
 export const DATA_TABLE_ACTIVE_TONE = 'text-primary-deep dark:text-primary'

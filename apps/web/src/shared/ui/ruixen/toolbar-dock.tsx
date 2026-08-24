@@ -1,19 +1,18 @@
 'use client'
 
-import {
-  BubbleChatIcon,
-  CommandIcon,
-  InboxIcon,
-  Menu01Icon,
-  PencilEdit01Icon,
-  Share08Icon,
-  ToggleOnIcon,
-} from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
 import { motion } from 'motion/react'
 import * as React from 'react'
 
 import { cn } from '@/shared/lib/index'
+import {
+  ChatCircleIcon,
+  CommandIcon,
+  MenuIcon,
+  PencilSimpleIcon,
+  ShareNetworkIcon,
+  ToggleRightIcon,
+  TrayIcon,
+} from '@/shared/ui/icons'
 
 export interface ToolbarDockItem {
   /** Stable identifier. */
@@ -66,34 +65,34 @@ const DEFAULT_ITEMS: ToolbarDockItem[] = [
   {
     id: 'comment',
     label: 'Comment',
-    icon: <HugeiconsIcon icon={BubbleChatIcon} {...ICON_PROPS} />,
+    icon: <ChatCircleIcon {...ICON_PROPS} />,
     shortcut: ['C'],
   },
   {
     id: 'inbox',
     label: 'Inbox',
-    icon: <HugeiconsIcon icon={InboxIcon} {...ICON_PROPS} />,
+    icon: <TrayIcon {...ICON_PROPS} />,
     badge: true,
   },
   {
     id: 'flags',
     label: 'Feature Flags',
-    icon: <HugeiconsIcon icon={ToggleOnIcon} {...ICON_PROPS} />,
+    icon: <ToggleRightIcon {...ICON_PROPS} />,
   },
   {
     id: 'draft',
     label: 'Draft Mode',
-    icon: <HugeiconsIcon icon={PencilEdit01Icon} {...ICON_PROPS} />,
+    icon: <PencilSimpleIcon {...ICON_PROPS} />,
   },
   {
     id: 'share',
     label: 'Share',
-    icon: <HugeiconsIcon icon={Share08Icon} {...ICON_PROPS} />,
+    icon: <ShareNetworkIcon {...ICON_PROPS} />,
   },
   {
     id: 'menu',
     label: 'Menu',
-    icon: <HugeiconsIcon icon={Menu01Icon} {...ICON_PROPS} />,
+    icon: <MenuIcon {...ICON_PROPS} />,
     badge: true,
     toggle: true,
   },
@@ -264,11 +263,7 @@ export function ToolbarDock({
                         key={k}
                         className="inline-flex size-5 items-center justify-center rounded-sm border border-primary-foreground/30 p-0.5 text-xs text-primary-foreground"
                       >
-                        {key === '⌘' ? (
-                          <HugeiconsIcon icon={CommandIcon} size={12} strokeWidth={2} />
-                        ) : (
-                          key
-                        )}
+                        {key === '⌘' ? <CommandIcon size={12} strokeWidth={2} /> : key}
                       </kbd>
                     ))}
                   </span>

@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 
 import { cn } from '@/shared/lib/cn'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
@@ -8,25 +9,36 @@ import { CaretUpDownIcon, CheckIcon, MagnifyingGlassIcon } from '@/shared/ui/ico
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { Button } from '@/shared/ui/shadcn/button'
 import { Command, CommandEmpty, CommandItem, CommandList } from '@/shared/ui/shadcn/command'
-import { Input } from '@/shared/ui/shadcn/input'
+import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import type { ReactNode } from 'react'
 
 const ASYNC_SELECT_COLLISION_PADDING = 12
+const ASYNC_SELECT_STALE_MS = 60 * 1000
+const ASYNC_SELECT_DEBOUNCE_MS = 300
 
-export interface AsyncSelectSource<T> {
-  readonly fetcher: (query: string) => Promise<ReadonlyArray<T>>
+interface AsyncSelectSourceBase<T> {
   readonly getValue: (option: T) => string
   readonly renderOption: (option: T) => ReactNode
-  readonly preload?: boolean
   readonly filterFn?: (option: T, query: string) => boolean
 }
+
+export type AsyncSelectSource<T> = AsyncSelectSourceBase<T> &
+  (
+    | { readonly options: ReadonlyArray<T>; readonly key?: never; readonly fetcher?: never }
+    | {
+        readonly options?: never
+        readonly key: string
+        readonly fetcher: (query: string) => Promise<ReadonlyArray<T>>
+      }
+  )
 
 export interface AsyncSelectView {
   readonly display?: ReactNode
   readonly placeholder: string
   readonly searchPlaceholder: string
   readonly empty: ReactNode | ((term: string) => ReactNode)
+  readonly error?: ReactNode
   readonly triggerClassName?: string
 }
 
@@ -47,39 +59,28 @@ export function AsyncSelect<T>({
 }: Readonly<AsyncSelectProps<T>>) {
   const [open, setOpen] = useState(false)
   const [term, setTerm] = useState('')
-  const [items, setItems] = useState<ReadonlyArray<T>>([])
-  const [loading, setLoading] = useState(false)
-  const [preloaded, setPreloaded] = useState(false)
-  const debounced = useDebouncedValue(term, source.preload ? 0 : 300)
+  const debounced = useDebouncedValue(term, source.options ? 0 : ASYNC_SELECT_DEBOUNCE_MS)
 
-  useEffect(() => {
-    if (!open || (source.preload && preloaded)) return
-    let cancelled = false
-    setLoading(true)
-    source
-      .fetcher(source.preload ? '' : debounced)
-      .then((data) => {
-        if (cancelled) return
-        setItems(data)
-        setPreloaded(true)
-      })
-      .catch(() => {
-        if (!cancelled) setItems([])
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [open, debounced, source, preloaded])
+  const query = useQuery({
+    queryKey: ['async-select', source.key ?? 'static', debounced],
+    queryFn: async () => (source.fetcher ? source.fetcher(debounced) : []),
+    enabled: open && Boolean(source.fetcher),
+    staleTime: ASYNC_SELECT_STALE_MS,
+    placeholderData: keepPreviousData,
+  })
+
+  const items = source.options ?? query.data
+  const loading = Boolean(source.fetcher) && open && query.isLoading
 
   const visible = useMemo(() => {
-    if (!source.preload || !term) return items
-    return items.filter((option) => source.filterFn?.(option, term) ?? true)
+    const base = items ?? []
+    if (!source.options || !term) return base
+    return base.filter((option) => source.filterFn?.(option, term) ?? true)
   }, [items, term, source])
 
+  const failed = Boolean(source.fetcher) && query.isError
   const emptyContent = typeof view.empty === 'function' ? view.empty(term) : view.empty
+  const listFallback = failed ? (view.error ?? emptyContent) : emptyContent
 
   const select = (option: T) => {
     onChange(source.getValue(option), option)
@@ -127,7 +128,7 @@ export function AsyncSelect<T>({
           <CommandList className="max-h-[min(16rem,max(9rem,calc(var(--radix-popover-content-available-height)-3.25rem)))] scroll-py-1 p-1 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {!loading && visible.length === 0 && (
               <CommandEmpty className="px-2.5 py-4 text-center text-sm text-muted-foreground">
-                {emptyContent}
+                {listFallback}
               </CommandEmpty>
             )}
             {visible.map((option) => (
@@ -139,7 +140,7 @@ export function AsyncSelect<T>({
               >
                 {source.renderOption(option)}
                 <CheckIcon
-                  weight="bold"
+                  strokeWidth={3}
                   className={cn(
                     'ml-auto size-3.5 shrink-0 text-primary-deep dark:text-primary',
                     value === source.getValue(option) ? 'opacity-100' : 'opacity-0',

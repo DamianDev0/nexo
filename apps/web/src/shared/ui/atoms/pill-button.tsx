@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
+import { Slot } from 'radix-ui'
 
 import { cn } from '@/shared/lib'
 
@@ -36,19 +37,23 @@ const pillButtonVariants = cva(
 
 interface PillButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof pillButtonVariants> {}
+    VariantProps<typeof pillButtonVariants> {
+  asChild?: boolean
+}
 
 export function PillButton({
   variant,
   size,
   className,
   type,
+  asChild = false,
   ...props
 }: Readonly<PillButtonProps>) {
+  const Comp = asChild ? Slot.Root : 'button'
   return (
-    <button
+    <Comp
       data-slot="pill-button"
-      type={type ?? 'button'}
+      type={asChild ? undefined : (type ?? 'button')}
       className={cn(pillButtonVariants({ variant, size }), className)}
       {...props}
     />
