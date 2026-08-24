@@ -8,10 +8,6 @@ import { cn } from '@/shared/lib'
 const CARET_SPRING = { stiffness: 500, damping: 30, mass: 0.5 }
 const REDUCED_SPRING = { stiffness: 10000, damping: 100, mass: 0.1 }
 
-function passwordChar() {
-  return /firefox|fxios/i.test(navigator.userAgent) ? '●' : '•'
-}
-
 function caretIndex(target: HTMLInputElement) {
   const start = target.selectionStart ?? 0
   const end = target.selectionEnd ?? 0
@@ -45,10 +41,17 @@ export function SmoothInput({
       const styles = window.getComputedStyle(target)
       measure.style.font = `${styles.fontStyle} ${styles.fontWeight} ${styles.fontSize} ${styles.fontFamily}`
       measure.style.letterSpacing = styles.letterSpacing
+      measure.style.fontFeatureSettings = styles.fontFeatureSettings
+      measure.style.fontVariationSettings = styles.fontVariationSettings
+      measure.style.fontKerning = styles.fontKerning
 
       const index = caretIndex(target)
-      const isPassword = target.type === 'password'
-      measure.textContent = isPassword ? passwordChar().repeat(index) : target.value.slice(0, index)
+      measure.textContent = target.value.slice(0, index)
+
+      if (target.type === 'password') {
+        caretOpacity.set(0)
+        return
+      }
 
       const paddingLeft = parseFloat(styles.paddingLeft) || 0
       const paddingRight = parseFloat(styles.paddingRight) || 0
@@ -64,6 +67,11 @@ export function SmoothInput({
     },
     [caretX, caretOpacity],
   )
+
+  React.useEffect(() => {
+    const input = inputRef.current
+    if (input && document.activeElement === input) updateCaret(input)
+  }, [type, updateCaret])
 
   React.useEffect(() => {
     const input = inputRef.current
@@ -98,9 +106,10 @@ export function SmoothInput({
           'h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30',
           'focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50',
           'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+          'autofill:[-webkit-box-shadow:inset_0_0_0_1000px_var(--color-surface-input)] autofill:[-webkit-text-fill-color:var(--color-foreground)]',
           className,
         )}
-        style={{ ...style, caretColor: 'transparent' }}
+        style={{ ...style, caretColor: type === 'password' ? undefined : 'transparent' }}
         onChange={(event) => {
           onChange?.(event)
           const target = event.target
