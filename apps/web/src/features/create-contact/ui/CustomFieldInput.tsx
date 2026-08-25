@@ -3,6 +3,7 @@
 import { CENTAVOS_PER_PESO } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
+import { DatePicker } from '@/shared/ui/molecules/date-picker'
 import {
   Select,
   SelectContent,
@@ -26,8 +27,6 @@ interface CustomFieldInputProps {
 const INPUT_TYPE: Readonly<Record<string, string>> = {
   number: 'number',
   currency: 'number',
-  date: 'date',
-  datetime: 'datetime-local',
   url: 'url',
   phone: 'tel',
   email: 'email',
@@ -90,6 +89,40 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
             {option.label}
           </label>
         ))}
+      </div>
+    )
+  }
+
+  if (def.type === 'date' || def.type === 'datetime') {
+    const raw = typeof value === 'string' ? value : ''
+    const datePart = raw.slice(0, 10)
+    const timePart = raw.slice(11, 16)
+    if (def.type === 'date') {
+      return (
+        <DatePicker
+          value={datePart}
+          onChange={onChange}
+          placeholder={def.placeholder ?? t('contacts.form.pickDate')}
+          aria-label={def.label}
+        />
+      )
+    }
+    return (
+      <div className="flex gap-2">
+        <DatePicker
+          value={datePart}
+          onChange={(next) => onChange(`${next}T${timePart || '00:00'}`)}
+          placeholder={def.placeholder ?? t('contacts.form.pickDate')}
+          aria-label={def.label}
+        />
+        <Input
+          type="time"
+          value={timePart}
+          disabled={!datePart}
+          onChange={(event) => onChange(`${datePart}T${event.target.value}`)}
+          aria-label={t('contacts.form.pickTime')}
+          className="w-28"
+        />
       </div>
     )
   }

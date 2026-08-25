@@ -1,3 +1,8 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+
+import { readSkeletonHint, type ContactsSkeletonHint } from '@/entities/contact'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 
 const HEADER_TABS = [
@@ -7,28 +12,59 @@ const HEADER_TABS = [
   ['qualified', 'w-20'],
   ['nurturing', 'w-20'],
 ] as const
-const ROW_KEYS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const
 
-function SkeletonRow() {
+const DEFAULT_HINT: ContactsSkeletonHint = { widths: [40, 220, 150, 190, 130, 110], rows: 8 }
+
+interface SkeletonCell {
+  readonly id: string
+  readonly width: number
+  readonly kind: 'select' | 'lead' | 'plain'
+}
+
+function toCells(widths: ReadonlyArray<number>): ReadonlyArray<SkeletonCell> {
+  return widths.map((width, index) => ({
+    id: `col-${index + 1}`,
+    width,
+    kind: index === 0 ? 'select' : index === 1 ? 'lead' : 'plain',
+  }))
+}
+
+function SkeletonCells({
+  cells,
+  header,
+}: Readonly<{ cells: ReadonlyArray<SkeletonCell>; header?: boolean }>) {
   return (
-    <div className="flex h-12 items-center gap-4 border-b border-border/60 px-4">
-      <Skeleton className="size-4 rounded-[4px]" />
-      <span className="flex w-1/4 min-w-32 items-center gap-2.5">
-        <Skeleton className="size-7 rounded-full" />
-        <Skeleton className="h-3.5 w-3/5" />
-      </span>
-      <span className="flex w-1/6 items-center gap-1.5">
-        <Skeleton className="size-2.5 rounded-full" />
-        <Skeleton className="h-3.5 w-16" />
-      </span>
-      <Skeleton className="h-3.5 w-1/5" />
-      <Skeleton className="h-3.5 w-20" />
-      <Skeleton className="h-3.5 w-14" />
-    </div>
+    <>
+      {cells.map((cell) => (
+        <span
+          key={cell.id}
+          style={{ width: cell.width }}
+          className="flex shrink-0 items-center gap-2.5 px-3"
+        >
+          {cell.kind === 'select' ? (
+            <Skeleton className="size-4 rounded-[4px]" />
+          ) : (
+            <>
+              {cell.kind === 'lead' && !header && (
+                <Skeleton className="size-7 shrink-0 rounded-full" />
+              )}
+              <Skeleton className={header ? 'h-3 w-2/3' : 'h-3.5 w-3/5'} />
+            </>
+          )}
+        </span>
+      ))}
+    </>
   )
 }
 
 export function ContactsSkeleton() {
+  const [hint, setHint] = useState<ContactsSkeletonHint>(DEFAULT_HINT)
+
+  useEffect(() => {
+    const stored = readSkeletonHint()
+    if (stored) setHint(stored)
+  }, [])
+
   return (
     <div className="flex flex-1 flex-col" aria-busy>
       <div className="flex h-12 shrink-0 items-center gap-5 border-b border-border px-5">
@@ -57,17 +93,17 @@ export function ContactsSkeleton() {
           </span>
         </div>
 
-        <div className="flex h-9 items-center gap-4 border-y border-border bg-muted/30 px-4">
-          <Skeleton className="size-4 rounded-[4px]" />
-          <Skeleton className="h-3 w-1/4 min-w-32" />
-          <Skeleton className="h-3 w-1/6" />
-          <Skeleton className="h-3 w-1/5" />
-          <Skeleton className="h-3 w-20" />
-          <Skeleton className="h-3 w-14" />
+        <div className="flex h-9 items-center overflow-hidden border-y border-border bg-muted/30">
+          <SkeletonCells cells={toCells(hint.widths)} header />
         </div>
 
-        {ROW_KEYS.map((key) => (
-          <SkeletonRow key={key} />
+        {Array.from({ length: hint.rows }, (_, row) => (
+          <div
+            key={`skeleton-row-${row + 1}`}
+            className="flex h-12 items-center overflow-hidden border-b border-border/60"
+          >
+            <SkeletonCells cells={toCells(hint.widths)} />
+          </div>
         ))}
 
         <span className="flex-1" />

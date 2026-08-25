@@ -31,7 +31,10 @@ function toSaveStatus(state: { isPending: boolean; isError: boolean; isSuccess: 
 
 export function useSaveContactTableState() {
   const client = useQueryClient()
-  const mutation = useMutation({ mutationFn: contactsService.saveTableState })
+  const mutation = useMutation({
+    mutationFn: contactsService.saveTableState,
+    scope: { id: 'contact-table-state' },
+  })
   const pending = useRef<ContactTableState | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 

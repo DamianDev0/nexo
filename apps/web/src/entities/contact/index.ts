@@ -22,3 +22,4 @@ export {
   type ContactSort,
 } from './lib/contact-sort'
 export { useContactList, usePrefetchContactList } from './query/useContactList'
+export { readSkeletonHint, writeSkeletonHint, type ContactsSkeletonHint } from './lib/skeleton-hint'

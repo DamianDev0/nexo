@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { buildContactColumns } from '@/entities/contact'
+import { writeSkeletonHint } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
@@ -131,6 +132,15 @@ export function useContactsBoard() {
 
   const isPending = table.isPending || workspace.isPending
   const isUnavailable = !isPending && columns.length <= 1
+
+  const { table: tanstackTable } = instance
+  const rowCount = table.rows.length
+  useEffect(() => {
+    if (isPending || isUnavailable) return
+    const headers = tanstackTable.getHeaderGroups()[0]?.headers ?? []
+    if (headers.length <= 1) return
+    writeSkeletonHint({ widths: headers.map((header) => header.getSize()), rows: rowCount || 5 })
+  }, [isPending, isUnavailable, tanstackTable, rowCount, saveStatus])
 
   return {
     instance,
