@@ -6,10 +6,13 @@ import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import type { ContactListQuery } from '@repo/shared-types'
 
+const LIST_STALE_MS = 30 * 1000
+
 function listOptions(query: ContactListQuery) {
   return {
     queryKey: QUERY_KEYS.contacts.list(query),
     queryFn: () => contactsService.list(query),
+    staleTime: LIST_STALE_MS,
   }
 }
 
