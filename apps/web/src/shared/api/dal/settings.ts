@@ -4,6 +4,7 @@ import { CACHE_TAGS } from '../cache-tags'
 import { apiFetch } from '../client'
 
 import type {
+  ActivityTypeDef,
   ContactTaxonomy,
   CustomFieldEntity,
   FieldDef,
@@ -34,6 +35,9 @@ export const getNomenclature = () =>
   apiFetch<NomenclatureConfig>('/settings/nomenclature', { cache: 'no-store' })
 
 export const getPipelines = () => apiFetch<Pipeline[]>('/settings/pipelines')
+
+export const getActivityTypes = () =>
+  apiFetch<ActivityTypeDef[]>('/settings/activity-types', { cache: 'no-store' })
 
 export const getOnboarding = () =>
   apiFetch<OnboardingStatus>('/settings/onboarding', { cache: 'no-store' })

@@ -1,10 +1,12 @@
 import {
+  ActivitiesPane,
   BrandPane,
   CompanySettings,
   FieldsPane,
   LifecyclePane,
   NavigationSettings,
   NomenclatureSettings,
+  PipelinesPane,
   SourcesPane,
   StatusPane,
   TagsPane,
@@ -26,6 +28,8 @@ const PANES = {
   contactTypes: TypesPane,
   contactTags: TagsPane,
   fields: FieldsPane,
+  pipelines: PipelinesPane,
+  activities: ActivitiesPane,
 } as const
 
 type SettingsPaneKey = keyof typeof PANES

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { useEntityLabels } from '@/entities/nomenclature'
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
 import { Text } from '@/shared/ui/atoms/text'
-import { PlusIcon, ShapesIcon } from '@/shared/ui/icons'
+import { CloudArrowUpIcon, PlusIcon, ShapesIcon } from '@/shared/ui/icons'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { Button } from '@/shared/ui/shadcn/button'
@@ -19,9 +19,11 @@ import {
   CUSTOM_FIELD_ENTITY_TERMS,
 } from '../../../config/custom-fields.constants'
 import { useFieldsPane } from '../../../model/useFieldsPane'
+import { useHeaderImport } from '../../../model/useHeaderImport'
 
 import { FieldFormDialog } from './FieldFormDialog'
 import { FieldRow } from './FieldRow'
+import { ImportColumnsDialog } from './ImportColumnsDialog'
 import { SortableFieldRow } from './SortableFieldRow'
 
 const SKELETON_ROWS = 3
@@ -30,6 +32,7 @@ export function FieldsPane() {
   const { t } = useTranslation()
   const entityLabel = useEntityLabels()
   const pane = useFieldsPane()
+  const importer = useHeaderImport(pane.entity)
   const dnd = useDndReorder(pane.onReorder)
 
   const actions = { onEdit: pane.onEdit, onArchive: pane.onArchive }
@@ -41,16 +44,28 @@ export function FieldsPane() {
         <Text as="p" variant="muted">
           {t('settings.fields.description')}
         </Text>
-        <Button
-          variant="outline"
-          size="sm"
-          className="shrink-0 gap-1.5"
-          disabled={pane.isPending}
-          onClick={pane.editor.openCreate}
-        >
-          <PlusIcon className="size-3.5" />
-          {t('settings.fields.add')}
-        </Button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={pane.isPending}
+            onClick={importer.openImport}
+          >
+            <CloudArrowUpIcon className="size-3.5" />
+            {t('settings.fields.import.cta')}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={pane.isPending}
+            onClick={pane.editor.openCreate}
+          >
+            <PlusIcon className="size-3.5" />
+            {t('settings.fields.add')}
+          </Button>
+        </div>
       </div>
 
       <SegmentedControl
@@ -114,6 +129,8 @@ export function FieldsPane() {
           initial={pane.editor.initial}
         />
       )}
+
+      {importer.open && <ImportColumnsDialog importer={importer} />}
     </div>
   )
 }

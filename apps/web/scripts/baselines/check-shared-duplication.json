@@ -1,6 +1,6 @@
 [
   "src/features/setup-workspace/ui/StepTeam.tsx:88 :: className repeated from src/features/setup-workspace/ui/StepPipeline.tsx:91",
   "src/features/setup-workspace/ui/appearance/ColorField.tsx:27 :: className repeated from src/features/setup-workspace/ui/appearance/BrandColorSection.tsx:64",
-  "src/features/setup-workspace/ui/navigation/SidebarPreview.tsx:33 :: className repeated from src/features/setup-workspace/ui/AppearanceLivePreview/index.tsx:57",
-  "src/features/setup-workspace/ui/navigation/SidebarPreview.tsx:34 :: className repeated from src/features/setup-workspace/ui/AppearanceLivePreview/index.tsx:60"
+  "src/features/setup-workspace/ui/navigation/SidebarPreview.tsx:31 :: className repeated from src/features/setup-workspace/ui/AppearanceLivePreview/index.tsx:53",
+  "src/features/setup-workspace/ui/navigation/SidebarPreview.tsx:32 :: className repeated from src/features/setup-workspace/ui/AppearanceLivePreview/index.tsx:56"
 ]

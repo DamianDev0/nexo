@@ -5,14 +5,17 @@ import { useTranslation } from 'react-i18next'
 
 import { SectorPicker } from '@/features/setup-workspace'
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { Text } from '@/shared/ui/atoms/text'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { useManageSettings } from '../../model/settings-context'
 
+import { SectorConfirmDialog } from './company/SectorConfirmDialog'
+
 export function CompanySettings() {
   const { t } = useTranslation()
   const s = 'onboarding.steps.company'
-  const { control, bindField } = useManageSettings().company
+  const { control, bindField, sectorConfirm } = useManageSettings().company
   const phone = useWatch({ control, name: 'phone' })
   const website = useWatch({ control, name: 'website' })
   const sector = useWatch({ control, name: 'sector' })
@@ -44,6 +47,13 @@ export function CompanySettings() {
       </div>
 
       <SectorPicker value={sector} onSelect={bindField('sector')} />
+      <Text as="p" variant="hint" className="mt-2">
+        {t('settings.company.sectorHint')}
+      </Text>
+
+      {sectorConfirm.open && (
+        <SectorConfirmDialog onCancel={sectorConfirm.cancel} onConfirm={sectorConfirm.confirm} />
+      )}
     </div>
   )
 }

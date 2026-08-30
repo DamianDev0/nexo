@@ -25,6 +25,7 @@ export const QUERY_KEYS = {
   settings: {
     general: ['settings', 'general'] as const,
     pipelines: ['settings', 'pipelines'] as const,
+    activityTypes: ['settings', 'activity-types'] as const,
     nomenclature: ['settings', 'nomenclature'] as const,
     navigation: ['settings', 'navigation'] as const,
     theme: ['settings', 'theme'] as const,

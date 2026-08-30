@@ -12,6 +12,7 @@ export type SettingsSectionKey =
   | 'nomenclature'
   | 'fields'
   | 'pipelines'
+  | 'activities'
   | 'contacts'
 
 export interface SettingsChild {

@@ -34,6 +34,7 @@ export const ROUTES = {
       nomenclature: '/settings/nomenclature',
       fields: '/settings/fields',
       pipelines: '/settings/pipelines',
+      activities: '/settings/activities',
       contacts: {
         root: '/settings/contacts',
         status: '/settings/contacts/status',

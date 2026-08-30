@@ -1,7 +1,9 @@
 import { request } from '@/shared/api/request'
 
 import type {
+  ActivityTypeDef,
   ContactTaxonomy,
+  CustomFieldHeaderAnalysis,
   CustomFieldEntity,
   FieldDef,
   GeneralSettings,
@@ -11,6 +13,17 @@ import type {
   ThemeConfig,
   SidebarConfig,
 } from '@repo/shared-types'
+
+export type PipelineStageInput = {
+  name: string
+  color: string
+  probability: number
+  position: number
+}
+
+export type PipelinePatch = { name?: string; isDefault?: boolean }
+
+export type CreatePipelineInput = PipelinePatch & { name: string; stages: PipelineStageInput[] }
 
 function fileForm(file: File): FormData {
   const formData = new FormData()
@@ -34,6 +47,14 @@ const settingsService = {
   archiveCustomField: (entity: CustomFieldEntity, key: string) =>
     request<void>({ method: 'delete', url: `/settings/custom-fields/${entity}/${key}` }),
 
+  analyzeCustomFieldHeaders: (entity: CustomFieldEntity, file: File) =>
+    request<CustomFieldHeaderAnalysis>({
+      method: 'post',
+      url: `/settings/custom-fields/${entity}/analyze-headers`,
+      data: fileForm(file),
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+
   replaceCustomFields: (entity: CustomFieldEntity, fields: FieldDef[]) =>
     request<void>({
       method: 'patch',
@@ -52,6 +73,34 @@ const settingsService = {
     request<OnboardingStatus>({ method: 'patch', url: '/settings/onboarding', data }),
 
   getPipelines: () => request<Pipeline[]>({ method: 'get', url: '/settings/pipelines' }),
+
+  createPipeline: (data: CreatePipelineInput) =>
+    request<Pipeline>({ method: 'post', url: '/settings/pipelines', data }),
+
+  patchPipeline: (id: string, data: PipelinePatch) =>
+    request<Pipeline>({ method: 'patch', url: `/settings/pipelines/${id}`, data }),
+
+  deletePipeline: (id: string) =>
+    request<void>({ method: 'delete', url: `/settings/pipelines/${id}` }),
+
+  replacePipelineStages: (id: string, stages: PipelineStageInput[]) =>
+    request<Pipeline>({
+      method: 'patch',
+      url: `/settings/pipelines/${id}/stages`,
+      data: { stages },
+    }),
+
+  getActivityTypes: () =>
+    request<ActivityTypeDef[]>({ method: 'get', url: '/settings/activity-types' }),
+
+  createActivityType: (data: ActivityTypeDef) =>
+    request<ActivityTypeDef[]>({ method: 'post', url: '/settings/activity-types', data }),
+
+  updateActivityType: (key: string, data: ActivityTypeDef) =>
+    request<ActivityTypeDef[]>({ method: 'put', url: `/settings/activity-types/${key}`, data }),
+
+  deleteActivityType: (key: string) =>
+    request<ActivityTypeDef[]>({ method: 'delete', url: `/settings/activity-types/${key}` }),
 
   getNomenclature: () =>
     request<NomenclatureConfig>({ method: 'get', url: '/settings/nomenclature' }),

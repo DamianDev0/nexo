@@ -6,11 +6,11 @@ import { sileo } from 'sileo'
 
 import {
   useStepAppearance,
-  useStepCompany,
   useStepNavigation,
   useStepNomenclature,
 } from '@/features/setup-workspace'
 
+import { useCompanySection } from './useCompanySection'
 import { useContactTaxonomySection } from './useContactTaxonomySection'
 
 export interface SettingsSectionController {
@@ -21,7 +21,7 @@ export interface SettingsSectionController {
 }
 
 interface ManageSettingsContextValue {
-  readonly company: ReturnType<typeof useStepCompany>
+  readonly company: ReturnType<typeof useCompanySection>
   readonly nomenclature: ReturnType<typeof useStepNomenclature>
   readonly navigation: ReturnType<typeof useStepNavigation>
   readonly appearance: ReturnType<typeof useStepAppearance>
@@ -35,7 +35,7 @@ export function ManageSettingsProvider({ children }: Readonly<{ children: ReactN
     sileo.success({ title: t('settings.saved') })
   }, [])
 
-  const company = useStepCompany(onSaved)
+  const company = useCompanySection(onSaved)
   const nomenclature = useStepNomenclature(onSaved)
   const navigation = useStepNavigation(onSaved)
   const appearance = useStepAppearance(onSaved)

@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 
 import { CountHint } from '@/shared/ui/atoms/count-hint'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { LockIcon, PencilSimpleIcon, TrashIcon } from '@/shared/ui/icons'
-import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
+import { PencilSimpleIcon, TrashIcon } from '@/shared/ui/icons'
+import { LockedHint } from '@/shared/ui/molecules/locked-hint'
 import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 
 interface RemoveAction {
@@ -57,11 +57,7 @@ export function OptionRowActions({
           <TrashIcon className="size-3.5" />
         </PillButton>
       ) : (
-        <HintTooltip asChild hint={remove.lockedHint}>
-          <span className="flex size-8 items-center justify-center text-muted-foreground">
-            <LockIcon className="size-3.5" />
-          </span>
-        </HintTooltip>
+        <LockedHint hint={remove.lockedHint} />
       )}
     </>
   )

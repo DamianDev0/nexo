@@ -3,6 +3,7 @@ import {
   AddressBookIcon,
   BellIcon,
   BuildingsIcon,
+  CalendarCheckIcon,
   PaletteIcon,
   ShapesIcon,
   SidebarSimpleIcon,
@@ -58,7 +59,13 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
         available: true,
       },
       { key: 'fields', href: SETTINGS.fields, icon: ShapesIcon, available: true },
-      { key: 'pipelines', href: SETTINGS.pipelines, icon: StackIcon, available: false },
+      { key: 'pipelines', href: SETTINGS.pipelines, icon: StackIcon, available: true },
+      {
+        key: 'activities',
+        href: SETTINGS.activities,
+        icon: CalendarCheckIcon,
+        available: true,
+      },
       {
         key: 'contacts',
         href: SETTINGS.contacts.status,
