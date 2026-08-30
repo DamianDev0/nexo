@@ -1,3 +1,5 @@
+> ⚠️ **OBSOLETO (2026-08-30):** este documento describe Prisma/tRPC u otro stack que ya no existe. Fuentes vigentes: `CLAUDE.md`, `docs/frontend-architecture.md`, `docs/adr/`, y el código. No usar para auditar ni implementar.
+
 # RFC 0001 — Turning Nexo into a configurable multi-industry CRM
 
 Status: Ready to implement

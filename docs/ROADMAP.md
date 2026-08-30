@@ -6,11 +6,11 @@
 
 ---
 
-## Status (2026-07-25)
+## Status (2026-08-30)
 
 | Layer                              | Reality                                               | %               |
 | ---------------------------------- | ----------------------------------------------------- | --------------- |
-| Backend core                       | 15 modules, ~280 tests, 17 migrations                 | ~67% of B2B PRD |
+| Backend core                       | 20 modules, ~640 tests, 30 migrations                 | ~67% of B2B PRD |
 | Frontend                           | Only 4 pages (auth, onboarding, dashboard). No CRM UI | ~10%            |
 | Money module (DIAN/Wompi/WhatsApp) | 0 code                                                | 0%              |
 | Automation + AI                    | 0 code                                                | 0%              |

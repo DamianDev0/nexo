@@ -23,6 +23,7 @@ export class TokenService {
       algorithm: 'RS256',
       privateKey: this.config.get<string>('jwt.privateKey'),
 
+      // jsonwebtoken types expiresIn as ms.StringValue, a template-literal type no runtime string satisfies
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expiresIn: (this.config.get<string>('jwt.accessTokenExpiresIn') ?? '15m') as any,
     })

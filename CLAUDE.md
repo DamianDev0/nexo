@@ -24,7 +24,7 @@ REST API client (axios + TanStack Query on web; older docs say tRPC — verify).
 - **Dates**: DB in UTC `TIMESTAMPTZ`; UI in `America/Bogota` (UTC-5, no DST), format `DD/MM/YYYY`.
 - **IDs**: UUID v4 (`gen_random_uuid()`). Never sequential in URLs.
 - **DIAN invoices**: never deleted — only voided with a credit note. Never deliver an invoice to the customer before DIAN validation.
-- **Secrets**: never in code. Validate env with zod at startup. Never log tokens/NITs/emails/passwords.
+- **Secrets**: never in code. Validate env at startup (class-validator on api, zod on web). Never log tokens/NITs/emails/passwords.
 
 ## Conventions
 
