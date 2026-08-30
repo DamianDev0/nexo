@@ -7,7 +7,7 @@ import { TenantThemeHistory } from '../entities/tenant-theme-history.entity'
 import { TenantConfigRepository } from '../repositories/tenant-config.repository'
 import { DEFAULT_THEME } from '../constants/default-theme'
 import { DEFAULT_NOMENCLATURE } from '../constants/default-nomenclature'
-import { DEFAULT_SIDEBAR_CONFIG } from '../constants/default-sidebar'
+import { defaultSidebarFor } from '../constants/default-sidebar'
 import type { TenantTheme } from '../interfaces/tenant-theme.interface'
 import type { TenantNomenclature } from '../interfaces/nomenclature.interface'
 import type { SidebarConfig } from '../interfaces/sidebar-config.interface'
@@ -125,7 +125,8 @@ export class TenantConfigService {
     if (cached) return cached
 
     const config = await this.getRawConfig(tenantId)
-    const sidebar = config.sidebarConfig ?? DEFAULT_SIDEBAR_CONFIG
+    const sidebar =
+      config.sidebarConfig ?? defaultSidebarFor(await this.getNomenclature(tenantId))
     await this.cache.set(this.sidebarKey(tenantId), sidebar, CACHE_TTL_SHORT_SECONDS)
     return sidebar
   }

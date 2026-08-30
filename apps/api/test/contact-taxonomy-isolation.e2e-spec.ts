@@ -30,11 +30,19 @@ describe('Contact Taxonomy Tenant Isolation (E2E, real HTTP)', () => {
 
   it("does NOT leak tenant A's custom status to tenant B", async () => {
     const customized: ContactTaxonomy = {
+      ...DEFAULT_CONTACT_TAXONOMY,
       statuses: [
         ...DEFAULT_CONTACT_TAXONOMY.statuses,
-        { key: 'vip_a', label: 'VIP A', color: '#111111', order: 99, isSystem: false },
+        {
+          key: 'vip_a',
+          label: 'VIP A',
+          description: null,
+          color: '#111111',
+          order: 99,
+          isSystem: false,
+          enabled: true,
+        },
       ],
-      sources: DEFAULT_CONTACT_TAXONOMY.sources,
     }
 
     await asTenant(
@@ -62,10 +70,18 @@ describe('Contact Taxonomy Tenant Isolation (E2E, real HTTP)', () => {
 
   it("tenant B's PATCH only affects its own taxonomy, not tenant A's", async () => {
     const bCustomized: ContactTaxonomy = {
-      statuses: DEFAULT_CONTACT_TAXONOMY.statuses,
+      ...DEFAULT_CONTACT_TAXONOMY,
       sources: [
         ...DEFAULT_CONTACT_TAXONOMY.sources,
-        { key: 'vip_source_b', label: 'B only', color: '#222222', order: 99, isSystem: false },
+        {
+          key: 'vip_source_b',
+          label: 'B only',
+          description: null,
+          color: '#222222',
+          order: 99,
+          isSystem: false,
+          enabled: true,
+        },
       ],
     }
 

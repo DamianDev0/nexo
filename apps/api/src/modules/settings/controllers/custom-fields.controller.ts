@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common'
+import { assertValidEntity, VALID_ENTITIES } from '../constants/custom-field-entities'
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -30,22 +31,11 @@ import {
   UpdateFieldPermissionsDto,
 } from '../dto/custom-fields.dto'
 import type {
-  CustomFieldEntity,
   CustomFieldsConfig,
   FieldDef,
   FieldPermission,
   FieldPermissionsConfig,
 } from '../interfaces/custom-field.interface'
-
-const VALID_ENTITIES: CustomFieldEntity[] = ['contacts', 'companies', 'deals']
-
-function assertValidEntity(entity: string): asserts entity is CustomFieldEntity {
-  if (!VALID_ENTITIES.includes(entity as CustomFieldEntity)) {
-    throw new BadRequestException(
-      `Invalid entity: ${entity}. Must be one of: ${VALID_ENTITIES.join(', ')}`,
-    )
-  }
-}
 
 @ApiTags('Settings – Custom Fields')
 @Controller('settings/custom-fields')
@@ -69,6 +59,44 @@ export class CustomFieldsController {
   @ApiEndpoint({ summary: 'Get all custom fields for all entities', roles: [UserRole.VIEWER] })
   getAllCustomFields(@TenantCtx() ctx: TenantContext): Promise<CustomFieldsConfig> {
     return this.configService.getCustomFields(ctx.tenantId)
+  }
+
+  @Get('permissions/:entity')
+  @ApiEndpoint({
+    summary: 'Get field permissions for a specific entity',
+    roles: [UserRole.ADMIN],
+  })
+  @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
+  async getFieldPermissions(
+    @Param('entity') entity: string,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<Record<string, FieldPermission>> {
+    assertValidEntity(entity)
+    const config = await this.configService.getFieldPermissions(ctx.tenantId)
+    return config[entity]
+  }
+
+  @Patch('permissions/:entity')
+  @ApiEndpoint({
+    summary: 'Update field permissions for a specific entity',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
+  @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
+  async updateFieldPermissions(
+    @Param('entity') entity: string,
+    @Body() dto: UpdateFieldPermissionsDto,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<FieldPermissionsConfig> {
+    assertValidEntity(entity)
+    const current = await this.configService.getFieldPermissions(ctx.tenantId)
+    const entityPermissions = Object.fromEntries(
+      dto.permissions.map(({ key, visibility, editable }) => [key, { visibility, editable }]),
+    )
+    const updated: FieldPermissionsConfig = { ...current, [entity]: entityPermissions }
+    const result = await this.configService.updateFieldPermissions(ctx.tenantId, updated, ctx.slug)
+    await this.auditChange(ctx, `Field permissions updated on ${entity}`)
+    return result
   }
 
   @Get(':entity')
@@ -199,43 +227,5 @@ export class CustomFieldsController {
       ctx.slug,
     )
     await this.auditChange(ctx, `Custom field "${key}" archived on ${entity}`)
-  }
-
-  @Get('permissions/:entity')
-  @ApiEndpoint({
-    summary: 'Get field permissions for a specific entity',
-    roles: [UserRole.ADMIN],
-  })
-  @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
-  async getFieldPermissions(
-    @Param('entity') entity: string,
-    @TenantCtx() ctx: TenantContext,
-  ): Promise<Record<string, FieldPermission>> {
-    assertValidEntity(entity)
-    const config = await this.configService.getFieldPermissions(ctx.tenantId)
-    return config[entity]
-  }
-
-  @Patch('permissions/:entity')
-  @ApiEndpoint({
-    summary: 'Update field permissions for a specific entity',
-    roles: [UserRole.ADMIN],
-    status: HttpStatus.OK,
-  })
-  @ApiParam({ name: 'entity', enum: VALID_ENTITIES })
-  async updateFieldPermissions(
-    @Param('entity') entity: string,
-    @Body() dto: UpdateFieldPermissionsDto,
-    @TenantCtx() ctx: TenantContext,
-  ): Promise<FieldPermissionsConfig> {
-    assertValidEntity(entity)
-    const current = await this.configService.getFieldPermissions(ctx.tenantId)
-    const entityPermissions = Object.fromEntries(
-      dto.permissions.map(({ key, visibility, editable }) => [key, { visibility, editable }]),
-    )
-    const updated: FieldPermissionsConfig = { ...current, [entity]: entityPermissions }
-    const result = await this.configService.updateFieldPermissions(ctx.tenantId, updated, ctx.slug)
-    await this.auditChange(ctx, `Field permissions updated on ${entity}`)
-    return result
   }
 }

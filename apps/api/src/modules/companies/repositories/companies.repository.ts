@@ -118,7 +118,11 @@ export class CompaniesRepository {
 
       for (const [col, value] of fields) {
         params.push(value)
-        sets.push(`${col} = $${params.length}`)
+        sets.push(
+          col === 'custom_fields'
+            ? `custom_fields = jsonb_strip_nulls(COALESCE(custom_fields, '{}'::jsonb) || $${params.length}::jsonb)`
+            : `${col} = $${params.length}`,
+        )
       }
 
       params.push(companyId)

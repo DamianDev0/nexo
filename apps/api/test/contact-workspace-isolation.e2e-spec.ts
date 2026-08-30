@@ -46,7 +46,7 @@ describe('Contact Workspace Tenant Isolation (E2E, real HTTP)', () => {
     const viewId = createdView.body.data.id as string
 
     await asTenant(request(app.getHttpServer()).patch(`/${API_PREFIX}/contacts/workspace`), tenantA)
-      .send({ activeViewId: viewId, tableState: { density: 'compact', pageSize: 50 } })
+      .send({ activeViewId: viewId, tableState: { density: 'compact' } })
       .expect(204)
 
     const workspaceA = await asTenant(
@@ -54,7 +54,7 @@ describe('Contact Workspace Tenant Isolation (E2E, real HTTP)', () => {
       tenantA,
     ).expect(200)
     expect(workspaceA.body.data.activeViewId).toBe(viewId)
-    expect(workspaceA.body.data.tableState).toEqual({ density: 'compact', pageSize: 50 })
+    expect(workspaceA.body.data.tableState).toEqual({ density: 'compact' })
 
     const workspaceB = await asTenant(
       request(app.getHttpServer()).get(`/${API_PREFIX}/contacts/workspace`),

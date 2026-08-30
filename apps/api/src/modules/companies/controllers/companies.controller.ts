@@ -82,7 +82,7 @@ export class CompaniesController {
     @Body() dto: UpdateCompanyDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<Company> {
-    await this.customFields.validate(ctx.tenantId, 'companies', dto.customFields)
+    await this.customFields.validate(ctx.tenantId, 'companies', dto.customFields, 'update')
     return this.companiesService.update(ctx.schemaName, id, dto)
   }
 

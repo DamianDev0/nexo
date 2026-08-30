@@ -95,7 +95,7 @@ export class DealsController {
     @Body() dto: UpdateDealDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<DealDetail> {
-    await this.customFields.validate(ctx.tenantId, 'deals', dto.customFields)
+    await this.customFields.validate(ctx.tenantId, 'deals', dto.customFields, 'update')
     return this.dealsService.update(ctx.schemaName, id, dto)
   }
 

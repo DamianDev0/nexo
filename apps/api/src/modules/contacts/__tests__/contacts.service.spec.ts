@@ -452,7 +452,9 @@ describe('ContactsService', () => {
 
       expect(result.customFields).toEqual(customFields)
       const updateQuery: string = qr.query.mock.calls[1][0] as string
-      expect(updateQuery).toContain('custom_fields = $')
+      expect(updateQuery).toContain(
+        "custom_fields = jsonb_strip_nulls(COALESCE(custom_fields, '{}'::jsonb) || $1::jsonb)",
+      )
     })
 
     it('checks for duplicates excluding itself, honouring the force flag', async () => {

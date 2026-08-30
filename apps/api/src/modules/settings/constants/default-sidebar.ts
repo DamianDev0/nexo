@@ -1,4 +1,21 @@
+import type { TenantNomenclature } from '@repo/shared-types'
 import type { SidebarConfig } from '../interfaces/sidebar-config.interface'
+
+const NOMENCLATURE_MODULE_KEYS: Partial<Record<string, keyof TenantNomenclature>> = {
+  contacts: 'contact',
+  companies: 'company',
+  deals: 'deal',
+  activities: 'activity',
+}
+
+export function defaultSidebarFor(nomenclature: TenantNomenclature): SidebarConfig {
+  return {
+    modules: DEFAULT_SIDEBAR_CONFIG.modules.map((module) => {
+      const entity = NOMENCLATURE_MODULE_KEYS[module.key]
+      return entity ? { ...module, label: nomenclature[entity].plural } : module
+    }),
+  }
+}
 
 export const DEFAULT_SIDEBAR_CONFIG: SidebarConfig = {
   modules: [

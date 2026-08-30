@@ -48,7 +48,7 @@ describe('Tags Tenant Isolation (E2E, real HTTP)', () => {
       tenantA,
     ).expect(200)
 
-    const idsA = (listA.body.data as Array<{ id: string }>).map((t) => t.id)
+    const idsA = (listA.body.data.data as Array<{ id: string }>).map((t) => t.id)
     expect(idsA).toContain(tagId)
 
     const listB = await asTenant(
@@ -56,7 +56,7 @@ describe('Tags Tenant Isolation (E2E, real HTTP)', () => {
       tenantB,
     ).expect(200)
 
-    const idsB = (listB.body.data as Array<{ id: string }>).map((t) => t.id)
+    const idsB = (listB.body.data.data as Array<{ id: string }>).map((t) => t.id)
     expect(idsB).not.toContain(tagId)
   })
 

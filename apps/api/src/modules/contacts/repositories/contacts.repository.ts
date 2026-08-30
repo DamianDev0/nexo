@@ -220,7 +220,11 @@ export class ContactsRepository {
     changes: ContactColumnChange[],
   ): Promise<ContactRow | null> {
     const values: unknown[] = changes.map((change) => change.value)
-    const updates = changes.map((change, index) => `${change.column} = $${index + 1}`)
+    const updates = changes.map((change, index) =>
+      change.column === 'custom_fields'
+        ? `custom_fields = jsonb_strip_nulls(COALESCE(custom_fields, '{}'::jsonb) || $${index + 1}::jsonb)`
+        : `${change.column} = $${index + 1}`,
+    )
 
     updates.push('updated_at = NOW()')
     if (changes.some((change) => change.column === 'status')) {

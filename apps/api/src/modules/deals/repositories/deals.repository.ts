@@ -134,7 +134,11 @@ export class DealsRepository {
       for (const [inputKey, col] of UPDATABLE_FIELDS) {
         if (input[inputKey] !== undefined) {
           params.push(input[inputKey])
-          sets.push(`${col} = $${params.length}`)
+          sets.push(
+            col === 'custom_fields'
+              ? `custom_fields = jsonb_strip_nulls(COALESCE(custom_fields, '{}'::jsonb) || $${params.length}::jsonb)`
+              : `${col} = $${params.length}`,
+          )
         }
       }
 

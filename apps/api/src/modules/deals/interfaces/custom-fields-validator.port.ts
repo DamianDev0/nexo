@@ -5,5 +5,6 @@ export type CustomFieldsValidatorPort = {
     tenantId: string,
     entity: CustomFieldEntity,
     values: Record<string, unknown> | undefined,
+    mode?: 'create' | 'update',
   ): Promise<void>
 }

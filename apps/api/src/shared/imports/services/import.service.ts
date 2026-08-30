@@ -6,6 +6,7 @@ import type {
   AnalyzeResult,
   ImportFieldError,
   ImportRowMapper,
+  ParsedFile,
   UploadedImportFile,
   ValidationPreview,
 } from '../interfaces/import.interfaces'
@@ -17,6 +18,11 @@ export class ImportService {
     private readonly fieldMapper: ImportFieldMapperService,
     private readonly fileStore: ImportFileStoreService,
   ) {}
+
+  async parseHeaders(file: UploadedImportFile): Promise<ParsedFile> {
+    this.parser.validateFile(file)
+    return this.parser.analyze(file.buffer, file.originalname)
+  }
 
   async analyze(file: UploadedImportFile, mapper: ImportRowMapper): Promise<AnalyzeResult> {
     this.parser.validateFile(file)

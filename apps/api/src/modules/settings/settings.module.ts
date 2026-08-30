@@ -9,6 +9,7 @@ import { NomenclatureController } from './controllers/nomenclature.controller'
 import { ContactTaxonomyController } from './controllers/contact-taxonomy.controller'
 import { NavigationController } from './controllers/navigation.controller'
 import { CustomFieldsController } from './controllers/custom-fields.controller'
+import { CustomFieldsImportController } from './controllers/custom-fields-import.controller'
 import { TenantPublicController } from './controllers/tenant-public.controller'
 import { PipelineController } from './controllers/pipeline.controller'
 import { ActivityTypesController } from './controllers/activity-types.controller'
@@ -21,6 +22,7 @@ import { ThemeCssService } from './services/theme-css.service'
 import { ThemeExportService } from './services/theme-export.service'
 import { ThemeImportService } from './services/theme-import.service'
 import { CustomFieldsValidator } from './services/custom-fields-validator.service'
+import { CustomFieldsImportService } from './services/custom-fields-import.service'
 import { CustomFieldsComputer } from './services/custom-fields-computer.service'
 import { PipelineSettingsRepository } from './repositories/pipeline-settings.repository'
 import { TenantConfigRepository } from './repositories/tenant-config.repository'
@@ -36,6 +38,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     NavigationController,
     ContactTaxonomyController,
     CustomFieldsController,
+    CustomFieldsImportController,
     TenantPublicController,
     PipelineController,
     ActivityTypesController,
@@ -51,6 +54,7 @@ import { ModuleEnabledGuard } from './guards/module-enabled.guard'
     ThemeImportService,
     CustomFieldsValidator,
     CustomFieldsComputer,
+    CustomFieldsImportService,
     PipelineSettingsRepository,
     TenantConfigRepository,
     IndustryPresetRepository,

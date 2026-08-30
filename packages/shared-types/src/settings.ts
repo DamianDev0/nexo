@@ -218,6 +218,22 @@ export type FieldPermission = {
 
 export type FieldPermissionsConfig = Record<CustomFieldEntity, Record<string, FieldPermission>>
 
+export type CustomFieldHeaderSuggestion = {
+  column: string
+  sampleValues: string[]
+  fillRate: number
+  suggestedKey: string
+  suggestedLabel: string
+  suggestedType: CustomFieldType
+  existingFieldKey: string | null
+}
+
+export type CustomFieldHeaderAnalysis = {
+  entity: CustomFieldEntity
+  totalRows: number
+  suggestions: CustomFieldHeaderSuggestion[]
+}
+
 export type ActivityTypeDef = {
   key: string
   label: string

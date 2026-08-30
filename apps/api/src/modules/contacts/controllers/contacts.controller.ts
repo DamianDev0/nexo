@@ -222,7 +222,7 @@ export class ContactsController {
     @CurrentUser() user: AuthenticatedUser,
     @Query('force', new ParseBoolPipe({ optional: true })) force?: boolean,
   ): Promise<Contact> {
-    await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields)
+    await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields, 'update')
     const taxonomy = await this.tenantConfig.getContactTaxonomy(ctx.tenantId)
     return this.contactsService.update(ctx.schemaName, id, dto, force ?? false, taxonomy, user.id)
   }

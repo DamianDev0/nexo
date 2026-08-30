@@ -181,6 +181,49 @@ describe('TenantConfigService', () => {
     })
   })
 
+  describe('getSidebarConfig', () => {
+    it('derives default labels from the tenant nomenclature when sidebar is not customized', async () => {
+      const { service } = buildService({
+        nomenclature: {
+          contact: { singular: 'Paciente', plural: 'Pacientes' },
+          deal: { singular: 'Tratamiento', plural: 'Tratamientos' },
+        },
+      })
+
+      const sidebar = await service.getSidebarConfig(TENANT_ID)
+      const labels = Object.fromEntries(sidebar.modules.map((m) => [m.key, m.label]))
+
+      expect(labels.contacts).toBe('Pacientes')
+      expect(labels.deals).toBe('Tratamientos')
+      expect(labels.companies).toBe('Empresas')
+      expect(labels.dashboard).toBe('Dashboard')
+    })
+
+    it('keeps a customized sidebar untouched', async () => {
+      const stored = {
+        modules: [
+          {
+            key: 'contacts',
+            label: 'Mi gente',
+            icon: 'users',
+            enabled: true,
+            order: 1,
+            customIconUrl: null,
+            required: false,
+          },
+        ],
+      }
+      const { service } = buildService({
+        sidebarConfig: stored,
+        nomenclature: { contact: { singular: 'Paciente', plural: 'Pacientes' } },
+      })
+
+      const sidebar = await service.getSidebarConfig(TENANT_ID)
+
+      expect(sidebar).toEqual(stored)
+    })
+  })
+
   describe('updateOnboarding', () => {
     it('saves the onboarding section and returns it', async () => {
       const { service, tenantRepo } = buildService()
