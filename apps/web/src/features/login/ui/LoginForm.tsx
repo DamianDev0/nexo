@@ -75,12 +75,6 @@ export function LoginForm({
               {t('auth.rememberMe')}
             </Label>
           </div>
-          <Link
-            href="/forgot-password"
-            className="text-sm text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
-          >
-            {t('auth.forgotPassword')}
-          </Link>
         </div>
 
         <LiquidButton

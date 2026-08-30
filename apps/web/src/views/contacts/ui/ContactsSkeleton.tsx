@@ -65,6 +65,8 @@ export function ContactsSkeleton() {
     if (stored) setHint(stored)
   }, [])
 
+  const cells = toCells(hint.widths)
+
   return (
     <div className="flex flex-1 flex-col" aria-busy>
       <div className="flex h-12 shrink-0 items-center gap-5 border-b border-border px-5">
@@ -94,7 +96,7 @@ export function ContactsSkeleton() {
         </div>
 
         <div className="flex h-9 items-center overflow-hidden border-y border-border bg-muted/30">
-          <SkeletonCells cells={toCells(hint.widths)} header />
+          <SkeletonCells cells={cells} header />
         </div>
 
         {Array.from({ length: hint.rows }, (_, row) => (
@@ -102,7 +104,7 @@ export function ContactsSkeleton() {
             key={`skeleton-row-${row + 1}`}
             className="flex h-12 items-center overflow-hidden border-b border-border/60"
           >
-            <SkeletonCells cells={toCells(hint.widths)} />
+            <SkeletonCells cells={cells} />
           </div>
         ))}
 

@@ -12,7 +12,6 @@ export interface CheckboxProps {
   'aria-label'?: string
   /** Whether the checkbox is checked */
   checked?: boolean
-  /** Uncontrolled initial state, used when `checked` is absent */
   defaultChecked?: boolean
   /** Optional CSS class */
   className?: string

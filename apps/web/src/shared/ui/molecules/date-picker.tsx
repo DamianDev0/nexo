@@ -36,6 +36,16 @@ function toDisplayDate(value?: string): string {
   return `${`${date.getDate()}`.padStart(2, '0')}/${`${date.getMonth() + 1}`.padStart(2, '0')}/${date.getFullYear()}`
 }
 
+function DayPickerChevron({ orientation }: Readonly<{ orientation?: string }>) {
+  return orientation === 'left' ? (
+    <CaretLeftIcon className="size-4" />
+  ) : (
+    <CaretRightIcon className="size-4" />
+  )
+}
+
+const DAY_PICKER_COMPONENTS = { Chevron: DayPickerChevron }
+
 const DAY_PICKER_CLASSNAMES = {
   months: 'relative flex flex-col',
   month_caption: 'flex h-9 items-center justify-center',
@@ -99,14 +109,7 @@ export function DatePicker({
             setOpen(false)
           }}
           classNames={DAY_PICKER_CLASSNAMES}
-          components={{
-            Chevron: ({ orientation }) =>
-              orientation === 'left' ? (
-                <CaretLeftIcon className="size-4" />
-              ) : (
-                <CaretRightIcon className="size-4" />
-              ),
-          }}
+          components={DAY_PICKER_COMPONENTS}
         />
       </GroovyPopover.Content>
     </GroovyPopover>

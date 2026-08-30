@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import { isGuestOnlyPath } from '@/shared/lib/route-access'
+
 import { tenantRef } from './tenant-ref'
 
 import type { AxiosRequestConfig } from 'axios'
@@ -45,9 +47,7 @@ function refreshSession(): Promise<void> {
 }
 
 function redirectToLogin(): void {
-  const path = globalThis.location.pathname
-  const isAuthRoute = path.includes('/login') || path.includes('/onboarding')
-  if (!isAuthRoute) {
+  if (!isGuestOnlyPath(globalThis.location.pathname)) {
     globalThis.location.href = '/login'
   }
 }

@@ -24,6 +24,9 @@ export function proxy(request: NextRequest) {
   }
 
   if (decision === 'redirect-dashboard') {
+    if (request.nextUrl.searchParams.has('stale')) {
+      return dropStaleSession(NextResponse.next(), true)
+    }
     return NextResponse.redirect(new URL(ROUTES.app.dashboard, request.url))
   }
 
@@ -31,17 +34,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/contacts/:path*',
-    '/companies/:path*',
-    '/deals/:path*',
-    '/activities/:path*',
-    '/invoices/:path*',
-    '/products/:path*',
-    '/reports/:path*',
-    '/settings/:path*',
-    '/onboarding/:path*',
-    '/login',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon\\.ico|.*\\..*).*)'],
 }

@@ -6,6 +6,7 @@ const store = new Map<string, string>()
 
 beforeEach(() => {
   store.clear()
+  document.cookie = 'nexo_tenant=acme'
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
     value: {
@@ -21,9 +22,16 @@ describe('skeleton-hint', () => {
     expect(readSkeletonHint()).toBeNull()
   })
 
-  it('round-trips widths and rows', () => {
+  it('round-trips widths and rows under the tenant scope', () => {
     writeSkeletonHint({ widths: [40, 220, 150], rows: 6 })
+    expect(store.has('nexo:contacts-skeleton:acme')).toBe(true)
     expect(readSkeletonHint()).toEqual({ widths: [40, 220, 150], rows: 6 })
+  })
+
+  it('does not leak hints across tenants', () => {
+    writeSkeletonHint({ widths: [40, 220], rows: 5 })
+    document.cookie = 'nexo_tenant=otra'
+    expect(readSkeletonHint()).toBeNull()
   })
 
   it('clamps rows into the visible range', () => {
@@ -33,10 +41,15 @@ describe('skeleton-hint', () => {
     expect(readSkeletonHint()?.rows).toBe(3)
   })
 
-  it('rejects malformed payloads', () => {
-    store.set('nexo:contacts-skeleton', '{"widths":["x"],"rows":5}')
+  it('rejects malformed or oversized payloads', () => {
+    store.set('nexo:contacts-skeleton:acme', '{"widths":["x"],"rows":5}')
     expect(readSkeletonHint()).toBeNull()
-    store.set('nexo:contacts-skeleton', 'not-json')
+    store.set('nexo:contacts-skeleton:acme', 'not-json')
+    expect(readSkeletonHint()).toBeNull()
+    store.set(
+      'nexo:contacts-skeleton:acme',
+      JSON.stringify({ widths: Array.from({ length: 500 }, () => 40), rows: 5 }),
+    )
     expect(readSkeletonHint()).toBeNull()
   })
 })

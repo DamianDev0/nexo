@@ -29,7 +29,7 @@ async function prefetchShell(
   const client = getServerQueryClient()
 
   const me = await getMe().catch(() => null)
-  if (!me) redirect(ROUTES.auth.login)
+  if (!me) redirect(`${ROUTES.auth.login}?stale=1`)
   if (options?.requireOnboarded && !me.onboardingCompleted) redirect(ROUTES.setup.onboarding)
 
   client.setQueryData(QUERY_KEYS.auth.me, me)

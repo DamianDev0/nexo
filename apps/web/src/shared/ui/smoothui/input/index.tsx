@@ -38,7 +38,8 @@ export function SmoothInput({
 }: Readonly<React.ComponentProps<'input'>>) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const measureRef = React.useRef<HTMLSpanElement>(null)
-  const wrapperRef = React.useRef<HTMLDivElement>(null)
+  const detachRef = React.useRef<(() => void) | null>(null)
+  const fontSyncedRef = React.useRef(false)
   const caretX = useMotionValue(0)
   const caretOpacity = useMotionValue(0)
   const prefersReducedMotion = useReducedMotion()
@@ -49,20 +50,23 @@ export function SmoothInput({
       const measure = measureRef.current
       if (!measure) return
 
-      const styles = window.getComputedStyle(target)
-      measure.style.font = `${styles.fontStyle} ${styles.fontWeight} ${styles.fontSize} ${styles.fontFamily}`
-      measure.style.letterSpacing = styles.letterSpacing
-      measure.style.fontFeatureSettings = styles.fontFeatureSettings
-      measure.style.fontVariationSettings = styles.fontVariationSettings
-      measure.style.fontKerning = styles.fontKerning
-
-      const index = caretIndex(target)
-      measure.textContent = target.value.slice(0, index)
-
       if (NATIVE_CARET_TYPES.has(target.type)) {
         caretOpacity.set(0)
         return
       }
+
+      const styles = window.getComputedStyle(target)
+      if (!fontSyncedRef.current) {
+        measure.style.font = `${styles.fontStyle} ${styles.fontWeight} ${styles.fontSize} ${styles.fontFamily}`
+        measure.style.letterSpacing = styles.letterSpacing
+        measure.style.fontFeatureSettings = styles.fontFeatureSettings
+        measure.style.fontVariationSettings = styles.fontVariationSettings
+        measure.style.fontKerning = styles.fontKerning
+        fontSyncedRef.current = true
+      }
+
+      const index = caretIndex(target)
+      measure.textContent = target.value.slice(0, index)
 
       const paddingLeft = parseFloat(styles.paddingLeft) || 0
       const paddingRight = parseFloat(styles.paddingRight) || 0
@@ -80,33 +84,41 @@ export function SmoothInput({
   )
 
   React.useEffect(() => {
+    fontSyncedRef.current = false
     const input = inputRef.current
     if (input && document.activeElement === input) updateCaret(input)
   }, [type, updateCaret])
 
-  React.useEffect(() => {
-    const input = inputRef.current
-    if (!input) return
+  const attachCaretListeners = React.useCallback(
+    (input: HTMLInputElement) => {
+      if (detachRef.current) return
+      const updateIfFocused = () => {
+        if (document.activeElement !== input) return
+        requestAnimationFrame(() => {
+          if (document.activeElement === input) updateCaret(input)
+        })
+      }
+      const resyncFont = () => {
+        fontSyncedRef.current = false
+        updateIfFocused()
+      }
+      document.addEventListener('selectionchange', updateIfFocused)
+      document.fonts?.addEventListener('loadingdone', resyncFont)
+      input.addEventListener('scroll', updateIfFocused)
+      detachRef.current = () => {
+        document.removeEventListener('selectionchange', updateIfFocused)
+        document.fonts?.removeEventListener('loadingdone', resyncFont)
+        input.removeEventListener('scroll', updateIfFocused)
+        detachRef.current = null
+      }
+    },
+    [updateCaret],
+  )
 
-    const updateIfFocused = () => {
-      if (document.activeElement !== input) return
-      requestAnimationFrame(() => {
-        if (document.activeElement === input) updateCaret(input)
-      })
-    }
-
-    document.addEventListener('selectionchange', updateIfFocused)
-    document.fonts?.addEventListener('loadingdone', updateIfFocused)
-    input.addEventListener('scroll', updateIfFocused)
-    return () => {
-      document.removeEventListener('selectionchange', updateIfFocused)
-      document.fonts?.removeEventListener('loadingdone', updateIfFocused)
-      input.removeEventListener('scroll', updateIfFocused)
-    }
-  }, [updateCaret])
+  React.useEffect(() => () => detachRef.current?.(), [])
 
   return (
-    <div ref={wrapperRef} className="relative w-full min-w-0">
+    <div className="relative w-full min-w-0">
       <input
         type={type}
         data-slot="input"
@@ -134,10 +146,13 @@ export function SmoothInput({
         onFocus={(event) => {
           onFocus?.(event)
           const target = event.target
+          fontSyncedRef.current = false
+          attachCaretListeners(target)
           requestAnimationFrame(() => updateCaret(target))
         }}
         onBlur={(event) => {
           caretOpacity.set(0)
+          detachRef.current?.()
           onBlur?.(event)
         }}
         {...props}

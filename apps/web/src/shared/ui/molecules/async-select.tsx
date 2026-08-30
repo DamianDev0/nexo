@@ -70,7 +70,7 @@ export function AsyncSelect<T>({
   })
 
   const items = source.options ?? query.data
-  const loading = Boolean(source.fetcher) && open && query.isLoading
+  const loading = Boolean(source.fetcher) && open && query.isFetching
 
   const visible = useMemo(() => {
     const base = items ?? []

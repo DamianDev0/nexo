@@ -48,12 +48,12 @@ describe('decideRoute', () => {
     expect(decideRoute('/onboarding/setup', true)).toBe('allow')
   })
 
-  it('allows unknown public paths', () => {
-    expect(decideRoute('/some-public-page', false)).toBe('allow')
+  it('protects unknown paths by default', () => {
+    expect(decideRoute('/some-new-page', false)).toBe('redirect-login')
   })
 
-  it('allows an unknown public path even with an active session', () => {
-    expect(decideRoute('/some-public-page', true)).toBe('allow')
+  it('allows unknown paths with an active session', () => {
+    expect(decideRoute('/some-new-page', true)).toBe('allow')
   })
 })
 

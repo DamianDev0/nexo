@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
-import { useCallback, useMemo, useReducer } from 'react'
+import { useCallback, useMemo, useReducer, useRef } from 'react'
 import { sileo } from 'sileo'
 
 import { revalidateContacts } from '@/entities/contact'
@@ -30,9 +30,13 @@ export function useContactImport(onFinished: () => void) {
     onError: () => sileo.error({ title: t('contacts.import.errors.analyze') }),
   })
 
+  const latestMapping = useRef<ImportMapping | null>(null)
   const refreshPreview = useMutation({
     mutationFn: (next: ImportMapping) => contactsService.previewImport({ fileId, mapping: next }),
-    onSuccess: (data) => dispatch({ type: 'previewed', preview: data }),
+    onSuccess: (data, variables) => {
+      if (variables !== latestMapping.current) return
+      dispatch({ type: 'previewed', preview: data })
+    },
   })
 
   const validate = useMutation({
@@ -57,6 +61,7 @@ export function useContactImport(onFinished: () => void) {
     (column: string, field: string) => {
       const next = applyMapping(mapping, column, field)
       dispatch({ type: 'remapped', mapping: next })
+      latestMapping.current = next
       previewMapping(next)
     },
     [mapping, previewMapping],

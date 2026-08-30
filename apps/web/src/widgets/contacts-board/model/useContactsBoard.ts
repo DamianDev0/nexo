@@ -1,10 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { buildContactColumns } from '@/entities/contact'
-import { writeSkeletonHint } from '@/entities/contact'
+import { buildContactColumns, writeSkeletonHint } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
@@ -135,11 +134,16 @@ export function useContactsBoard() {
 
   const { table: tanstackTable } = instance
   const rowCount = table.rows.length
+  const lastHintRef = useRef('')
   useEffect(() => {
     if (isPending || isUnavailable) return
     const headers = tanstackTable.getHeaderGroups()[0]?.headers ?? []
     if (headers.length <= 1) return
-    writeSkeletonHint({ widths: headers.map((header) => header.getSize()), rows: rowCount || 5 })
+    const hint = { widths: headers.map((header) => header.getSize()), rows: rowCount || 5 }
+    const serialized = JSON.stringify(hint)
+    if (serialized === lastHintRef.current) return
+    lastHintRef.current = serialized
+    writeSkeletonHint(hint)
   }, [isPending, isUnavailable, tanstackTable, rowCount, saveStatus])
 
   return {

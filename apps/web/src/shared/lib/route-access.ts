@@ -28,11 +28,8 @@ export function isGuestOnlyPath(pathname: string): boolean {
 }
 
 export function decideRoute(pathname: string, hasSession: boolean): RouteDecision {
-  if (isProtectedPath(pathname)) {
-    return hasSession ? 'allow' : 'redirect-login'
-  }
   if (isGuestOnlyPath(pathname)) {
     return hasSession ? 'redirect-dashboard' : 'allow'
   }
-  return 'allow'
+  return hasSession ? 'allow' : 'redirect-login'
 }
