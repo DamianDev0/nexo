@@ -119,7 +119,7 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
           type="time"
           value={timePart}
           disabled={!datePart}
-          onChange={(event) => onChange(`${datePart}T${event.target.value}`)}
+          onChange={(event) => onChange(`${datePart}T${event.target.value || '00:00'}`)}
           aria-label={t('contacts.form.pickTime')}
           className="w-28"
         />

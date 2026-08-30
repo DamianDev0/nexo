@@ -8,6 +8,17 @@ import { cn } from '@/shared/lib'
 const CARET_SPRING = { stiffness: 500, damping: 30, mass: 0.5 }
 const REDUCED_SPRING = { stiffness: 10000, damping: 100, mass: 0.1 }
 
+const NATIVE_CARET_TYPES = new Set([
+  'password',
+  'email',
+  'number',
+  'date',
+  'time',
+  'datetime-local',
+  'month',
+  'week',
+])
+
 function caretIndex(target: HTMLInputElement) {
   const start = target.selectionStart ?? 0
   const end = target.selectionEnd ?? 0
@@ -48,7 +59,7 @@ export function SmoothInput({
       const index = caretIndex(target)
       measure.textContent = target.value.slice(0, index)
 
-      if (target.type === 'password') {
+      if (NATIVE_CARET_TYPES.has(target.type)) {
         caretOpacity.set(0)
         return
       }
@@ -111,7 +122,10 @@ export function SmoothInput({
           'autofill:[-webkit-box-shadow:inset_0_0_0_1000px_var(--color-surface-input)] autofill:[-webkit-text-fill-color:var(--color-foreground)]',
           className,
         )}
-        style={{ ...style, caretColor: type === 'password' ? undefined : 'transparent' }}
+        style={{
+          ...style,
+          caretColor: NATIVE_CARET_TYPES.has(type ?? '') ? undefined : 'transparent',
+        }}
         onChange={(event) => {
           onChange?.(event)
           const target = event.target
