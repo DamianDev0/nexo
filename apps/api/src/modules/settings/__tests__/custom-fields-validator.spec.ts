@@ -1,6 +1,10 @@
 import { BadRequestException } from '@nestjs/common'
 import type { FieldDef } from '@repo/shared-types'
-import { validateCustomFields } from '../services/custom-fields-validator.service'
+import {
+  CustomFieldsValidator,
+  validateCustomFields,
+} from '../services/custom-fields-validator.service'
+import type { TenantConfigService } from '../services/tenant-config.service'
 
 function def(partial: Partial<FieldDef> & Pick<FieldDef, 'key' | 'type'>): FieldDef {
   return {
@@ -87,5 +91,72 @@ describe('validateCustomFields', () => {
   it('ignores absent optional fields', () => {
     const defs = [def({ key: 'note', type: 'text' })]
     expect(() => validateCustomFields({}, defs)).not.toThrow()
+  })
+
+  describe('update mode', () => {
+    const defs = [
+      def({ key: 'nit', type: 'text', required: true }),
+      def({ key: 'score', type: 'number', min: 0, max: 100 }),
+    ]
+
+    it('skips required fields absent from the payload', () => {
+      expect(() => validateCustomFields({ score: 50 }, defs, 'update')).not.toThrow()
+      expect(() => validateCustomFields({}, defs, 'update')).not.toThrow()
+    })
+
+    it('rejects blanking a required field', () => {
+      expect(() => validateCustomFields({ nit: null }, defs, 'update')).toThrow(BadRequestException)
+      expect(() => validateCustomFields({ nit: '' }, defs, 'update')).toThrow(BadRequestException)
+    })
+
+    it('allows null to clear an optional field', () => {
+      expect(() => validateCustomFields({ score: null }, defs, 'update')).not.toThrow()
+    })
+
+    it('allows null to purge an archived key but rejects real values on it', () => {
+      expect(() => validateCustomFields({ legacy: null }, defs, 'update')).not.toThrow()
+      expect(() => validateCustomFields({ legacy: 'x' }, defs, 'update')).toThrow(
+        BadRequestException,
+      )
+      expect(() => validateCustomFields({ legacy: null }, defs, 'create')).toThrow(
+        BadRequestException,
+      )
+    })
+
+    it('still validates provided values and unknown keys', () => {
+      expect(() => validateCustomFields({ score: 150 }, defs, 'update')).toThrow(
+        BadRequestException,
+      )
+      expect(() => validateCustomFields({ ghost: 'x' }, defs, 'update')).toThrow(
+        BadRequestException,
+      )
+    })
+  })
+})
+
+describe('CustomFieldsValidator', () => {
+  it('skips config lookup entirely when updating without custom fields', async () => {
+    const config = {
+      getCustomFields: jest.fn().mockRejectedValue(new Error('must not be called')),
+    } as unknown as TenantConfigService
+    const validator = new CustomFieldsValidator(config)
+
+    await expect(validator.validate('t1', 'contacts', undefined, 'update')).resolves.toBeUndefined()
+    expect(config.getCustomFields).not.toHaveBeenCalled()
+  })
+
+  it('still enforces required fields on create when values are missing', async () => {
+    const config = {
+      getCustomFields: jest.fn().mockResolvedValue({
+        contacts: [def({ key: 'nit', type: 'text', required: true })],
+        companies: [],
+        deals: [],
+      }),
+    } as unknown as TenantConfigService
+    const validator = new CustomFieldsValidator(config)
+
+    await expect(validator.validate('t1', 'contacts', undefined)).rejects.toThrow(
+      BadRequestException,
+    )
   })
 })

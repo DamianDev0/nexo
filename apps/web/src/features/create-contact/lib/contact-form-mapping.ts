@@ -6,6 +6,10 @@ import { resolveWhatsapp, type ContactFormValues } from './contact-form.schema'
 
 import type { ContactInput, ContactListItem } from '@repo/shared-types'
 
+export function stripNullValues(record: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(record).filter(([, value]) => value !== null))
+}
+
 export function toInput(
   values: ContactFormValues,
   customFields: Record<string, unknown>,

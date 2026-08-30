@@ -120,15 +120,24 @@ function validateField(def: FieldDef, value: unknown): string | null {
   return (VALIDATORS[def.type] ?? validateGeneric)(def, value)
 }
 
-export function validateCustomFields(values: Record<string, unknown>, defs: FieldDef[]): void {
+export type CustomFieldsValidationMode = 'create' | 'update'
+
+export function validateCustomFields(
+  values: Record<string, unknown>,
+  defs: FieldDef[],
+  mode: CustomFieldsValidationMode = 'create',
+): void {
   const errors: string[] = []
   const byKey = new Map(defs.map((d) => [d.key, d]))
 
   for (const key of Object.keys(values)) {
-    if (!byKey.has(key)) errors.push(`Unknown field "${key}"`)
+    if (byKey.has(key)) continue
+    if (mode === 'update' && values[key] === null) continue
+    errors.push(`Unknown field "${key}"`)
   }
 
-  for (const def of defs) {
+  const checkedDefs = mode === 'create' ? defs : defs.filter((def) => def.key in values)
+  for (const def of checkedDefs) {
     const error = validateField(def, values[def.key])
     if (error) errors.push(error)
   }
@@ -146,8 +155,10 @@ export class CustomFieldsValidator {
     tenantId: string,
     entity: CustomFieldEntity,
     values: Record<string, unknown> | undefined,
+    mode: CustomFieldsValidationMode = 'create',
   ): Promise<void> {
+    if (mode === 'update' && values === undefined) return
     const defs = activeFieldDefs((await this.config.getCustomFields(tenantId))[entity])
-    validateCustomFields(values ?? {}, defs)
+    validateCustomFields(values ?? {}, defs, mode)
   }
 }

@@ -13,7 +13,7 @@ import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { CONTACT_FORM_DEFAULTS } from '../config/contact-form.constants'
 import { duplicateFormField, duplicateMessage } from '../lib/contact-duplicates'
-import { toFormValues, toInput } from '../lib/contact-form-mapping'
+import { stripNullValues, toFormValues, toInput } from '../lib/contact-form-mapping'
 import { buildContactSchema, type ContactFormValues } from '../lib/contact-form.schema'
 import { validateCustomValues } from '../lib/custom-field-validation'
 import { useContactCustomFields } from '../query/useContactCustomFields'
@@ -105,7 +105,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
     mutationFn: ({ values, force }) =>
       contact
         ? contactsService.update(contact.id, toInput(values, customValues), force)
-        : contactsService.create(toInput(values, customValues), force),
+        : contactsService.create(toInput(values, stripNullValues(customValues)), force),
     onMutate: () => setPendingDuplicate(null),
     onSuccess: (_, { addAnother }) => {
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
@@ -149,8 +149,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
     setCustomErrors(({ [key]: _cleared, ...rest }) => rest)
     setCustomValues((current) => {
       if (value === undefined || value === null || value === '') {
-        const { [key]: _removed, ...rest } = current
-        return rest
+        return { ...current, [key]: null }
       }
       return { ...current, [key]: value }
     })
