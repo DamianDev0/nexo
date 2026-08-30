@@ -300,7 +300,7 @@ export class DealsRepository {
         `SELECT
            TO_CHAR(d.expected_close_date, 'YYYY-MM') AS month,
            SUM(d.value_cents)::text                  AS total_value_cents,
-           SUM(d.value_cents * COALESCE(ps.probability, 0) / 100)::text AS weighted_value_cents,
+           ROUND(SUM(d.value_cents * COALESCE(ps.probability, 0))::numeric / 100)::BIGINT::text AS weighted_value_cents,
            COUNT(*)::text                            AS deal_count
          FROM deals d
          LEFT JOIN pipeline_stages ps ON ps.id = d.stage_id

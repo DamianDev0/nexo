@@ -6,6 +6,7 @@ import type {
   ForecastEntry,
 } from '@repo/shared-types'
 import { CURRENCY_CODE } from '@repo/shared-utils'
+import { toCents } from '@/shared/utils/money'
 import type {
   DealDetailRow,
   DealItemRow,
@@ -17,7 +18,7 @@ export function mapDealListItem(r: DealListRow): DealListItem {
   return {
     id: r.id,
     title: r.title,
-    valueCents: Number(r.value_cents),
+    valueCents: toCents(r.value_cents),
     expectedCloseDate: r.expected_close_date,
     closeDateActual: r.close_date_actual ?? null,
     stageId: r.stage_id,
@@ -83,8 +84,8 @@ export function mapDealDetail(r: DealDetailRow): Omit<DealDetail, 'items'> {
 }
 
 export function mapDealItem(r: DealItemRow): DealItem {
-  const unitPrice = Number(r.unit_price_cents)
-  const subtotal = (r.quantity * unitPrice * (100 - r.discount_percent)) / 100
+  const unitPrice = toCents(r.unit_price_cents)
+  const subtotal = Math.round((r.quantity * unitPrice * (100 - r.discount_percent)) / 100)
   return {
     id: r.id,
     dealId: r.deal_id,
@@ -95,7 +96,7 @@ export function mapDealItem(r: DealItemRow): DealItem {
     discountPercent: r.discount_percent,
     ivaRate: r.iva_rate,
     position: r.position,
-    subtotalCents: Math.round(subtotal),
+    subtotalCents: subtotal,
     createdAt: r.created_at,
   }
 }
@@ -103,8 +104,8 @@ export function mapDealItem(r: DealItemRow): DealItem {
 export function mapForecastEntry(r: ForecastRow): ForecastEntry {
   return {
     month: r.month,
-    totalValueCents: Number(r.total_value_cents),
-    weightedValueCents: Number(r.weighted_value_cents),
+    totalValueCents: toCents(r.total_value_cents),
+    weightedValueCents: toCents(r.weighted_value_cents),
     dealCount: Number(r.deal_count),
   }
 }

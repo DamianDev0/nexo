@@ -479,4 +479,25 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".contact_lifecycle_history (contact_id, changed_at DESC);
     `,
   },
+  {
+    id: '0030_data_integrity_checks',
+    up: (schema) => `
+      DELETE FROM "${schema}".tags t USING "${schema}".tags dup
+        WHERE t.id > dup.id AND t.name = dup.name AND t.entity_type = dup.entity_type;
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_tags_name_entity"
+        ON "${schema}".tags (name, entity_type);
+      ALTER TABLE "${schema}".deal_items
+        ADD CONSTRAINT deal_items_quantity_positive CHECK (quantity > 0) NOT VALID,
+        ADD CONSTRAINT deal_items_unit_price_non_negative CHECK (unit_price_cents >= 0) NOT VALID,
+        ADD CONSTRAINT deal_items_discount_range CHECK (discount_percent BETWEEN 0 AND 100) NOT VALID,
+        ADD CONSTRAINT deal_items_iva_rate_valid CHECK (iva_rate IN (0, 5, 19)) NOT VALID;
+      ALTER TABLE "${schema}".deals
+        ADD CONSTRAINT deals_value_non_negative CHECK (value_cents >= 0) NOT VALID;
+      ALTER TABLE "${schema}".pipeline_stages
+        ADD CONSTRAINT pipeline_stages_probability_range CHECK (probability BETWEEN 0 AND 100) NOT VALID;
+      ALTER TABLE "${schema}".message_templates
+        ADD CONSTRAINT message_templates_channel_valid CHECK (channel IN ('whatsapp','email','sms')) NOT VALID,
+        ALTER COLUMN channel SET DEFAULT 'whatsapp';
+    `,
+  },
 ]
