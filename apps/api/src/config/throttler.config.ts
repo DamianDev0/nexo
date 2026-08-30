@@ -9,6 +9,7 @@ export function createThrottlerOptions(config: ConfigService): ThrottlerModuleOp
   const redis = new Redis({
     host: config.get<string>('redis.host'),
     port: config.get<number>('redis.port'),
+    password: config.get<string>('redis.password'),
     lazyConnect: true,
     maxRetriesPerRequest: null,
   })

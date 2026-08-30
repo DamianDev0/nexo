@@ -17,6 +17,7 @@ import type {
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
+import { ReorderWidgetsDto, ToggleWidgetDto } from '../dto/dashboard-config.dto'
 import { DashboardService } from '../services/dashboard.service'
 import { DashboardConfigService } from '../services/dashboard-config.service'
 
@@ -148,7 +149,7 @@ export class DashboardController {
   @Patch('config/toggle-widget')
   @ApiEndpoint({ summary: 'Toggle a widget visible/hidden', roles: [UserRole.VIEWER] })
   toggleWidget(
-    @Body() dto: { widgetId: string; visible: boolean },
+    @Body() dto: ToggleWidgetDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<UserDashboardConfig> {
@@ -166,7 +167,7 @@ export class DashboardController {
     roles: [UserRole.VIEWER],
   })
   reorderWidgets(
-    @Body() dto: { widgetIds: string[] },
+    @Body() dto: ReorderWidgetsDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<UserDashboardConfig> {

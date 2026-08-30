@@ -14,6 +14,7 @@ import type { ApiKey, AuthenticatedUser, TenantContext } from '@repo/shared-type
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
+import { CreateApiKeyDto } from '../dto/create-api-key.dto'
 import { ApiKeysService } from '../services/api-keys.service'
 
 @ApiTags('API Keys')
@@ -36,7 +37,7 @@ export class ApiKeysController {
     roles: [UserRole.OWNER],
   })
   create(
-    @Body() dto: { name: string; scopes?: string[]; expiresAt?: string },
+    @Body() dto: CreateApiKeyDto,
     @TenantCtx() ctx: TenantContext,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<ApiKey & { rawKey: string }> {

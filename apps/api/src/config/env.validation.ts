@@ -1,5 +1,15 @@
 import { plainToInstance } from 'class-transformer'
-import { IsEnum, IsInt, IsOptional, IsString, IsUrl, Min, validateSync } from 'class-validator'
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+  MinLength,
+  ValidateIf,
+  validateSync,
+} from 'class-validator'
 
 enum NodeEnv {
   Development = 'development',
@@ -37,6 +47,11 @@ class EnvironmentVariables {
   @IsInt()
   @Min(1)
   REDIS_PORT: number
+
+  @ValidateIf((env: EnvironmentVariables) => env.NODE_ENV === NodeEnv.Production)
+  @IsString()
+  @MinLength(1)
+  REDIS_PASSWORD?: string
 
   @IsString()
   JWT_PRIVATE_KEY: string

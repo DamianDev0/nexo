@@ -23,6 +23,7 @@ import type {
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
+import { SendTemplateDto } from '../dto/send-template.dto'
 import { MessageTemplatesService } from '../services/message-templates.service'
 
 @ApiTags('Message Templates')
@@ -121,7 +122,7 @@ export class MessageTemplatesController {
   })
   send(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: { recipients: string[]; variables: Record<string, string> },
+    @Body() dto: SendTemplateDto,
     @TenantCtx() ctx: TenantContext,
   ): Promise<SendMessageResult> {
     return this.service.send(ctx.schemaName, id, dto.recipients, dto.variables)

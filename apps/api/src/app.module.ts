@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { ThrottlerGuard } from '@nestjs/throttler'
+import { TenantThrottlerGuard } from '@/shared/security/tenant-throttler.guard'
 import { LoggerModule } from 'nestjs-pino'
 
 import { appConfig } from '@/config/app.config'
@@ -72,7 +72,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     ApiKeysModule,
   ],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: TenantThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: TenantMatchGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
