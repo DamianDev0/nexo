@@ -2,6 +2,7 @@ const es = {
   common: {
     save: 'Guardar',
     cancel: 'Cancelar',
+    clear: 'Limpiar',
     continue: 'Continuar',
     back: 'Atrás',
     optional: 'Opcional',
@@ -108,6 +109,7 @@ const es = {
         },
       },
       clearOne: 'Quitar este filtro',
+      searchOption: 'Buscar opción...',
       clearAll: 'Quitar {{count}} filtro',
       clearAll_other: 'Quitar {{count}} filtros',
     },

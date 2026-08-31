@@ -2,6 +2,7 @@ const en = {
   common: {
     save: 'Save',
     cancel: 'Cancel',
+    clear: 'Clear',
     continue: 'Continue',
     back: 'Back',
     optional: 'Optional',
@@ -108,6 +109,7 @@ const en = {
         },
       },
       clearOne: 'Clear this filter',
+      searchOption: 'Search options...',
       clearAll: 'Clear {{count}} filter',
       clearAll_other: 'Clear {{count}} filters',
     },

@@ -1,8 +1,8 @@
 'use client'
 
 import { cn } from '@/shared/lib/cn'
-import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
+import { CommandItem } from '@/shared/ui/shadcn/command'
 import { SmoothCheckboxGlyph } from '@/shared/ui/smoothui/checkbox'
 
 import type { QuickFilterOption } from '../model/types'
@@ -15,15 +15,14 @@ interface OptionRowProps {
 
 export function OptionRow({ option, checked, onToggle }: Readonly<OptionRowProps>) {
   const row = (
-    <PillButton
-      variant="ghost"
-      size="sm"
-      onClick={onToggle}
-      aria-pressed={checked}
-      className="h-8 w-full shrink-0 justify-start gap-2.5 rounded-md px-2.5 font-normal"
+    <CommandItem
+      value={option.value}
+      onSelect={onToggle}
+      aria-checked={checked}
+      className="h-8 cursor-pointer gap-2.5 rounded-md px-2.5"
     >
       <SmoothCheckboxGlyph checked={checked} />
-      <span className="flex-1 truncate text-left">{option.label}</span>
+      <span className="flex-1 truncate">{option.label}</span>
       {option.count !== undefined && (
         <span
           className={cn(
@@ -34,7 +33,7 @@ export function OptionRow({ option, checked, onToggle }: Readonly<OptionRowProps
           {option.count}
         </span>
       )}
-    </PillButton>
+    </CommandItem>
   )
 
   if (!option.hint) return row
