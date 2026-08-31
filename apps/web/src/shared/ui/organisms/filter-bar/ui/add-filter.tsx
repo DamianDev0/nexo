@@ -1,5 +1,6 @@
 'use client'
 
+import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -13,6 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/shared/ui/shadcn/command'
+import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
 
 import type { FilterFieldDef } from '../model/types'
 
@@ -20,9 +22,10 @@ type AddFilterProps = {
   readonly fields: ReadonlyArray<FilterFieldDef>
   readonly onPick: (field: FilterFieldDef) => void
   readonly showLabel: boolean
+  readonly count?: number
 }
 
-export function AddFilter({ fields, onPick, showLabel }: Readonly<AddFilterProps>) {
+export function AddFilter({ fields, onPick, showLabel, count = 0 }: Readonly<AddFilterProps>) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
@@ -32,11 +35,24 @@ export function AddFilter({ fields, onPick, showLabel }: Readonly<AddFilterProps
         <PillButton
           variant="ghost"
           size="xs"
-          className="gap-1.5 text-muted-foreground hover:text-foreground"
+          className="relative gap-1.5 text-muted-foreground hover:text-foreground"
           aria-label={t('common.filters.advanced.add')}
         >
           <FunnelIcon className="size-3.5" />
           {showLabel && t('common.filters.advanced.add')}
+          <AnimatePresence>
+            {count > 0 && (
+              <motion.span
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={SPRING_SNAPPY}
+                className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold tabular-nums text-primary-foreground"
+              >
+                {count}
+              </motion.span>
+            )}
+          </AnimatePresence>
         </PillButton>
       </GroovyPopover.Trigger>
 

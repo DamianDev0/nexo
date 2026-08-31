@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { useReducedTransition } from '@/shared/lib/animations'
+import { useScrollFade } from '@/shared/lib/hooks/useScrollFade'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
 
@@ -23,6 +24,7 @@ type FilterChipsProps = {
 export function FilterChips({ fields, value, onChange, className }: Readonly<FilterChipsProps>) {
   const { t } = useTranslation()
   const transition = useReducedTransition(SPRING_SNAPPY)
+  const fade = useScrollFade<HTMLDivElement>()
   const fieldByKey = new Map(fields.map((field) => [field.key, field]))
   const conditions = value.filter((condition) => fieldByKey.has(condition.field))
 
@@ -35,7 +37,7 @@ export function FilterChips({ fields, value, onChange, className }: Readonly<Fil
   }
 
   return (
-    <div className={cn('flex items-center gap-1.5', className)}>
+    <div ref={fade.ref} style={fade.style} className={cn('flex items-center gap-1.5', className)}>
       <AnimatePresence mode="popLayout" initial={false}>
         {conditions.map((condition, index) => {
           const field = fieldByKey.get(condition.field)

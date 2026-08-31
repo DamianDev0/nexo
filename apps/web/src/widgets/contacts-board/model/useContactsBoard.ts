@@ -19,6 +19,7 @@ import {
   useContactsTable,
   useAdvancedFilterFields,
 } from '@/features/filter-contacts'
+import { useTaxonomyUsage } from '@/features/manage-settings'
 import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
@@ -42,6 +43,7 @@ export function useContactsBoard() {
   const preview = useEntityEditor<ContactListItem>()
   const { archive, isArchiving } = useArchiveContacts()
   const workspace = useContactWorkspace()
+  const usage = useTaxonomyUsage()
   useCreateFromUrl(sheet.openCreate)
 
   const catalog = workspace.data?.columns ?? NO_COLUMNS
@@ -155,7 +157,11 @@ export function useContactsBoard() {
       quickFilters: buildQuickFilterDefs(
         t,
         table.filters,
-        { sources: taxonomy.sources, lifecycleStages: taxonomy.lifecycleStages },
+        {
+          sources: taxonomy.sources,
+          lifecycleStages: taxonomy.lifecycleStages,
+          usage: { sources: usage.sources, lifecycleStages: usage.lifecycleStages },
+        },
         terms.lowerSingular,
       ),
     },
