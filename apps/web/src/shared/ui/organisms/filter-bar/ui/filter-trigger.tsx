@@ -1,6 +1,6 @@
 'use client'
 
-import { defaultOperator, isComplete } from '../lib/conditions'
+import { defaultOperator } from '../lib/conditions'
 
 import { AddFilter } from './add-filter'
 
@@ -24,7 +24,7 @@ export function FilterTrigger({ fields, value, onChange, iconOnly }: Readonly<Fi
       fields={fields}
       onPick={add}
       showLabel={!iconOnly}
-      count={value.filter((c) => isComplete(c)).length}
+      count={value.length}
     />
   )
 }
