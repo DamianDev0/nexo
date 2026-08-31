@@ -223,6 +223,14 @@ export class ContactQueryDto extends TaggedPaginationQueryDto {
   @IsString()
   q?: string
 
+  @ApiPropertyOptional({
+    description: 'JSON array of {field, operator, value} conditions (AND semantics)',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(4000)
+  advanced?: string
+
   @ApiPropertyOptional({ description: 'Tenant taxonomy status key' })
   @IsOptional()
   @IsString()

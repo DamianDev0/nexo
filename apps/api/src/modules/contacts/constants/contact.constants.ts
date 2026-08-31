@@ -1,3 +1,4 @@
+import type { FilterableColumn } from '@/shared/database/advanced-filter-sql'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateContactDto } from '../dto/contact.dto'
 import type { CreateContactData } from '../interfaces/contact-row.interfaces'
@@ -118,4 +119,26 @@ export const REASSIGN_TAXONOMY_SQL: Readonly<Record<TaxonomyColumn, string>> = {
   type: `UPDATE contacts SET type = $2, updated_at = NOW() WHERE type = $1 RETURNING id`,
   lifecycle: `UPDATE contacts SET lifecycle_stage = $2, updated_at = NOW()
               WHERE lifecycle_stage = $1 RETURNING id`,
+}
+
+export const FILTERABLE_COLUMNS: Readonly<Record<string, FilterableColumn>> = {
+  firstName: { column: 'first_name', type: 'text' },
+  lastName: { column: 'last_name', type: 'text' },
+  email: { column: 'email', type: 'text' },
+  phone: { column: 'phone', type: 'text' },
+  whatsapp: { column: 'whatsapp', type: 'text' },
+  city: { column: 'city', type: 'text' },
+  documentNumber: { column: 'document_number', type: 'text' },
+  jobTitle: { column: 'job_title', type: 'text' },
+  status: { column: 'status', type: 'select' },
+  source: { column: 'source', type: 'select' },
+  type: { column: 'type', type: 'select' },
+  lifecycleStage: { column: 'lifecycle_stage', type: 'select' },
+  assignedToId: { column: 'assigned_to_id', type: 'select' },
+  companyId: { column: 'company_id', type: 'select' },
+  tags: { column: 'tags', type: 'multi' },
+  leadScore: { column: 'lead_score', type: 'number' },
+  createdAt: { column: 'created_at', type: 'date' },
+  updatedAt: { column: 'updated_at', type: 'date' },
+  lastContactedAt: { column: 'last_contacted_at', type: 'date' },
 }

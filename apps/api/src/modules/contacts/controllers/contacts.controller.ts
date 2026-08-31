@@ -34,6 +34,7 @@ import type {
 import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
+import { parseAdvancedFilters } from '@/shared/utils/advanced-filters'
 import { ContactsService } from '../services/contacts.service'
 import { ContactImportService } from '../services/contact-import.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
@@ -142,7 +143,11 @@ export class ContactsController {
     @TenantCtx() ctx: TenantContext,
     @Query() query: ContactQueryDto,
   ): Promise<PaginatedContacts> {
-    return this.contactsService.findAll(ctx.schemaName, query)
+    const { advanced, ...filters } = query
+    return this.contactsService.findAll(ctx.schemaName, {
+      ...filters,
+      advanced: parseAdvancedFilters(advanced),
+    })
   }
 
   @Post()

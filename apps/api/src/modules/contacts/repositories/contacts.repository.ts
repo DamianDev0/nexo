@@ -16,11 +16,13 @@ import type {
 import {
   CONTACT_COLUMNS,
   CONTACT_LIST_COLUMNS,
+  FILTERABLE_COLUMNS,
   REASSIGN_TAXONOMY_SQL,
   SORTABLE_COLUMNS,
   TAXONOMY_USAGE_SQL,
   type TaxonomyColumn,
 } from '../constants/contact.constants'
+import { advancedFilterClauses } from '@/shared/database/advanced-filter-sql'
 import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
@@ -336,6 +338,9 @@ export class ContactsRepository {
     if (query.createdTo) push(`created_at <= ?`, query.createdTo)
     if (query.lastContactedFrom) push(`last_contacted_at >= ?`, query.lastContactedFrom)
     if (query.lastContactedTo) push(`last_contacted_at <= ?`, query.lastContactedTo)
+    if (query.advanced?.length) {
+      conditions.push(...advancedFilterClauses(query.advanced, FILTERABLE_COLUMNS, params))
+    }
 
     return { where: conditions.join(' AND '), params }
   }

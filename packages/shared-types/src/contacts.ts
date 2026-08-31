@@ -1,4 +1,5 @@
 import type { DocumentType } from './enums'
+import type { FilterCondition } from './filters'
 
 export type Contact = {
   id: string
@@ -73,6 +74,7 @@ export type ContactInput = {
 
 export type ContactListQuery = {
   q?: string
+  advanced?: FilterCondition[]
   status?: string
   source?: string
   lifecycleStage?: string

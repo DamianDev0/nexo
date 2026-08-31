@@ -118,10 +118,17 @@ export type SidebarModule = {
   order: number
   customIconUrl: string | null
   required: boolean
+  status: SidebarModuleStatus
 }
 
 export type SidebarConfig = {
   modules: SidebarModule[]
+}
+
+export type SidebarModuleInput = Omit<SidebarModule, 'status'>
+
+export type SidebarConfigInput = {
+  modules: SidebarModuleInput[]
 }
 
 export const REQUIRED_SIDEBAR_MODULES = new Set(['dashboard', 'settings'])
@@ -137,6 +144,30 @@ export const DEFAULT_SIDEBAR_MODULE_KEYS = [
   'reports',
   'settings',
 ] as const
+
+export type SidebarModuleKey = (typeof DEFAULT_SIDEBAR_MODULE_KEYS)[number]
+
+export type SidebarModuleStatus = 'available' | 'coming_soon'
+
+export const SIDEBAR_MODULE_STATUS: Record<SidebarModuleKey, SidebarModuleStatus> = {
+  dashboard: 'available',
+  contacts: 'available',
+  settings: 'available',
+  companies: 'coming_soon',
+  deals: 'coming_soon',
+  activities: 'coming_soon',
+  products: 'coming_soon',
+  invoices: 'coming_soon',
+  reports: 'coming_soon',
+}
+
+export function sidebarModuleStatus(key: string): SidebarModuleStatus {
+  return SIDEBAR_MODULE_STATUS[key as SidebarModuleKey] ?? 'coming_soon'
+}
+
+export function isSidebarModuleAvailable(key: string): boolean {
+  return sidebarModuleStatus(key) === 'available'
+}
 
 export type CustomFieldType =
   | 'text'

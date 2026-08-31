@@ -31,7 +31,7 @@ import type {
   ContactQueryDto,
   ProbeContactDuplicatesDto,
 } from '../dto/contact.dto'
-import type { ContactColumnChange, CreateContactData } from '../interfaces/contact-row.interfaces'
+import type { ContactColumnChange, CreateContactData, ContactListQuery } from '../interfaces/contact-row.interfaces'
 import { OTHER_CONTACT_TYPE, UPDATABLE_FIELDS } from '../constants/contact.constants'
 import { ContactsRepository } from '../repositories/contacts.repository'
 import {
@@ -70,7 +70,7 @@ export class ContactsService {
     )
   }
 
-  async findAll(schemaName: string, query: ContactQueryDto): Promise<PaginatedContacts> {
+  async findAll(schemaName: string, query: ContactListQuery): Promise<PaginatedContacts> {
     const { rows, total, page, limit } = await this.repository.findPage(schemaName, query)
     return { data: rows.map((r) => mapContactListItem(r)), total, page, limit }
   }

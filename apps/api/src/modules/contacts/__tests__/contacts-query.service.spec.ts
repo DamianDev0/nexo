@@ -5,7 +5,7 @@ import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { ContactDuplicatesService } from '../services/contact-duplicates.service'
 import { ContactsService } from '../services/contacts.service'
 import { ContactsRepository } from '../repositories/contacts.repository'
-import type { ContactQueryDto } from '../dto/contact.dto'
+import type { ContactListQuery } from '../interfaces/contact-row.interfaces'
 
 const SCHEMA = 'tenant_test'
 
@@ -33,7 +33,7 @@ describe('ContactsService query extensions', () => {
     await service.findAll(SCHEMA, {
       sortBy: 'leadScore',
       sortDir: 'asc',
-    } as ContactQueryDto)
+    } as ContactListQuery)
 
     const [dataSql] = qr.query.mock.calls[1] as [string]
     expect(dataSql).toContain('ORDER BY lead_score ASC NULLS LAST, id ASC')
@@ -42,7 +42,7 @@ describe('ContactsService query extensions', () => {
   it('falls back to created_at DESC when no sort is provided', async () => {
     qr.query.mockResolvedValueOnce([{ count: '0' }]).mockResolvedValueOnce([])
 
-    await service.findAll(SCHEMA, {} as ContactQueryDto)
+    await service.findAll(SCHEMA, {} as ContactListQuery)
 
     const [dataSql] = qr.query.mock.calls[1] as [string]
     expect(dataSql).toContain('ORDER BY created_at DESC NULLS LAST, id ASC')
@@ -56,7 +56,7 @@ describe('ContactsService query extensions', () => {
       city: 'Bogota',
       createdFrom: '2026-01-01T00:00:00Z',
       lastContactedTo: '2026-07-01T00:00:00Z',
-    } as ContactQueryDto)
+    } as ContactListQuery)
 
     const [countSql, params] = qr.query.mock.calls[0] as [string, unknown[]]
     expect(countSql).toContain('lifecycle_stage = $1')

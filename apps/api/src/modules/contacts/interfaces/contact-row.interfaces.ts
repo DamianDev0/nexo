@@ -1,4 +1,4 @@
-import type { ContactSortField } from '@repo/shared-types'
+import type { ContactSortField, FilterCondition } from '@repo/shared-types'
 
 export interface ContactRow {
   id: string
@@ -67,6 +67,7 @@ export interface DealRow {
 
 export interface ContactListQuery {
   q?: string
+  advanced?: FilterCondition[]
   status?: string
   source?: string
   tags?: string[]
