@@ -51,6 +51,7 @@ export {
   Eye as EyeIcon,
   EyeOff as EyeSlashIcon,
   FileDown as FileArrowDownIcon,
+  ListFilter as FunnelIcon,
   FileText as FileTextIcon,
   Fingerprint as FingerprintIcon,
   Scan as FrameCornersIcon,

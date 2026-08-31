@@ -8,6 +8,7 @@ import { parseSortParam, type ContactSort } from '@/entities/contact'
 import { FIRST_PAGE } from '@/shared/config/pagination'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
 import { pageCount } from '@/shared/lib/pagination'
+import { isComplete, parseConditions, serializeConditions } from '@/shared/ui/organisms/filter-bar'
 
 import {
   contactsQueryString,
@@ -24,7 +25,7 @@ import {
 } from '../lib/quick-filters'
 import { contactListQuery } from '../query/contacts-query'
 
-import type { ContactListItem } from '@repo/shared-types'
+import type { ContactListItem, FilterCondition } from '@repo/shared-types'
 
 const NO_ROWS: readonly ContactListItem[] = []
 
@@ -38,23 +39,49 @@ export function useContactsTable() {
   const limit = parseLimitParam(params.get('limit'))
   const sort = useMemo(() => parseSortParam(params.get('sort')), [params])
   const filters = useMemo(() => parseQuickFilters((key) => params.get(key)), [params])
+  const advancedRaw = params.get('af')
+  const urlAdvanced = useMemo(() => parseConditions(advancedRaw), [advancedRaw])
 
   const [search, setSearch] = useState(urlSearch)
   const [syncedSearch, setSyncedSearch] = useState(urlSearch)
+  const [advanced, setAdvanced] = useState<ReadonlyArray<FilterCondition>>(urlAdvanced)
+  const [syncedAdvanced, setSyncedAdvanced] = useState(advancedRaw)
 
   if (syncedSearch !== urlSearch) {
     setSyncedSearch(urlSearch)
     setSearch(urlSearch)
   }
 
+  if (syncedAdvanced !== advancedRaw) {
+    setSyncedAdvanced(advancedRaw)
+    setAdvanced(urlAdvanced)
+  }
+
   const debouncedSearch = useDebouncedValue(search)
 
   const commit = useCallback(
     (next: Partial<ContactsUrlState>) => {
-      const state = { status, search: urlSearch, filters, page, limit, sort, ...next }
+      const state = {
+        status,
+        search: urlSearch,
+        advanced: advancedRaw,
+        filters,
+        page,
+        limit,
+        sort,
+        ...next,
+      }
       window.history.replaceState(null, '', `${pathname}${contactsQueryString(state)}`)
     },
-    [pathname, status, urlSearch, filters, page, limit, sort],
+    [pathname, status, urlSearch, advancedRaw, filters, page, limit, sort],
+  )
+
+  const handleAdvanced = useCallback(
+    (next: ReadonlyArray<FilterCondition>) => {
+      setAdvanced(next)
+      commit({ advanced: serializeConditions(next), page: FIRST_PAGE })
+    },
+    [commit],
   )
 
   useEffect(() => {
@@ -63,8 +90,9 @@ export function useContactsTable() {
   }, [debouncedSearch, urlSearch, commit])
 
   const query = useMemo(
-    () => contactListQuery(urlSearch, status, filters, { page, limit, sort }),
-    [urlSearch, status, filters, page, limit, sort],
+    () =>
+      contactListQuery(urlSearch, status, filters, { page, limit, sort }, advanced.filter((c) => isComplete(c))),
+    [urlSearch, status, filters, page, limit, sort, advanced],
   )
 
   const { data, isPending, isFetching } = useContactList(query)
@@ -123,7 +151,10 @@ export function useContactsTable() {
     sort,
     isPending,
     isFetching,
-    isFiltered: Boolean(urlSearch.trim() || status) || hasQuickFilters(filters),
+    isFiltered:
+      Boolean(urlSearch.trim() || status) || hasQuickFilters(filters) || advanced.length > 0,
+    advanced,
+    handleAdvanced,
     handleSearch: setSearch,
     handleSort,
     handlePage,

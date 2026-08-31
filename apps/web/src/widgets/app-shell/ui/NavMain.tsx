@@ -17,13 +17,13 @@ import {
 
 import { isNavItemActive } from '../lib/nav-items'
 
-import type { NavItem } from '../model/types'
+import type { NavEntry } from '../model/types'
 import type { SidebarNavGroup } from '../query/useSidebarModules'
 
 const BUTTON_CLASSES =
   'h-9 gap-2.5 rounded-sm text-[13px] [&_svg]:size-4.5 [&_svg]:shrink-0 [&_svg]:text-faint hover:bg-transparent hover:text-foreground hover:[&_svg]:text-primary-deep active:bg-transparent dark:hover:[&_svg]:text-primary'
 
-function NavEntry({ item }: Readonly<{ item: NavItem }>) {
+function NavEntryButton({ item }: Readonly<{ item: NavEntry }>) {
   const { t } = useTranslation()
   const moduleLabel = useModuleLabels()
   const pathname = usePathname()
@@ -95,7 +95,7 @@ export function NavMain({ groups }: Readonly<NavMainProps>) {
             </SidebarGroupLabel>
             <SidebarMenu className="gap-0.5">
               {group.items.map((item) => (
-                <NavEntry key={item.key} item={item} />
+                <NavEntryButton key={item.key} item={item} />
               ))}
             </SidebarMenu>
           </SidebarGroup>

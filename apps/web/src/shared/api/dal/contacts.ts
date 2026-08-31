@@ -27,7 +27,9 @@ function appendParam(params: URLSearchParams, key: string, value: unknown): void
 function toSearchParams(query: ContactListQuery): string {
   const params = new URLSearchParams()
 
-  for (const [key, value] of Object.entries(query)) appendParam(params, key, value)
+  const { advanced, ...rest } = query
+  for (const [key, value] of Object.entries(rest)) appendParam(params, key, value)
+  if (advanced?.length) params.append('advanced', JSON.stringify(advanced))
 
   const serialized = params.toString()
   return serialized ? `?${serialized}` : ''

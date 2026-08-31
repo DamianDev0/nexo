@@ -13,8 +13,8 @@ interface DatePickerProps {
   readonly value?: string
   readonly onChange: (value: string) => void
   readonly placeholder?: string
-  readonly 'aria-label'?: string
-  readonly disabled?: boolean
+  readonly 'aria-label': string
+  readonly className?: string
 }
 
 function parseIsoDate(value?: string): Date | undefined {
@@ -71,7 +71,7 @@ export function DatePicker({
   onChange,
   placeholder,
   'aria-label': ariaLabel,
-  disabled,
+  className,
 }: Readonly<DatePickerProps>) {
   const { i18n } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -83,13 +83,12 @@ export function DatePicker({
       <GroovyPopover.Trigger asChild>
         <button
           type="button"
-          disabled={disabled}
           aria-label={ariaLabel}
           className={cn(
             'flex h-10 w-full items-center gap-2 rounded-md border border-border bg-surface-input px-3 text-sm outline-none transition-[color,box-shadow]',
             'focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50',
-            'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
             display ? 'text-foreground' : 'text-muted-foreground',
+            className,
           )}
         >
           <CalendarBlankIcon className="size-4 shrink-0 text-muted-foreground" />

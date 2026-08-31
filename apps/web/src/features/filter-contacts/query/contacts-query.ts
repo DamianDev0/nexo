@@ -1,11 +1,12 @@
 import { parseSortParam, type ContactSort } from '@/entities/contact'
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from '@/shared/config/pagination'
+import { isComplete, parseConditions } from '@/shared/ui/organisms/filter-bar'
 
 import { EMPTY_QUICK_FILTERS, type QuickFilterState } from '../config/quick-filters.constants'
 import { parseLimitParam, parseListParam, parsePageParam } from '../lib/contact-lists'
 import { parseQuickFilters } from '../lib/quick-filters'
 
-import type { ContactListQuery } from '@repo/shared-types'
+import type { ContactListQuery, FilterCondition } from '@repo/shared-types'
 
 type ContactListPagination = {
   readonly page: number
@@ -24,9 +25,11 @@ export function contactListQuery(
   status: string | null,
   filters: QuickFilterState = EMPTY_QUICK_FILTERS,
   pagination: ContactListPagination = DEFAULT_PAGINATION,
+  advanced: ReadonlyArray<FilterCondition> = [],
 ): ContactListQuery {
   return {
     q: search.trim() || undefined,
+    advanced: advanced.length > 0 ? [...advanced] : undefined,
     status: status ?? undefined,
     lifecycleStage: (filters.lifecycleStage[0] as ContactListQuery['lifecycleStage']) ?? undefined,
     source: filters.source[0] ?? undefined,
@@ -43,9 +46,15 @@ export function contactListQueryFromParams(
   const read = (key: string) => (typeof params[key] === 'string' ? (params[key] as string) : null)
   const filters = parseQuickFilters(read)
 
-  return contactListQuery(read('q') ?? '', parseListParam(read('list')), filters, {
-    page: parsePageParam(read('page')),
-    limit: parseLimitParam(read('limit')),
-    sort: parseSortParam(read('sort')),
-  })
+  return contactListQuery(
+    read('q') ?? '',
+    parseListParam(read('list')),
+    filters,
+    {
+      page: parsePageParam(read('page')),
+      limit: parseLimitParam(read('limit')),
+      sort: parseSortParam(read('sort')),
+    },
+    parseConditions(read('af')).filter((c) => isComplete(c)),
+  )
 }

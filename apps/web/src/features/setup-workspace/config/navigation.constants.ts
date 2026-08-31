@@ -1,3 +1,5 @@
+import { sidebarModuleStatus } from '@repo/shared-types'
+
 import type { ModuleGroup } from '../model/types'
 import type { SidebarModule } from '@repo/shared-types'
 
@@ -9,86 +11,22 @@ export const MODULE_GROUPS: ReadonlyArray<ModuleGroup> = [
   { key: 'system', moduleKeys: ['settings'] },
 ]
 
-export const DEFAULT_MODULES: ReadonlyArray<SidebarModule> = [
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    icon: 'home',
-    enabled: true,
-    order: 1,
-    customIconUrl: null,
-    required: true,
-  },
-  {
-    key: 'contacts',
-    label: 'Contacts',
-    icon: 'users',
-    enabled: true,
-    order: 2,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'companies',
-    label: 'Companies',
-    icon: 'building',
-    enabled: true,
-    order: 3,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'deals',
-    label: 'Deals',
-    icon: 'briefcase',
-    enabled: true,
-    order: 4,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'activities',
-    label: 'Activities',
-    icon: 'calendar',
-    enabled: true,
-    order: 5,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'invoices',
-    label: 'Invoices',
-    icon: 'file-text',
-    enabled: true,
-    order: 6,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'products',
-    label: 'Products',
-    icon: 'package',
-    enabled: true,
-    order: 7,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'reports',
-    label: 'Reports',
-    icon: 'bar-chart',
-    enabled: true,
-    order: 8,
-    customIconUrl: null,
-    required: false,
-  },
-  {
-    key: 'settings',
-    label: 'Settings',
-    icon: 'settings',
-    enabled: true,
-    order: 9,
-    customIconUrl: null,
-    required: true,
-  },
+type ModuleSeed = Pick<SidebarModule, 'key' | 'label' | 'icon' | 'required'>
+
+const MODULE_SEEDS: ReadonlyArray<ModuleSeed> = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'home', required: true },
+  { key: 'contacts', label: 'Contacts', icon: 'users', required: false },
+  { key: 'companies', label: 'Companies', icon: 'building', required: false },
+  { key: 'deals', label: 'Deals', icon: 'briefcase', required: false },
+  { key: 'activities', label: 'Activities', icon: 'calendar', required: false },
+  { key: 'products', label: 'Products', icon: 'package', required: false },
+  { key: 'settings', label: 'Settings', icon: 'settings', required: true },
 ]
+
+export const DEFAULT_MODULES: ReadonlyArray<SidebarModule> = MODULE_SEEDS.map((seed, index) => ({
+  ...seed,
+  enabled: true,
+  order: index + 1,
+  customIconUrl: null,
+  status: sidebarModuleStatus(seed.key),
+}))

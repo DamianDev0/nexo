@@ -1,3 +1,4 @@
+import { sidebarModuleStatus } from '@repo/shared-types'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { SidebarModule } from '@repo/shared-types'
@@ -8,7 +9,16 @@ vi.mock('next/cache', () => ({ updateTag: vi.fn() }))
 const { toNavGroups } = await import('@/widgets/app-shell/query/useSidebarModules')
 
 function mod(key: string, order: number, enabled = true): SidebarModule {
-  return { key, label: key, icon: key, enabled, order, customIconUrl: null, required: false }
+  return {
+    key,
+    label: key,
+    icon: key,
+    enabled,
+    order,
+    customIconUrl: null,
+    required: false,
+    status: sidebarModuleStatus(key),
+  }
 }
 
 describe('toNavGroups', () => {
@@ -30,6 +40,26 @@ describe('toNavGroups', () => {
 
     expect(groups.map((g) => g.key)).toEqual(['overview', 'system'])
     expect(groups.flatMap((g) => g.items.map((i) => i.key))).not.toContain('reports')
+  })
+
+  it('takes item availability from the backend status, not a local list', () => {
+    const groups = toNavGroups([
+      { ...mod('contacts', 1), status: 'coming_soon' },
+      { ...mod('deals', 2), status: 'available' },
+    ])
+
+    const items = groups.flatMap((g) => g.items)
+    expect(items.find((i) => i.key === 'contacts')?.available).toBe(false)
+    expect(items.find((i) => i.key === 'deals')?.available).toBe(true)
+  })
+
+  it('falls back to the shared status map when the backend omits status', () => {
+    const legacy = { ...mod('deals', 1) } as Partial<SidebarModule>
+    delete legacy.status
+
+    const groups = toNavGroups([legacy as SidebarModule])
+
+    expect(groups.flatMap((g) => g.items)[0]?.available).toBe(false)
   })
 
   it('ignores unknown module keys from the backend', () => {

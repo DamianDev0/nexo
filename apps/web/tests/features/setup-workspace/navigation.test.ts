@@ -27,6 +27,7 @@ function buildModule(overrides: Partial<SidebarModule>): SidebarModule {
     order: 1,
     customIconUrl: null,
     required: true,
+    status: 'available',
     ...overrides,
   }
 }

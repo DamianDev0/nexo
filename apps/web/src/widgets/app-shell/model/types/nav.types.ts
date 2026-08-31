@@ -1,7 +1,7 @@
 import type { AppIcon } from '@/shared/ui/icons'
-import type { DEFAULT_SIDEBAR_MODULE_KEYS } from '@repo/shared-types'
+import type { SidebarModuleKey } from '@repo/shared-types'
 
-export type SidebarModuleKey = (typeof DEFAULT_SIDEBAR_MODULE_KEYS)[number]
+export type { SidebarModuleKey }
 
 export interface SidebarUser {
   readonly name: string
@@ -20,5 +20,8 @@ export interface NavItem {
   readonly url: string
   readonly basePath: string
   readonly icon: AppIcon
+}
+
+export interface NavEntry extends NavItem {
   readonly available: boolean
 }

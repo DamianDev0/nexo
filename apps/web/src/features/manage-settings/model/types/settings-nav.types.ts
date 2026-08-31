@@ -1,5 +1,3 @@
-import type { AppIcon } from '@/shared/ui/icons'
-
 export type SettingsGroupKey = 'personal' | 'account' | 'workspace'
 
 export type SettingsSectionKey =
@@ -23,7 +21,6 @@ export interface SettingsChild {
 export interface SettingsSection {
   readonly key: SettingsSectionKey
   readonly href: string
-  readonly icon: AppIcon
   readonly available: boolean
   readonly children?: ReadonlyArray<SettingsChild>
 }

@@ -18,6 +18,7 @@ import {
   statusToListId,
   useContactCounts,
   useContactsTable,
+  useAdvancedFilterFields,
 } from '@/features/filter-contacts'
 import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
@@ -114,9 +115,7 @@ export function useContactsBoard() {
 
   const { handleStatus } = table
   const selectList = useCallback((id: string) => handleStatus(listIdToStatus(id)), [handleStatus])
-
   const bulkLabels = useMemo(() => buildBulkLabels(t), [t])
-
   const activeListId = statusToListId(table.status)
   const listHints = useMemo(
     () =>
@@ -129,22 +128,22 @@ export function useContactsBoard() {
     [t, items, activeListId, counts, table.rows, terms],
   )
 
+  const advancedFields = useAdvancedFilterFields(catalog)
   const isPending = table.isPending || workspace.isPending
   const isUnavailable = !isPending && columns.length <= 1
 
-  const { table: tanstackTable } = instance
-  const rowCount = table.rows.length
   const lastHintRef = useRef('')
+  const { table: tanstack } = instance
   useEffect(() => {
     if (isPending || isUnavailable) return
-    const headers = tanstackTable.getHeaderGroups()[0]?.headers ?? []
+    const headers = tanstack.getHeaderGroups()[0]?.headers ?? []
     if (headers.length <= 1) return
-    const hint = { widths: headers.map((header) => header.getSize()), rows: rowCount || 5 }
+    const hint = { widths: headers.map((header) => header.getSize()), rows: table.rows.length || 5 }
     const serialized = JSON.stringify(hint)
     if (serialized === lastHintRef.current) return
     lastHintRef.current = serialized
     writeSkeletonHint(hint)
-  }, [isPending, isUnavailable, tanstackTable, rowCount, saveStatus])
+  }, [isPending, isUnavailable, tanstack, table.rows.length, saveStatus])
 
   return {
     instance,
@@ -164,6 +163,8 @@ export function useContactsBoard() {
       isArchiving,
       listHints,
       bulkLabels,
+      advanced: table.advanced,
+      advancedFields,
       quickFilters: buildQuickFilterDefs(
         t,
         table.filters,
@@ -174,6 +175,7 @@ export function useContactsBoard() {
     actions: {
       onSelectList: selectList,
       onReorderLists: setListOrder,
+      onAdvancedChange: table.handleAdvanced,
       onSearch: table.handleSearch,
       onPageChange: table.handlePage,
       onPrefetchPage: table.prefetchPage,

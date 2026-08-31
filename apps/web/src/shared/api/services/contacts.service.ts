@@ -50,8 +50,15 @@ const contactsService = {
   executeImport: (data: ContactImportRun) =>
     request<ImportResult>({ method: 'post', url: '/contacts/import/execute', data }),
 
-  list: (params: ContactListQuery) =>
-    request<PaginatedContacts>({ method: 'get', url: '/contacts', params }),
+  list: ({ advanced, ...params }: ContactListQuery) =>
+    request<PaginatedContacts>({
+      method: 'get',
+      url: '/contacts',
+      params: {
+        ...params,
+        advanced: advanced?.length ? JSON.stringify(advanced) : undefined,
+      },
+    }),
 
   counts: () => request<ContactCounts>({ method: 'get', url: '/contacts/counts' }),
 

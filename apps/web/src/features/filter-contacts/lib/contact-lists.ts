@@ -49,6 +49,7 @@ export function parseListParam(value: string | null): string | null {
 
 export interface ContactsUrlState {
   readonly status: string | null
+  readonly advanced: string | null
   readonly search: string
   readonly filters: QuickFilterState
   readonly page: number
@@ -68,6 +69,7 @@ export function parseLimitParam(value: string | null): number {
 
 export function contactsQueryString(state: {
   status: string | null
+  advanced?: string | null
   search: string
   filters?: Readonly<Record<string, ReadonlyArray<string>>>
   page?: number
@@ -77,6 +79,7 @@ export function contactsQueryString(state: {
   const params = new URLSearchParams()
   if (state.status) params.set('list', state.status)
   if (state.search.trim()) params.set('q', state.search.trim())
+  if (state.advanced) params.set('af', state.advanced)
   for (const [key, values] of Object.entries(state.filters ?? {})) {
     if (values.length > 0) params.set(key, values.join(','))
   }

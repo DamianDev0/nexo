@@ -3,12 +3,6 @@ import { ROUTES } from '@/shared/config/routes'
 
 import type { NavItem, SidebarModuleKey } from '../model/types'
 
-const BUILT_ROUTES: ReadonlySet<string> = new Set([
-  ROUTES.app.dashboard,
-  ROUTES.app.contacts.list,
-  ROUTES.app.settings.company,
-])
-
 function navItem(key: SidebarModuleKey, url: string, basePath: string = url): NavItem {
   return {
     key,
@@ -16,7 +10,6 @@ function navItem(key: SidebarModuleKey, url: string, basePath: string = url): Na
     url,
     basePath,
     icon: moduleIcon(key),
-    available: BUILT_ROUTES.has(url),
   }
 }
 

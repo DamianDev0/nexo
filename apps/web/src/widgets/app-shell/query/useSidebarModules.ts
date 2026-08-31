@@ -1,3 +1,4 @@
+import { sidebarModuleStatus } from '@repo/shared-types'
 import { useQuery } from '@tanstack/react-query'
 
 import { groupModules } from '@/features/setup-workspace'
@@ -6,12 +7,12 @@ import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { NAV_CRM } from '../lib/nav-items'
 
-import type { NavItem } from '../model/types'
+import type { NavEntry } from '../model/types'
 import type { SidebarModule } from '@repo/shared-types'
 
 export interface SidebarNavGroup {
   readonly key: string
-  readonly items: ReadonlyArray<NavItem>
+  readonly items: ReadonlyArray<NavEntry>
 }
 
 export function toNavGroups(modules: ReadonlyArray<SidebarModule>): ReadonlyArray<SidebarNavGroup> {
@@ -22,20 +23,25 @@ export function toNavGroups(modules: ReadonlyArray<SidebarModule>): ReadonlyArra
     .map((group) => ({
       key: group.key,
       items: group.modules
-        .map((m) => navByKey.get(m.key as NavItem['key']))
-        .filter((item): item is NavItem => item !== undefined),
+        .map((m) => {
+          const item = navByKey.get(m.key as NavEntry['key'])
+          if (!item) return undefined
+          return { ...item, available: (m.status ?? sidebarModuleStatus(m.key)) === 'available' }
+        })
+        .filter((item): item is NavEntry => item !== undefined),
     }))
     .filter((group) => group.items.length > 0)
 }
 
-const ALL_ENABLED: ReadonlyArray<SidebarModule> = NAV_CRM.map((item, index) => ({
+const FALLBACK_MODULES: ReadonlyArray<SidebarModule> = NAV_CRM.map((item, index) => ({
   key: item.key,
   label: item.key,
   icon: item.key,
-  enabled: true,
+  enabled: sidebarModuleStatus(item.key) === 'available',
   order: index + 1,
   customIconUrl: null,
   required: false,
+  status: sidebarModuleStatus(item.key),
 }))
 
 export function useSidebarModules(): ReadonlyArray<SidebarNavGroup> {
@@ -45,6 +51,6 @@ export function useSidebarModules(): ReadonlyArray<SidebarNavGroup> {
     staleTime: 5 * 60 * 1000,
   })
 
-  const modules = data?.modules?.length ? data.modules : ALL_ENABLED
+  const modules = data?.modules?.length ? data.modules : FALLBACK_MODULES
   return toNavGroups(modules)
 }

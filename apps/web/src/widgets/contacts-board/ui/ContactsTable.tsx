@@ -12,6 +12,7 @@ import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { CloudArrowUpIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
+import { FilterBar } from '@/shared/ui/organisms/filter-bar'
 import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 
 import { ContactsPagination } from './ContactsPagination'
@@ -50,6 +51,13 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
         onToggle={actions.onToggleFilter}
         onClear={actions.onClearFilters}
         announcement={<ContactsListHint hints={state.listHints} />}
+      />
+
+      <FilterBar
+        fields={state.advancedFields}
+        value={state.advanced}
+        onChange={actions.onAdvancedChange}
+        className="shrink-0 px-4 pt-1"
       />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 pb-2 pt-1">

@@ -64,6 +64,27 @@ const es = {
     },
     moreOptions: 'Más opciones',
     filters: {
+      advanced: {
+        add: 'Filtrar',
+        searchField: 'Buscar campo...',
+        clear: 'Limpiar',
+        remove: 'Quitar filtro de {{field}}',
+        pickValue: 'Elegir...',
+        pickValues: 'Elegir valores...',
+        pickDate: 'Fecha',
+        typeValue: 'Escribe...',
+        operators: {
+          is: 'es',
+          is_not: 'no es',
+          contains: 'contiene',
+          not_contains: 'no contiene',
+          is_any_of: 'es cualquiera de',
+          is_empty: 'está vacío',
+          is_not_empty: 'no está vacío',
+          gte: 'desde',
+          lte: 'hasta',
+        },
+      },
       removeOne: 'Quitar {{value}}',
       hints: {
         lifecycleStage: {
