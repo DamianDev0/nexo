@@ -22,10 +22,10 @@ export function SwatchRow({ swatch, name, leading, trailing, ghost }: Readonly<S
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-lg border border-border bg-card px-2 py-1.5 transition-[box-shadow,border-color]',
+        'flex items-center gap-2 rounded-lg border border-border bg-card px-2 py-1.5 transition-[box-shadow,border-color,background-color]',
         ghost
           ? 'scale-[1.02] cursor-grabbing shadow-xl ring-1 ring-primary/40'
-          : 'hover:border-input/70 hover:shadow-xs',
+          : 'hover:border-input/70 hover:bg-row-hover hover:shadow-xs',
       )}
     >
       {leading}

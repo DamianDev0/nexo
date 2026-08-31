@@ -35,7 +35,6 @@ export function FieldsPane() {
   const importer = useHeaderImport(pane.entity)
   const dnd = useDndReorder(pane.onReorder)
 
-  const actions = { onEdit: pane.onEdit, onArchive: pane.onArchive }
   const dragged = pane.fields.find((field) => field.key === dnd.activeId)
 
   return (
@@ -91,7 +90,12 @@ export function FieldsPane() {
           icon={<ShapesIcon className="size-6" />}
           title={t('settings.fields.emptyTitle')}
           description={t('settings.fields.emptyDescription')}
-        />
+        >
+          <Button size="sm" className="gap-1.5" onClick={pane.editor.openCreate}>
+            <PlusIcon className="size-3.5" />
+            {t('settings.fields.emptyCta')}
+          </Button>
+        </EmptyState>
       )}
 
       {!pane.isPending && pane.fields.length > 0 && (
@@ -110,13 +114,13 @@ export function FieldsPane() {
           >
             <div className="flex flex-col gap-1.5">
               {pane.fields.map((field) => (
-                <SortableFieldRow key={field.key} field={field} actions={actions} />
+                <SortableFieldRow key={field.key} field={field} actions={pane.rowActions} />
               ))}
             </div>
           </SortableContext>
 
           <DragOverlay modifiers={[restrictToVerticalAxis]}>
-            {dragged ? <FieldRow field={dragged} actions={actions} /> : null}
+            {dragged ? <FieldRow field={dragged} actions={pane.rowActions} /> : null}
           </DragOverlay>
         </DndContext>
       )}

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { Text } from '@/shared/ui/atoms/text'
 import { ColorSwatchPicker } from '@/shared/ui/molecules/color-swatch-picker'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
+import { FieldError } from '@/shared/ui/molecules/field-error'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
@@ -16,8 +17,8 @@ import {
 import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
-import { DEFAULT_ACTIVITY_ICON } from '../../../config/activity-types.constants'
 import { HEX_COLOR_PALETTE } from '../../../config/hex-palette.constants'
+import { useActivityTypeForm } from '../../../model/useActivityTypeForm'
 
 import { ActivityIconPicker } from './ActivityIconPicker'
 
@@ -35,10 +36,7 @@ export function ActivityTypeFormDialog({
   onSubmit,
 }: Readonly<ActivityTypeFormDialogProps>) {
   const { t } = useTranslation()
-  const [label, setLabel] = useState('')
-  const [icon, setIcon] = useState(DEFAULT_ACTIVITY_ICON)
-  const [color, setColor] = useState(HEX_COLOR_PALETTE[0] ?? '')
-  const [trackDuration, setTrackDuration] = useState(false)
+  const form = useActivityTypeForm(onSubmit)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,34 +45,48 @@ export function ActivityTypeFormDialog({
           <DialogTitle>{t('settings.activityTypes.createTitle')}</DialogTitle>
         </DialogHeader>
 
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={(event) => {
-            event.preventDefault()
-            onSubmit({ label, icon, color, trackDuration })
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <ActivityIconPicker
-              icon={icon}
-              onChange={setIcon}
-              label={t('settings.activityTypes.pickIcon')}
-            />
-            <ColorSwatchPicker
-              color={color}
-              colors={HEX_COLOR_PALETTE}
-              onChange={setColor}
-              label={t('settings.taxonomy.pickColor')}
-            />
-            <Input
-              autoFocus
-              value={label}
-              placeholder={t('settings.activityTypes.namePlaceholder')}
-              aria-label={t('settings.activityTypes.nameLabel')}
-              className="h-9 flex-1"
-              onChange={(event) => setLabel(event.target.value)}
-            />
-          </div>
+        <form className="flex flex-col gap-4" onSubmit={form.submit}>
+          <Controller
+            control={form.control}
+            name="label"
+            render={({ field, fieldState }) => (
+              <div>
+                <div className="flex items-center gap-2">
+                  <Controller
+                    control={form.control}
+                    name="icon"
+                    render={({ field: icon }) => (
+                      <ActivityIconPicker
+                        icon={icon.value}
+                        onChange={icon.onChange}
+                        label={t('settings.activityTypes.pickIcon')}
+                      />
+                    )}
+                  />
+                  <Controller
+                    control={form.control}
+                    name="color"
+                    render={({ field: color }) => (
+                      <ColorSwatchPicker
+                        color={color.value}
+                        colors={HEX_COLOR_PALETTE}
+                        onChange={color.onChange}
+                        label={t('settings.taxonomy.pickColor')}
+                      />
+                    )}
+                  />
+                  <Input
+                    {...field}
+                    autoFocus
+                    placeholder={t('settings.activityTypes.namePlaceholder')}
+                    aria-label={t('settings.activityTypes.nameLabel')}
+                    className="h-9 flex-1"
+                  />
+                </div>
+                <FieldError message={fieldState.error?.message} />
+              </div>
+            )}
+          />
 
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -85,11 +97,17 @@ export function ActivityTypeFormDialog({
                 {t('settings.activityTypes.trackDurationHint')}
               </Text>
             </div>
-            <AnimatedToggle
-              size="sm"
-              checked={trackDuration}
-              label={t('settings.activityTypes.trackDuration')}
-              onChange={setTrackDuration}
+            <Controller
+              control={form.control}
+              name="trackDuration"
+              render={({ field }) => (
+                <AnimatedToggle
+                  size="sm"
+                  checked={field.value}
+                  label={t('settings.activityTypes.trackDuration')}
+                  onChange={field.onChange}
+                />
+              )}
             />
           </div>
 
@@ -97,7 +115,7 @@ export function ActivityTypeFormDialog({
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={label.trim().length === 0}>
+            <Button type="submit" disabled={!form.canSubmit}>
               {t('common.create')}
             </Button>
           </DialogActions>

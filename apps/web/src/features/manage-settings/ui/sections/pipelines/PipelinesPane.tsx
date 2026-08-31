@@ -51,7 +51,12 @@ export function PipelinesPane() {
           icon={<StackIcon className="size-6" />}
           title={t('settings.pipelines.emptyTitle')}
           description={t('settings.pipelines.emptyDescription')}
-        />
+        >
+          <Button size="sm" className="gap-1.5" onClick={pane.creator.openCreate}>
+            <PlusIcon className="size-3.5" />
+            {t('settings.pipelines.emptyCta')}
+          </Button>
+        </EmptyState>
       )}
 
       {!pane.isPending && pane.pipelines.length > 0 && (

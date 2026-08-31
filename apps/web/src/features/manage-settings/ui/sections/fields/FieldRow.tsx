@@ -25,7 +25,7 @@ export function FieldRow({ field, actions, handle }: Readonly<FieldRowProps>) {
   const { t } = useTranslation()
 
   return (
-    <div className="flex min-h-11 items-center gap-2 rounded-lg border border-border bg-card px-2 py-1.5">
+    <div className="flex min-h-11 items-center gap-2 rounded-lg border border-border bg-card px-2 py-1.5 transition-colors hover:border-input/70 hover:bg-row-hover">
       <DragHandle handle={handle} label={t('settings.fields.reorder')} />
       <span className="min-w-0 flex-1 truncate text-sm text-foreground">{field.label}</span>
       {field.required && <BadgeSoft tone="warning">{t('settings.fields.requiredLabel')}</BadgeSoft>}

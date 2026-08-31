@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
+import { normalizeSearchText as normalize } from '@/shared/lib/search-text'
 import { CaretDownIcon, MagnifyingGlassIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { GROOVY_ITEM, GROOVY_ITEM_IDLE } from '@/shared/ui/molecules/groovy-popover/constants'
@@ -29,12 +30,6 @@ function summarize(filter: QuickFilterDef): string | null {
   return filter.options.find((option) => option.value === filter.selected[0])?.label ?? null
 }
 
-function normalize(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replaceAll(/[̀-ͯ]/g, '')
-}
 
 export function QuickFilter({ filter, onToggle, onClear }: Readonly<QuickFilterProps>) {
   const { t } = useTranslation()

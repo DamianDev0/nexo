@@ -130,4 +130,17 @@ describe('useOptionForm', () => {
 
     await waitFor(() => expect(screen.getByTestId('length')).toHaveTextContent('4'))
   })
+
+  it('submits once, closes, and ignores a second submit of the same mount', async () => {
+    const user = userEvent.setup()
+    const { onSubmit, onClose } = setup({ name: 'VIP', description: '' })
+
+    const button = screen.getByRole('button')
+    await waitFor(() => expect(button).toBeEnabled())
+    await user.click(button)
+    await user.click(button)
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
 })

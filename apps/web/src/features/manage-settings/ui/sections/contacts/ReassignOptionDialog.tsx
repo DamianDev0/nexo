@@ -21,12 +21,17 @@ import { useReassignForm } from '../../../model/useReassignForm'
 
 import type { ReassignCandidate, ReassignSource } from '../../../model/types'
 
+interface ReassignConfirm {
+  readonly action: (toKey: string) => void
+  readonly isPending: boolean
+}
+
 interface ReassignOptionDialogProps {
   readonly open: boolean
   readonly onOpenChange: (open: boolean) => void
   readonly source: ReassignSource
   readonly candidates: ReadonlyArray<ReassignCandidate>
-  readonly onConfirm: (toKey: string) => void
+  readonly confirm: ReassignConfirm
 }
 
 function candidateOption(candidate: ReassignCandidate) {
@@ -43,11 +48,11 @@ export function ReassignOptionDialog({
   onOpenChange,
   source,
   candidates,
-  onConfirm,
+  confirm,
 }: Readonly<ReassignOptionDialogProps>) {
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
-  const form = useReassignForm({ candidates, onConfirm })
+  const form = useReassignForm({ candidates, onConfirm: confirm.action })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,7 +100,11 @@ export function ReassignOptionDialog({
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" variant="destructive" disabled={!form.canSubmit}>
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={!form.canSubmit || confirm.isPending}
+            >
               {t('settings.reassign.confirm')}
             </Button>
           </DialogActions>

@@ -1,7 +1,7 @@
 'use client'
 
 import { t } from 'i18next'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { sileo } from 'sileo'
 
 import { buildImportFieldDefs, toImportRows, updateImportRow } from '../lib/header-import'
@@ -17,8 +17,10 @@ export function useHeaderImport(entity: CustomFieldEntity) {
   const [rows, setRows] = useState<HeaderImportRow[]>([])
   const admin = useCustomFieldsAdmin(entity)
   const analyze = useAnalyzeHeaders(entity)
+  const uploadSeq = useRef(0)
 
   const openImport = useCallback(() => {
+    uploadSeq.current += 1
     setAnalysis(null)
     setRows([])
     setOpen(true)
@@ -27,6 +29,7 @@ export function useHeaderImport(entity: CustomFieldEntity) {
   const onOpenChange = useCallback((next: boolean) => {
     setOpen(next)
     if (!next) {
+      uploadSeq.current += 1
       setAnalysis(null)
       setRows([])
     }
@@ -34,7 +37,10 @@ export function useHeaderImport(entity: CustomFieldEntity) {
 
   const upload = useCallback(
     async (file: File) => {
+      uploadSeq.current += 1
+      const seq = uploadSeq.current
       const result = await analyze.mutateAsync(file)
+      if (seq !== uploadSeq.current) return
       setAnalysis(result)
       setRows(toImportRows(result.suggestions))
     },

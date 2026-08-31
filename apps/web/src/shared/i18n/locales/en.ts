@@ -890,6 +890,7 @@ const en = {
       showInFormLabel: 'Ask on create',
       showInFormHint: 'Shown in the create form',
       optionsLabel: 'Options',
+      optionsRequired: 'Add at least one option',
       optionPlaceholder: 'Option name',
       addOption: 'Add option',
       removeOption: 'Remove option',

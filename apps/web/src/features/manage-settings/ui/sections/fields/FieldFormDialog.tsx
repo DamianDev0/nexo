@@ -1,10 +1,12 @@
 'use client'
 
+import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { Text } from '@/shared/ui/atoms/text'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
+import { FieldError } from '@/shared/ui/molecules/field-error'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
@@ -55,12 +57,7 @@ export function FieldFormDialog({
   initial,
 }: Readonly<FieldFormDialogProps>) {
   const { t } = useTranslation()
-  const form = useFieldForm(initial)
-
-  const submit = () => {
-    if (!form.canSubmit) return
-    onSubmit(form.values())
-  }
+  const form = useFieldForm(initial, onSubmit)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,13 +68,21 @@ export function FieldFormDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-3">
-          <Input
-            autoFocus
-            value={form.label}
-            onChange={(event) => form.setLabel(event.target.value)}
-            placeholder={t('settings.fields.namePlaceholder')}
-            aria-label={t('settings.fields.nameLabel')}
+        <form className="flex flex-col gap-3" onSubmit={form.submit}>
+          <Controller
+            control={form.control}
+            name="label"
+            render={({ field, fieldState }) => (
+              <div>
+                <Input
+                  {...field}
+                  autoFocus
+                  placeholder={t('settings.fields.namePlaceholder')}
+                  aria-label={t('settings.fields.nameLabel')}
+                />
+                <FieldError message={fieldState.error?.message} />
+              </div>
+            )}
           />
 
           {form.isEdit ? (
@@ -86,35 +91,54 @@ export function FieldFormDialog({
               <BadgeSoft tone="outline">{t(`settings.fields.types.${form.type}`)}</BadgeSoft>
             </div>
           ) : (
-            <FieldTypePicker value={form.type} onChange={form.setType} />
+            <Controller
+              control={form.control}
+              name="type"
+              render={({ field }) => <FieldTypePicker value={field.value} onChange={field.onChange} />}
+            />
           )}
 
-          <CheckRow
-            label={t('settings.fields.requiredLabel')}
-            hint={t('settings.fields.requiredHint')}
-            checked={form.required}
-            onChange={form.setRequired}
+          <Controller
+            control={form.control}
+            name="required"
+            render={({ field }) => (
+              <CheckRow
+                label={t('settings.fields.requiredLabel')}
+                hint={t('settings.fields.requiredHint')}
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            )}
           />
-          <CheckRow
-            label={t('settings.fields.showInFormLabel')}
-            hint={t('settings.fields.showInFormHint')}
-            checked={form.showInForm}
-            onChange={form.setShowInForm}
+          <Controller
+            control={form.control}
+            name="showInForm"
+            render={({ field }) => (
+              <CheckRow
+                label={t('settings.fields.showInFormLabel')}
+                hint={t('settings.fields.showInFormHint')}
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            )}
           />
 
           {form.hasOptions && (
-            <FieldOptionsEditor options={form.options} actions={form.optionActions} />
+            <div>
+              <FieldOptionsEditor options={form.options} actions={form.optionActions} />
+              <FieldError message={form.optionsError} />
+            </div>
           )}
-        </div>
 
-        <DialogActions>
-          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-            {t('common.cancel')}
-          </Button>
-          <Button type="button" disabled={!form.canSubmit} onClick={submit}>
-            {t(form.isEdit ? 'common.save' : 'common.create')}
-          </Button>
-        </DialogActions>
+          <DialogActions>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" disabled={!form.canSubmit}>
+              {t(form.isEdit ? 'common.save' : 'common.create')}
+            </Button>
+          </DialogActions>
+        </form>
       </DialogContent>
     </Dialog>
   )

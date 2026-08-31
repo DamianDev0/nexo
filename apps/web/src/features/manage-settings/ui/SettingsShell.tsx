@@ -13,6 +13,7 @@ import { Text } from '@/shared/ui/atoms/text'
 import { SectionTabs } from '@/shared/ui/molecules/section-tabs'
 
 import { buildMobileNavTabs, buildSectionTabs, findSection } from '../lib/settings-nav'
+import { useSaveShortcut } from '../model/useSaveShortcut'
 import { useSectionController } from '../model/useSectionController'
 
 import { SettingsNav } from './nav/SettingsNav'
@@ -27,12 +28,18 @@ export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const contentTransition = useReducedTransition(quickEase)
 
-  useScrollTopOnChange(pathname, scrollRef)
-
   const section = useMemo(() => findSection(pathname), [pathname])
+  const contentKey = section?.key ?? pathname
+
+  useScrollTopOnChange(contentKey, scrollRef)
   const tabs = useMemo(() => buildSectionTabs(section, t), [section, t])
   const mobileTabs = useMemo(() => buildMobileNavTabs(moduleLabel), [moduleLabel])
   const controller = useSectionController(section?.key)
+
+  useSaveShortcut({
+    onSave: controller?.handleSave ?? null,
+    canSave: Boolean(controller && controller.isDirty && !controller.isPending),
+  })
 
   return (
     <div className="flex h-full">
@@ -56,7 +63,7 @@ export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
               : t('settings.title')}
           </h1>
           <Text as="p" variant="muted" className="mt-1">
-            {t('settings.subtitle')}
+            {section ? t(`settings.descriptions.${section.key}`) : t('settings.subtitle')}
           </Text>
           {tabs.length > 0 && (
             <SectionTabs
@@ -72,7 +79,7 @@ export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
           className="scrollbar-hidden min-h-0 flex-1 overflow-y-auto px-4 py-6 lg:px-8"
         >
           <motion.div
-            key={pathname}
+            key={contentKey}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={contentTransition}

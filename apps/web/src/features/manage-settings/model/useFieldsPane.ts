@@ -64,7 +64,10 @@ export function useFieldsPane() {
 
   const onArchive = useCallback((key: string) => admin.archive(key), [admin])
 
+  const rowActions = useMemo(() => ({ onEdit: openEdit, onArchive }), [onArchive, openEdit])
+
   return {
+    rowActions,
     entity,
     setEntity: changeEntity,
     fields,

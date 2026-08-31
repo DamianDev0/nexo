@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -19,6 +19,7 @@ interface UseOptionFormArgs {
 export function useOptionForm({ initial, onSubmit, onClose }: UseOptionFormArgs) {
   const { t } = useTranslation()
   const schema = useMemo(() => buildOptionFormSchema(t), [t])
+  const submitted = useRef(false)
 
   const form = useForm<OptionFormSchemaValues>({
     resolver: zodResolver(schema),
@@ -37,6 +38,8 @@ export function useOptionForm({ initial, onSubmit, onClose }: UseOptionFormArgs)
     descriptionLength: form.watch('description').length,
     canSubmit: form.formState.isValid,
     submit: form.handleSubmit((values) => {
+      if (submitted.current) return
+      submitted.current = true
       onSubmit(values)
       onClose()
     }),

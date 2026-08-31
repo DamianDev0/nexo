@@ -7,6 +7,7 @@ import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon, TagIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
+import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { Button } from '@/shared/ui/shadcn/button'
 
 import { useTagsPane } from '../../../model/useTagsPane'
@@ -42,15 +43,16 @@ export function TagsPane() {
       </div>
 
       {!pane.isPending && pane.tags.length === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-10 text-center">
-          <TagIcon className="size-6 text-muted-foreground" />
-          <Text as="p" variant="strong">
-            {t('settings.tags.emptyTitle')}
-          </Text>
-          <p className="max-w-xs text-xs text-muted-foreground">
-            {t('settings.tags.emptyDescription', { entities: terms.lowerPlural })}
-          </p>
-        </div>
+        <EmptyState
+          icon={<TagIcon className="size-6" />}
+          title={t('settings.tags.emptyTitle')}
+          description={t('settings.tags.emptyDescription', { entities: terms.lowerPlural })}
+        >
+          <Button size="sm" className="gap-1.5" onClick={pane.editor.openCreate}>
+            <PlusIcon className="size-3.5" />
+            {t('settings.tags.emptyCta')}
+          </Button>
+        </EmptyState>
       )}
 
       <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
@@ -90,7 +92,7 @@ export function TagsPane() {
           }}
           source={pane.removal.source}
           candidates={pane.removal.candidates}
-          onConfirm={pane.removal.confirm}
+          confirm={{ action: pane.removal.confirm, isPending: pane.removal.isPending }}
         />
       )}
     </div>

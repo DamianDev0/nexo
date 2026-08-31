@@ -895,6 +895,7 @@ const es = {
       showInFormLabel: 'Pedir al crear',
       showInFormHint: 'Aparece en el formulario de creación',
       optionsLabel: 'Opciones',
+      optionsRequired: 'Agrega al menos una opción',
       optionPlaceholder: 'Nombre de la opción',
       addOption: 'Agregar opción',
       removeOption: 'Quitar opción',

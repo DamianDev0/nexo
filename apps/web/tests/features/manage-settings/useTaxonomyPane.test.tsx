@@ -123,7 +123,7 @@ describe('useTaxonomyPane', () => {
     const { result } = renderHook(() => useTaxonomyPane(kind))
 
     expect(result.current.namespace).toBe(namespace)
-    expect(result.current.options).toEqual(TAXONOMY[kind])
+    expect(result.current.rows.map((row) => row.option)).toEqual(TAXONOMY[kind])
   })
 
   it('falls back to empty options while taxonomy is null', () => {
@@ -131,7 +131,7 @@ describe('useTaxonomyPane', () => {
 
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    expect(result.current.options).toEqual([])
+    expect(result.current.rows).toEqual([])
     expect(result.current.isLoading).toBe(true)
   })
 
@@ -206,7 +206,10 @@ describe('useTaxonomyPane', () => {
 
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    expect(result.current.counts).toEqual({ new: 7 })
+    const counts = Object.fromEntries(
+      result.current.rows.map((row) => [row.option.key, row.count]),
+    )
+    expect(counts.new).toBe(7)
   })
 
   it('prefills the editor with the localized label of a system option, never its raw key', () => {
@@ -230,7 +233,7 @@ describe('useTaxonomyPane', () => {
 
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    expect(result.current.optionLabel(result.current.options[0]!)).toBe('Dormido')
+    expect(result.current.rows[0]!.label).toBe('Dormido')
 
     act(() => result.current.actions.onEdit('dormido'))
 
@@ -287,7 +290,7 @@ describe('useTaxonomyPane', () => {
 
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    expect(result.current.optionLabel(result.current.options[0]!)).toBe('Dormido')
+    expect(result.current.rows[0]!.label).toBe('Dormido')
 
     act(() => result.current.actions.onEdit('dormido'))
 

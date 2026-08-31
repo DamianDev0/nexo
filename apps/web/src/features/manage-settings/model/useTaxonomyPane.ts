@@ -93,6 +93,16 @@ export function useTaxonomyPane(kind: TaxonomyKind) {
     [contacts, editingKey, kind, options.length, setPage],
   )
 
+  const rows = useMemo(
+    () =>
+      pageWindow(options, page, COMPACT_PAGE_SIZE).map((option) => ({
+        option,
+        label: label(option),
+        count: counts[option.key] ?? 0,
+      })),
+    [counts, label, options, page],
+  )
+
   const editingLabel = editingOption ? label(editingOption) : null
   const editingDescription = editingOption?.description ?? ''
   const editing = useMemo(
@@ -102,9 +112,7 @@ export function useTaxonomyPane(kind: TaxonomyKind) {
 
   return {
     namespace,
-    options: pageWindow(options, page, COMPACT_PAGE_SIZE),
-    optionLabel: label,
-    counts,
+    rows,
     isLoading: contacts.isLoading,
     dnd,
     actions,

@@ -34,7 +34,7 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
   const terms = useEntityTerms('contact')
   const pane = useTaxonomyPane(kind)
 
-  const dragged = pane.options.find((option) => option.key === pane.dnd.activeId)
+  const draggedRow = pane.rows.find((row) => row.option.key === pane.dnd.activeId)
 
   return (
     <div className="max-w-2xl">
@@ -74,35 +74,19 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
           onDragCancel={pane.dnd.handleDragCancel}
         >
           <SortableContext
-            items={pane.options.map((option) => option.key)}
+            items={pane.rows.map((row) => row.option.key)}
             strategy={verticalListSortingStrategy}
           >
             <PagedTransition page={pane.pagination.page} className="flex flex-col gap-1.5">
-              {pane.options.map((option) => (
-                <SortableTaxonomyOption
-                  key={option.key}
-                  row={{
-                    option,
-                    label: pane.optionLabel(option),
-                    count: pane.counts[option.key] ?? 0,
-                  }}
-                  actions={pane.actions}
-                />
+              {pane.rows.map((row) => (
+                <SortableTaxonomyOption key={row.option.key} row={row} actions={pane.actions} />
               ))}
             </PagedTransition>
           </SortableContext>
 
           <DragOverlay modifiers={[restrictToVerticalAxis]} dropAnimation={DROP_ANIMATION}>
-            {dragged ? (
-              <TaxonomyOptionRow
-                ghost
-                row={{
-                  option: dragged,
-                  label: pane.optionLabel(dragged),
-                  count: pane.counts[dragged.key] ?? 0,
-                }}
-                actions={pane.actions}
-              />
+            {draggedRow ? (
+              <TaxonomyOptionRow ghost row={draggedRow} actions={pane.actions} />
             ) : null}
           </DragOverlay>
         </DndContext>
@@ -134,7 +118,7 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
           }}
           source={pane.removal.source}
           candidates={pane.removal.candidates}
-          onConfirm={pane.removal.confirm}
+          confirm={{ action: pane.removal.confirm, isPending: pane.removal.isPending }}
         />
       )}
     </div>

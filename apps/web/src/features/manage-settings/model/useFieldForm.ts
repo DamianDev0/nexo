@@ -1,68 +1,84 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMemo, useRef } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 
 import { fieldHasOptions } from '../lib/custom-field-edit'
+import { buildFieldFormSchema, type FieldFormSchemaValues } from '../lib/field-form.schema'
 
 import type { FieldFormValues } from '../lib/custom-field-edit'
-import type { CustomFieldType } from '@repo/shared-types'
 
 export type FieldOptionItem = { id: string; value: string }
 
-function seedOptions(labels: ReadonlyArray<string>): FieldOptionItem[] {
-  return labels.map((value, index) => ({ id: `seed-${index}`, value }))
+function toFieldValues(values: FieldFormSchemaValues): FieldFormValues {
+  return {
+    label: values.label,
+    type: values.type,
+    required: values.required,
+    showInForm: values.showInForm,
+    optionLabels: values.options.map((option) => option.value.trim()).filter(Boolean),
+  }
 }
 
-export function useFieldForm(initial: FieldFormValues | null) {
-  const [label, setLabel] = useState(initial?.label ?? '')
-  const [type, setType] = useState<CustomFieldType>(initial?.type ?? 'text')
-  const [required, setRequired] = useState(initial?.required ?? false)
-  const [showInForm, setShowInForm] = useState(initial?.showInForm ?? true)
-  const [options, setOptions] = useState<FieldOptionItem[]>(() =>
-    seedOptions(initial?.optionLabels ?? []),
-  )
-  const nextId = useRef(0)
+export function useFieldForm(
+  initial: FieldFormValues | null,
+  onSubmit: (values: FieldFormValues) => void,
+) {
+  const { t } = useTranslation()
+  const schema = useMemo(() => buildFieldFormSchema(t), [t])
+  const submitted = useRef(false)
 
-  const addOption = useCallback(() => {
-    nextId.current += 1
-    setOptions((current) => [...current, { id: `new-${nextId.current}`, value: '' }])
-  }, [])
+  const form = useForm<FieldFormSchemaValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      label: initial?.label ?? '',
+      type: initial?.type ?? 'text',
+      required: initial?.required ?? false,
+      showInForm: initial?.showInForm ?? true,
+      options: (initial?.optionLabels ?? []).map((value) => ({ value })),
+    },
+    mode: 'onChange',
+  })
 
-  const changeOption = useCallback((id: string, value: string) => {
-    setOptions((current) => current.map((item) => (item.id === id ? { ...item, value } : item)))
-  }, [])
+  const optionsArray = useFieldArray({ control: form.control, name: 'options' })
+  const watchedOptions = form.watch('options')
+  const type = form.watch('type')
 
-  const removeOption = useCallback((id: string) => {
-    setOptions((current) => current.filter((item) => item.id !== id))
-  }, [])
+  const options: ReadonlyArray<FieldOptionItem> = optionsArray.fields.map((field, index) => ({
+    id: field.id,
+    value: watchedOptions[index]?.value ?? '',
+  }))
 
-  const optionLabels = useMemo(
-    () => options.map((item) => item.value.trim()).filter(Boolean),
-    [options],
-  )
-
-  const hasOptions = fieldHasOptions(type)
-  const canSubmit = Boolean(label.trim()) && (!hasOptions || optionLabels.length > 0)
-
-  const values = useCallback(
-    (): FieldFormValues => ({ label, type, required, showInForm, optionLabels }),
-    [label, optionLabels, required, showInForm, type],
+  const optionActions = useMemo(
+    () => ({
+      onAdd: () => optionsArray.append({ value: '' }),
+      onChange: (id: string, value: string) => {
+        const index = optionsArray.fields.findIndex((field) => field.id === id)
+        if (index >= 0) form.setValue(`options.${index}.value`, value, { shouldValidate: true })
+      },
+      onRemove: (id: string) => {
+        const index = optionsArray.fields.findIndex((field) => field.id === id)
+        if (index >= 0) optionsArray.remove(index)
+      },
+    }),
+    [form, optionsArray],
   )
 
   return {
-    label,
-    setLabel,
+    control: form.control,
     type,
-    setType,
-    required,
-    setRequired,
-    showInForm,
-    setShowInForm,
-    hasOptions,
+    hasOptions: fieldHasOptions(type),
     options,
-    optionActions: { onAdd: addOption, onChange: changeOption, onRemove: removeOption },
-    canSubmit,
-    values,
+    optionActions,
+    optionsError: form.formState.errors.options?.message,
+    canSubmit: form.formState.isValid,
     isEdit: initial !== null,
+    submit: form.handleSubmit((values) => {
+      if (submitted.current) return
+      submitted.current = true
+      onSubmit(toFieldValues(values))
+    }),
   }
 }
