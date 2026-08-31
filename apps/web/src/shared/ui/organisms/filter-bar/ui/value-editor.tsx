@@ -113,7 +113,7 @@ export function ValueEditor(props: Readonly<ValueEditorProps>) {
         onChange={onChange}
         placeholder={t('common.filters.advanced.pickDate')}
         aria-label={field.label}
-        className="h-7 w-36 rounded-none border-0 bg-transparent px-2.5"
+        className="h-7 w-32 rounded-none border-0 bg-transparent px-2.5"
       />
     )
   }
@@ -131,7 +131,7 @@ export function ValueEditor(props: Readonly<ValueEditorProps>) {
       }
       placeholder={t('common.filters.advanced.typeValue')}
       aria-label={field.label}
-      className="h-7 w-36 rounded-none border-0 bg-transparent px-2.5 text-sm shadow-none focus-visible:ring-0"
+      className="h-7 w-28 rounded-none border-0 bg-transparent px-2.5 text-sm shadow-none focus-visible:ring-0"
     />
   )
 }

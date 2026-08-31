@@ -32,30 +32,34 @@ export function DataTableSearch({
   const toggleLabel = t(open ? 'common.table.closeSearch' : 'common.table.search')
 
   return (
-    <div
+    <motion.div
       ref={containerRef}
       data-slot="table-search"
-      className={cn('relative shrink-0', className)}
-      style={{ width: DATA_TABLE_SEARCH_COLLAPSED, height: DATA_TABLE_SEARCH_COLLAPSED }}
+      initial={false}
+      animate={{ width: open ? DATA_TABLE_SEARCH_EXPANDED : DATA_TABLE_SEARCH_COLLAPSED }}
+      transition={DATA_TABLE_SEARCH_SPRING}
+      className={cn(
+        'relative h-9 shrink-0 overflow-hidden rounded-full',
+        open && 'border border-input bg-background shadow-xs',
+        className,
+      )}
     >
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
-            initial={{ width: DATA_TABLE_SEARCH_COLLAPSED, opacity: 0 }}
-            animate={{ width: DATA_TABLE_SEARCH_EXPANDED, opacity: 1 }}
-            exit={{ width: DATA_TABLE_SEARCH_COLLAPSED, opacity: 0 }}
-            transition={DATA_TABLE_SEARCH_SPRING}
-            className="absolute left-0 top-0 flex h-9 items-center overflow-hidden rounded-full border border-input bg-background shadow-xs"
-          >
-            <input
-              ref={inputRef}
-              type="search"
-              value={value}
-              placeholder={placeholder}
-              onChange={(event) => onChange(event.target.value)}
-              className="h-full w-full min-w-0 bg-transparent pl-10 pr-3 text-sm text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
-            />
-          </motion.div>
+          <motion.input
+            key="search-input"
+            ref={inputRef}
+            type="search"
+            value={value}
+            placeholder={placeholder}
+            onChange={(event) => onChange(event.target.value)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12 }}
+            className="absolute inset-y-0 left-0 h-full bg-transparent pl-10 pr-3 text-sm text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+            style={{ width: DATA_TABLE_SEARCH_EXPANDED }}
+          />
         )}
       </AnimatePresence>
 
@@ -67,12 +71,12 @@ export function DataTableSearch({
         aria-label={toggleLabel}
         onClick={toggle}
         className={cn(
-          'absolute inset-0 z-10 size-9 rounded-full text-foreground/70 hover:bg-transparent hover:text-foreground',
+          'absolute left-0 top-0 z-10 size-9 rounded-full text-foreground/70 hover:bg-transparent hover:text-foreground',
           !open && 'border border-input bg-secondary hover:bg-secondary',
         )}
       >
         {open ? <XIcon className="size-4" /> : <MagnifyingGlassIcon className="size-4" />}
       </Button>
-    </div>
+    </motion.div>
   )
 }
