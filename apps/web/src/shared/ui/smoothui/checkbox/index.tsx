@@ -1,38 +1,27 @@
 'use client'
 
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Checkbox as CheckboxPrimitive } from 'radix-ui'
 import { useState } from 'react'
 
 import { cn } from '@/shared/lib'
-import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
+
+import { CHECKBOX_BOX_CLASSES, CheckboxMark } from './mark'
+
+export { SmoothCheckboxGlyph } from './mark'
 
 export interface CheckboxProps {
-  /** Accessible name when no visible label is associated */
   'aria-label'?: string
-  /** Whether the checkbox is checked */
   checked?: boolean
   defaultChecked?: boolean
-  /** Optional CSS class */
   className?: string
-  /** Whether the checkbox is disabled */
   disabled?: boolean
-  /** ID for label association */
   id?: string
-  /** Whether the checkbox is in an indeterminate state */
   indeterminate?: boolean
-  /** Accessible name for the checkbox */
   name?: string
-  /** Callback when the checked state changes */
   onCheckedChange?: (checked: boolean) => void
-  /** Whether the checkbox is required */
   required?: boolean
-  /** Value attribute for form submission */
   value?: string
 }
-
-const CheckmarkPath = motion.path
-const MotionSvg = motion.svg
 
 export function SmoothCheckbox({
   'aria-label': ariaLabel,
@@ -47,7 +36,6 @@ export function SmoothCheckbox({
   id,
   required,
 }: CheckboxProps) {
-  const shouldReduceMotion = useReducedMotion()
   const [internal, setInternal] = useState(defaultChecked)
   const isChecked = checked ?? internal
 
@@ -66,10 +54,7 @@ export function SmoothCheckbox({
       aria-checked={indeterminate ? 'mixed' : isChecked}
       aria-label={ariaLabel}
       checked={indeterminate ? 'indeterminate' : isChecked}
-      className={cn(
-        'peer size-4 shrink-0 rounded-[4px] border border-input shadow-xs outline-none transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-foreground data-[state=indeterminate]:border-foreground data-[state=checked]:bg-foreground data-[state=indeterminate]:bg-foreground data-[state=unchecked]:bg-background data-[state=checked]:text-background data-[state=indeterminate]:text-background dark:data-[state=unchecked]:bg-input/30 dark:aria-invalid:ring-destructive/40',
-        className,
-      )}
+      className={cn(CHECKBOX_BOX_CLASSES, className)}
       data-slot="checkbox"
       disabled={disabled}
       id={id}
@@ -83,64 +68,7 @@ export function SmoothCheckbox({
         data-slot="checkbox-indicator"
         forceMount
       >
-        <AnimatePresence mode="wait">
-          {derivedState === 'checked' && (
-            <MotionSvg
-              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-              className="size-3.5"
-              exit={
-                shouldReduceMotion
-                  ? { opacity: 0, transition: { duration: 0 } }
-                  : { opacity: 0, scale: 0.8 }
-              }
-              fill="none"
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
-              key="check"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
-              viewBox="0 0 24 24"
-            >
-              <title>Checked</title>
-              <CheckmarkPath
-                animate={shouldReduceMotion ? {} : { pathLength: 1 }}
-                d="M20 6L9 17l-5-5"
-                initial={shouldReduceMotion ? {} : { pathLength: 0 }}
-                transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
-              />
-            </MotionSvg>
-          )}
-          {derivedState === 'indeterminate' && (
-            <MotionSvg
-              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-              className="size-3.5"
-              exit={
-                shouldReduceMotion
-                  ? { opacity: 0, transition: { duration: 0 } }
-                  : { opacity: 0, scale: 0.8 }
-              }
-              fill="none"
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
-              key="indeterminate"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
-              viewBox="0 0 24 24"
-            >
-              <title>Indeterminate</title>
-              <CheckmarkPath
-                animate={shouldReduceMotion ? {} : { pathLength: 1 }}
-                d="M5 12h14"
-                initial={shouldReduceMotion ? {} : { pathLength: 0 }}
-                transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
-              />
-            </MotionSvg>
-          )}
-        </AnimatePresence>
+        <CheckboxMark state={derivedState} />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )

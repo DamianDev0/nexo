@@ -16,6 +16,8 @@ import type {
 import {
   CONTACT_COLUMNS,
   CONTACT_LIST_COLUMNS,
+  CONTACT_LIST_FILTERS,
+  CONTACT_SEARCH,
   FILTERABLE_COLUMNS,
   REASSIGN_TAXONOMY_SQL,
   SORTABLE_COLUMNS,
@@ -23,6 +25,7 @@ import {
   type TaxonomyColumn,
 } from '../constants/contact.constants'
 import { advancedFilterClauses } from '@/shared/database/advanced-filter-sql'
+import { searchClause } from '@/shared/database/search-sql'
 import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
@@ -315,29 +318,15 @@ export class ContactsRepository {
       conditions.push(condition.replace('?', `$${params.length}`))
     }
 
-    if (query.q) {
-      push(
-        `to_tsvector('spanish',
-          coalesce(first_name, '') || ' ' ||
-          coalesce(last_name, '') || ' ' ||
-          coalesce(email, '') || ' ' ||
-          coalesce(document_number, '') || ' ' ||
-          coalesce(phone, '')
-        ) @@ plainto_tsquery('spanish', ?)`,
-        query.q,
-      )
+    if (query.q) conditions.push(searchClause(query.q, CONTACT_SEARCH, params))
+
+    for (const [key, clause] of CONTACT_LIST_FILTERS) {
+      const value = query[key]
+      if (value === undefined || value === null || value === '') continue
+      if (Array.isArray(value) && value.length === 0) continue
+      push(clause, value)
     }
-    if (query.status) push(`status = ?`, query.status)
-    if (query.source) push(`source = ?`, query.source)
-    if (query.lifecycleStage) push(`lifecycle_stage = ?`, query.lifecycleStage)
-    if (query.tags?.length) push(`tags @> ?::text[]`, query.tags)
-    if (query.companyId) push(`company_id = ?`, query.companyId)
-    if (query.assignedToId) push(`assigned_to_id = ?`, query.assignedToId)
-    if (query.city) push(`LOWER(city) = LOWER(?)`, query.city)
-    if (query.createdFrom) push(`created_at >= ?`, query.createdFrom)
-    if (query.createdTo) push(`created_at <= ?`, query.createdTo)
-    if (query.lastContactedFrom) push(`last_contacted_at >= ?`, query.lastContactedFrom)
-    if (query.lastContactedTo) push(`last_contacted_at <= ?`, query.lastContactedTo)
+
     if (query.advanced?.length) {
       conditions.push(...advancedFilterClauses(query.advanced, FILTERABLE_COLUMNS, params))
     }

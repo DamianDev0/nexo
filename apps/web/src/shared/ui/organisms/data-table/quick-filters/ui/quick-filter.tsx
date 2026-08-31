@@ -59,8 +59,8 @@ export function QuickFilter({ filter, onToggle, onClear }: Readonly<QuickFilterP
         </Button>
       </GroovyPopover.Anchor>
 
-      <GroovyPopover.Content align="end" className="w-64">
-        <div className="flex max-h-72 flex-col gap-0.5 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <GroovyPopover.Content align="end" className="w-64 p-1.5">
+        <div className="flex max-h-49 flex-col gap-1 overflow-y-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {filter.options.map((option) => (
             <OptionRow
               key={option.value}

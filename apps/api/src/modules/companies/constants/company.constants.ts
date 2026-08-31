@@ -1,3 +1,4 @@
+import type { SearchSource } from '@/shared/database/search-sql'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateCompanyDto } from '../dto/company.dto'
 
@@ -29,3 +30,8 @@ export const COMPANY_LIST_COLUMNS = `
   website, phone, email, city, department, municipio_code,
   tags, assigned_to_id, is_active, created_by, created_at, updated_at
 `
+
+export const COMPANY_SEARCH: SearchSource = {
+  columns: ['name', 'nit', 'email', 'phone', 'city'],
+  customFieldsColumn: 'custom_fields',
+}

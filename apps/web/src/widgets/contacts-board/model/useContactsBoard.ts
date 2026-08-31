@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { buildContactColumns } from '@/entities/contact'
-import { useContactTaxonomy } from '@/entities/contact-taxonomy'
+import { useContactTaxonomy, useTaxonomyUsage } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
 import { buildBulkLabels, useArchiveContacts } from '@/features/archive-contacts'
@@ -19,7 +19,6 @@ import {
   useContactsTable,
   useAdvancedFilterFields,
 } from '@/features/filter-contacts'
-import { useTaxonomyUsage } from '@/features/manage-settings'
 import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 

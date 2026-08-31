@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { t } from 'i18next'
 import { sileo } from 'sileo'
 
@@ -9,26 +9,9 @@ import contactsService from '@/shared/api/services/contacts.service'
 import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
-import type { ContactTaxonomyUsage, TaxonomyReassignKind } from '@repo/shared-types'
+import type { TaxonomyReassignKind } from '@repo/shared-types'
 
-const USAGE_STALE_MS = 60 * 1000
-
-const EMPTY_USAGE: ContactTaxonomyUsage = {
-  statuses: {},
-  sources: {},
-  types: {},
-  lifecycleStages: {},
-  tags: {},
-}
-
-export function useTaxonomyUsage() {
-  const { data } = useQuery({
-    queryKey: QUERY_KEYS.contacts.taxonomyUsage,
-    queryFn: contactsService.taxonomyUsage,
-    staleTime: USAGE_STALE_MS,
-  })
-  return data ?? EMPTY_USAGE
-}
+export { useTaxonomyUsage } from '@/entities/contact-taxonomy'
 
 export function useReassignTaxonomy() {
   const queryClient = useQueryClient()

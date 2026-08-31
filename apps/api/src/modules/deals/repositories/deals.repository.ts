@@ -22,8 +22,10 @@ import {
   DEAL_DETAIL_FROM,
   DEAL_LIST_COLUMNS,
   DEAL_LIST_FROM,
+  DEAL_SEARCH,
   UPDATABLE_FIELDS,
 } from '../constants/deal.constants'
+import { searchClause } from '@/shared/database/search-sql'
 import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
@@ -403,10 +405,7 @@ export class DealsRepository {
     const conditions: string[] = ['d.is_active = true']
     const params: unknown[] = []
 
-    if (filters.q) {
-      params.push(filters.q)
-      conditions.push(`d.title ILIKE '%' || $${params.length} || '%'`)
-    }
+    if (filters.q) conditions.push(searchClause(filters.q, DEAL_SEARCH, params))
 
     if (filters.status) {
       params.push(filters.status)

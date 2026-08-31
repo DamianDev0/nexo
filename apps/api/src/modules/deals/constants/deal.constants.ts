@@ -1,3 +1,4 @@
+import type { SearchSource } from '@/shared/database/search-sql'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateDealInput } from '../interfaces/deal-input.interfaces'
 
@@ -68,3 +69,8 @@ export const DEAL_DETAIL_FROM = `
   LEFT JOIN contacts         c  ON c.id   = d.contact_id
   LEFT JOIN companies        co ON co.id  = d.company_id
 `
+
+export const DEAL_SEARCH: SearchSource = {
+  columns: ['d.title', 'c.first_name', 'c.last_name', 'co.name'],
+  customFieldsColumn: 'd.custom_fields',
+}

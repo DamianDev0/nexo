@@ -20,6 +20,21 @@ const DEFAULT_PAGINATION: ContactListPagination = {
   sort: null,
 }
 
+function quickFilterConditions(filters: QuickFilterState): FilterCondition[] {
+  const conditions: FilterCondition[] = []
+  if (filters.source.length > 0) {
+    conditions.push({ field: 'source', operator: 'is_any_of', value: [...filters.source] })
+  }
+  if (filters.lifecycleStage.length > 0) {
+    conditions.push({
+      field: 'lifecycleStage',
+      operator: 'is_any_of',
+      value: [...filters.lifecycleStage],
+    })
+  }
+  return conditions
+}
+
 export function contactListQuery(
   search: string,
   status: string | null,
@@ -27,12 +42,11 @@ export function contactListQuery(
   pagination: ContactListPagination = DEFAULT_PAGINATION,
   advanced: ReadonlyArray<FilterCondition> = [],
 ): ContactListQuery {
+  const conditions = [...advanced, ...quickFilterConditions(filters)]
   return {
     q: search.trim() || undefined,
-    advanced: advanced.length > 0 ? [...advanced] : undefined,
+    advanced: conditions.length > 0 ? conditions : undefined,
     status: status ?? undefined,
-    lifecycleStage: (filters.lifecycleStage[0] as ContactListQuery['lifecycleStage']) ?? undefined,
-    source: filters.source[0] ?? undefined,
     page: pagination.page,
     limit: pagination.limit,
     sortBy: pagination.sort?.field,

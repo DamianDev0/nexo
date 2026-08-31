@@ -1,7 +1,11 @@
 import type { FilterableColumn } from '@/shared/database/advanced-filter-sql'
+import type { SearchSource } from '@/shared/database/search-sql'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateContactDto } from '../dto/contact.dto'
-import type { CreateContactData } from '../interfaces/contact-row.interfaces'
+import type {
+  ContactListQuery,
+  CreateContactData,
+} from '../interfaces/contact-row.interfaces'
 
 export const OTHER_CONTACT_TYPE = 'other'
 
@@ -143,3 +147,22 @@ export const FILTERABLE_COLUMNS: Readonly<Record<string, FilterableColumn>> = {
   updatedAt: { column: 'updated_at', type: 'date' },
   lastContactedAt: { column: 'last_contacted_at', type: 'date' },
 }
+
+export const CONTACT_SEARCH: SearchSource = {
+  columns: ['first_name', 'last_name', 'email', 'document_number', 'phone'],
+  customFieldsColumn: 'custom_fields',
+}
+
+export const CONTACT_LIST_FILTERS: ReadonlyArray<readonly [keyof ContactListQuery, string]> = [
+  ['status', 'status = ?'],
+  ['source', 'source = ?'],
+  ['lifecycleStage', 'lifecycle_stage = ?'],
+  ['tags', 'tags @> ?::text[]'],
+  ['companyId', 'company_id = ?'],
+  ['assignedToId', 'assigned_to_id = ?'],
+  ['city', 'LOWER(city) = LOWER(?)'],
+  ['createdFrom', 'created_at >= ?'],
+  ['createdTo', 'created_at <= ?'],
+  ['lastContactedFrom', 'last_contacted_at >= ?'],
+  ['lastContactedTo', 'last_contacted_at <= ?'],
+]

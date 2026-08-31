@@ -39,7 +39,10 @@ export function toggleQuickFilter(
   value: string,
 ): QuickFilterState {
   if (!isQuickFilterId(filterId)) return state
-  const next = state[filterId].includes(value) ? [] : [value]
+  const current = state[filterId]
+  const next = current.includes(value)
+    ? current.filter((entry) => entry !== value)
+    : [...current, value]
   return { ...state, [filterId]: next }
 }
 

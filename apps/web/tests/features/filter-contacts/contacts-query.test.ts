@@ -34,11 +34,13 @@ describe('contactListQuery', () => {
     expect(query.limit).toBe(50)
   })
 
-  it('picks the first selected lifecycleStage and source', () => {
-    const query = contactListQuery('', null, { lifecycleStage: ['lead'], source: ['manual'] })
+  it('maps quick filters to is_any_of advanced conditions', () => {
+    const query = contactListQuery('', null, { lifecycleStage: ['lead', 'mql'], source: ['manual'] })
 
-    expect(query.lifecycleStage).toBe('lead')
-    expect(query.source).toBe('manual')
+    expect(query.advanced).toEqual([
+      { field: 'source', operator: 'is_any_of', value: ['manual'] },
+      { field: 'lifecycleStage', operator: 'is_any_of', value: ['lead', 'mql'] },
+    ])
   })
 
   it('maps a null status to undefined', () => {
@@ -60,7 +62,7 @@ describe('contactListQueryFromParams', () => {
 
     expect(query.q).toBe('carlos')
     expect(query.status).toBe('qualified')
-    expect(query.source).toBe('manual')
+    expect(query.advanced).toEqual([{ field: 'source', operator: 'is_any_of', value: ['manual'] }])
   })
 
   it('drops an invalid list value and reports no status', () => {

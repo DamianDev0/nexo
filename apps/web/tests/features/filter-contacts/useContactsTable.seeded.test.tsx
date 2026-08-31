@@ -45,6 +45,8 @@ describe('useContactsTable seeded from the URL', () => {
     const last = urls.at(-1)?.searchParams
     expect(last?.get('status')).toBe('qualified')
     expect(last?.get('q')).toBe('ana')
-    expect(last?.get('source')).toBe('whatsapp')
+    expect(JSON.parse(last?.get('advanced') ?? '[]')).toEqual([
+      { field: 'source', operator: 'is_any_of', value: ['whatsapp'] },
+    ])
   })
 })

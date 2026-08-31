@@ -12,7 +12,8 @@ import type {
   CompanyFieldUpdate,
   CompanySummaryRows,
 } from '../interfaces/company-row.interfaces'
-import { COMPANY_COLUMNS, COMPANY_LIST_COLUMNS } from '../constants/company.constants'
+import { COMPANY_COLUMNS, COMPANY_LIST_COLUMNS, COMPANY_SEARCH } from '../constants/company.constants'
+import { searchClause } from '@/shared/database/search-sql'
 import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
@@ -274,12 +275,7 @@ export class CompaniesRepository {
     const conditions: string[] = ['is_active = true']
     const params: unknown[] = []
 
-    if (filters.q) {
-      params.push(filters.q)
-      conditions.push(
-        `to_tsvector('spanish', coalesce(name,'') || ' ' || coalesce(nit,'')) @@ plainto_tsquery('spanish', $${params.length})`,
-      )
-    }
+    if (filters.q) conditions.push(searchClause(filters.q, COMPANY_SEARCH, params))
 
     if (filters.taxRegime) {
       params.push(filters.taxRegime)
