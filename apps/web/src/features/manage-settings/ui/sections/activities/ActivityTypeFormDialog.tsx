@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next'
 
 import { Text } from '@/shared/ui/atoms/text'
 import { ColorSwatchPicker } from '@/shared/ui/molecules/color-swatch-picker'
+import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
@@ -93,14 +93,14 @@ export function ActivityTypeFormDialog({
             />
           </div>
 
-          <DialogFooter>
+          <DialogActions>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={label.trim().length === 0}>
               {t('common.create')}
             </Button>
-          </DialogFooter>
+          </DialogActions>
         </form>
       </DialogContent>
     </Dialog>

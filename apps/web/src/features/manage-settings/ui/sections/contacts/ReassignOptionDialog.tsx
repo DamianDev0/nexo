@@ -6,13 +6,13 @@ import { useTranslation } from 'react-i18next'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
+import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FieldError } from '@/shared/ui/molecules/field-error'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
@@ -91,14 +91,14 @@ export function ReassignOptionDialog({
             )}
           />
 
-          <DialogFooter>
+          <DialogActions>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </Button>
             <Button type="submit" variant="destructive" disabled={!form.canSubmit}>
               {t('settings.reassign.confirm')}
             </Button>
-          </DialogFooter>
+          </DialogActions>
         </form>
       </DialogContent>
     </Dialog>

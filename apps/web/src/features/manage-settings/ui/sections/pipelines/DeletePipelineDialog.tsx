@@ -3,11 +3,11 @@
 import { useTranslation } from 'react-i18next'
 
 import { Text } from '@/shared/ui/atoms/text'
+import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
@@ -41,14 +41,14 @@ export function DeletePipelineDialog({
           {t('settings.pipelines.deleteDescription', { name })}
         </Text>
 
-        <DialogFooter>
+        <DialogActions>
           <Button type="button" variant="ghost" onClick={onCancel}>
             {t('common.cancel')}
           </Button>
           <Button type="button" variant="destructive" onClick={onConfirm}>
             {t('common.delete')}
           </Button>
-        </DialogFooter>
+        </DialogActions>
       </DialogContent>
     </Dialog>
   )

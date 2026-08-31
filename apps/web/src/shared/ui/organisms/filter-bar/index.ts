@@ -1,3 +1,4 @@
-export { FilterBar } from './ui/filter-bar'
+export { FilterTrigger } from './ui/filter-trigger'
+export { FilterChips } from './ui/filter-chips'
 export { parseConditions, serializeConditions, isComplete } from './lib/conditions'
-export type { FilterBarProps, FilterFieldDef, FilterFieldOption } from './model/types'
+export type { FilterFieldDef, FilterFieldOption } from './model/types'

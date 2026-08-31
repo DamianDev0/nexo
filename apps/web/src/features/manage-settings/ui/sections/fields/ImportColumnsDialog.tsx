@@ -3,12 +3,12 @@
 import { useTranslation } from 'react-i18next'
 
 import { Text } from '@/shared/ui/atoms/text'
+import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FileDropzone } from '@/shared/ui/molecules/file-dropzone'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
@@ -61,7 +61,7 @@ export function ImportColumnsDialog({ importer }: Readonly<{ importer: HeaderImp
               </div>
             )}
 
-            <DialogFooter>
+            <DialogActions>
               <Button type="button" variant="ghost" onClick={() => importer.onOpenChange(false)}>
                 {t('common.cancel')}
               </Button>
@@ -72,7 +72,7 @@ export function ImportColumnsDialog({ importer }: Readonly<{ importer: HeaderImp
               >
                 {t('settings.fields.import.confirm', { count })}
               </Button>
-            </DialogFooter>
+            </DialogActions>
           </>
         )}
       </DialogContent>

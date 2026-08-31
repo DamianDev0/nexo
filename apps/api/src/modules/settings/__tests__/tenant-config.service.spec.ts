@@ -199,7 +199,7 @@ describe('TenantConfigService', () => {
       expect(labels.dashboard).toBe('Dashboard')
     })
 
-    it('keeps a customized sidebar untouched', async () => {
+    it('keeps a customized sidebar label untouched', async () => {
       const stored = {
         modules: [
           {
@@ -220,7 +220,28 @@ describe('TenantConfigService', () => {
 
       const sidebar = await service.getSidebarConfig(TENANT_ID)
 
-      expect(sidebar).toEqual(stored)
+      expect(sidebar.modules[0]).toMatchObject(stored.modules[0]!)
+    })
+
+    it('derives module status for sidebars stored before the field existed', async () => {
+      const stored = {
+        modules: [
+          {
+            key: 'deals',
+            label: 'Negocios',
+            icon: 'briefcase',
+            enabled: true,
+            order: 1,
+            customIconUrl: null,
+            required: false,
+          },
+        ],
+      }
+      const { service } = buildService({ sidebarConfig: stored })
+
+      const sidebar = await service.getSidebarConfig(TENANT_ID)
+
+      expect(sidebar.modules[0]?.status).toBe('coming_soon')
     })
   })
 

@@ -1,4 +1,5 @@
-import type { TenantNomenclature } from '@repo/shared-types'
+import { sidebarModuleStatus } from '@repo/shared-types'
+import type { SidebarModule, TenantNomenclature } from '@repo/shared-types'
 import type { SidebarConfig } from '../interfaces/sidebar-config.interface'
 
 const NOMENCLATURE_MODULE_KEYS: Partial<Record<string, keyof TenantNomenclature>> = {
@@ -7,6 +8,18 @@ const NOMENCLATURE_MODULE_KEYS: Partial<Record<string, keyof TenantNomenclature>
   deals: 'deal',
   activities: 'activity',
 }
+
+type ModuleSeed = Pick<SidebarModule, 'key' | 'label' | 'icon' | 'required'>
+
+const MODULE_SEEDS: ReadonlyArray<ModuleSeed> = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'home', required: true },
+  { key: 'contacts', label: 'Contactos', icon: 'users', required: false },
+  { key: 'companies', label: 'Empresas', icon: 'building', required: false },
+  { key: 'deals', label: 'Negocios', icon: 'briefcase', required: false },
+  { key: 'activities', label: 'Actividades', icon: 'calendar', required: false },
+  { key: 'products', label: 'Productos', icon: 'package', required: false },
+  { key: 'settings', label: 'Ajustes', icon: 'settings', required: true },
+]
 
 export function defaultSidebarFor(nomenclature: TenantNomenclature): SidebarConfig {
   return {
@@ -18,87 +31,11 @@ export function defaultSidebarFor(nomenclature: TenantNomenclature): SidebarConf
 }
 
 export const DEFAULT_SIDEBAR_CONFIG: SidebarConfig = {
-  modules: [
-    {
-      key: 'dashboard',
-      label: 'Dashboard',
-      icon: 'home',
-      enabled: true,
-      order: 1,
-      customIconUrl: null,
-      required: true,
-    },
-    {
-      key: 'contacts',
-      label: 'Contactos',
-      icon: 'users',
-      enabled: true,
-      order: 2,
-      customIconUrl: null,
-      required: false,
-    },
-    {
-      key: 'companies',
-      label: 'Empresas',
-      icon: 'building',
-      enabled: true,
-      order: 3,
-      customIconUrl: null,
-      required: false,
-    },
-    {
-      key: 'deals',
-      label: 'Negocios',
-      icon: 'briefcase',
-      enabled: true,
-      order: 4,
-      customIconUrl: null,
-      required: false,
-    },
-    {
-      key: 'activities',
-      label: 'Actividades',
-      icon: 'calendar',
-      enabled: true,
-      order: 5,
-      customIconUrl: null,
-      required: false,
-    },
-    {
-      key: 'invoices',
-      label: 'Facturas',
-      icon: 'file-text',
-      enabled: true,
-      order: 6,
-      customIconUrl: null,
-      required: false,
-    },
-    {
-      key: 'products',
-      label: 'Productos',
-      icon: 'package',
-      enabled: true,
-      order: 7,
-      customIconUrl: null,
-      required: false,
-    },
-    {
-      key: 'reports',
-      label: 'Reportes',
-      icon: 'bar-chart',
-      enabled: true,
-      order: 8,
-      customIconUrl: null,
-      required: false,
-    },
-    {
-      key: 'settings',
-      label: 'Ajustes',
-      icon: 'settings',
-      enabled: true,
-      order: 9,
-      customIconUrl: null,
-      required: true,
-    },
-  ],
+  modules: MODULE_SEEDS.map((seed, index) => ({
+    ...seed,
+    enabled: true,
+    order: index + 1,
+    customIconUrl: null,
+    status: sidebarModuleStatus(seed.key),
+  })),
 }

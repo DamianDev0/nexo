@@ -11,9 +11,9 @@ import {
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import type { SidebarConfig, SidebarModule } from '../interfaces/sidebar-config.interface'
+import type { SidebarConfigInput, SidebarModuleInput } from '../interfaces/sidebar-config.interface'
 
-export class SidebarModuleDto implements SidebarModule {
+export class SidebarModuleDto implements SidebarModuleInput {
   @ApiProperty() @IsString() key: string
   @ApiProperty() @IsString() label: string
   @ApiProperty() @IsString() icon: string
@@ -23,7 +23,7 @@ export class SidebarModuleDto implements SidebarModule {
   @ApiProperty() @IsBoolean() required: boolean
 }
 
-export class UpdateSidebarDto implements SidebarConfig {
+export class UpdateSidebarDto implements SidebarConfigInput {
   @ApiProperty({ type: [SidebarModuleDto] })
   @IsArray()
   @ArrayNotEmpty()

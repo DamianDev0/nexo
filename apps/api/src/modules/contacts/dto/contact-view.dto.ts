@@ -72,6 +72,11 @@ export class CreateContactViewDto {
   name!: string
 
   @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  description?: string
+
+  @IsOptional()
   @IsObject()
   filters?: Record<string, unknown>
 

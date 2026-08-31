@@ -44,7 +44,7 @@ const CORE_FIELDS: Readonly<Record<string, CoreFieldSpec>> = {
   lastContactedAt: { type: 'date' },
 }
 
-const NAME_FILTER_FIELD = 'firstName'
+const NAME_FILTER_FIELD = 'name'
 
 const CUSTOM_TYPE_MAP: Readonly<Partial<Record<string, FilterFieldType>>> = {
   select: 'select',

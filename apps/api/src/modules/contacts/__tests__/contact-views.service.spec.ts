@@ -15,6 +15,7 @@ function makeViewRow(overrides: Partial<ContactViewRow> = {}): ContactViewRow {
     id: 'a67c2f4e-3333-4f2c-b6d8-e4a67c056f03',
     owner_id: OWNER,
     name: 'My leads',
+    description: null,
     filters: { status: 'new' },
     advanced_filters: null,
     columns: { hidden: ['city'] },

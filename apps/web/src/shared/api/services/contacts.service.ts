@@ -11,6 +11,8 @@ import type {
   ContactTableState,
   ContactTaxonomyUsage,
   ContactTimeline,
+  ContactView,
+  ContactViewInput,
   ContactWorkspace,
   DuplicateStrategy,
   ImportResult,
@@ -63,6 +65,14 @@ const contactsService = {
   counts: () => request<ContactCounts>({ method: 'get', url: '/contacts/counts' }),
 
   workspace: () => request<ContactWorkspace>({ method: 'get', url: '/contacts/workspace' }),
+
+  createView: (data: ContactViewInput) =>
+    request<ContactView>({ method: 'post', url: '/contacts/views', data }),
+
+  updateView: (id: string, data: Partial<ContactViewInput>) =>
+    request<ContactView>({ method: 'patch', url: `/contacts/views/${id}`, data }),
+
+  deleteView: (id: string) => request<void>({ method: 'delete', url: `/contacts/views/${id}` }),
 
   saveTableState: (tableState: ContactTableState) =>
     request<void>({ method: 'patch', url: '/contacts/workspace', data: { tableState } }),

@@ -28,7 +28,7 @@ describe('advancedFilterClauses', () => {
       'status = ANY($3::text[])',
       'tags && $4::text[]',
       'lead_score >= $5',
-      'created_at <= $6',
+      'created_at < ($6::date + 1)',
     ])
     expect(params).toEqual(['seed', '%acme%', ['new', 'client'], ['vip'], 50, '2026-01-01'])
   })

@@ -8,7 +8,7 @@ import { XIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { Command, CommandItem, CommandList } from '@/shared/ui/shadcn/command'
 
-import { needsValue, operatorsFor } from '../lib/conditions'
+import { needsValue, OPERATOR_GLYPHS, operatorsFor } from '../lib/conditions'
 
 import { ValueEditor } from './value-editor'
 
@@ -53,10 +53,13 @@ function OperatorPicker({
               <CommandItem
                 key={operator}
                 value={operator}
-                className="rounded-md"
+                className="gap-2 rounded-md"
                 onSelect={() => pick(operator)}
               >
-                {t(`common.filters.advanced.operators.${operator}`)}
+                <span className="flex-1">{t(`common.filters.advanced.operators.${operator}`)}</span>
+                <Text variant="hint" className="font-mono">
+                  {OPERATOR_GLYPHS[operator]}
+                </Text>
               </CommandItem>
             ))}
           </CommandList>

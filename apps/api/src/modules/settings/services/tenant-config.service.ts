@@ -8,9 +8,10 @@ import { TenantConfigRepository } from '../repositories/tenant-config.repository
 import { DEFAULT_THEME } from '../constants/default-theme'
 import { DEFAULT_NOMENCLATURE } from '../constants/default-nomenclature'
 import { defaultSidebarFor } from '../constants/default-sidebar'
+import { withModuleStatus } from '../mappers/sidebar.mapper'
 import type { TenantTheme } from '../interfaces/tenant-theme.interface'
 import type { TenantNomenclature } from '../interfaces/nomenclature.interface'
-import type { SidebarConfig } from '../interfaces/sidebar-config.interface'
+import type { SidebarConfig, SidebarConfigInput } from '../interfaces/sidebar-config.interface'
 import type {
   CustomFieldsConfig,
   FieldPermissionsConfig,
@@ -125,15 +126,15 @@ export class TenantConfigService {
     if (cached) return cached
 
     const config = await this.getRawConfig(tenantId)
-    const sidebar =
-      config.sidebarConfig ?? defaultSidebarFor(await this.getNomenclature(tenantId))
+    const stored = config.sidebarConfig ?? defaultSidebarFor(await this.getNomenclature(tenantId))
+    const sidebar = withModuleStatus(stored)
     await this.cache.set(this.sidebarKey(tenantId), sidebar, CACHE_TTL_SHORT_SECONDS)
     return sidebar
   }
 
   async updateSidebarConfig(
     tenantId: string,
-    updated: SidebarConfig,
+    updated: SidebarConfigInput,
     slug: string,
   ): Promise<SidebarConfig> {
     const disabledRequired = updated.modules.filter((m) => m.required && !m.enabled)
@@ -143,9 +144,10 @@ export class TenantConfigService {
       )
     }
 
-    await this.saveConfigSection(tenantId, 'sidebarConfig', updated)
+    const normalized = withModuleStatus(updated)
+    await this.saveConfigSection(tenantId, 'sidebarConfig', normalized)
     await this.invalidateAll(tenantId, slug)
-    return updated
+    return normalized
   }
 
   async getCustomFields(tenantId: string): Promise<CustomFieldsConfig> {

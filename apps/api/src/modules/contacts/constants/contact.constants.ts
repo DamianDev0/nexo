@@ -122,6 +122,7 @@ export const REASSIGN_TAXONOMY_SQL: Readonly<Record<TaxonomyColumn, string>> = {
 }
 
 export const FILTERABLE_COLUMNS: Readonly<Record<string, FilterableColumn>> = {
+  name: { column: "(first_name || ' ' || COALESCE(last_name, ''))", type: 'text' },
   firstName: { column: 'first_name', type: 'text' },
   lastName: { column: 'last_name', type: 'text' },
   email: { column: 'email', type: 'text' },

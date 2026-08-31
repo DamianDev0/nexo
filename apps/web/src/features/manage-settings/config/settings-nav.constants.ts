@@ -1,4 +1,17 @@
 import { ROUTES } from '@/shared/config/routes'
+import {
+  AddressBookIcon,
+  BellIcon,
+  BuildingsIcon,
+  CalendarCheckIcon,
+  PaletteIcon,
+  ShapesIcon,
+  SidebarSimpleIcon,
+  StackIcon,
+  TextAaIcon,
+  UserCircleIcon,
+  UsersThreeIcon,
+} from '@/shared/ui/icons'
 
 import type { SettingsGroup } from '../model/types'
 
@@ -8,15 +21,20 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
   {
     key: 'personal',
     sections: [
-      { key: 'profile', href: SETTINGS.profile, available: false },
-      { key: 'notifications', href: SETTINGS.notifications, available: false },
+      { key: 'profile', href: SETTINGS.profile, icon: UserCircleIcon, available: false },
+      {
+        key: 'notifications',
+        href: SETTINGS.notifications,
+        icon: BellIcon,
+        available: false,
+      },
     ],
   },
   {
     key: 'account',
     sections: [
-      { key: 'company', href: SETTINGS.company, available: true },
-      { key: 'team', href: SETTINGS.team, available: false },
+      { key: 'company', href: SETTINGS.company, icon: BuildingsIcon, available: true },
+      { key: 'team', href: SETTINGS.team, icon: UsersThreeIcon, available: false },
     ],
   },
   {
@@ -25,6 +43,7 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
       {
         key: 'appearance',
         href: SETTINGS.appearance.brand,
+        icon: PaletteIcon,
         available: true,
         children: [
           { key: 'brand', href: SETTINGS.appearance.brand },
@@ -32,14 +51,25 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
           { key: 'typography', href: SETTINGS.appearance.typography },
         ],
       },
-      { key: 'navigation', href: SETTINGS.navigation, available: true },
-      { key: 'nomenclature', href: SETTINGS.nomenclature, available: true },
-      { key: 'fields', href: SETTINGS.fields, available: true },
-      { key: 'pipelines', href: SETTINGS.pipelines, available: true },
-      { key: 'activities', href: SETTINGS.activities, available: true },
+      { key: 'navigation', href: SETTINGS.navigation, icon: SidebarSimpleIcon, available: true },
+      {
+        key: 'nomenclature',
+        href: SETTINGS.nomenclature,
+        icon: TextAaIcon,
+        available: true,
+      },
+      { key: 'fields', href: SETTINGS.fields, icon: ShapesIcon, available: true },
+      { key: 'pipelines', href: SETTINGS.pipelines, icon: StackIcon, available: true },
+      {
+        key: 'activities',
+        href: SETTINGS.activities,
+        icon: CalendarCheckIcon,
+        available: true,
+      },
       {
         key: 'contacts',
         href: SETTINGS.contacts.status,
+        icon: AddressBookIcon,
         available: true,
         children: [
           { key: 'status', href: SETTINGS.contacts.status },

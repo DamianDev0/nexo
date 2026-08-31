@@ -77,7 +77,7 @@ const en = {
           is: 'is',
           is_not: 'is not',
           contains: 'contains',
-          not_contains: 'does not contain',
+          not_contains: "doesn't contain",
           is_any_of: 'is any of',
           is_empty: 'is empty',
           is_not_empty: 'is not empty',
@@ -406,6 +406,25 @@ const en = {
     },
   },
   contacts: {
+    views: {
+      save: 'Save list',
+      saveTitle: 'Save as list',
+      editTitle: 'Edit list',
+      edit: 'Edit list',
+      delete: 'Delete list',
+      deleteTitle: 'Delete "{{name}}"',
+      deleteDescription: 'The list is deleted forever. Your contacts are not touched.',
+      name: 'Name',
+      namePlaceholder: 'VIP clients Medellín',
+      description: 'Description',
+      descriptionPlaceholder: 'What is this list for?',
+      saved: '"{{name}}" saved',
+      updated: 'List updated',
+      deleted: 'List deleted',
+      nameRequired: 'Give the list a name',
+      nameTooLong: 'Max 120 characters',
+      descriptionTooLong: 'Max 300 characters',
+    },
     filters: {
       lifecycleStage: 'Lifecycle',
       source: 'Source',
@@ -806,6 +825,21 @@ const en = {
       activities: 'Activities',
       contacts: 'Contacts',
     },
+    descriptions: {
+      profile: 'Your personal info and sign-in details.',
+      notifications: 'Choose what Nexo notifies you about.',
+      company: 'Company identity and regional defaults.',
+      team: 'Invite teammates and manage their roles.',
+      appearance: 'Brand colors, theme and typography for your workspace.',
+      navigation: 'Choose which modules appear in the sidebar.',
+      nomenclature: 'Rename entities so the CRM speaks your language.',
+      fields: 'Custom fields that capture the data your business needs.',
+      pipelines: 'Pipelines and stages that organize your deals.',
+      activities: 'Activity types your team logs day to day.',
+      contacts: 'Statuses, lifecycle, sources, types and tags for your contacts.',
+    },
+    searchPlaceholder: 'Search settings…',
+    searchEmpty: 'No sections match',
     children: {
       appearance: {
         brand: 'Brand',
@@ -880,6 +914,7 @@ const en = {
       },
       emptyTitle: 'No fields yet',
       emptyDescription: 'Create your first field to capture the data your business needs.',
+      emptyCta: 'Create your first field',
       types: {
         text: 'Text',
         textarea: 'Long text',
@@ -909,6 +944,7 @@ const en = {
       deleted: 'Tag deleted',
       emptyTitle: 'No tags yet',
       emptyDescription: 'Create your first tag to start grouping {{entities}} your way.',
+      emptyCta: 'Create your first tag',
     },
     company: {
       sectorHint:
@@ -967,6 +1003,7 @@ const en = {
       deleted: 'Pipeline deleted',
       emptyTitle: 'No pipelines yet',
       emptyDescription: 'Create your first pipeline to organize your deals into stages.',
+      emptyCta: 'Create your first pipeline',
       defaultStages: {
         lead: 'Lead',
         proposal: 'Proposal',

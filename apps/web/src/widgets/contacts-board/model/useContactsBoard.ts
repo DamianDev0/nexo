@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { buildContactColumns, writeSkeletonHint } from '@/entities/contact'
+import { buildContactColumns } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
@@ -14,7 +14,6 @@ import {
   buildContactHints,
   buildQuickFilterDefs,
   buildSmartLists,
-  listIdToStatus,
   statusToListId,
   useContactCounts,
   useContactsTable,
@@ -23,7 +22,10 @@ import {
 import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
+import { useBoardSelection } from './useBoardSelection'
+import { useBoardViews } from './useBoardViews'
 import { useContactRowActions } from './useContactRowActions'
+import { useSkeletonHintSync } from './useSkeletonHintSync'
 
 import type { ContactColumnDef, ContactListItem, ContactTableState } from '@repo/shared-types'
 
@@ -40,7 +42,6 @@ export function useContactsBoard() {
   const preview = useEntityEditor<ContactListItem>()
   const { archive, isArchiving } = useArchiveContacts()
   const workspace = useContactWorkspace()
-
   useCreateFromUrl(sheet.openCreate)
 
   const catalog = workspace.data?.columns ?? NO_COLUMNS
@@ -83,22 +84,12 @@ export function useContactsBoard() {
     totalRows: table.total,
   })
 
-  const { setOpen: setPreviewOpen } = preview
-  const { openEdit } = sheet
-  const openFromPreview = useCallback(
-    (contact: ContactListItem) => {
-      setPreviewOpen(false)
-      openEdit(contact)
-    },
-    [setPreviewOpen, openEdit],
-  )
-
-  const archiveSelected = useCallback(() => {
-    const ids = instance.table.getSelectedRowModel().rows.map((row) => row.id)
-    if (ids.length === 0) return
-    instance.table.resetRowSelection()
-    archive(ids)
-  }, [instance.table, archive])
+  const { openFromPreview, archiveSelected } = useBoardSelection({
+    instance,
+    archive,
+    closePreview: () => preview.setOpen(false),
+    openEdit: sheet.openEdit,
+  })
 
   const listOrder = workspace.data?.tableState.listOrder
   const items = useMemo(() => {
@@ -112,9 +103,6 @@ export function useContactsBoard() {
       return listOrder.indexOf(a.id) - listOrder.indexOf(b.id)
     })
   }, [t, counts, taxonomy.statuses, listOrder, terms])
-
-  const { handleStatus } = table
-  const selectList = useCallback((id: string) => handleStatus(listIdToStatus(id)), [handleStatus])
   const bulkLabels = useMemo(() => buildBulkLabels(t), [t])
   const activeListId = statusToListId(table.status)
   const listHints = useMemo(
@@ -129,25 +117,22 @@ export function useContactsBoard() {
   )
 
   const advancedFields = useAdvancedFilterFields(catalog)
+
   const isPending = table.isPending || workspace.isPending
   const isUnavailable = !isPending && columns.length <= 1
 
-  const lastHintRef = useRef('')
-  const { table: tanstack } = instance
-  useEffect(() => {
-    if (isPending || isUnavailable) return
-    const headers = tanstack.getHeaderGroups()[0]?.headers ?? []
-    if (headers.length <= 1) return
-    const hint = { widths: headers.map((header) => header.getSize()), rows: table.rows.length || 5 }
-    const serialized = JSON.stringify(hint)
-    if (serialized === lastHintRef.current) return
-    lastHintRef.current = serialized
-    writeSkeletonHint(hint)
-  }, [isPending, isUnavailable, tanstack, table.rows.length, saveStatus])
+  useSkeletonHintSync(instance.table, table.rows.length, !isPending && !isUnavailable, saveStatus)
+
+  const boardViews = useBoardViews({
+    table,
+    workspace: { views: workspace.data?.views, tableState: workspace.data?.tableState },
+    items,
+    fallbackActiveId: activeListId,
+  })
 
   return {
     instance,
-    lists: { items, activeId: activeListId },
+    lists: boardViews.lists,
     state: {
       search: table.search,
       total: table.total,
@@ -165,6 +150,8 @@ export function useContactsBoard() {
       bulkLabels,
       advanced: table.advanced,
       advancedFields,
+      viewSnapshot: boardViews.viewSnapshot,
+      activeView: boardViews.activeView,
       quickFilters: buildQuickFilterDefs(
         t,
         table.filters,
@@ -173,7 +160,7 @@ export function useContactsBoard() {
       ),
     },
     actions: {
-      onSelectList: selectList,
+      onSelectList: boardViews.selectList,
       onReorderLists: setListOrder,
       onAdvancedChange: table.handleAdvanced,
       onSearch: table.handleSearch,

@@ -44,14 +44,11 @@ export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
         <SectionTabs
           tabs={mobileTabs}
           active={section?.href ?? ''}
-          className="scrollbar-hidden shrink-0 overflow-x-auto px-2 lg:hidden"
+          className="scrollbar-hidden shrink-0 overflow-x-auto overflow-y-hidden px-2 lg:hidden"
         />
 
         <header
-          className={cn(
-            'shrink-0 px-4 pt-6 lg:px-8',
-            tabs.length > 0 && 'border-b border-border lg:border-b-0',
-          )}
+          className={cn('shrink-0 px-4 pt-6 lg:px-8', tabs.length > 0 && 'border-b border-border')}
         >
           <h1 className="text-lg font-black tracking-[-0.02em] text-foreground">
             {section
@@ -65,7 +62,7 @@ export function SettingsShell({ children }: Readonly<{ children: ReactNode }>) {
             <SectionTabs
               tabs={tabs}
               active={pathname}
-              className="scrollbar-hidden mt-4 overflow-x-auto border-b-0 lg:hidden"
+              className="scrollbar-hidden mt-4 overflow-x-auto overflow-y-hidden border-b-0"
             />
           )}
         </header>

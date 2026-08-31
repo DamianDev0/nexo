@@ -9,7 +9,7 @@ import type {
 } from '../interfaces/contact-view-row.interfaces'
 import { sqlRows } from '@/shared/database/sql.util'
 
-const VIEW_COLUMNS = `id, owner_id, name, filters, advanced_filters, columns, sort,
+const VIEW_COLUMNS = `id, owner_id, name, description, filters, advanced_filters, columns, sort,
   density, is_default, is_favorite, visibility, position, created_at, updated_at`
 
 @Injectable()
@@ -69,13 +69,14 @@ export class ContactViewsRepository {
     const rows = await sqlRows<ContactViewRow[]>(
       qr,
       `INSERT INTO contact_views
-         (owner_id, name, filters, advanced_filters, columns, sort, density,
+         (owner_id, name, description, filters, advanced_filters, columns, sort, density,
           is_default, is_favorite, visibility, position)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING ${VIEW_COLUMNS}`,
       [
         data.ownerId,
         data.name,
+        data.description,
         data.filters,
         data.advancedFilters,
         data.columns,
@@ -94,13 +95,14 @@ export class ContactViewsRepository {
     const rows = await sqlRows<ContactViewRow[]>(
       qr,
       `INSERT INTO contact_views
-         (owner_id, name, filters, advanced_filters, columns, sort, density,
+         (owner_id, name, description, filters, advanced_filters, columns, sort, density,
           is_default, is_favorite, visibility, position)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, false, false, 'private', $8)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, false, false, 'private', $9)
        RETURNING ${VIEW_COLUMNS}`,
       [
         data.ownerId,
         data.name,
+        data.description,
         data.filters,
         data.advancedFilters,
         data.columns,
@@ -121,8 +123,8 @@ export class ContactViewsRepository {
     const rows = await sqlRows<ContactViewRow[]>(
       qr,
       `UPDATE contact_views SET
-         name = $3, filters = $4, advanced_filters = $5, columns = $6, sort = $7,
-         density = $8, is_default = $9, is_favorite = $10, visibility = $11,
+         name = $3, description = $4, filters = $5, advanced_filters = $6, columns = $7, sort = $8,
+         density = $9, is_default = $10, is_favorite = $11, visibility = $12,
          updated_at = NOW()
        WHERE id = $1 AND owner_id = $2
        RETURNING ${VIEW_COLUMNS}`,
@@ -130,6 +132,7 @@ export class ContactViewsRepository {
         viewId,
         userId,
         data.name,
+        data.description,
         data.filters,
         data.advancedFilters,
         data.columns,

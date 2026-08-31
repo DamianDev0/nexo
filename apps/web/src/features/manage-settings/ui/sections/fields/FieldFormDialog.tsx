@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { Text } from '@/shared/ui/atoms/text'
+import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
@@ -107,14 +107,14 @@ export function FieldFormDialog({
           )}
         </div>
 
-        <DialogFooter>
+        <DialogActions>
           <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
             {t('common.cancel')}
           </Button>
           <Button type="button" disabled={!form.canSubmit} onClick={submit}>
             {t(form.isEdit ? 'common.save' : 'common.create')}
           </Button>
-        </DialogFooter>
+        </DialogActions>
       </DialogContent>
     </Dialog>
   )

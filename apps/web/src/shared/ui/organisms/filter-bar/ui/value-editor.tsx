@@ -123,7 +123,11 @@ export function ValueEditor(props: Readonly<ValueEditorProps>) {
       type={field.type === 'number' ? 'number' : 'text'}
       value={typeof value === 'string' || typeof value === 'number' ? value : ''}
       onChange={(event) =>
-        onChange(field.type === 'number' ? Number(event.target.value) : event.target.value)
+        onChange(
+          field.type === 'number' && event.target.value !== ''
+            ? Number(event.target.value)
+            : event.target.value,
+        )
       }
       placeholder={t('common.filters.advanced.typeValue')}
       aria-label={field.label}

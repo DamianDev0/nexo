@@ -480,6 +480,13 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
     `,
   },
   {
+    id: '0031_contact_views_description',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contact_views
+        ADD COLUMN IF NOT EXISTS description TEXT;
+    `,
+  },
+  {
     id: '0030_data_integrity_checks',
     up: (schema) => `
       DELETE FROM "${schema}".tags t USING "${schema}".tags dup

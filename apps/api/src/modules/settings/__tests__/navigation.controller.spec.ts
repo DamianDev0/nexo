@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { NavigationController } from '../controllers/navigation.controller'
 import { TenantConfigService } from '../services/tenant-config.service'
+import { sidebarConfig, sidebarModule } from '@/shared/testing/sidebar.factory'
 import { PlanName, type SidebarConfig, type TenantContext } from '@repo/shared-types'
 
 const mockCtx: TenantContext = {
@@ -12,41 +13,6 @@ const mockCtx: TenantContext = {
   config: {},
   productName: 'NexoCRM',
   customDomain: null,
-}
-
-function makeSidebarConfig(overrides: Partial<SidebarConfig> = {}): SidebarConfig {
-  return {
-    modules: [
-      {
-        key: 'dashboard',
-        label: 'Dashboard',
-        icon: 'home',
-        enabled: true,
-        order: 1,
-        customIconUrl: null,
-        required: true,
-      },
-      {
-        key: 'contacts',
-        label: 'Contacts',
-        icon: 'users',
-        enabled: true,
-        order: 2,
-        customIconUrl: null,
-        required: false,
-      },
-      {
-        key: 'settings',
-        label: 'Settings',
-        icon: 'cog',
-        enabled: true,
-        order: 9,
-        customIconUrl: null,
-        required: true,
-      },
-    ],
-    ...overrides,
-  }
 }
 
 function buildServiceMock() {
@@ -73,49 +39,34 @@ describe('NavigationController', () => {
 
   describe('getSidebar', () => {
     it('returns the sidebar config from service', async () => {
-      const sidebar = makeSidebarConfig()
-      configService.getSidebarConfig.mockResolvedValue(sidebar)
+      configService.getSidebarConfig.mockResolvedValue(sidebarConfig())
 
       const result = await controller.getSidebar(mockCtx)
 
       expect(configService.getSidebarConfig).toHaveBeenCalledWith(mockCtx.tenantId)
       expect(result.modules).toHaveLength(3)
     })
+
+    it('exposes module availability so the client does not hardcode it', async () => {
+      configService.getSidebarConfig.mockResolvedValue(sidebarConfig())
+
+      const result = await controller.getSidebar(mockCtx)
+
+      expect(result.modules.map((m) => [m.key, m.status])).toEqual([
+        ['dashboard', 'available'],
+        ['contacts', 'available'],
+        ['settings', 'available'],
+      ])
+    })
   })
 
   describe('updateSidebar', () => {
     it('updates the sidebar when all required modules stay enabled', async () => {
-      const updated = makeSidebarConfig({
-        modules: [
-          {
-            key: 'dashboard',
-            label: 'Dashboard',
-            icon: 'home',
-            enabled: true,
-            order: 1,
-            customIconUrl: null,
-            required: true,
-          },
-          {
-            key: 'contacts',
-            label: 'Contacts',
-            icon: 'users',
-            enabled: false,
-            order: 2,
-            customIconUrl: null,
-            required: false,
-          },
-          {
-            key: 'settings',
-            label: 'Settings',
-            icon: 'cog',
-            enabled: true,
-            order: 9,
-            customIconUrl: null,
-            required: true,
-          },
-        ],
-      })
+      const updated = sidebarConfig([
+        sidebarModule('dashboard', { order: 1 }),
+        sidebarModule('contacts', { order: 2, enabled: false }),
+        sidebarModule('settings', { order: 9 }),
+      ])
       configService.updateSidebarConfig.mockResolvedValue(updated)
 
       const result = await controller.updateSidebar(updated, mockCtx)
@@ -129,28 +80,10 @@ describe('NavigationController', () => {
     })
 
     it('propagates BadRequestException when a required module is disabled', async () => {
-      const invalidConfig = makeSidebarConfig({
-        modules: [
-          {
-            key: 'dashboard',
-            label: 'Dashboard',
-            icon: 'home',
-            enabled: false,
-            order: 1,
-            customIconUrl: null,
-            required: true,
-          },
-          {
-            key: 'settings',
-            label: 'Settings',
-            icon: 'cog',
-            enabled: true,
-            order: 9,
-            customIconUrl: null,
-            required: true,
-          },
-        ],
-      })
+      const invalidConfig = sidebarConfig([
+        sidebarModule('dashboard', { order: 1, enabled: false }),
+        sidebarModule('settings', { order: 9 }),
+      ])
       configService.updateSidebarConfig.mockRejectedValue(
         new BadRequestException('Required modules cannot be disabled: dashboard'),
       )
@@ -161,28 +94,10 @@ describe('NavigationController', () => {
     })
 
     it('propagates BadRequestException when multiple required modules are disabled', async () => {
-      const invalidConfig = makeSidebarConfig({
-        modules: [
-          {
-            key: 'dashboard',
-            label: 'Dashboard',
-            icon: 'home',
-            enabled: false,
-            order: 1,
-            customIconUrl: null,
-            required: true,
-          },
-          {
-            key: 'settings',
-            label: 'Settings',
-            icon: 'cog',
-            enabled: false,
-            order: 9,
-            customIconUrl: null,
-            required: true,
-          },
-        ],
-      })
+      const invalidConfig = sidebarConfig([
+        sidebarModule('dashboard', { order: 1, enabled: false }),
+        sidebarModule('settings', { order: 9, enabled: false }),
+      ])
       configService.updateSidebarConfig.mockRejectedValue(
         new BadRequestException('Required modules cannot be disabled: dashboard, settings'),
       )
@@ -206,21 +121,12 @@ describe('TenantConfigService sidebar required module guard', () => {
     }
     const mockCache = { get: jest.fn().mockResolvedValue(null), set: jest.fn(), del: jest.fn() }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial DI for a pure guard check
     const svc = new (TenantConfigService as any)(mockRepo, mockHistoryRepo, mockCache)
 
-    const invalidConfig: SidebarConfig = {
-      modules: [
-        {
-          key: 'dashboard',
-          label: 'Dashboard',
-          icon: 'home',
-          enabled: false,
-          order: 1,
-          customIconUrl: null,
-          required: true,
-        },
-      ],
-    }
+    const invalidConfig: SidebarConfig = sidebarConfig([
+      sidebarModule('dashboard', { order: 1, enabled: false }),
+    ])
 
     await expect(svc.updateSidebarConfig('tenant-1', invalidConfig, 'acme')).rejects.toThrow(
       BadRequestException,

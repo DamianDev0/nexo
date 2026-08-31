@@ -2,6 +2,7 @@ export interface ContactViewRow {
   id: string
   owner_id: string
   name: string
+  description: string | null
   filters: Record<string, unknown>
   advanced_filters: Record<string, unknown> | null
   columns: Record<string, unknown>
@@ -18,6 +19,7 @@ export interface ContactViewRow {
 export interface ContactViewCopyData {
   ownerId: string
   name: string
+  description: string | null
   filters: Record<string, unknown>
   advancedFilters: Record<string, unknown> | null
   columns: object
@@ -34,6 +36,7 @@ export interface ContactViewInsertData extends ContactViewCopyData {
 
 export interface ContactViewUpdateData {
   name: string
+  description: string | null
   filters: Record<string, unknown>
   advancedFilters: Record<string, unknown> | null
   columns: object

@@ -49,3 +49,15 @@ export function parseConditions(raw: string | null | undefined): FilterCondition
     return []
   }
 }
+
+export const OPERATOR_GLYPHS: Readonly<Record<FilterOperator, string>> = {
+  is: '=',
+  is_not: '≠',
+  contains: '≈',
+  not_contains: '≉',
+  is_any_of: '⊂',
+  is_empty: '∅',
+  is_not_empty: '≠∅',
+  gte: '≥',
+  lte: '≤',
+}

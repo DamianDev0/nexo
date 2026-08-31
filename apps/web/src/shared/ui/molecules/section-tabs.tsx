@@ -41,7 +41,7 @@ export function SectionTabs({ tabs, active, onChange, className }: Readonly<Sect
               <motion.span
                 layoutId={layoutId}
                 transition={underlineTransition}
-                className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary"
+                className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary"
               />
             )}
           </>

@@ -38,6 +38,7 @@ export type ContactView = {
   id: string
   ownerId: string
   name: string
+  description: string | null
   filters: Record<string, unknown>
   advancedFilters: Record<string, unknown> | null
   columns: ContactViewColumns
@@ -134,4 +135,14 @@ export type ContactDuplicateProbeQuery = {
 
 export type ContactDuplicateProbeResult = {
   duplicate: ContactDuplicatePayload | null
+}
+
+export type ContactViewInput = {
+  name: string
+  description?: string | null
+  filters?: Record<string, unknown>
+  advancedFilters?: Record<string, unknown> | null
+  columns?: ContactViewColumns
+  sort?: ContactViewSort | null
+  density?: ContactViewDensity
 }

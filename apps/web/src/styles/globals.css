@@ -288,6 +288,13 @@
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-hidden {
+  scrollbar-width: none;
 }
 
 @keyframes node-float {

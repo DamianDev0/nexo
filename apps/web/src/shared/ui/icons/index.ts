@@ -13,6 +13,7 @@ export {
   FoldVertical as ArrowsInLineVerticalIcon,
   Move as ArrowsOutCardinalIcon,
   UnfoldVertical as ArrowsOutLineVerticalIcon,
+  Bookmark as BookmarkIcon,
   Landmark as BankIcon,
   Bell as BellIcon,
   Building2 as BuildingsIcon,

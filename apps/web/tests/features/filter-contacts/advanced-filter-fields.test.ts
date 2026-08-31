@@ -51,7 +51,7 @@ describe('buildAdvancedFilterFields', () => {
       SOURCES,
       ADVANCED_FILTER_ICONS,
     )
-    expect(fields[0]?.key).toBe('firstName')
+    expect(fields[0]?.key).toBe('name')
   })
 
   it('exposes tenant custom fields under the custom prefix with their options', () => {

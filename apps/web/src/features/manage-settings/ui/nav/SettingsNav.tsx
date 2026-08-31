@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 
 import { ROUTES } from '@/shared/config/routes'
+import { Text } from '@/shared/ui/atoms/text'
 import { CaretLeftIcon } from '@/shared/ui/icons'
 
 import { SETTINGS_GROUPS } from '../../config/settings-nav.constants'
@@ -28,9 +29,9 @@ export function SettingsNav() {
 
       {SETTINGS_GROUPS.map((group) => (
         <div key={group.key}>
-          <p className="px-2.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <Text as="p" variant="caption" className="px-2.5 text-[10px] uppercase">
             {t(`settings.groups.${group.key}`)}
-          </p>
+          </Text>
           <ul className="mt-1.5 flex flex-col gap-0.5">
             {group.sections.map((section) => (
               <SettingsNavItem

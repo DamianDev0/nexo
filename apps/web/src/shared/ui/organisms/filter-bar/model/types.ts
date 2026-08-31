@@ -1,5 +1,5 @@
 import type { AppIcon } from '@/shared/ui/icons'
-import type { FilterCondition, FilterFieldType } from '@repo/shared-types'
+import type { FilterFieldType } from '@repo/shared-types'
 
 export type FilterFieldOption = {
   readonly value: string
@@ -15,9 +15,3 @@ export type FilterFieldDef = {
   readonly options?: ReadonlyArray<FilterFieldOption>
 }
 
-export type FilterBarProps = {
-  readonly fields: ReadonlyArray<FilterFieldDef>
-  readonly value: ReadonlyArray<FilterCondition>
-  readonly onChange: (next: ReadonlyArray<FilterCondition>) => void
-  readonly className?: string
-}

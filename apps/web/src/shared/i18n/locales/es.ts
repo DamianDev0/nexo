@@ -409,6 +409,25 @@ const es = {
     },
   },
   contacts: {
+    views: {
+      save: 'Guardar lista',
+      saveTitle: 'Guardar como lista',
+      editTitle: 'Editar lista',
+      edit: 'Editar lista',
+      delete: 'Eliminar lista',
+      deleteTitle: 'Eliminar "{{name}}"',
+      deleteDescription: 'La lista se elimina para siempre. Tus contactos no se tocan.',
+      name: 'Nombre',
+      namePlaceholder: 'Clientes VIP Medellín',
+      description: 'Descripción',
+      descriptionPlaceholder: '¿Para qué sirve esta lista?',
+      saved: '"{{name}}" guardada',
+      updated: 'Lista actualizada',
+      deleted: 'Lista eliminada',
+      nameRequired: 'Ponle un nombre a la lista',
+      nameTooLong: 'Máximo 120 caracteres',
+      descriptionTooLong: 'Máximo 300 caracteres',
+    },
     filters: {
       lifecycleStage: 'Ciclo de vida',
       source: 'Origen',
@@ -810,6 +829,21 @@ const es = {
       activities: 'Actividades',
       contacts: 'Contactos',
     },
+    descriptions: {
+      profile: 'Tu información personal y datos de acceso.',
+      notifications: 'Elige sobre qué te notifica Nexo.',
+      company: 'Identidad de la empresa y valores regionales.',
+      team: 'Invita a tu equipo y gestiona sus roles.',
+      appearance: 'Colores de marca, tema y tipografía de tu espacio.',
+      navigation: 'Elige qué módulos aparecen en la barra lateral.',
+      nomenclature: 'Renombra entidades para que el CRM hable tu idioma.',
+      fields: 'Campos personalizados con los datos que tu negocio necesita.',
+      pipelines: 'Embudos y etapas que organizan tus negocios.',
+      activities: 'Tipos de actividad que tu equipo registra día a día.',
+      contacts: 'Estados, ciclo de vida, fuentes, tipos y etiquetas de tus contactos.',
+    },
+    searchPlaceholder: 'Buscar en ajustes…',
+    searchEmpty: 'Ninguna sección coincide',
     children: {
       appearance: {
         brand: 'Marca',
@@ -869,6 +903,7 @@ const es = {
       archived: 'Campo archivado',
       emptyTitle: 'Aún no hay campos',
       emptyDescription: 'Crea tu primer campo para capturar los datos que tu negocio necesita.',
+      emptyCta: 'Crear tu primer campo',
       import: {
         cta: 'Importar columnas',
         title: 'Importar columnas desde un archivo',
@@ -914,6 +949,7 @@ const es = {
       deleted: 'Etiqueta eliminada',
       emptyTitle: 'Aún no hay etiquetas',
       emptyDescription: 'Crea tu primera etiqueta para agrupar {{entities}} a tu manera.',
+      emptyCta: 'Crear tu primera etiqueta',
     },
     company: {
       sectorHint:
@@ -972,6 +1008,7 @@ const es = {
       deleted: 'Embudo eliminado',
       emptyTitle: 'Aún no hay embudos',
       emptyDescription: 'Crea tu primer embudo para organizar tus negocios en etapas.',
+      emptyCta: 'Crear tu primer embudo',
       defaultStages: {
         lead: 'Prospecto',
         proposal: 'Propuesta',

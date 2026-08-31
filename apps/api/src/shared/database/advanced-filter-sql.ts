@@ -80,6 +80,21 @@ function comparableClause(
   }
 }
 
+function dateClause(column: string, condition: FilterCondition, params: unknown[]): string | null {
+  switch (condition.operator) {
+    case 'gte':
+      return `${column} >= ${bind(params, condition.value)}::date`
+    case 'lte':
+      return `${column} < (${bind(params, condition.value)}::date + 1)`
+    case 'is_empty':
+      return `${column} IS NULL`
+    case 'is_not_empty':
+      return `${column} IS NOT NULL`
+    default:
+      return null
+  }
+}
+
 function conditionClause(
   condition: FilterCondition,
   columns: Readonly<Record<string, FilterableColumn>>,
@@ -99,8 +114,9 @@ function conditionClause(
     case 'multi':
       return multiClause(target.column, condition, params)
     case 'number':
-    case 'date':
       return comparableClause(target.column, condition, params)
+    case 'date':
+      return dateClause(target.column, condition, params)
     default:
       return textClause(target.column, condition, params)
   }

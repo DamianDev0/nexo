@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Text } from '@/shared/ui/atoms/text'
+import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
@@ -56,14 +56,14 @@ export function CreatePipelineDialog({
             {t('settings.pipelines.createHint')}
           </Text>
 
-          <DialogFooter>
+          <DialogActions>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={name.trim().length === 0}>
               {t('common.create')}
             </Button>
-          </DialogFooter>
+          </DialogActions>
         </form>
       </DialogContent>
     </Dialog>

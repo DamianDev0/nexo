@@ -34,6 +34,7 @@ export class ContactViewsService {
       const row = await this.repository.insert(qr, {
         ownerId: userId,
         name: dto.name,
+        description: dto.description ?? null,
         filters: dto.filters ?? {},
         advancedFilters: dto.advancedFilters ?? null,
         columns: sanitizeContactViewColumns(dto.columns),
@@ -63,6 +64,7 @@ export class ContactViewsService {
       if (dto.isDefault) await this.repository.clearDefault(qr, userId)
       const row = await this.repository.updateOwned(qr, viewId, userId, {
         name: dto.name ?? existing.name,
+        description: dto.description ?? existing.description,
         filters: dto.filters ?? existing.filters,
         advancedFilters: dto.advancedFilters ?? existing.advanced_filters,
         columns: sanitizeContactViewColumns(dto.columns ?? existing.columns),
@@ -89,6 +91,7 @@ export class ContactViewsService {
       const row = await this.repository.insertCopy(qr, {
         ownerId: userId,
         name: dto.name ?? `${source.name} (copy)`,
+        description: source.description,
         filters: source.filters,
         advancedFilters: source.advanced_filters,
         columns: sanitizeContactViewColumns(source.columns),

@@ -15,6 +15,7 @@ function makeView(overrides: Partial<ContactView> = {}): ContactView {
     id: 'view-1',
     ownerId: USER,
     name: 'My leads',
+    description: null,
     filters: {},
     advancedFilters: null,
     columns: {},

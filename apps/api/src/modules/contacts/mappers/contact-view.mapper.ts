@@ -16,6 +16,7 @@ export function mapContactView(r: ContactViewRow): ContactView {
     id: r.id,
     ownerId: r.owner_id,
     name: r.name,
+    description: r.description,
     filters: r.filters ?? {},
     advancedFilters: r.advanced_filters,
     columns: sanitizeContactViewColumns(r.columns),

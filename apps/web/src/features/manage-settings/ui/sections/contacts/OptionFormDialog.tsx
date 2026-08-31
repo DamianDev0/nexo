@@ -4,12 +4,12 @@ import { TAXONOMY_DESCRIPTION_MAX } from '@repo/shared-types'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FieldError } from '@/shared/ui/molecules/field-error'
 import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog'
@@ -86,14 +86,14 @@ export function OptionFormDialog({
             {form.descriptionLength}/{TAXONOMY_DESCRIPTION_MAX}
           </p>
 
-          <DialogFooter>
+          <DialogActions>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={!form.canSubmit}>
               {initial ? t('common.save') : t('common.create')}
             </Button>
-          </DialogFooter>
+          </DialogActions>
         </form>
       </DialogContent>
     </Dialog>
