@@ -40,7 +40,7 @@ export function OptionRow({ option, checked, onToggle }: Readonly<OptionRowProps
 
   return (
     <HintTooltip asChild hint={option.hint} side="right">
-      {row}
+      <div>{row}</div>
     </HintTooltip>
   )
 }
