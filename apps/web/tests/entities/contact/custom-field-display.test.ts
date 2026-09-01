@@ -25,10 +25,10 @@ describe('customFieldDisplay', () => {
     expect(display.numeric).toBe(true)
   })
 
-  it('formats a date-only value as DD/MM/YYYY without timezone drift', () => {
+  it('formats a date-only value in the medium table format without timezone drift', () => {
     const display = customFieldDisplay(column({ fieldType: 'date' }), '2026-08-21', t)
 
-    expect(display.text).toBe('21/08/2026')
+    expect(display.text).toBe('21 ago 2026')
     expect(display.numeric).toBe(true)
   })
 

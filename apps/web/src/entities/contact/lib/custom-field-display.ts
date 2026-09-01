@@ -25,8 +25,7 @@ function optionLabel(def: CustomFieldColumn, value: unknown): string {
 
 function dateText(value: unknown): string {
   const raw = fallbackText(value)
-  const dateOnly = DATE_ONLY.exec(raw)
-  if (dateOnly) return `${dateOnly[3]}/${dateOnly[2]}/${dateOnly[1]}`
+  if (DATE_ONLY.test(raw)) return formatDateShortCO(`${raw}T00:00:00-05:00`)
   return formatDateShortCO(raw)
 }
 

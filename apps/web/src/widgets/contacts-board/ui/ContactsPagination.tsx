@@ -31,8 +31,8 @@ export function ContactsPagination({
   const range = pageRange(nav.page, nav.limit, nav.total)
 
   return (
-    <div className="mt-auto flex shrink-0 items-center justify-between gap-4 px-7 py-1.5">
-      <Text variant="hint" className="truncate tabular-nums">
+    <div className="@container mt-auto flex shrink-0 items-center justify-between gap-4 px-7 py-1.5">
+      <Text variant="hint" className="hidden truncate tabular-nums @md:block">
         {t('contacts.pageRange', {
           from: range.from,
           to: range.to,
@@ -52,18 +52,22 @@ export function ContactsPagination({
           onPrefetch={onPrefetchPage}
           labels={{ prev: t('common.pagination.prev'), next: t('common.pagination.next') }}
         />
-        <DataTable.Pagination.Divider />
-        <DataTable.Pagination.PageSize
-          value={nav.limit}
-          options={PAGE_SIZE_OPTIONS}
-          onChange={onLimitChange}
-          label={t('common.pagination.perPage')}
-        />
-        <DataTable.Pagination.Divider />
-        <DataTable.Pagination.ScrollTrack
-          target={scrollTarget}
-          label={t('common.pagination.scroll')}
-        />
+        <span className="hidden items-center gap-2 @lg:inline-flex">
+          <DataTable.Pagination.Divider />
+          <DataTable.Pagination.PageSize
+            value={nav.limit}
+            options={PAGE_SIZE_OPTIONS}
+            onChange={onLimitChange}
+            label={t('common.pagination.perPage')}
+          />
+        </span>
+        <span className="hidden items-center gap-2 @xl:inline-flex">
+          <DataTable.Pagination.Divider />
+          <DataTable.Pagination.ScrollTrack
+            target={scrollTarget}
+            label={t('common.pagination.scroll')}
+          />
+        </span>
       </DataTable.Pagination>
     </div>
   )
