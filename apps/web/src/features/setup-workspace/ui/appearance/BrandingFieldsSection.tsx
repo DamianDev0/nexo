@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Label } from '@/shared/ui/shadcn/label'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 interface BrandingFieldsSectionProps {
@@ -22,9 +22,7 @@ export function BrandingFieldsSection({
   return (
     <div className="grid grid-cols-2 gap-4 px-4 py-4">
       <div>
-        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-          {t(`${s}.crmName`)}
-        </Label>
+        <FieldLabel variant="section">{t(`${s}.crmName`)}</FieldLabel>
         <Input
           className="mt-1.5 h-9 text-sm"
           placeholder="Nexo Acme Corp"
@@ -33,9 +31,7 @@ export function BrandingFieldsSection({
         />
       </div>
       <div>
-        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-          {t(`${s}.loginTagline`)}
-        </Label>
+        <FieldLabel variant="section">{t(`${s}.loginTagline`)}</FieldLabel>
         <Input
           className="mt-1.5 h-9 text-sm"
           placeholder="Build. Grow. Scale."

@@ -32,7 +32,9 @@ export function LoginForm({
   return (
     <div className="flex w-full max-w-md flex-col gap-6">
       <div>
-        <span className="text-sm font-medium text-muted-foreground">{t('auth.welcomeBack')}</span>
+        <Text variant="muted" className="font-medium">
+          {t('auth.welcomeBack')}
+        </Text>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
           {t('auth.logIn')}
         </h1>
@@ -51,10 +53,12 @@ export function LoginForm({
         <ControlledField
           control={control}
           name="email"
-          label={t('auth.email')}
-          type="email"
-          placeholder={t('auth.emailPlaceholder')}
-          autoComplete="email"
+          field={{
+            label: t('auth.email'),
+            type: 'email',
+            placeholder: t('auth.emailPlaceholder'),
+            autoComplete: 'email',
+          }}
         />
 
         <PasswordField

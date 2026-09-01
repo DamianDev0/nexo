@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
+import { Text } from '@/shared/ui/atoms/text'
 import { WarningCircleIcon, XIcon } from '@/shared/ui/icons'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import { Table, TableBody, TableCell, TableRow } from '@/shared/ui/shadcn/table'
@@ -14,9 +15,9 @@ export function IssueList({ issues }: Readonly<{ issues: ReadonlyArray<ImportIss
 
   if (issues.length === 0) {
     return (
-      <p className="rounded-lg border border-border px-3 py-6 text-center text-xs text-muted-foreground">
+      <Text as="p" variant="hint" className="rounded-lg border border-border px-3 py-6 text-center">
         {t('contacts.import.review.noIssues')}
-      </p>
+      </Text>
     )
   }
 

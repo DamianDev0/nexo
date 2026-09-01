@@ -2,16 +2,11 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FileDropzone } from '@/shared/ui/molecules/file-dropzone'
-import { Button } from '@/shared/ui/shadcn/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/shadcn/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/shadcn/dialog'
 
 import { IMPORT_ACCEPT, IMPORT_MAX_SIZE_MB } from '../../../config/header-import.constants'
 import { includedRows } from '../../../lib/header-import'
@@ -62,16 +57,16 @@ export function ImportColumnsDialog({ importer }: Readonly<{ importer: HeaderImp
             )}
 
             <DialogActions>
-              <Button type="button" variant="ghost" onClick={() => importer.onOpenChange(false)}>
+              <PillButton variant="ghost" size="sm" onClick={() => importer.onOpenChange(false)}>
                 {t('common.cancel')}
-              </Button>
-              <Button
-                type="button"
+              </PillButton>
+              <PillButton
+                size="sm"
                 disabled={count === 0 || importer.fieldsPending}
                 onClick={importer.confirm}
               >
                 {t('settings.fields.import.confirm', { count })}
-              </Button>
+              </PillButton>
             </DialogActions>
           </>
         )}

@@ -74,9 +74,7 @@ function OptionPicker({ field, multiple, value, onChange }: Readonly<ValueEditor
         <Command>
           <CommandInput placeholder={t('common.search')} />
           <CommandList className="max-h-56 p-1">
-            <CommandEmpty className="px-2.5 py-4 text-center text-sm text-muted-foreground">
-              {t('common.noResults')}
-            </CommandEmpty>
+            <CommandEmpty>{t('common.noResults')}</CommandEmpty>
             {options.map((option) => (
               <CommandItem
                 key={option.value}
@@ -87,7 +85,10 @@ function OptionPicker({ field, multiple, value, onChange }: Readonly<ValueEditor
                 {option.color && <ColorDot color={option.color} />}
                 <span className="flex-1 truncate">{option.label}</span>
                 {selected.includes(option.value) && (
-                  <CheckIcon strokeWidth={3} className="size-3.5 text-primary-deep dark:text-primary" />
+                  <CheckIcon
+                    strokeWidth={3}
+                    className="size-3.5 text-primary-deep dark:text-primary"
+                  />
                 )}
               </CommandItem>
             ))}

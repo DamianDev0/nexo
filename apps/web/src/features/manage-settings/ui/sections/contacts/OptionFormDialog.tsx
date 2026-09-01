@@ -4,15 +4,11 @@ import { TAXONOMY_DESCRIPTION_MAX } from '@repo/shared-types'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FieldError } from '@/shared/ui/molecules/field-error'
-import { Button } from '@/shared/ui/shadcn/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/shadcn/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/shadcn/dialog'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
@@ -82,17 +78,17 @@ export function OptionFormDialog({
             )}
           />
 
-          <p className="text-right text-xs tabular-nums text-muted-foreground">
+          <Text as="p" variant="hint" className="text-right tabular-nums">
             {form.descriptionLength}/{TAXONOMY_DESCRIPTION_MAX}
-          </p>
+          </Text>
 
           <DialogActions>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            <PillButton variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
-            </Button>
-            <Button type="submit" disabled={!form.canSubmit}>
+            </PillButton>
+            <PillButton type="submit" size="sm" disabled={!form.canSubmit}>
               {initial ? t('common.save') : t('common.create')}
-            </Button>
+            </PillButton>
           </DialogActions>
         </form>
       </DialogContent>

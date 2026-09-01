@@ -3,8 +3,8 @@
 import Image from 'next/image'
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
-import { Button } from '@/shared/ui/shadcn/button'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { NOMENCLATURE_ENTITIES, NOMENCLATURE_PRESETS } from '../../config/nomenclature.constants'
@@ -59,19 +59,21 @@ export function NomenclatureFields({
       </div>
 
       <div className="mt-6">
-        <p className="mb-2 text-xs font-semibold text-muted-foreground">{t(`${s}.quickPresets`)}</p>
+        <Text as="p" variant="emphasis" className="mb-2 text-muted-foreground">
+          {t(`${s}.quickPresets`)}
+        </Text>
         <div className="flex flex-wrap gap-2">
           {Object.entries(NOMENCLATURE_PRESETS).map(([key, preset]) => (
-            <Button
+            <PillButton
               key={key}
               variant="outline"
-              size="sm"
-              className="gap-2 text-xs"
+              size="xs"
+              className="text-xs"
               onClick={() => onPreset(key)}
             >
               <Image src={preset.icon} alt="" width={18} height={18} className="size-4.5" />
               {preset.label}
-            </Button>
+            </PillButton>
           ))}
         </div>
       </div>

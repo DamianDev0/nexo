@@ -4,10 +4,9 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
-import { useReducedTransition } from '@/shared/lib/animations'
+import { snappySpring, useReducedTransition } from '@/shared/lib/animations'
 import { useScrollFade } from '@/shared/lib/hooks/useScrollFade'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
 
 import { FilterChip } from './filter-chip'
 
@@ -23,7 +22,7 @@ type FilterChipsProps = {
 
 export function FilterChips({ fields, value, onChange, className }: Readonly<FilterChipsProps>) {
   const { t } = useTranslation()
-  const transition = useReducedTransition(SPRING_SNAPPY)
+  const transition = useReducedTransition(snappySpring)
   const fade = useScrollFade<HTMLDivElement>()
   const fieldByKey = new Map(fields.map((field) => [field.key, field]))
   const conditions = value.filter((condition) => fieldByKey.has(condition.field))

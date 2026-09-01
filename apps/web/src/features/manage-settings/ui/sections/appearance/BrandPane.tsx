@@ -9,8 +9,8 @@ import {
   PresetsSection,
   useActivePresetKey,
 } from '@/features/setup-workspace'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { FileUpload } from '@/shared/ui/molecules/file-upload'
-import { Label } from '@/shared/ui/shadcn/label'
 
 import { useManageSettings } from '../../../model/settings-context'
 
@@ -34,9 +34,7 @@ export function BrandPane() {
       />
 
       <div className="px-4 py-4">
-        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-          {t('onboarding.steps.appearance.logo')}
-        </Label>
+        <FieldLabel variant="section">{t('onboarding.steps.appearance.logo')}</FieldLabel>
         <FileUpload
           preview={logoPreview}
           fileName={logoFileName}

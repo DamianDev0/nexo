@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { FileUpload } from '@/shared/ui/molecules/file-upload'
 import { PanelStack } from '@/shared/ui/molecules/panel-stack'
-import { Label } from '@/shared/ui/shadcn/label'
 
 import { useGoogleFont } from '../model/useGoogleFont'
 
@@ -58,9 +58,7 @@ export function StepAppearance({ data, actions, nav }: Readonly<StepAppearancePr
         />
 
         <div className="px-4 py-4">
-          <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-            {t(`${s}.logo`, 'Logo')}
-          </Label>
+          <FieldLabel variant="section">{t(`${s}.logo`, 'Logo')}</FieldLabel>
           <FileUpload
             preview={data.logoPreview}
             fileName={data.logoFileName}

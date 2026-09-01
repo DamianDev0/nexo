@@ -17,6 +17,7 @@ export {
   indicatorSpring,
   gooeyPopover,
   gooeySpring,
+  snappySpring,
   subtlePopover,
   subtleTween,
   instant,

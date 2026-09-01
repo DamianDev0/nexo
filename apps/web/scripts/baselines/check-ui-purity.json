@@ -1,6 +1,6 @@
 [
   "src/widgets/app-shell/ui/AppSidebar.tsx:7 :: import { useSidebarModules } from '../query/useSidebarModules'",
   "src/widgets/app-shell/ui/AppSidebar.tsx:8 :: import { useTenantBranding } from '../query/useTenantBranding'",
-  "src/widgets/app-shell/ui/HeaderSearch.tsx:18 :: import { useSidebarModules } from '../query/useSidebarModules'",
+  "src/widgets/app-shell/ui/HeaderSearch.tsx:19 :: import { useSidebarModules } from '../query/useSidebarModules'",
   "src/widgets/app-shell/ui/NavMain.tsx:21 :: import type { SidebarNavGroup } from '../query/useSidebarModules'"
 ]

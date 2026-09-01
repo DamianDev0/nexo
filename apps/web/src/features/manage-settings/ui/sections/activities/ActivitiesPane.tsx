@@ -2,10 +2,10 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
-import { Skeleton } from '@/shared/ui/shadcn/skeleton'
+import { SkeletonList } from '@/shared/ui/molecules/skeleton-list'
 
 import { useActivityTypesPane } from '../../../model/useActivityTypesPane'
 
@@ -24,24 +24,20 @@ export function ActivitiesPane() {
         <Text as="p" variant="muted">
           {t('settings.activityTypes.description')}
         </Text>
-        <Button
+        <PillButton
           variant="outline"
-          size="sm"
+          size="xs"
           className="shrink-0 gap-1.5"
           disabled={pane.isPending}
           onClick={pane.creator.openCreate}
         >
           <PlusIcon className="size-3.5" />
           {t('settings.activityTypes.add')}
-        </Button>
+        </PillButton>
       </div>
 
       {pane.isPending ? (
-        <div className="flex flex-col gap-1.5">
-          {Array.from({ length: SKELETON_ROWS }, (_, index) => `row-${index}`).map((key) => (
-            <Skeleton key={key} className="h-11 w-full rounded-lg" />
-          ))}
-        </div>
+        <SkeletonList rows={SKELETON_ROWS} />
       ) : (
         <div className="flex flex-col gap-1.5">
           {pane.types.map((type) => (

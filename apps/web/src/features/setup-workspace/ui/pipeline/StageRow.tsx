@@ -4,10 +4,11 @@ import { TAXONOMY_COLOR_PALETTE } from '@repo/shared-types'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { DotsSixVerticalIcon, XIcon } from '@/shared/ui/icons'
 import { ColorSwatchPicker } from '@/shared/ui/molecules/color-swatch-picker'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
-import { Button } from '@/shared/ui/shadcn/button'
 import { Slider } from '@/shared/ui/shadcn/slider'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
@@ -46,17 +47,16 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
       )}
     >
       <HintTooltip asChild hint={t(`${s}.dragToReorder`)}>
-        <Button
-          type="button"
+        <PillButton
           variant="ghost"
-          size="icon"
-          className="size-6 shrink-0 cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
+          size="xs"
+          className="size-6 px-0 shrink-0 cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
           aria-label={t(`${s}.dragToReorder`)}
           {...handle?.attributes}
           {...handle?.listeners}
         >
           <DotsSixVerticalIcon className="size-4" />
-        </Button>
+        </PillButton>
       </HintTooltip>
 
       <ColorSwatchPicker
@@ -83,23 +83,25 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
             onValueChange={([v]) => actions.onUpdate(stage.id, { probability: v })}
             className="w-24 **:data-[slot=slider-thumb]:cursor-grab **:data-[slot=slider-thumb]:active:cursor-grabbing"
           />
-          <span className="w-9 text-right text-xs font-bold tabular-nums text-primary-deep dark:text-primary">
+          <Text
+            variant="bold"
+            className="w-9 text-right text-xs tabular-nums text-primary-deep dark:text-primary"
+          >
             {stage.probability}%
-          </span>
+          </Text>
         </div>
       </HintTooltip>
 
       <HintTooltip asChild hint={t(`${s}.removeStage`)}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        <PillButton
+          variant="ghostDanger"
+          size="xs"
           onClick={() => actions.onRemove(stage.id)}
           aria-label={t(`${s}.removeStage`)}
-          className="size-6 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          className="size-6 rounded-full px-0"
         >
           <XIcon className="size-3.5" />
-        </Button>
+        </PillButton>
       </HintTooltip>
     </div>
   )

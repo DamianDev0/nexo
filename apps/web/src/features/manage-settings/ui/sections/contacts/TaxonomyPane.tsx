@@ -6,12 +6,12 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
-import { Button } from '@/shared/ui/shadcn/button'
-import { Skeleton } from '@/shared/ui/shadcn/skeleton'
+import { SkeletonList } from '@/shared/ui/molecules/skeleton-list'
 
 import { useTaxonomyPane } from '../../../model/useTaxonomyPane'
 
@@ -45,24 +45,20 @@ export function TaxonomyPane({ kind }: Readonly<{ kind: TaxonomyKind }>) {
             entities: terms.lowerPlural,
           })}
         </Text>
-        <Button
+        <PillButton
           variant="outline"
-          size="sm"
+          size="xs"
           className="shrink-0 gap-1.5"
           disabled={pane.isLoading}
           onClick={pane.editor.openCreate}
         >
           <PlusIcon className="size-3.5" />
           {t('settings.taxonomy.add')}
-        </Button>
+        </PillButton>
       </div>
 
       {pane.isLoading ? (
-        <div className="flex flex-col gap-1.5">
-          {Array.from({ length: SKELETON_ROWS }, (_, index) => `row-${index}`).map((key) => (
-            <Skeleton key={key} className="h-11 w-full rounded-lg" />
-          ))}
-        </div>
+        <SkeletonList rows={SKELETON_ROWS} />
       ) : (
         <DndContext
           id="settings-taxonomy-dnd"

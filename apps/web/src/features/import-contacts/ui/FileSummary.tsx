@@ -2,9 +2,9 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { CheckIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import type { AnalyzeResult } from '@repo/shared-types'
 
@@ -20,7 +20,9 @@ export function FileSummary({ analysis, onRestart }: Readonly<FileSummaryProps>)
     <span className="flex items-center gap-3 rounded-lg border border-border px-4 py-3">
       <CheckIcon className="size-4 shrink-0 text-positive" />
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-sm font-medium text-foreground">{analysis.fileName}</span>
+        <Text variant="strong" className="truncate">
+          {analysis.fileName}
+        </Text>
         <Text variant="hint">
           {t('contacts.import.upload.summary', {
             rows: analysis.totalRows,
@@ -28,9 +30,9 @@ export function FileSummary({ analysis, onRestart }: Readonly<FileSummaryProps>)
           })}
         </Text>
       </span>
-      <Button variant="ghost" size="sm" onClick={onRestart}>
+      <PillButton variant="ghost" size="xs" onClick={onRestart}>
         {t('contacts.import.actions.changeFile')}
-      </Button>
+      </PillButton>
     </span>
   )
 }

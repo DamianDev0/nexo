@@ -4,9 +4,10 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { SubmitButton } from '@/shared/ui/molecules/submit-button'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import { useSaveShortcutLabel } from '../model/useSaveShortcut'
 
@@ -39,9 +40,9 @@ export function SaveBar({ onSave, onReset, isDirty, isPending }: Readonly<SaveBa
 
   return (
     <div className="flex shrink-0 items-center justify-end gap-4 border-t border-border bg-background px-8 py-3">
-      <span className="mr-auto text-sm text-muted-foreground">
+      <Text variant="muted" className="mr-auto">
         {isDirty ? t('settings.unsavedChanges') : t('settings.noChanges')}
-      </span>
+      </Text>
 
       <div className="flex items-center gap-2">
         <AnimatePresence initial={false}>
@@ -52,9 +53,9 @@ export function SaveBar({ onSave, onReset, isDirty, isPending }: Readonly<SaveBa
               exit={{ opacity: 0, x: 8 }}
               transition={transition}
             >
-              <Button variant="ghost" size="sm" onClick={onReset} disabled={isPending}>
+              <PillButton variant="ghost" size="xs" onClick={onReset} disabled={isPending}>
                 {t('settings.discard')}
-              </Button>
+              </PillButton>
             </motion.div>
           )}
         </AnimatePresence>

@@ -3,16 +3,11 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FieldError } from '@/shared/ui/molecules/field-error'
-import { Button } from '@/shared/ui/shadcn/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/shadcn/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/shadcn/dialog'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { PIPELINE_NAME_MAX } from '../../../config/pipelines.constants'
@@ -61,12 +56,12 @@ export function CreatePipelineDialog({
           </Text>
 
           <DialogActions>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            <PillButton variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
-            </Button>
-            <Button type="submit" disabled={!form.canSubmit}>
+            </PillButton>
+            <PillButton type="submit" size="sm" disabled={!form.canSubmit}>
               {t('common.create')}
-            </Button>
+            </PillButton>
           </DialogActions>
         </form>
       </DialogContent>

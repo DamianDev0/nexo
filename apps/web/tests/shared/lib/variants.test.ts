@@ -15,6 +15,7 @@ import {
   slideRight,
   smoothEase,
   smoothSpring,
+  snappySpring,
   staggerChild,
   staggerContainer,
 } from '@/shared/lib/animations/variants'
@@ -115,5 +116,9 @@ describe('animation variants', () => {
 
   it('gooeySpring carries the exact bounce and duration', () => {
     expect(gooeySpring).toEqual({ type: 'spring', bounce: 0.24, duration: 0.36 })
+  })
+
+  it('snappySpring is a no-overshoot quick spring', () => {
+    expect(snappySpring).toEqual({ type: 'spring', duration: 0.2, bounce: 0 })
   })
 })

@@ -7,12 +7,12 @@ import { useTranslation } from 'react-i18next'
 
 import { useEntityLabels } from '@/entities/nomenclature'
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { CloudArrowUpIcon, PlusIcon, ShapesIcon } from '@/shared/ui/icons'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
+import { SkeletonList } from '@/shared/ui/molecules/skeleton-list'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
-import { Button } from '@/shared/ui/shadcn/button'
-import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 
 import {
   CUSTOM_FIELD_ENTITIES,
@@ -44,26 +44,26 @@ export function FieldsPane() {
           {t('settings.fields.description')}
         </Text>
         <div className="flex shrink-0 items-center gap-1.5">
-          <Button
+          <PillButton
             variant="outline"
-            size="sm"
+            size="xs"
             className="gap-1.5"
             disabled={pane.isPending}
             onClick={importer.openImport}
           >
             <CloudArrowUpIcon className="size-3.5" />
             {t('settings.fields.import.cta')}
-          </Button>
-          <Button
+          </PillButton>
+          <PillButton
             variant="outline"
-            size="sm"
+            size="xs"
             className="gap-1.5"
             disabled={pane.isPending}
             onClick={pane.editor.openCreate}
           >
             <PlusIcon className="size-3.5" />
             {t('settings.fields.add')}
-          </Button>
+          </PillButton>
         </div>
       </div>
 
@@ -77,13 +77,7 @@ export function FieldsPane() {
         className="mb-4 max-w-sm"
       />
 
-      {pane.isPending && (
-        <div className="flex flex-col gap-1.5">
-          {Array.from({ length: SKELETON_ROWS }, (_, index) => `row-${index}`).map((key) => (
-            <Skeleton key={key} className="h-11 w-full rounded-lg" />
-          ))}
-        </div>
-      )}
+      {pane.isPending && <SkeletonList rows={SKELETON_ROWS} />}
 
       {!pane.isPending && pane.fields.length === 0 && (
         <EmptyState
@@ -91,10 +85,10 @@ export function FieldsPane() {
           title={t('settings.fields.emptyTitle')}
           description={t('settings.fields.emptyDescription')}
         >
-          <Button size="sm" className="gap-1.5" onClick={pane.editor.openCreate}>
+          <PillButton size="xs" className="gap-1.5" onClick={pane.editor.openCreate}>
             <PlusIcon className="size-3.5" />
             {t('settings.fields.emptyCta')}
-          </Button>
+          </PillButton>
         </EmptyState>
       )}
 

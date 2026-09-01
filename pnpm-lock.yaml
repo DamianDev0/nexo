@@ -332,9 +332,6 @@ importers:
       react:
         specifier: ^19.1.0
         version: 19.2.0
-      react-day-picker:
-        specifier: ^10.0.1
-        version: 10.0.1(@types/react@19.1.0)(react@19.2.0)
       react-dom:
         specifier: ^19.1.0
         version: 19.2.0(react@19.2.0)
@@ -2398,13 +2395,6 @@ packages:
       }
     engines: { node: '>=20.19.0' }
     dev: true
-
-  /@date-fns/tz@1.5.0:
-    resolution:
-      {
-        integrity: sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==,
-      }
-    dev: false
 
   /@dnd-kit/accessibility@3.1.1(react@19.2.0):
     resolution:
@@ -12884,13 +12874,6 @@ packages:
       is-data-view: 1.0.2
     dev: true
 
-  /date-fns@4.4.0:
-    resolution:
-      {
-        integrity: sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==,
-      }
-    dev: false
-
   /dateformat@4.6.3:
     resolution:
       {
@@ -19386,25 +19369,6 @@ packages:
       http-errors: 2.0.1
       iconv-lite: 0.7.1
       unpipe: 1.0.0
-
-  /react-day-picker@10.0.1(@types/react@19.1.0)(react@19.2.0):
-    resolution:
-      {
-        integrity: sha512-eNh6BlwcYInWaJtRv18mXQ06Ys/H6rdTZAnTaSdOYJuTpwP1JMCHNd1FDRadA+gbeinq+psdULN5Xnowy9mV8w==,
-      }
-    engines: { node: '>=18' }
-    peerDependencies:
-      '@types/react': '>=16.8.0'
-      react: '>=16.8.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@date-fns/tz': 1.5.0
-      '@types/react': 19.1.0
-      date-fns: 4.4.0
-      react: 19.2.0
-    dev: false
 
   /react-docgen-typescript@2.4.0(typescript@5.8.2):
     resolution:

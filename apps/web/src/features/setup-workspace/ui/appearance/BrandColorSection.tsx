@@ -2,11 +2,11 @@ import { BRAND_COLOR_OPTIONS } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { PaletteIcon } from '@/shared/ui/icons'
 import { ArcColorPicker } from '@/shared/ui/molecules/color-picker'
-import { Button } from '@/shared/ui/shadcn/button'
-import { Label } from '@/shared/ui/shadcn/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
 import { COLOR_NAMES } from '../../config/appearance.constants'
@@ -29,9 +29,7 @@ export function BrandColorSection({
 
   return (
     <div className="px-4 py-4">
-      <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-        {t('onboarding.steps.appearance.primaryColor')}
-      </Label>
+      <FieldLabel variant="section">{t('onboarding.steps.appearance.primaryColor')}</FieldLabel>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {BRAND_COLOR_OPTIONS.map(({ hex, label }) => (
           <button
@@ -54,19 +52,19 @@ export function BrandColorSection({
         <Text variant="hint">{colorName}</Text>
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              type="button"
+            <PillButton
               variant="outline"
+              size="sm"
               aria-label={t('onboarding.steps.appearance.customColor')}
-              className="h-8 w-32 justify-start gap-2 px-2 font-normal"
+              className="h-8 w-32 justify-start px-2 font-normal"
             >
               <span
                 className="size-4.5 shrink-0 rounded-sm border border-border/60"
                 style={{ background: primaryColor }}
               />
-              <span className="font-mono text-xs uppercase text-foreground/80">{primaryColor}</span>
+              <Text variant="mono">{primaryColor}</Text>
               <PaletteIcon className="ml-auto size-3 text-muted-foreground" />
-            </Button>
+            </PillButton>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-72 p-0">
             <ArcColorPicker

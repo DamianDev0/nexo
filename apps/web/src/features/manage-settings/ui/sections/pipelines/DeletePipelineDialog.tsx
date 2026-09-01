@@ -2,15 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
-import { Text } from '@/shared/ui/atoms/text'
-import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
-import { Button } from '@/shared/ui/shadcn/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/shadcn/dialog'
+import { ConfirmDialog } from '@/shared/ui/molecules/confirm-dialog'
 
 interface DeletePipelineDialogProps {
   readonly name: string
@@ -26,30 +18,19 @@ export function DeletePipelineDialog({
   const { t } = useTranslation()
 
   return (
-    <Dialog
+    <ConfirmDialog
       open
       onOpenChange={(open) => {
         if (!open) onCancel()
       }}
-    >
-      <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>{t('settings.pipelines.deleteTitle')}</DialogTitle>
-        </DialogHeader>
-
-        <Text as="p" variant="muted">
-          {t('settings.pipelines.deleteDescription', { name })}
-        </Text>
-
-        <DialogActions>
-          <Button type="button" variant="ghost" onClick={onCancel}>
-            {t('common.cancel')}
-          </Button>
-          <Button type="button" variant="destructive" onClick={onConfirm}>
-            {t('common.delete')}
-          </Button>
-        </DialogActions>
-      </DialogContent>
-    </Dialog>
+      onConfirm={onConfirm}
+      tone="destructive"
+      copy={{
+        title: t('settings.pipelines.deleteTitle'),
+        description: t('settings.pipelines.deleteDescription', { name }),
+        confirmLabel: t('common.delete'),
+        cancelLabel: t('common.cancel'),
+      }}
+    />
   )
 }

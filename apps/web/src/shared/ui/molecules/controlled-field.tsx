@@ -5,30 +5,33 @@ import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { FieldError } from './field-error'
 
-interface ControlledFieldProps<T extends FieldValues> {
-  readonly control: Control<T>
-  readonly name: Path<T>
+export type ControlledFieldSpec = {
   readonly label: string
   readonly type?: string
   readonly placeholder?: string
   readonly autoComplete?: string
-  readonly onValueChange?: (value: string, onChange: (value: string) => void) => void
-  readonly hintFormat?: (value: string) => string
   readonly required?: boolean
+}
+
+export type ControlledFieldActions = {
+  readonly onValueChange?: (value: string, onChange: (value: string) => void) => void
   readonly onBlur?: () => void
+}
+
+interface ControlledFieldProps<T extends FieldValues> {
+  readonly control: Control<T>
+  readonly name: Path<T>
+  readonly field: ControlledFieldSpec
+  readonly actions?: ControlledFieldActions
+  readonly hintFormat?: (value: string) => string
 }
 
 export function ControlledField<T extends FieldValues>({
   control,
   name,
-  label,
-  type,
-  placeholder,
-  autoComplete,
-  onValueChange,
+  field: spec,
+  actions,
   hintFormat,
-  required,
-  onBlur,
 }: Readonly<ControlledFieldProps<T>>) {
   return (
     <Controller
@@ -36,20 +39,22 @@ export function ControlledField<T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <FieldLabel required={required}>{label}</FieldLabel>
+          <FieldLabel required={spec.required}>{spec.label}</FieldLabel>
           <Input
-            type={type}
-            placeholder={placeholder}
-            autoComplete={autoComplete}
+            type={spec.type}
+            placeholder={spec.placeholder}
+            autoComplete={spec.autoComplete}
             className="mt-1.5 h-10 border-border bg-surface-input text-sm"
             {...field}
             value={field.value ?? ''}
             onChange={
-              onValueChange ? (e) => onValueChange(e.target.value, field.onChange) : field.onChange
+              actions?.onValueChange
+                ? (e) => actions.onValueChange?.(e.target.value, field.onChange)
+                : field.onChange
             }
             onBlur={() => {
               field.onBlur()
-              onBlur?.()
+              actions?.onBlur?.()
             }}
           />
           {hintFormat && (

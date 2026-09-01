@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { CaretDownIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
 import { FIELD_TYPE_ICONS } from '../../../config/custom-fields.constants'
@@ -26,17 +26,16 @@ export function FieldTypePopover({ value, onChange }: Readonly<FieldTypePopoverP
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          type="button"
+        <PillButton
           variant="outline"
-          size="sm"
+          size="xs"
           className="shrink-0 gap-1.5"
           aria-label={t('settings.fields.typeLabel')}
         >
           {Icon && <Icon className="size-3.5" />}
           {t(`settings.fields.types.${value}`)}
           <CaretDownIcon className="size-3.5 text-muted-foreground" />
-        </Button>
+        </PillButton>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 rounded-xl p-3">
         <FieldTypePicker

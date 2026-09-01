@@ -1,5 +1,4 @@
 [
   "src/features/setup-workspace/ui/AppearanceLivePreview/PreviewSidebar.tsx :: PreviewSidebarProps",
-  "src/shared/ui/molecules/controlled-field.tsx :: ControlledFieldProps",
   "src/shared/ui/organisms/empty-state.tsx :: EmptyStateProps"
 ]

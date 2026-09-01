@@ -11,9 +11,19 @@ const meta = {
   argTypes: {
     variant: {
       control: 'inline-radio',
-      options: ['primary', 'ink', 'secondary', 'tertiary', 'ghost', 'icon'],
+      options: [
+        'primary',
+        'ink',
+        'secondary',
+        'tertiary',
+        'outline',
+        'ghost',
+        'ghostDanger',
+        'destructive',
+        'icon',
+      ],
     },
-    size: { control: 'inline-radio', options: ['lg', 'md', 'sm'] },
+    size: { control: 'inline-radio', options: ['lg', 'md', 'sm', 'xs'] },
   },
   args: { onClick: fn() },
 } satisfies Meta<typeof PillButton>
@@ -50,10 +60,21 @@ export const Icon: Story = {
   args: { variant: 'icon', children: '+', 'aria-label': 'Add' },
 }
 
+export const Outline: Story = {
+  args: { variant: 'outline', size: 'sm', children: 'Ver detalle' },
+}
+
+export const Destructive: Story = {
+  args: { variant: 'destructive', size: 'sm', children: 'Eliminar' },
+}
+
 export const Sizes: Story = {
   args: { children: 'sm' },
   render: () => (
     <div className="flex items-center gap-3">
+      <PillButton size="xs" variant="tertiary">
+        xs · 32
+      </PillButton>
       <PillButton size="sm" variant="tertiary">
         sm · 36
       </PillButton>

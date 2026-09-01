@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/shadcn/select'
-import { Switch } from '@/shared/ui/shadcn/switch'
+import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
 import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
@@ -41,7 +41,7 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
   const { t } = useTranslation()
 
   if (def.type === 'boolean') {
-    return <Switch checked={value === true} onCheckedChange={onChange} aria-label={def.label} />
+    return <AnimatedToggle checked={value === true} onChange={onChange} label={def.label} />
   }
 
   if (def.type === 'textarea') {

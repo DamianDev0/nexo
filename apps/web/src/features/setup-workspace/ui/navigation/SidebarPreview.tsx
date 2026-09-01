@@ -35,23 +35,29 @@ export function SidebarPreview({ modules, highlightKey }: Readonly<SidebarPrevie
             <div className="size-2 rounded-full bg-amber-400/90" />
             <div className="size-2 rounded-full bg-emerald-400/90" />
           </div>
-          <span className="text-[10px] font-medium tracking-wide text-muted-foreground/50">
+          <Text variant="micro" className="font-medium tracking-wide text-muted-foreground/50">
             app.nexo.com
-          </span>
+          </Text>
         </div>
 
         <div className="flex min-h-72 bg-background">
           <div className="flex w-44 shrink-0 flex-col gap-0.5 border-r border-border bg-muted/30 p-2.5">
             <div className="mb-3 flex items-center gap-2 px-2">
               <div className="size-5 rounded bg-primary" />
-              <span className="text-xs font-bold text-foreground">Nexo CRM</span>
+              <Text variant="bold" className="text-xs">
+                Nexo CRM
+              </Text>
             </div>
 
             {groups.map((group, gi) => (
               <div key={group.key} className={cn(gi > 0 && 'mt-2')}>
-                <p className="mb-1 px-2 text-[10px] font-semibold tracking-wide text-muted-foreground/60">
+                <Text
+                  as="p"
+                  variant="micro"
+                  className="mb-1 px-2 font-semibold tracking-wide text-muted-foreground/60"
+                >
                   {t(`nav.groups.${group.key}`)}
-                </p>
+                </Text>
                 {group.modules.map((mod) => {
                   const Icon = SIDEBAR_ICON_MAP[mod.icon]
                   const isActive = mod.key === 'dashboard'

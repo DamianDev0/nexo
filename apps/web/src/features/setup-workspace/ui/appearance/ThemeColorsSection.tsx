@@ -2,7 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
-import { Label } from '@/shared/ui/shadcn/label'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 
 import { ColorField } from './ColorField'
 
@@ -26,9 +26,9 @@ export function ThemeColorsSection({ colors, onColorOverride }: Readonly<ThemeCo
 
   return (
     <div className="px-4 py-4">
-      <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
+      <FieldLabel variant="section">
         {t('onboarding.steps.appearance.secondaryColors', 'Theme colors')}
-      </Label>
+      </FieldLabel>
       <div className="mt-2.5 flex flex-col gap-2">
         {OVERRIDE_ITEMS.map((item) => (
           <ColorField

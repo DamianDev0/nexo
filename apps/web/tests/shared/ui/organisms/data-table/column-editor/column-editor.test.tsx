@@ -123,7 +123,7 @@ describe('DataTableColumnEditor', () => {
     await openDrawer()
 
     const city = screen.getByRole('switch', { name: 'City' })
-    expect(city).toHaveAttribute('data-state', 'unchecked')
+    expect(city).toHaveAttribute('aria-checked', 'false')
 
     await userEvent.click(city)
 

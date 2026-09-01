@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
 import { downloadCsv } from '@/shared/lib/download-csv'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { FileDropzone } from '@/shared/ui/molecules/file-dropzone'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import { IMPORT_ACCEPT, IMPORT_MAX_SIZE_MB } from '../../config/import-contacts.constants'
 import { buildCsvTemplate, templateEntitiesSlug } from '../../lib/import-template'
@@ -33,12 +34,12 @@ export function UploadStep({ onFile, isBusy }: Readonly<UploadStepProps>) {
         isBusy={isBusy}
       />
 
-      <span className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+      <Text variant="hint" className="flex items-center justify-center gap-1.5">
         {t('contacts.import.upload.templateHint')}
-        <Button
-          variant="link"
+        <PillButton
+          variant="ghost"
           size="xs"
-          className="h-auto p-0 text-xs text-primary-deep dark:text-primary"
+          className="h-auto p-0 text-xs font-medium text-primary-deep underline-offset-4 hover:bg-transparent hover:underline dark:text-primary"
           onClick={() =>
             downloadCsv(
               buildCsvTemplate(),
@@ -49,8 +50,8 @@ export function UploadStep({ onFile, isBusy }: Readonly<UploadStepProps>) {
           }
         >
           {t('contacts.import.upload.templateCta')}
-        </Button>
-      </span>
+        </PillButton>
+      </Text>
     </div>
   )
 }

@@ -3,11 +3,12 @@ import { formatDateTimeCO, timeAgo } from '@repo/shared-utils'
 import { cn } from '@/shared/lib/cn'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { CaretDownIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import { DataTable } from '@/shared/ui/organisms/data-table'
-import { Button } from '@/shared/ui/shadcn/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,7 +44,9 @@ export function ContactStatusCell({
         <TruncateTip>{choice?.label ?? contact.status}</TruncateTip>
       </span>
       {contact.statusChangedAt && (
-        <span className="pl-3 text-xs text-faint">{timeAgo(contact.statusChangedAt, locale)}</span>
+        <Text variant="faint" className="pl-3">
+          {timeAgo(contact.statusChangedAt, locale)}
+        </Text>
       )}
     </span>
   )
@@ -53,14 +56,15 @@ export function ContactStatusCell({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
+        <PillButton
           variant="ghost"
+          size="sm"
           data-slot="status-picker"
           className="h-auto w-full justify-between gap-1 rounded-md px-1 py-0.5 font-normal hover:bg-muted"
         >
           {label}
           <CaretDownIcon className="size-3.5 shrink-0 text-faint" />
-        </Button>
+        </PillButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
         {options.map((option) => (
@@ -115,10 +119,10 @@ export function ContactScoreCell({
 
   return (
     <HintTooltip asChild hint={bandLabel}>
-      <span className="inline-flex items-center gap-1.5 text-sm tabular-nums text-body">
+      <Text variant="body" className="inline-flex items-center gap-1.5 tabular-nums">
         <span className={cn('size-1.5 shrink-0 rounded-full', CONTACT_SCORE_DOT[band])} />
         {score}
-      </span>
+      </Text>
     </HintTooltip>
   )
 }

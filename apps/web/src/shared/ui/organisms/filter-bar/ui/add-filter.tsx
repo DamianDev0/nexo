@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { snappySpring, useReducedTransition } from '@/shared/lib/animations'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { FunnelIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
@@ -14,7 +15,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/shared/ui/shadcn/command'
-import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
 
 import type { FilterFieldDef } from '../model/types'
 
@@ -28,6 +28,7 @@ type AddFilterProps = {
 export function AddFilter({ fields, onPick, showLabel, count = 0 }: Readonly<AddFilterProps>) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  const badgeTransition = useReducedTransition(snappySpring)
 
   return (
     <GroovyPopover open={open} onOpenChange={setOpen}>
@@ -46,7 +47,7 @@ export function AddFilter({ fields, onPick, showLabel, count = 0 }: Readonly<Add
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.5, opacity: 0 }}
-                transition={SPRING_SNAPPY}
+                transition={badgeTransition}
                 className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold tabular-nums text-primary-foreground"
               >
                 {count}
@@ -60,9 +61,7 @@ export function AddFilter({ fields, onPick, showLabel, count = 0 }: Readonly<Add
         <Command>
           <CommandInput placeholder={t('common.filters.advanced.searchField')} />
           <CommandList className="max-h-64 p-1">
-            <CommandEmpty className="px-2.5 py-4 text-center text-sm text-muted-foreground">
-              {t('common.noResults')}
-            </CommandEmpty>
+            <CommandEmpty>{t('common.noResults')}</CommandEmpty>
             {fields.map((field) => {
               const Icon = field.icon
               return (

@@ -4,8 +4,9 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { CircleNotchIcon, MapPinIcon, SignpostIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import type { AddressFieldActions, AddressFieldState } from '../model/types/address-field.types'
@@ -72,9 +73,9 @@ export function AddressField({ value, state, actions, placeholder }: Readonly<Ad
                   {t('geo.addresses')}
                 </div>
               )}
-              <Button
-                type="button"
+              <PillButton
                 variant="ghost"
+                size="sm"
                 id={optionId(index)}
                 role="option"
                 aria-selected={index === activeIndex}
@@ -99,14 +100,14 @@ export function AddressField({ value, state, actions, placeholder }: Readonly<Ad
                     <span className="flex min-w-0 flex-col items-start text-left">
                       <span className="w-full truncate">{option.mainText}</span>
                       {option.secondaryText && (
-                        <span className="w-full truncate text-xs text-muted-foreground">
+                        <Text variant="hint" className="w-full truncate">
                           {option.secondaryText}
-                        </span>
+                        </Text>
                       )}
                     </span>
                   </>
                 )}
-              </Button>
+              </PillButton>
             </li>
           ))}
           {firstPlaceIndex >= 0 && (

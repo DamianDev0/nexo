@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { COLOMBIA_FLAG_SRC, PHONE_PREFIX } from '@/shared/config/colombia'
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { Text } from '@/shared/ui/atoms/text'
 import { BankIcon, ClockIcon, LockIcon } from '@/shared/ui/icons'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/shadcn/input-group'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
@@ -45,7 +46,9 @@ function ReadonlyField({ label, value, icon: Icon }: Readonly<ReadonlyFieldProps
       <FieldLabel>{label}</FieldLabel>
       <div className="mt-1.5 flex h-9 items-center gap-2.5 rounded-md border border-border/70 bg-muted/40 px-3">
         <Icon className="size-4 shrink-0 text-muted-foreground/70" />
-        <span className="flex-1 truncate text-sm text-foreground/80">{value}</span>
+        <Text variant="body" className="flex-1 truncate text-foreground/80">
+          {value}
+        </Text>
         <LockIcon className="size-3 shrink-0 text-muted-foreground/50" />
       </div>
     </div>
@@ -73,7 +76,9 @@ export function StepCompany({ data, actions, nav }: Readonly<StepCompanyProps>) 
                 height={16}
                 className="size-4 rounded-full"
               />
-              <span className="text-xs font-semibold text-foreground/70">{PHONE_PREFIX}</span>
+              <Text variant="emphasis" className="text-foreground/70">
+                {PHONE_PREFIX}
+              </Text>
             </InputGroupAddon>
             <InputGroupInput
               className="text-sm"

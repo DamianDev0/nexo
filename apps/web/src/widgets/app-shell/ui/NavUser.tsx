@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useLogout } from '@/features/logout'
 import { Avatar } from '@/shared/ui/atoms/avatar'
 import { AvatarGradient } from '@/shared/ui/atoms/avatar-gradient'
+import { Text } from '@/shared/ui/atoms/text'
 import { BellIcon, CaretUpDownIcon, GearIcon, SignOutIcon } from '@/shared/ui/icons'
 import {
   DropdownMenu,
@@ -34,10 +35,12 @@ function UserIdentity({ user }: Readonly<{ user: SidebarUser }>) {
         </Avatar.Fallback>
       </Avatar>
       <div className="grid flex-1 text-left leading-tight">
-        <span className="truncate text-sm font-bold tracking-[-0.01em] text-foreground">
+        <Text variant="bold" className="truncate tracking-[-0.01em]">
           {user.name}
-        </span>
-        <span className="truncate text-[11px] text-muted-foreground">{user.email}</span>
+        </Text>
+        <Text variant="fine" className="truncate">
+          {user.email}
+        </Text>
       </div>
     </>
   )

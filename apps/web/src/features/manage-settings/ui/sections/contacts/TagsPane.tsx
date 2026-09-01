@@ -3,12 +3,12 @@
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon, TagIcon } from '@/shared/ui/icons'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import { useTagsPane } from '../../../model/useTagsPane'
 
@@ -30,16 +30,16 @@ export function TagsPane() {
             entities: terms.lowerPlural,
           })}
         </Text>
-        <Button
+        <PillButton
           variant="outline"
-          size="sm"
+          size="xs"
           className="shrink-0 gap-1.5"
           disabled={pane.isPending}
           onClick={pane.editor.openCreate}
         >
           <PlusIcon className="size-3.5" />
           {t('settings.tags.add')}
-        </Button>
+        </PillButton>
       </div>
 
       {!pane.isPending && pane.tags.length === 0 && (
@@ -48,10 +48,10 @@ export function TagsPane() {
           title={t('settings.tags.emptyTitle')}
           description={t('settings.tags.emptyDescription', { entities: terms.lowerPlural })}
         >
-          <Button size="sm" className="gap-1.5" onClick={pane.editor.openCreate}>
+          <PillButton size="xs" className="gap-1.5" onClick={pane.editor.openCreate}>
             <PlusIcon className="size-3.5" />
             {t('settings.tags.emptyCta')}
-          </Button>
+          </PillButton>
         </EmptyState>
       )}
 

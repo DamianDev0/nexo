@@ -3,8 +3,8 @@
 import { THEME_MODE_OPTIONS } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
-import { Label } from '@/shared/ui/shadcn/label'
 
 import type { ThemeMode } from '../../model/types'
 
@@ -18,9 +18,7 @@ export function ModeSection({ darkMode, onDarkModeChange }: Readonly<ModeSection
 
   return (
     <div className="px-4 py-4">
-      <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-        {t('onboarding.steps.appearance.colorMode')}
-      </Label>
+      <FieldLabel variant="section">{t('onboarding.steps.appearance.colorMode')}</FieldLabel>
       <SegmentedControl
         className="mt-2"
         value={darkMode}

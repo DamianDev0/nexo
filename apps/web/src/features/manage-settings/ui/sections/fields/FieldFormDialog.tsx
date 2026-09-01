@@ -4,16 +4,11 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FieldError } from '@/shared/ui/molecules/field-error'
-import { Button } from '@/shared/ui/shadcn/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/shadcn/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/shadcn/dialog'
 import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
@@ -42,7 +37,7 @@ function CheckRow({ label, hint, checked, onChange }: Readonly<CheckRowProps>) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2.5">
       <span className="flex min-w-0 flex-col">
-        <span className="text-sm text-foreground">{label}</span>
+        <Text className="text-foreground">{label}</Text>
         <Text variant="hint">{hint}</Text>
       </span>
       <AnimatedToggle size="sm" checked={checked} label={label} onChange={onChange} />
@@ -94,7 +89,9 @@ export function FieldFormDialog({
             <Controller
               control={form.control}
               name="type"
-              render={({ field }) => <FieldTypePicker value={field.value} onChange={field.onChange} />}
+              render={({ field }) => (
+                <FieldTypePicker value={field.value} onChange={field.onChange} />
+              )}
             />
           )}
 
@@ -131,12 +128,12 @@ export function FieldFormDialog({
           )}
 
           <DialogActions>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            <PillButton variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
-            </Button>
-            <Button type="submit" disabled={!form.canSubmit}>
+            </PillButton>
+            <PillButton type="submit" size="sm" disabled={!form.canSubmit}>
               {t(form.isEdit ? 'common.save' : 'common.create')}
-            </Button>
+            </PillButton>
           </DialogActions>
         </form>
       </DialogContent>

@@ -1,5 +1,6 @@
 import { getT } from '@/shared/i18n/server'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { CheckIcon, TrayIcon } from '@/shared/ui/icons'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 
@@ -16,7 +17,9 @@ export async function DashboardView() {
         <h1 className="text-5xl font-black leading-[0.98] tracking-[-0.045em] text-foreground">
           {t('dashboard.greeting')}, {firstName}.
         </h1>
-        <p className="mt-3 text-lg text-body">{t('dashboard.subtitle')}</p>
+        <Text as="p" variant="lead" className="mt-3">
+          {t('dashboard.subtitle')}
+        </Text>
       </header>
 
       <EmptyState
@@ -38,12 +41,12 @@ export async function DashboardView() {
                 <CheckIcon className="size-3" />
               </span>
               <div>
-                <p className="text-sm font-semibold leading-snug text-foreground">
+                <Text as="p" variant="strong" className="font-semibold leading-snug">
                   {t(`dashboard.tips.${key}Title`)}
-                </p>
-                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                </Text>
+                <Text as="p" variant="hint" className="mt-0.5 leading-relaxed">
                   {t(`dashboard.tips.${key}Body`)}
-                </p>
+                </Text>
               </div>
             </li>
           ))}

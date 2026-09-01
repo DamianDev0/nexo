@@ -3,8 +3,8 @@
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PlusIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import { useStageEditor } from '../../../model/useStageEditor'
 
@@ -38,17 +38,17 @@ export function StageEditor({ pipeline, onSave }: Readonly<StageEditorProps>) {
       ))}
 
       <div className="mt-1 flex items-center gap-2">
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={editor.add}>
+        <PillButton variant="outline" size="xs" className="gap-1.5" onClick={editor.add}>
           <PlusIcon className="size-3.5" />
           {t('settings.pipelines.addStage')}
-        </Button>
+        </PillButton>
         <div className="flex-1" />
-        <Button variant="ghost" size="sm" disabled={!editor.dirty} onClick={editor.discard}>
+        <PillButton variant="ghost" size="xs" disabled={!editor.dirty} onClick={editor.discard}>
           {t('settings.discard')}
-        </Button>
-        <Button size="sm" disabled={!editor.dirty || !editor.valid} onClick={editor.save}>
+        </PillButton>
+        <PillButton size="xs" disabled={!editor.dirty || !editor.valid} onClick={editor.save}>
           {t('settings.pipelines.saveStages')}
-        </Button>
+        </PillButton>
       </div>
     </div>
   )

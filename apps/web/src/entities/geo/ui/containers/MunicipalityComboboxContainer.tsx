@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
 
 import { useMunicipalityFetcher } from '../../query/useMunicipalityFetcher'
@@ -22,9 +23,9 @@ function renderMunicipality(municipality: Municipality) {
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2">
       <span className="truncate">{municipality.name}</span>
-      <span className="ml-auto shrink-0 text-xs text-muted-foreground">
+      <Text variant="hint" className="ml-auto shrink-0">
         {municipality.department}
-      </span>
+      </Text>
     </span>
   )
 }

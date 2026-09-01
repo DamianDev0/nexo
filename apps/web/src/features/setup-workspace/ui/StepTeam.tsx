@@ -1,8 +1,8 @@
 import { INVITE_ROLE_OPTIONS, USER_ROLE_LABELS } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PlusIcon, XIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 import {
   Select,
   SelectContent,
@@ -67,29 +67,28 @@ export function StepTeam({ data, actions, nav }: Readonly<StepTeamProps>) {
               </SelectContent>
             </Select>
             {data.length > 1 && (
-              <Button
-                type="button"
+              <PillButton
                 variant="outline"
-                size="icon"
+                size="sm"
                 onClick={() => actions.onRemove(inv.id)}
-                className="size-9 shrink-0 text-muted-foreground hover:border-destructive/50 hover:text-destructive"
+                className="w-9 px-0 shrink-0 text-muted-foreground hover:border-destructive/50 hover:text-destructive"
               >
                 <XIcon className="size-3.5" />
-              </Button>
+              </PillButton>
             )}
           </div>
         ))}
       </div>
 
-      <Button
-        type="button"
+      <PillButton
         variant="outline"
+        size="sm"
         onClick={actions.onAdd}
-        className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
+        className="mt-2 w-full justify-start border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
       >
         <PlusIcon className="size-3.5" />
         {t(`${s}.addMember`)}
-      </Button>
+      </PillButton>
     </WizardStep>
   )
 }

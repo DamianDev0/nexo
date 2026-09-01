@@ -2,6 +2,16 @@ import { cn } from '@/shared/lib'
 
 import type { ReactNode } from 'react'
 
+export function optionTileClass(selected: boolean, className?: string): string {
+  return cn(
+    'rounded-lg border transition-colors',
+    selected
+      ? 'border-primary bg-accent text-foreground'
+      : 'border-border text-muted-foreground hover:border-primary/50',
+    className,
+  )
+}
+
 interface OptionTileProps {
   readonly selected: boolean
   readonly onSelect: () => void
@@ -15,13 +25,7 @@ export function OptionTile({ selected, onSelect, children, className }: Readonly
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      className={cn(
-        'rounded-lg border transition-colors',
-        selected
-          ? 'border-primary bg-accent text-foreground'
-          : 'border-border text-muted-foreground hover:border-primary/50',
-        className,
-      )}
+      className={optionTileClass(selected, className)}
     >
       {children}
     </button>

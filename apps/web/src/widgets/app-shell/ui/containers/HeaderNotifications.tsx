@@ -9,11 +9,11 @@ import {
   useMarkNotificationRead,
   useUnreadNotifications,
 } from '@/entities/notification'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { BellIcon } from '@/shared/ui/icons'
 import { HeaderIconButton } from '@/shared/ui/molecules/header-icon-button'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { NotificationsCarousel } from '@/shared/ui/ruixen/notifications-carousel'
-import { Button } from '@/shared/ui/shadcn/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
 const MAX_BADGE_COUNT = 99
@@ -71,15 +71,15 @@ export function HeaderNotifications() {
           footer={
             unreadCount > 0 ? (
               <div className="border-t border-border/60 p-1.5">
-                <Button
+                <PillButton
                   variant="ghost"
-                  size="sm"
+                  size="xs"
                   disabled={isClearing}
                   onClick={() => markAllAsRead()}
-                  className="w-full text-xs font-medium text-muted-foreground hover:text-foreground"
+                  className="w-full gap-1.5 rounded-md px-3 text-xs font-medium text-muted-foreground hover:text-foreground"
                 >
                   {t('notifications.markAllRead')}
-                </Button>
+                </PillButton>
               </div>
             ) : null
           }

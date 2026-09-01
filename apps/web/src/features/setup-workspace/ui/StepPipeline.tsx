@@ -7,8 +7,8 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useDndReorder } from '@/shared/lib/hooks/useDndReorder'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PlusIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { SortableStage } from './pipeline/SortableStage'
@@ -84,15 +84,15 @@ export function StepPipeline({ data, actions, nav }: Readonly<StepPipelineProps>
         </DragOverlay>
       </DndContext>
 
-      <Button
-        type="button"
+      <PillButton
         variant="outline"
+        size="sm"
         onClick={actions.onAddStage}
-        className="mt-2 w-full justify-start gap-2 border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
+        className="mt-2 w-full justify-start border-dashed p-2.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary-deep dark:hover:text-primary"
       >
         <PlusIcon className="size-3.5" />
         {t(`${s}.addStage`)}
-      </Button>
+      </PillButton>
     </WizardStep>
   )
 }

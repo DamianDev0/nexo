@@ -1,20 +1,9 @@
+import type { AsyncOptionSource } from '@/shared/lib/hooks/useAsyncSelect'
 import type { ReactNode } from 'react'
 
-interface AsyncSelectSourceBase<T> {
-  readonly getValue: (option: T) => string
+export type AsyncSelectSource<T> = AsyncOptionSource<T> & {
   readonly renderOption: (option: T) => ReactNode
-  readonly filterFn?: (option: T, query: string) => boolean
 }
-
-export type AsyncSelectSource<T> = AsyncSelectSourceBase<T> &
-  (
-    | { readonly options: ReadonlyArray<T>; readonly key?: never; readonly fetcher?: never }
-    | {
-        readonly options?: never
-        readonly key: string
-        readonly fetcher: (query: string) => Promise<ReadonlyArray<T>>
-      }
-  )
 
 export interface AsyncSelectView {
   readonly display?: ReactNode

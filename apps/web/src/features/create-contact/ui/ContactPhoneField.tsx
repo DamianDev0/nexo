@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 import { COLOMBIA_FLAG_SRC, PHONE_PREFIX, WHATSAPP_ICON_SRC } from '@/shared/config/colombia'
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { Text } from '@/shared/ui/atoms/text'
 import { FieldError } from '@/shared/ui/molecules/field-error'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/shadcn/input-group'
 
@@ -50,7 +51,9 @@ export function ContactPhoneField({
                 height={16}
                 className={isWhatsapp ? 'size-4' : 'size-4 rounded-full'}
               />
-              <span className="text-xs font-semibold text-foreground/70">{PHONE_PREFIX}</span>
+              <Text variant="emphasis" className="text-foreground/70">
+                {PHONE_PREFIX}
+              </Text>
             </InputGroupAddon>
             <InputGroupInput
               className="text-sm tabular-nums"

@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { CaretUpDownIcon, PlusIcon } from '@/shared/ui/icons'
 import {
   DropdownMenu,
@@ -39,12 +40,12 @@ export function TeamSwitcher({ team }: Readonly<{ team: SidebarTeam }>) {
                 {teamInitial(team.name)}
               </span>
               <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate text-base font-black tracking-[-0.02em] text-foreground">
+                <Text variant="bold" className="truncate text-base font-black tracking-[-0.02em]">
                   {team.name}
-                </span>
-                <span className="truncate text-xs font-medium text-muted-foreground">
+                </Text>
+                <Text variant="hint" className="truncate font-medium">
                   {team.plan}
-                </span>
+                </Text>
               </div>
               <CaretUpDownIcon className="ml-auto size-4 text-faint group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
@@ -64,7 +65,9 @@ export function TeamSwitcher({ team }: Readonly<{ team: SidebarTeam }>) {
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
               <PlusIcon className="size-4" />
-              <span className="font-medium text-muted-foreground">{t('nav.addTeam')}</span>
+              <Text variant="muted" className="font-medium">
+                {t('nav.addTeam')}
+              </Text>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -3,8 +3,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { useModuleLabels } from '@/entities/nomenclature'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { MagnifyingGlassIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 import {
   CommandDialog,
   CommandEmpty,
@@ -25,18 +26,20 @@ export function HeaderSearch() {
 
   return (
     <>
-      <Button
-        type="button"
+      <PillButton
         variant="ghost"
+        size="sm"
         onClick={() => setOpen(true)}
         className="hidden h-9 w-64 justify-start gap-2 px-2.5 font-normal text-muted-foreground hover:bg-muted/60 md:flex lg:w-80"
       >
         <MagnifyingGlassIcon className="size-3.5" />
-        <span className="flex-1 text-left text-sm">{t('nav.search')}</span>
+        <Text variant="muted" className="flex-1 text-left">
+          {t('nav.search')}
+        </Text>
         <kbd className="pointer-events-none rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground">
           ⌘K
         </kbd>
-      </Button>
+      </PillButton>
 
       <CommandDialog
         open={open}
@@ -58,9 +61,9 @@ export function HeaderSearch() {
                   <item.icon />
                   <span>{moduleLabel(item.key, item.titleKey)}</span>
                   {!item.available && (
-                    <span className="ml-auto text-xs text-muted-foreground">
+                    <Text variant="hint" className="ml-auto">
                       {t('nav.comingSoon')}
-                    </span>
+                    </Text>
                   )}
                 </CommandItem>
               ))}

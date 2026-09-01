@@ -68,24 +68,30 @@ export function ContactFormFields({
         <ControlledField
           control={control}
           name="firstName"
-          label={t('contacts.form.firstName')}
-          placeholder={t('contacts.form.firstNamePlaceholder')}
-          required
+          field={{
+            label: t('contacts.form.firstName'),
+            placeholder: t('contacts.form.firstNamePlaceholder'),
+            required: true,
+          }}
         />
         <ControlledField
           control={control}
           name="lastName"
-          label={t('contacts.form.lastName')}
-          placeholder={t('contacts.form.lastNamePlaceholder')}
+          field={{
+            label: t('contacts.form.lastName'),
+            placeholder: t('contacts.form.lastNamePlaceholder'),
+          }}
         />
       </div>
       <ControlledField
         control={control}
         name="email"
-        type="email"
-        label={t('contacts.form.email')}
-        placeholder={t('contacts.form.emailPlaceholder')}
-        onBlur={() => onProbeField?.('email')}
+        field={{
+          label: t('contacts.form.email'),
+          type: 'email',
+          placeholder: t('contacts.form.emailPlaceholder'),
+        }}
+        actions={{ onBlur: () => onProbeField?.('email') }}
       />
       <ContactPhoneFields control={control} onPhoneBlur={() => onProbeField?.('phone')} />
       <Controller

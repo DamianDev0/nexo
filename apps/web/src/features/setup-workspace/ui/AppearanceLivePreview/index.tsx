@@ -59,9 +59,9 @@ export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewPr
             <div className="size-2 rounded-full bg-amber-400/90" />
             <div className="size-2 rounded-full bg-emerald-400/90" />
           </div>
-          <span className="text-[10px] font-medium tracking-wide text-muted-foreground/50">
+          <Text variant="micro" className="font-medium tracking-wide text-muted-foreground/50">
             app.nexo.com
-          </span>
+          </Text>
         </div>
 
         <div className="flex min-h-96">

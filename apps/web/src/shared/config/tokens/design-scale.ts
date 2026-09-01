@@ -66,18 +66,37 @@ export const ELEVATION_SCALE: ReadonlyArray<ScaleRow> = [
 export const MOTION_SCALE: ReadonlyArray<ScaleRow> = [
   {
     token: 'instant',
-    value: '120ms cubic-bezier(.25,.1,.25,1)',
+    value: '120ms ease (duration-120)',
     use: 'Hover, focus halo, checkbox.',
   },
   {
+    token: 'fast',
+    value: '180ms cubic-bezier(.25,.1,.25,1) (quickEase / subtleTween 140ms)',
+    use: 'Micro fades, chips, route content swap.',
+  },
+  {
     token: 'standard',
-    value: '200ms cubic-bezier(.25,.1,.25,1)',
-    use: 'Dropdowns, toasts, tab change.',
+    value: '200ms ease (duration-200); dialogs: open 250ms ease-out / close 150ms ease-in',
+    use: 'Dropdowns, dialogs, toasts, tab change.',
   },
   {
     token: 'deliberate',
-    value: '320ms cubic-bezier(.25,.1,.25,1)',
+    value: '350ms cubic-bezier(.25,.1,.25,1) (smoothEase, sheets)',
     use: 'Page transitions, sheets, wizard.',
   },
-  { token: 'spring', value: '260 / 28 / mass .8', use: 'Drag and reorder.' },
+  {
+    token: 'snappy spring',
+    value: 'duration .2 / bounce 0 (snappySpring)',
+    use: 'Count badges, chips add/remove.',
+  },
+  {
+    token: 'gooey spring',
+    value: 'duration .36 / bounce .24 (gooeySpring)',
+    use: 'Popovers with blur entrance.',
+  },
+  {
+    token: 'indicator spring',
+    value: 'duration .45 / bounce .18 (indicatorSpring)',
+    use: 'Active rails, tab underline.',
+  },
 ]

@@ -16,7 +16,9 @@ export function RolePermissionsMatrix() {
     <div className="flex flex-col gap-3">
       <div>
         <Text variant="emphasis">{t(`${s}.rolesAndPermissions`)}</Text>
-        <p className="mt-0.5 text-xs text-muted-foreground">{t(`${s}.permissionsHint`)}</p>
+        <Text as="p" variant="hint" className="mt-0.5">
+          {t(`${s}.permissionsHint`)}
+        </Text>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
@@ -36,9 +38,9 @@ export function RolePermissionsMatrix() {
             key={role}
             className="grid grid-cols-5 items-center gap-0 border-t border-border/60 px-4 py-2.5 first:border-t-0"
           >
-            <span className="text-xs font-medium text-foreground">
+            <Text variant="label">
               {t(`${s}.roles.${role}`, { defaultValue: USER_ROLE_LABELS[role] })}
-            </span>
+            </Text>
             {PERMISSION_COLUMNS.map((col) => {
               const allowed = hasPermission(role, col.resource, col.action)
               return (

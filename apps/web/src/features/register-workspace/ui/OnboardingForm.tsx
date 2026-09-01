@@ -47,33 +47,32 @@ export function OnboardingForm({
         <ControlledField
           control={control}
           name="businessName"
-          label={t('auth.businessName')}
-          placeholder="Nexo Acme"
-          onValueChange={onBusinessNameChange}
+          field={{ label: t('auth.businessName'), placeholder: 'Nexo Acme' }}
+          actions={{ onValueChange: onBusinessNameChange }}
         />
 
         <ControlledField
           control={control}
           name="slug"
-          label={t('auth.workspaceUrl')}
-          placeholder="nexo-acme"
+          field={{ label: t('auth.workspaceUrl'), placeholder: 'nexo-acme' }}
           hintFormat={(value) => `nexo.app/${value || 'your-slug'}`}
         />
 
         <ControlledField
           control={control}
           name="ownerFullName"
-          label={t('auth.fullName')}
-          placeholder="Acme Corporation"
+          field={{ label: t('auth.fullName'), placeholder: 'Acme Corporation' }}
         />
 
         <ControlledField
           control={control}
           name="ownerEmail"
-          label={t('auth.workEmail')}
-          type="email"
-          placeholder={t('auth.emailPlaceholder')}
-          autoComplete="email"
+          field={{
+            label: t('auth.workEmail'),
+            type: 'email',
+            placeholder: t('auth.emailPlaceholder'),
+            autoComplete: 'email',
+          }}
         />
 
         <PasswordField

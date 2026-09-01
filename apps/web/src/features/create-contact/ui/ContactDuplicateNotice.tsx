@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 
 interface ContactDuplicateNoticeProps {
   readonly notice: { readonly message: string; readonly canForce: boolean } | null
@@ -26,7 +27,7 @@ export function ContactDuplicateNotice({
       role="alert"
       className="mt-3.5 flex flex-col gap-2 rounded-md border border-border bg-surface-input px-3.5 py-2.5"
     >
-      <p className="text-sm text-body">{notice.message}</p>
+      <Text as="p">{notice.message}</Text>
       <div className="flex items-center justify-end gap-2">
         <PillButton variant="ghost" size="sm" onClick={onDismiss}>
           {t('contacts.duplicates.dismiss')}

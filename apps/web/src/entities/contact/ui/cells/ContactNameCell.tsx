@@ -1,9 +1,9 @@
 import { cn } from '@/shared/lib/cn'
 import { Avatar } from '@/shared/ui/atoms/avatar'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { SidebarSimpleIcon, TagIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import { CONTACT_NAME_TEXT, CONTACT_STRIP_BUTTON } from '../../config/contact-columns.constants'
 import { contactAvatarUrl, contactFullName } from '../../lib/contact-display'
@@ -45,15 +45,15 @@ function TagsStripAction({ contact, labels, tagsByName }: Omit<StripContext, 'ac
 
   return (
     <ContactTagsHoverCard tags={tags} labels={labels.tags} byName={tagsByName}>
-      <Button
+      <PillButton
         variant="ghost"
-        size="icon-xs"
+        size="xs"
         aria-label={labels.tags.title}
-        className={CONTACT_STRIP_BUTTON}
+        className={cn('w-8 px-0', CONTACT_STRIP_BUTTON)}
       >
         <TagIcon className="size-3.5" />
         <CountBadge count={tags.length} />
-      </Button>
+      </PillButton>
     </ContactTagsHoverCard>
   )
 }
@@ -64,15 +64,15 @@ function ActionStrip({ contact, labels, actions, tagsByName }: StripContext) {
       <TagsStripAction contact={contact} labels={labels} tagsByName={tagsByName} />
       {actions.onPreview && (
         <HintTooltip asChild hint={labels.preview}>
-          <Button
+          <PillButton
             variant="ghost"
-            size="icon-xs"
+            size="xs"
             aria-label={labels.preview}
             onClick={() => actions.onPreview?.(contact)}
-            className={CONTACT_STRIP_BUTTON}
+            className={cn('w-8 px-0', CONTACT_STRIP_BUTTON)}
           >
             <SidebarSimpleIcon className="size-3.5" />
-          </Button>
+          </PillButton>
         </HintTooltip>
       )}
     </span>
@@ -89,8 +89,9 @@ export function ContactNameCell({
   const name = contactFullName(contact)
 
   const nameNode: ReactNode = actions?.onOpen ? (
-    <Button
+    <PillButton
       variant="ghost"
+      size="sm"
       onClick={() => actions.onOpen?.(contact)}
       className={cn(
         'h-auto min-w-0 justify-start rounded-sm p-0 hover:bg-transparent hover:underline',
@@ -98,7 +99,7 @@ export function ContactNameCell({
       )}
     >
       <TruncateTip>{name}</TruncateTip>
-    </Button>
+    </PillButton>
   ) : (
     <TruncateTip className={CONTACT_NAME_TEXT}>{name}</TruncateTip>
   )

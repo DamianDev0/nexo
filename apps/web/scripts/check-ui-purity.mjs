@@ -13,12 +13,13 @@ const FORBIDDEN_IMPORTS = [
 ]
 
 const UI_SEGMENT = /src\/(features|entities|widgets|views)\/[^/]+\/ui\//
+const SHARED_UI = /src\/shared\/ui\//
 const CONTAINERS = /\/ui\/containers\//
 
 const violations = []
 for (const file of walkSource()) {
   const rel = relPath(file)
-  if (!UI_SEGMENT.test(rel) || CONTAINERS.test(rel)) continue
+  if (!(UI_SEGMENT.test(rel) || SHARED_UI.test(rel)) || CONTAINERS.test(rel)) continue
   readLines(file).forEach((line, index) => {
     if (!/^\s*import\b|require\(/.test(line)) return
     for (const rule of FORBIDDEN_IMPORTS) {

@@ -9,6 +9,7 @@ import { Avatar } from '@/shared/ui/atoms/avatar'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import {
   Sheet,
@@ -68,15 +69,13 @@ export function ContactPreviewSheet({
             </span>
           </span>
           <span className="flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1.5 text-sm text-body">
+            <Text variant="body" className="inline-flex items-center gap-1.5">
               {status?.color && <ColorDot color={status.color} />}
               {status?.label ?? contact.status}
               {contact.statusChangedAt && (
-                <span className="text-xs text-faint">
-                  {timeAgo(contact.statusChangedAt, i18n.language)}
-                </span>
+                <Text variant="faint">{timeAgo(contact.statusChangedAt, i18n.language)}</Text>
               )}
-            </span>
+            </Text>
             <BadgeSoft tone="outline">
               {taxonomy.lifecycleByKey.get(contact.lifecycleStage)?.label ?? contact.lifecycleStage}
             </BadgeSoft>
@@ -105,7 +104,7 @@ export function ContactPreviewSheet({
             </span>
           )}
 
-          <span className="mt-5 flex flex-col gap-1 border-t border-border pt-4 text-xs text-muted-foreground">
+          <Text variant="hint" className="mt-5 flex flex-col gap-1 border-t border-border pt-4">
             {contact.lastContactedAt && (
               <HintTooltip asChild hint={formatDateTimeCO(contact.lastContactedAt)}>
                 <span>
@@ -120,7 +119,7 @@ export function ContactPreviewSheet({
                 when: timeAgo(contact.createdAt, i18n.language),
               })}
             </span>
-          </span>
+          </Text>
         </div>
 
         {onEdit && (

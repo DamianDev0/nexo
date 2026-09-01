@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { MAP_GLOW_DARK, MAP_GLOW_LIGHT } from '@/shared/config/tokens/effects'
 import { StaticNoise } from '@/shared/ui/atoms/static-noise'
+import { Text } from '@/shared/ui/atoms/text'
 
 const ColombiaMap = dynamic(
   () => import('./containers/ColombiaMapContainer').then((m) => m.ColombiaMapContainer),
@@ -37,11 +38,11 @@ export function OnboardingBranding() {
           {t('onboarding.branding.title')}{' '}
           <em className="italic text-foreground/35">{t('onboarding.branding.titleAccent')}</em>
         </h2>
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+        <Text as="p" variant="hint" className="mt-2 leading-relaxed">
           {t('onboarding.branding.line1')}
           <br />
           {t('onboarding.branding.line2')}
-        </p>
+        </Text>
       </div>
     </div>
   )

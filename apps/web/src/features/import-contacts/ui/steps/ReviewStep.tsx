@@ -5,12 +5,13 @@ import { useTranslation } from 'react-i18next'
 
 import { useEntityLabels } from '@/entities/nomenclature'
 import { Note } from '@/shared/ui/atoms/note'
+import { Text } from '@/shared/ui/atoms/text'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
+import { StatTile } from '@/shared/ui/molecules/stat-tile'
 
 import { IMPORT_ISSUES_SHOWN, IMPORT_ISSUE_FILTERS } from '../../config/import-contacts.constants'
 import { filterIssues } from '../../lib/import-issues'
 import { IssueList } from '../IssueList'
-import { StatTile } from '../StatTile'
 
 import type { ImportIssueFilter } from '../../model/types/import.types'
 import type { DuplicateStrategy, ValidationReport } from '@repo/shared-types'
@@ -66,11 +67,11 @@ export function ReviewStep({ report, strategy }: Readonly<ReviewStepProps>) {
           <IssueList issues={issues.slice(0, IMPORT_ISSUES_SHOWN)} />
 
           {(issues.length > IMPORT_ISSUES_SHOWN || report.truncatedIssues) && (
-            <span className="text-xs text-faint">
+            <Text variant="hint" className="text-faint">
               {t('contacts.import.review.truncated', {
                 shown: Math.min(issues.length, IMPORT_ISSUES_SHOWN),
               })}
-            </span>
+            </Text>
           )}
         </span>
       )}

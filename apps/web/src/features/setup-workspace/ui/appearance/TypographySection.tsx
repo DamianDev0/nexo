@@ -3,8 +3,8 @@
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
-import { Label } from '@/shared/ui/shadcn/label'
 import {
   Select,
   SelectContent,
@@ -50,9 +50,7 @@ export function TypographySection({ data, actions }: Readonly<TypographySectionP
   return (
     <>
       <div className="px-4 py-4">
-        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-          {t(`${s}.font`, 'Font')}
-        </Label>
+        <FieldLabel variant="section">{t(`${s}.font`, 'Font')}</FieldLabel>
         <Select value={data.fontFamily} onValueChange={actions.onFontFamilyChange}>
           <SelectTrigger
             className="mt-2 h-8 w-full text-sm"
@@ -76,9 +74,7 @@ export function TypographySection({ data, actions }: Readonly<TypographySectionP
       </div>
 
       <div className="px-4 py-4">
-        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-          {t(`${s}.corners`, 'Corners')}
-        </Label>
+        <FieldLabel variant="section">{t(`${s}.corners`, 'Corners')}</FieldLabel>
         <SegmentedControl
           className="mt-2"
           value={data.borderRadius}
@@ -98,9 +94,7 @@ export function TypographySection({ data, actions }: Readonly<TypographySectionP
       </div>
 
       <div className="px-4 py-4">
-        <Label className="text-[11px] font-semibold tracking-wide text-muted-foreground">
-          {t(`${s}.density`, 'Density')}
-        </Label>
+        <FieldLabel variant="section">{t(`${s}.density`, 'Density')}</FieldLabel>
         <SegmentedControl
           className="mt-2"
           value={data.density}

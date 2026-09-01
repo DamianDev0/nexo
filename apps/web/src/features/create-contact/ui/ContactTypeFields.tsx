@@ -49,9 +49,13 @@ export function ContactTypeFields({ control, choices }: Readonly<ContactTypeFiel
             <ControlledField
               control={control}
               name="typeLabel"
-              label={t('contacts.form.typeOtherLabel')}
-              placeholder={t('contacts.form.typeOtherPlaceholder', { entity: terms.lowerSingular })}
-              required
+              field={{
+                label: t('contacts.form.typeOtherLabel'),
+                placeholder: t('contacts.form.typeOtherPlaceholder', {
+                  entity: terms.lowerSingular,
+                }),
+                required: true,
+              }}
             />
           </motion.div>
         )}

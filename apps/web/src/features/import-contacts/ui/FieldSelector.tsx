@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { CaretDownIcon, CheckIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
 import {
   Command,
   CommandEmpty,
@@ -37,13 +38,14 @@ export function FieldSelector({ fields, value, label, onSelect }: Readonly<Field
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
+        <PillButton
           variant="outline"
+          size="sm"
           role="combobox"
           aria-expanded={open}
           aria-label={label}
           className={cn(
-            'h-9 w-52 shrink-0 justify-between gap-2 font-normal',
+            'w-52 shrink-0 justify-between font-normal',
             !selected && 'text-muted-foreground',
           )}
         >
@@ -51,7 +53,7 @@ export function FieldSelector({ fields, value, label, onSelect }: Readonly<Field
             {selected ? fieldLabel(t, selected) : t('contacts.import.map.ignore')}
           </span>
           <CaretDownIcon className="size-3.5 shrink-0 opacity-50" />
-        </Button>
+        </PillButton>
       </PopoverTrigger>
 
       <PopoverContent align="end" className="w-64 p-0">
@@ -67,9 +69,9 @@ export function FieldSelector({ fields, value, label, onSelect }: Readonly<Field
                   setOpen(false)
                 }}
               >
-                <span className="flex-1 text-muted-foreground">
+                <Text variant="muted" className="flex-1">
                   {t('contacts.import.map.ignore')}
-                </span>
+                </Text>
                 {!selected && <CheckIcon className="size-4" />}
               </CommandItem>
 

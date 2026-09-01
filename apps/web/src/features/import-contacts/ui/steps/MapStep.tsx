@@ -73,11 +73,11 @@ export function MapStep({ analysis, data, onRemap }: Readonly<MapStepProps>) {
       </div>
 
       {data.missingFields.length > 0 && (
-        <p role="alert" className="text-sm text-destructive">
+        <Text as="p" role="alert" className="text-destructive">
           {t('contacts.import.map.missing', {
             fields: data.missingFields.map((field) => fieldLabel(t, field)).join(', '),
           })}
-        </p>
+        </Text>
       )}
 
       <div className="flex flex-col gap-2">

@@ -3,6 +3,10 @@ import { THEME_PRESETS } from '../config/appearance.constants'
 import type { AppearanceFormValues, ThemePreset } from '../model/types'
 import type { ThemeTypography } from '@repo/shared-types'
 
+export function findPresetByKey(key: string) {
+  return THEME_PRESETS.find((preset) => preset.key === key)
+}
+
 export function matchingPresetKey(values: {
   primaryColor: string
   fontFamily: ThemeTypography['fontFamily']

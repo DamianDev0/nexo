@@ -102,6 +102,12 @@ export const gooeySpring = {
   duration: 0.36,
 }
 
+export const snappySpring = {
+  type: 'spring' as const,
+  duration: 0.2,
+  bounce: 0,
+}
+
 export const subtlePopover: Variants = {
   initial: { opacity: 0, scale: 0.97 },
   animate: { opacity: 1, scale: 1 },

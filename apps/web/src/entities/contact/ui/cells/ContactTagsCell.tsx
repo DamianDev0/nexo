@@ -1,8 +1,9 @@
 import { cn } from '@/shared/lib/cn'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { Text } from '@/shared/ui/atoms/text'
 import { HintContent } from '@/shared/ui/molecules/hint-content'
 import { DataTable } from '@/shared/ui/organisms/data-table'
-import { Button } from '@/shared/ui/shadcn/button'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/shared/ui/shadcn/hover-card'
 import { Tooltip, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
@@ -23,7 +24,9 @@ function TagRow({ name, meta }: Readonly<{ name: string; meta?: Tag }>) {
   const label: ReactNode = (
     <span className="flex min-w-0 cursor-pointer items-center gap-2">
       <ColorDot color={meta?.color ?? ''} className={meta?.color ? undefined : 'bg-faint'} />
-      <span className="truncate text-sm text-body">{name}</span>
+      <Text variant="body" className="truncate">
+        {name}
+      </Text>
     </span>
   )
 
@@ -53,7 +56,9 @@ export function ContactTagsHoverCard({
     <HoverCard openDelay={150} closeDelay={100}>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
       <HoverCardContent align="start" className="w-56 p-2">
-        <p className="px-1.5 pb-1 text-xs font-medium text-muted-foreground">{labels.title}</p>
+        <Text as="p" variant="hint" className="px-1.5 pb-1 font-medium">
+          {labels.title}
+        </Text>
         <span className="flex max-h-56 flex-col overflow-y-auto">
           {tags.map((tag) => (
             <TagRow key={tag} name={tag} meta={byName?.get(tag.toLowerCase())} />
@@ -102,14 +107,14 @@ export function ContactTagsCell({ tags, labels, byName }: Readonly<ContactTagsCe
 
   return (
     <ContactTagsHoverCard tags={tags} labels={labels} byName={byName}>
-      <Button
+      <PillButton
         variant="ghost"
         size="xs"
         aria-label={labels.title}
         className={cn(CONTACT_TAG_CHIP, 'shrink-0 cursor-pointer hover:bg-accent')}
       >
         {labels.count(tags.length)}
-      </Button>
+      </PillButton>
     </ContactTagsHoverCard>
   )
 }

@@ -3,12 +3,11 @@
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
-import { CaretDownIcon, MagnifyingGlassIcon } from '@/shared/ui/icons'
+import { CaretDownIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { GROOVY_ITEM, GROOVY_ITEM_IDLE } from '@/shared/ui/molecules/groovy-popover/constants'
+import { SearchableCommand } from '@/shared/ui/molecules/searchable-command'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Command, CommandEmpty, CommandList } from '@/shared/ui/shadcn/command'
-import { SmoothInput } from '@/shared/ui/smoothui/input'
 
 import { useQuickFilter } from '../model/use-quick-filter'
 
@@ -55,48 +54,44 @@ export function QuickFilter({ filter, onToggle, onClear }: Readonly<QuickFilterP
       </GroovyPopover.Anchor>
 
       <GroovyPopover.Content align="end" autoFocusContent className="w-64 p-0">
-        <Command
-          shouldFilter={false}
-          value={state.highlightedValue}
-          onValueChange={state.setHighlighted}
+        <SearchableCommand
+          search={
+            state.searchable
+              ? {
+                  value: state.term,
+                  onChange: state.setTerm,
+                  placeholder: t('common.filters.searchOption'),
+                }
+              : undefined
+          }
+          highlight={{ value: state.highlightedValue, onChange: state.setHighlighted }}
+          view={{
+            empty: t('common.noResults'),
+            listClassName: 'max-h-49 scroll-py-1.5 p-1.5 **:[[cmdk-list-sizer]]:space-y-1',
+          }}
+          footer={
+            state.active && (
+              <div className="border-t border-border p-1">
+                <Button
+                  variant="ghost"
+                  onClick={onClear}
+                  className={cn(GROOVY_ITEM, GROOVY_ITEM_IDLE, 'h-auto w-full text-xs')}
+                >
+                  {t('common.filters.clearOne')}
+                </Button>
+              </div>
+            )
+          }
         >
-          {state.searchable && (
-            <div className="relative border-b border-border">
-              <MagnifyingGlassIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-              <SmoothInput
-                value={state.term}
-                onChange={(event) => state.setTerm(event.target.value)}
-                placeholder={t('common.filters.searchOption')}
-                className="h-9 rounded-b-none border-none pl-8.5 focus-visible:ring-0"
-              />
-            </div>
-          )}
-          <CommandList className="max-h-49 scroll-py-1.5 p-1.5 scroll-smooth scrollbar-hidden **:[[cmdk-list-sizer]]:space-y-1">
-            <CommandEmpty className="px-2.5 py-4 text-center text-sm text-muted-foreground">
-              {t('common.noResults')}
-            </CommandEmpty>
-            {state.visible.map((option) => (
-              <OptionRow
-                key={option.value}
-                option={option}
-                checked={filter.selected.includes(option.value)}
-                onToggle={() => onToggle(option.value)}
-              />
-            ))}
-          </CommandList>
-
-          {state.active && (
-            <div className="border-t border-border p-1">
-              <Button
-                variant="ghost"
-                onClick={onClear}
-                className={cn(GROOVY_ITEM, GROOVY_ITEM_IDLE, 'h-auto w-full text-xs')}
-              >
-                {t('common.filters.clearOne')}
-              </Button>
-            </div>
-          )}
-        </Command>
+          {state.visible.map((option) => (
+            <OptionRow
+              key={option.value}
+              option={option}
+              checked={filter.selected.includes(option.value)}
+              onToggle={() => onToggle(option.value)}
+            />
+          ))}
+        </SearchableCommand>
       </GroovyPopover.Content>
     </GroovyPopover>
   )

@@ -8,7 +8,7 @@ import { cn } from '@/shared/lib/cn'
 import { DotsSixVerticalIcon, LockIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Button } from '@/shared/ui/shadcn/button'
-import { Switch } from '@/shared/ui/shadcn/switch'
+import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 
 import type { ColumnEditorItem } from '../model/use-column-editor'
 
@@ -65,11 +65,11 @@ export function ColumnEditorRow({ item, onToggle }: Readonly<ColumnEditorRowProp
           </span>
         </HintTooltip>
       ) : (
-        <Switch
+        <AnimatedToggle
           size="sm"
           checked={item.visible}
-          aria-label={item.label}
-          onCheckedChange={(checked) => onToggle(item.id, checked)}
+          label={item.label}
+          onChange={(checked) => onToggle(item.id, checked)}
         />
       )}
     </li>

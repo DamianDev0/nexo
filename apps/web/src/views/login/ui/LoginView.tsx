@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { LoginForm, useLoginForm } from '@/features/login'
 import { usePasswordToggle } from '@/shared/lib/hooks/usePasswordToggle'
+import { Text } from '@/shared/ui/atoms/text'
 import { AuthSplitView } from '@/widgets/auth-shell'
 
 import { LoginBranding } from './LoginBranding'
@@ -27,7 +28,9 @@ export function LoginView() {
           {t('auth.mobileHeadline')}{' '}
           <em className="italic text-foreground/35">{t('auth.mobileHeadlineEm')}</em>
         </h2>
-        <p className="text-xs leading-relaxed text-muted-foreground">{t('auth.mobileSubline')}</p>
+        <Text as="p" variant="hint" className="leading-relaxed">
+          {t('auth.mobileSubline')}
+        </Text>
       </div>
     </AuthSplitView>
   )

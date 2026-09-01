@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { CaretLeftIcon, CaretRightIcon } from '@/shared/ui/icons'
 import { SubmitButton } from '@/shared/ui/molecules/submit-button'
-import { Button } from '@/shared/ui/shadcn/button'
 
 import type { ReactNode } from 'react'
 
@@ -42,11 +42,16 @@ export function WizardStep({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="px-8 pt-8 lg:px-12 lg:pt-10">
-        <span className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
+        <Text
+          variant="emphasis"
+          className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-accent-foreground"
+        >
           {header.badge}
-        </span>
+        </Text>
         <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{header.title}</h1>
-        <p className="mt-2 max-w-lg text-sm text-muted-foreground">{header.description}</p>
+        <Text as="p" variant="muted" className="mt-2 max-w-lg">
+          {header.description}
+        </Text>
       </div>
 
       <div
@@ -70,10 +75,10 @@ export function WizardStep({
         <Text variant="hint">{nav.footerNote}</Text>
         <div className="flex items-center gap-2">
           {nav.onBack && (
-            <Button variant="ghost" size="sm" onClick={nav.onBack}>
+            <PillButton variant="ghost" size="xs" onClick={nav.onBack}>
               <CaretLeftIcon />
               {t('common.back')}
-            </Button>
+            </PillButton>
           )}
           <SubmitButton size="sm" onSubmit={nav.onNext} isPending={nav.isPending}>
             {nav.isPending ? t('common.saving') : (nav.nextLabel ?? t('common.continue'))}

@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'motion/react'
+import { Popover as PopoverPrimitive } from 'radix-ui'
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 
 import {
@@ -11,7 +12,7 @@ import {
   useReducedTransition,
 } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/shared/ui/shadcn/popover'
+import { Popover, PopoverAnchor, PopoverTrigger } from '@/shared/ui/shadcn/popover'
 
 import { GROOVY_SIDE_OFFSET, GROOVY_SURFACE } from './constants'
 import { GroovyItem } from './item'
@@ -30,7 +31,7 @@ function useGroovyPopover(): GroovyPopoverContextValue {
   return ctx
 }
 
-interface GroovyPopoverRootProps {
+export interface GroovyPopoverRootProps {
   readonly open?: boolean
   readonly onOpenChange?: (open: boolean) => void
   readonly modal?: boolean
@@ -58,7 +59,7 @@ function GroovyPopoverRoot({
 
   return (
     <GroovyPopoverContext.Provider value={value}>
-      <Popover open={isOpen} onOpenChange={handleOpenChange} modal={modal}>
+      <Popover open={isOpen} onOpenChange={handleOpenChange} modal={modal && isOpen}>
         {children}
       </Popover>
     </GroovyPopoverContext.Provider>
@@ -73,7 +74,7 @@ function GroovyPopoverContent({
   subtle = false,
   ...props
 }: Readonly<
-  ComponentProps<typeof PopoverContent> & { autoFocusContent?: boolean; subtle?: boolean }
+  ComponentProps<typeof PopoverPrimitive.Content> & { autoFocusContent?: boolean; subtle?: boolean }
 >) {
   const { open } = useGroovyPopover()
   const transition = useReducedTransition(subtle ? subtleTween : gooeySpring)
@@ -81,24 +82,33 @@ function GroovyPopoverContent({
   return (
     <AnimatePresence>
       {open && (
-        <PopoverContent
-          asChild
-          forceMount
-          sideOffset={subtle ? 4 : sideOffset}
-          onOpenAutoFocus={autoFocusContent ? undefined : (event) => event.preventDefault()}
-          className={cn(GROOVY_SURFACE, subtle && 'rounded-lg', className)}
-          {...props}
-        >
-          <motion.div
-            variants={subtle ? subtlePopover : gooeyPopover}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={transition}
+        <PopoverPrimitive.Portal forceMount>
+          <PopoverPrimitive.Content
+            asChild
+            forceMount
+            data-slot="popover-content"
+            align="center"
+            sideOffset={subtle ? 4 : sideOffset}
+            onOpenAutoFocus={autoFocusContent ? undefined : (event) => event.preventDefault()}
+            className={cn(
+              'z-50 origin-(--radix-popover-content-transform-origin) text-popover-foreground outline-hidden',
+              GROOVY_SURFACE,
+              subtle && 'rounded-lg',
+              className,
+            )}
+            {...props}
           >
-            {children}
-          </motion.div>
-        </PopoverContent>
+            <motion.div
+              variants={subtle ? subtlePopover : gooeyPopover}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={transition}
+            >
+              {children}
+            </motion.div>
+          </PopoverPrimitive.Content>
+        </PopoverPrimitive.Portal>
       )}
     </AnimatePresence>
   )

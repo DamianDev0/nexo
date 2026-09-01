@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { PlusIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
@@ -40,9 +41,13 @@ export function HeaderQuickCreate() {
             </>
           }
         >
-          <p className="px-2 pb-2 pt-1 text-xs font-medium capitalize tracking-wider text-muted-foreground">
+          <Text
+            as="p"
+            variant="hint"
+            className="px-2 pb-2 pt-1 font-medium capitalize tracking-wider"
+          >
             {t('quickCreate.label')}
-          </p>
+          </Text>
           {items.map((item) => (
             <GroovyPopover.Item
               key={item.entity}
@@ -51,9 +56,9 @@ export function HeaderQuickCreate() {
                 label: item.label,
                 icon: item.icon,
                 trailing: item.available ? undefined : (
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
+                  <Text variant="fine" className="shrink-0">
                     {t('nav.comingSoon')}
-                  </span>
+                  </Text>
                 ),
               }}
               onSelect={() => onSelect(item.href)}

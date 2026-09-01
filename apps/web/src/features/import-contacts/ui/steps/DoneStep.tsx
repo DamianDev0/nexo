@@ -3,14 +3,14 @@
 import { useTranslation } from 'react-i18next'
 
 import { downloadCsv } from '@/shared/lib/download-csv'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { CheckIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
+import { StatTile } from '@/shared/ui/molecules/stat-tile'
 
 import { IMPORT_ISSUES_SHOWN } from '../../config/import-contacts.constants'
 import { issueReportCsv } from '../../lib/import-issues'
 import { IssueList } from '../IssueList'
-import { StatTile } from '../StatTile'
 
 import type { ImportIssue, ImportResult, ValidationReport } from '@repo/shared-types'
 
@@ -30,9 +30,9 @@ export function DoneStep({ result, report }: Readonly<DoneStepProps>) {
       </span>
 
       <span className="flex flex-col items-center gap-1 text-center">
-        <span className="text-lg font-semibold text-foreground">
+        <Text variant="lead" className="font-semibold text-foreground">
           {t('contacts.import.done.title')}
-        </span>
+        </Text>
         <Text variant="muted">
           {t('contacts.import.done.subtitle', {
             total: result.imported + result.updated + result.skipped,
@@ -52,15 +52,15 @@ export function DoneStep({ result, report }: Readonly<DoneStepProps>) {
             <Text variant="strong">
               {t('contacts.import.review.needsAttention', { count: issues.length })}
             </Text>
-            <Button
+            <PillButton
               variant="outline"
-              size="sm"
+              size="xs"
               onClick={() =>
                 downloadCsv(issueReportCsv(issues), t('contacts.import.done.reportName'))
               }
             >
               {t('contacts.import.done.downloadReport')}
-            </Button>
+            </PillButton>
           </span>
           <IssueList issues={issues.slice(0, IMPORT_ISSUES_SHOWN)} />
         </span>

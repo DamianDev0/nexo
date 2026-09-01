@@ -1,5 +1,6 @@
 'use client'
 
+import { Text } from '@/shared/ui/atoms/text'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
 interface OptionRowNameProps {
@@ -9,12 +10,12 @@ interface OptionRowNameProps {
 
 export function OptionRowName({ name, description }: Readonly<OptionRowNameProps>) {
   if (!description) {
-    return <span className="min-w-0 flex-1 truncate px-2 text-sm text-foreground">{name}</span>
+    return <Text className="min-w-0 flex-1 truncate px-2 text-foreground">{name}</Text>
   }
 
   return (
-    <span className="flex min-w-0 flex-1 px-2 text-sm text-foreground">
+    <Text className="flex min-w-0 flex-1 px-2 text-foreground">
       <HintTooltip hint={description}>{name}</HintTooltip>
-    </span>
+    </Text>
   )
 }

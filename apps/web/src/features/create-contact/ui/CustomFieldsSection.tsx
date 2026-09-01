@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
+import { Text } from '@/shared/ui/atoms/text'
 import { FieldError } from '@/shared/ui/molecules/field-error'
 
 import { CustomFieldInput } from './CustomFieldInput'
@@ -25,7 +26,9 @@ export function CustomFieldsSection({ data }: Readonly<CustomFieldsSectionProps>
 
   return (
     <section className="mt-5 flex flex-col gap-3 border-t border-border pt-4">
-      <p className="text-sm font-semibold text-foreground">{t('contacts.form.customFields')}</p>
+      <Text as="p" variant="strong" className="font-semibold">
+        {t('contacts.form.customFields')}
+      </Text>
       {data.defs.map((def) => (
         <div key={def.key} className="flex flex-col gap-1">
           <FieldLabel>

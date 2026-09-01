@@ -4,7 +4,7 @@ import { Slot } from 'radix-ui'
 import { cn } from '@/shared/lib'
 
 const pillButtonVariants = cva(
-  'inline-flex cursor-pointer items-center justify-center font-bold transition-colors duration-[120ms] disabled:cursor-not-allowed disabled:opacity-40',
+  'inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 font-bold whitespace-nowrap transition-colors duration-[120ms] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-40 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -13,8 +13,11 @@ const pillButtonVariants = cva(
         ink: 'bg-sidebar text-sidebar-foreground',
         secondary: 'bg-background text-foreground',
         tertiary: 'border border-foreground bg-card text-foreground',
+        outline: 'border border-border bg-card text-body hover:bg-muted',
         ghost: 'text-body hover:bg-muted',
         ghostDanger: 'text-muted-foreground hover:bg-destructive/10 hover:text-destructive',
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/30',
         icon: 'rounded-full border border-border-strong bg-card text-body',
       },
       size: {

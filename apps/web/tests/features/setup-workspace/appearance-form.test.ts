@@ -4,7 +4,11 @@ import {
   APPEARANCE_DEFAULT_VALUES,
   THEME_PRESETS,
 } from '@/features/setup-workspace/config/appearance.constants'
-import { matchingPresetKey, withPreset } from '@/features/setup-workspace/lib/appearance'
+import {
+  findPresetByKey,
+  matchingPresetKey,
+  withPreset,
+} from '@/features/setup-workspace/lib/appearance'
 
 describe('withPreset', () => {
   it('applies preset visuals while preserving branding fields', () => {
@@ -62,5 +66,16 @@ describe('matchingPresetKey', () => {
     if (!nexo) throw new Error('missing preset')
     const values = { ...withPreset(APPEARANCE_DEFAULT_VALUES, nexo), borderRadius: 'lg' as const }
     expect(matchingPresetKey(values)).toBeNull()
+  })
+})
+
+describe('findPresetByKey', () => {
+  it('returns the preset matching the key', () => {
+    const preset = findPresetByKey('nexo')
+    expect(preset?.key).toBe('nexo')
+  })
+
+  it('returns undefined for an unknown key', () => {
+    expect(findPresetByKey('nope')).toBeUndefined()
   })
 })

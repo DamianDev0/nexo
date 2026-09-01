@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib'
 import { Text } from '@/shared/ui/atoms/text'
 import { DotsSixVerticalIcon, LockIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
-import { Switch } from '@/shared/ui/shadcn/switch'
+import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 
 import { SIDEBAR_ICON_MAP } from '../../config/module-icons.constants'
 
@@ -75,17 +75,19 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
       <div className="flex-1">
         <Text variant="strong">{label}</Text>
         {module.required && (
-          <span className="ml-2 text-xs text-muted-foreground">({t(`${s}.required`)})</span>
+          <Text variant="hint" className="ml-2">
+            ({t(`${s}.required`)})
+          </Text>
         )}
       </div>
 
       {module.required ? (
         <LockIcon className="size-3.5 text-muted-foreground/50" />
       ) : (
-        <Switch
+        <AnimatedToggle
           checked={module.enabled}
-          onCheckedChange={() => actions.onToggle(module.key)}
-          aria-label={`Toggle ${label}`}
+          onChange={() => actions.onToggle(module.key)}
+          label={`Toggle ${label}`}
         />
       )}
     </div>

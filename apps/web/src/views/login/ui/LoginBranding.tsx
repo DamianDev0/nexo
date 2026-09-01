@@ -1,3 +1,5 @@
+import { Text } from '@/shared/ui/atoms/text'
+
 import { LoginOrb } from './LoginOrb'
 
 export function LoginBranding() {
@@ -11,11 +13,11 @@ export function LoginBranding() {
           <h2 className="text-3xl font-light text-foreground">
             Welcome back, <em className="italic text-foreground/35">let&apos;s close deals.</em>
           </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <Text as="p" variant="muted" className="leading-relaxed">
             Your team is waiting.
             <br />
             Pick up where you left off.
-          </p>
+          </Text>
         </div>
       </div>
     </div>

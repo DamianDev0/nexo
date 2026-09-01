@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { normalizeSearchText } from '@/shared/lib/search-text'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FieldError } from '@/shared/ui/molecules/field-error'
-import { Button } from '@/shared/ui/shadcn/button'
 import {
   Dialog,
   DialogContent,
@@ -98,16 +98,17 @@ export function ReassignOptionDialog({
           />
 
           <DialogActions>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            <PillButton variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
-            </Button>
-            <Button
+            </PillButton>
+            <PillButton
               type="submit"
               variant="destructive"
+              size="sm"
               disabled={!form.canSubmit || confirm.isPending}
             >
               {t('settings.reassign.confirm')}
-            </Button>
+            </PillButton>
           </DialogActions>
         </form>
       </DialogContent>

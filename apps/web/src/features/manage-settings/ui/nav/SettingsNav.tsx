@@ -6,9 +6,8 @@ import { useTranslation } from 'react-i18next'
 
 import { ROUTES } from '@/shared/config/routes'
 import { Text } from '@/shared/ui/atoms/text'
-import { CaretLeftIcon, MagnifyingGlassIcon, XIcon } from '@/shared/ui/icons'
-import { Button } from '@/shared/ui/shadcn/button'
-import { SmoothInput } from '@/shared/ui/smoothui/input'
+import { CaretLeftIcon } from '@/shared/ui/icons'
+import { SearchInput } from '@/shared/ui/molecules/search-input'
 
 import { isSectionActive } from '../../lib/settings-nav'
 import { useSettingsNavSearch } from '../../model/useSettingsNavSearch'
@@ -30,30 +29,17 @@ export function SettingsNav() {
         {t('settings.back')}
       </Link>
 
-      <div className="group relative">
-        <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 z-10 size-3.5 -translate-y-1/2 text-faint transition-colors group-focus-within:text-muted-foreground" />
-        <SmoothInput
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') setQuery('')
-          }}
-          placeholder={t('settings.searchPlaceholder')}
-          aria-label={t('settings.searchPlaceholder')}
-          className="h-8 border-transparent bg-muted/50 pl-8 pr-7 text-sm shadow-none hover:bg-muted/80 focus-visible:border-border focus-visible:bg-background focus-visible:ring-0 dark:bg-muted/30 dark:focus-visible:bg-input/30"
-        />
-        {query.length > 0 && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setQuery('')}
-            aria-label={t('common.clear')}
-            className="absolute right-1 top-1/2 z-10 size-6 -translate-y-1/2 text-muted-foreground"
-          >
-            <XIcon className="size-3" />
-          </Button>
-        )}
-      </div>
+      <SearchInput
+        value={query}
+        onChange={setQuery}
+        placeholder={t('settings.searchPlaceholder')}
+        clear={{ onClick: () => setQuery(''), label: t('common.clear') }}
+        classes={{
+          icon: 'size-3.5 text-faint transition-colors group-focus-within:text-muted-foreground',
+          input:
+            'h-8 border-transparent bg-muted/50 pl-8 pr-7 text-sm shadow-none hover:bg-muted/80 focus-visible:border-border focus-visible:bg-background focus-visible:ring-0 dark:bg-muted/30 dark:focus-visible:bg-input/30',
+        }}
+      />
 
       {groups.length === 0 && (
         <Text as="p" variant="muted" className="px-2.5">
