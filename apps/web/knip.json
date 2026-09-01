@@ -12,7 +12,7 @@
     "scripts/**/*.mjs"
   ],
   "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}", "e2e/**/*.ts", "scripts/**/*.mjs"],
-  "ignore": ["src/shared/ui/ruixen/toolbar-dock.tsx"],
+  "ignore": ["src/shared/ui/ruixen/*.tsx"],
   "ignoreDependencies": [
     "@repo/eslint-config",
     "@repo/typescript-config",
