@@ -1,10 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useEntityLabels } from '@/entities/nomenclature'
 import { PlusIcon } from '@/shared/ui/icons'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
@@ -15,23 +12,11 @@ import {
   QUICK_CREATE_PANEL_WIDTH,
   QUICK_CREATE_TRIGGER_SIZE,
 } from '../config/quick-create.constants'
-import { buildQuickCreateItems } from '../lib/quick-create-items'
+import { useQuickCreate } from '../model/useQuickCreate'
 
 export function HeaderQuickCreate() {
   const { t } = useTranslation()
-  const router = useRouter()
-  const entityLabel = useEntityLabels()
-  const [open, setOpen] = useState(false)
-
-  const items = buildQuickCreateItems(entityLabel)
-
-  const handleSelect = useCallback(
-    (href: string) => {
-      setOpen(false)
-      router.push(href)
-    },
-    [router],
-  )
+  const { open, setOpen, items, onSelect } = useQuickCreate()
 
   return (
     <HintTooltip asChild hint={t('quickCreate.label')} side="bottom">
@@ -71,7 +56,7 @@ export function HeaderQuickCreate() {
                   </span>
                 ),
               }}
-              onSelect={() => handleSelect(item.href)}
+              onSelect={() => onSelect(item.href)}
             />
           ))}
         </GooeyPopover>

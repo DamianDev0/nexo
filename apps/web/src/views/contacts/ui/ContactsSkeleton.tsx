@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
-import { readSkeletonHint, type ContactsSkeletonHint } from '@/entities/contact'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
+
+import { useSkeletonHint } from '../model/useSkeletonHint'
 
 const HEADER_TABS = [
   ['all', 'w-24'],
@@ -12,8 +11,6 @@ const HEADER_TABS = [
   ['qualified', 'w-20'],
   ['nurturing', 'w-20'],
 ] as const
-
-const DEFAULT_HINT: ContactsSkeletonHint = { widths: [40, 220, 150, 190, 130, 110], rows: 8 }
 
 interface SkeletonCell {
   readonly id: string
@@ -58,13 +55,7 @@ function SkeletonCells({
 }
 
 export function ContactsSkeleton() {
-  const [hint, setHint] = useState<ContactsSkeletonHint>(DEFAULT_HINT)
-
-  useEffect(() => {
-    const stored = readSkeletonHint()
-    if (stored) setHint(stored)
-  }, [])
-
+  const hint = useSkeletonHint()
   const cells = toCells(hint.widths)
 
   return (

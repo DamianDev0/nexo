@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { normalizeSearchText } from '@/shared/lib/search-text'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
@@ -44,7 +45,7 @@ export function TaxonomySelectField({
       options: choices,
       getValue: (choice) => choice.key,
       renderOption: renderChoice,
-      filterFn: (choice, query) => choice.label.toLowerCase().includes(query.toLowerCase()),
+      filterFn: (choice, query) => normalizeSearchText(choice.label).includes(query),
     }),
     [choices],
   )

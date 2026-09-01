@@ -1,0 +1,1 @@
+export const QUICK_FILTER_SEARCH_THRESHOLD = 8

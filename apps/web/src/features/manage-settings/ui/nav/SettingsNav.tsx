@@ -2,42 +2,23 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useModuleLabels } from '@/entities/nomenclature'
 import { ROUTES } from '@/shared/config/routes'
 import { Text } from '@/shared/ui/atoms/text'
 import { CaretLeftIcon, MagnifyingGlassIcon, XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 import { SmoothInput } from '@/shared/ui/smoothui/input'
 
-import { SETTINGS_GROUPS } from '../../config/settings-nav.constants'
-import { filterSettingsGroups } from '../../lib/filter-settings-nav'
 import { isSectionActive } from '../../lib/settings-nav'
+import { useSettingsNavSearch } from '../../model/useSettingsNavSearch'
 
 import { SettingsNavItem } from './SettingsNavItem'
 
-import type { SettingsNavLabels } from '../../lib/filter-settings-nav'
-
 export function SettingsNav() {
   const { t } = useTranslation()
-  const moduleLabel = useModuleLabels()
   const pathname = usePathname()
-  const [query, setQuery] = useState('')
-
-  const labels = useMemo<SettingsNavLabels>(
-    () => ({
-      section: (section) => moduleLabel(section.key, `settings.sections.${section.key}`),
-      child: (sectionKey, childKey) => t(`settings.children.${sectionKey}.${childKey}`),
-    }),
-    [moduleLabel, t],
-  )
-
-  const groups = useMemo(
-    () => filterSettingsGroups(SETTINGS_GROUPS, query, labels),
-    [query, labels],
-  )
+  const { query, setQuery, groups } = useSettingsNavSearch()
 
   return (
     <nav className="flex flex-col gap-6">

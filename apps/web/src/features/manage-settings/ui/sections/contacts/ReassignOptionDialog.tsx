@@ -4,6 +4,7 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
+import { normalizeSearchText } from '@/shared/lib/search-text'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
@@ -81,7 +82,7 @@ export function ReassignOptionDialog({
                     options: candidates,
                     getValue: (candidate) => candidate.key,
                     filterFn: (candidate, query) =>
-                      candidate.label.toLowerCase().includes(query.toLowerCase()),
+                      normalizeSearchText(candidate.label).includes(query),
                     renderOption: candidateOption,
                   }}
                   view={{
