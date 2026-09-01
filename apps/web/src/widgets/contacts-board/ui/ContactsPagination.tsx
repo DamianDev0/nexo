@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
 import { PAGE_SIZE_OPTIONS } from '@/shared/config/pagination'
+import { Text } from '@/shared/ui/atoms/text'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
 import { pageRange } from '../lib/page-range'
@@ -31,14 +32,14 @@ export function ContactsPagination({
 
   return (
     <div className="mt-auto flex shrink-0 items-center justify-between gap-4 px-7 py-1.5">
-      <span className="truncate text-xs tabular-nums text-muted-foreground">
+      <Text variant="hint" className="truncate tabular-nums">
         {t('contacts.pageRange', {
           from: range.from,
           to: range.to,
           total: range.total,
           entities: terms.lowerPlural,
         })}
-      </span>
+      </Text>
 
       <DataTable.Pagination
         label={t('common.pagination.pages')}

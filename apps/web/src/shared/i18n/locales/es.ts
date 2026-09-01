@@ -426,6 +426,7 @@ const es = {
       saved: '"{{name}}" guardada',
       updated: 'Lista actualizada',
       deleted: 'Lista eliminada',
+      menu: 'Opciones de la lista',
       nameRequired: 'Ponle un nombre a la lista',
       nameTooLong: 'Máximo 120 caracteres',
       descriptionTooLong: 'Máximo 300 caracteres',
@@ -437,6 +438,7 @@ const es = {
     searchPlaceholder: 'Nombre, email, teléfono o documento',
     lists: {
       all: 'Todos',
+      manage: 'Gestionar listas',
       new: 'Nuevo',
       descriptions: {
         all: 'Todos los {{entities}} de tu workspace.',

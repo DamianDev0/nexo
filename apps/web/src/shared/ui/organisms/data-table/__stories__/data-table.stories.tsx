@@ -99,7 +99,7 @@ function ContactsTable({ rows }: Readonly<{ rows: ReadonlyArray<ContactRow> }>) 
     <div className="flex h-136 min-h-0 flex-col">
       <DataTable.SmartLists
         data={{ items: SMART_LISTS, activeId: activeList }}
-        onSelect={setActiveList}
+        actions={{ onSelect: setActiveList }}
       />
       <div className="min-h-0 flex-1 px-4 pb-4 pt-1">
         <DataTable

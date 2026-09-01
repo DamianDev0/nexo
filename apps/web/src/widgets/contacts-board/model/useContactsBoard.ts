@@ -27,10 +27,16 @@ import { useBoardViews } from './useBoardViews'
 import { useContactRowActions } from './useContactRowActions'
 import { useSkeletonHintSync } from './useSkeletonHintSync'
 
-import type { ContactColumnDef, ContactListItem, ContactTableState } from '@repo/shared-types'
+import type {
+  ContactColumnDef,
+  ContactListItem,
+  ContactTableState,
+  ContactView,
+} from '@repo/shared-types'
 
 const NO_COLUMNS: ReadonlyArray<ContactColumnDef> = []
 const NO_TABLE_STATE: ContactTableState = {}
+const NO_VIEWS: ReadonlyArray<ContactView> = []
 
 export function useContactsBoard() {
   const { t, i18n } = useTranslation()
@@ -153,6 +159,7 @@ export function useContactsBoard() {
       advancedFields,
       viewSnapshot: boardViews.viewSnapshot,
       activeView: boardViews.activeView,
+      views: workspace.data?.views ?? NO_VIEWS,
       quickFilters: buildQuickFilterDefs(
         t,
         table.filters,

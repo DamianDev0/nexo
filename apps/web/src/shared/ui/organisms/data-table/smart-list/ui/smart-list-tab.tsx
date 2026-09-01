@@ -10,7 +10,9 @@ import { DotsSixVerticalIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Button } from '@/shared/ui/shadcn/button'
 
-import type { SmartListItem } from '../model/smart-list.types'
+import { SmartListTabMenu } from './smart-list-tab-menu'
+
+import type { SmartListItem, SmartListMenuAction } from '../model/smart-list.types'
 import type { KeyboardEvent } from 'react'
 
 export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
@@ -35,6 +37,8 @@ export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
 interface SmartListTabActions {
   readonly onSelect: (id: string) => void
   readonly onKeyDown: (event: KeyboardEvent<HTMLElement>) => void
+  readonly itemMenu?: (item: SmartListItem) => ReadonlyArray<SmartListMenuAction>
+  readonly menuLabel?: string
 }
 
 interface SmartListTabProps {
@@ -62,6 +66,9 @@ function SmartListTabBase({
     isDragging,
   } = useSortable({ id: item.id, disabled: !sortable })
 
+  const menuActions = actions.itemMenu?.(item) ?? []
+  const hasMenu = menuActions.length > 0
+
   const trigger = (
     <Button
       variant="ghost"
@@ -73,6 +80,7 @@ function SmartListTabBase({
       className={cn(
         'relative h-12 gap-2 whitespace-nowrap rounded-none px-4 text-sm hover:bg-transparent',
         sortable && 'pl-7 pr-5',
+        hasMenu && 'pr-8',
         active
           ? 'font-semibold text-foreground'
           : 'font-normal text-muted-foreground hover:text-body',
@@ -135,6 +143,7 @@ function SmartListTabBase({
           <DotsSixVerticalIcon aria-hidden className="size-3.5" />
         </span>
       )}
+      {hasMenu && <SmartListTabMenu item={item} actions={menuActions} label={actions.menuLabel} />}
       {item.description ? (
         <HintTooltip
           asChild

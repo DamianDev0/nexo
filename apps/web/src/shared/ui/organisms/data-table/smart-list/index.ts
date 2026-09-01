@@ -1,2 +1,2 @@
 export { DataTableSmartLists } from './ui/smart-lists'
-export type { SmartListItem } from './model/smart-list.types'
+export type { SmartListItem, SmartListMenuAction } from './model/smart-list.types'

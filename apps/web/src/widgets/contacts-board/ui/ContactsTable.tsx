@@ -19,10 +19,13 @@ import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 import { ContactsPagination } from './ContactsPagination'
 
 import type { ContactsBoard } from '../model/useContactsBoard'
+import type { ListMenu } from './containers/useListMenu'
 
-type ContactsTableProps = Readonly<Pick<ContactsBoard, 'instance' | 'lists' | 'state' | 'actions'>>
+type ContactsTableProps = Readonly<
+  Pick<ContactsBoard, 'instance' | 'lists' | 'state' | 'actions'> & { listMenu: ListMenu }
+>
 
-export function ContactsTable({ instance, lists, state, actions }: ContactsTableProps) {
+export function ContactsTable({ instance, lists, state, actions, listMenu }: ContactsTableProps) {
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -31,8 +34,12 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <DataTable.SmartLists
         data={lists}
-        onSelect={actions.onSelectList}
-        onReorder={actions.onReorderLists}
+        actions={{
+          onSelect: actions.onSelectList,
+          onReorder: actions.onReorderLists,
+          itemMenu: listMenu.itemMenu,
+          menuLabel: listMenu.menuLabel,
+        }}
         hotkeys
       >
         <SaveViewControls snapshot={state.viewSnapshot} activeView={state.activeView} />
@@ -47,6 +54,7 @@ export function ContactsTable({ instance, lists, state, actions }: ContactsTable
           {t('contacts.lists.new')}
         </PillButton>
       </DataTable.SmartLists>
+      {listMenu.dialogs}
 
       <DataTable.QuickFilters
         filters={state.quickFilters}

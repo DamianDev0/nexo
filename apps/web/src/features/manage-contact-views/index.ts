@@ -1,4 +1,5 @@
 export { SaveViewControls } from './ui/containers/SaveViewControls'
+export { useViewTabMenu } from './ui/containers/useViewTabMenu'
 export { useContactViewsSection } from './model/useViewLists'
 export { VIEW_LIST_PREFIX } from './config/view-list.constants'
 export type { ViewSnapshot } from './lib/view-snapshot'

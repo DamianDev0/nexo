@@ -24,7 +24,7 @@ export type {
 } from './model/types'
 
 export type { DataTableBulkConfig, DataTableBulkLabels } from './toolbar'
-export type { SmartListItem } from './smart-list'
+export type { SmartListItem, SmartListMenuAction } from './smart-list'
 export type { QuickFilterDef, QuickFilterOption } from './quick-filters'
 export { selectionColumn } from './selection'
 

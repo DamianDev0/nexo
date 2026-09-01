@@ -19,13 +19,19 @@ import { useSmartListViewport } from '../model/use-smart-list-viewport'
 
 import { SmartListTab, SmartListTabGhost } from './smart-list-tab'
 
-import type { SmartListsData } from '../model/smart-list.types'
+import type { SmartListItem, SmartListMenuAction, SmartListsData } from '../model/smart-list.types'
 import type { ReactNode } from 'react'
+
+export interface SmartListsActions {
+  readonly onSelect: (id: string) => void
+  readonly onReorder?: (ids: readonly string[]) => void
+  readonly itemMenu?: (item: SmartListItem) => ReadonlyArray<SmartListMenuAction>
+  readonly menuLabel?: string
+}
 
 interface SmartListsProps {
   readonly data: SmartListsData
-  readonly onSelect: (id: string) => void
-  readonly onReorder?: (ids: readonly string[]) => void
+  readonly actions: SmartListsActions
   readonly hotkeys?: boolean
   readonly children?: ReactNode
   readonly className?: string
@@ -33,12 +39,12 @@ interface SmartListsProps {
 
 export function DataTableSmartLists({
   data,
-  onSelect,
-  onReorder,
+  actions,
   hotkeys = false,
   children,
   className,
 }: Readonly<SmartListsProps>) {
+  const { onSelect, onReorder, itemMenu, menuLabel } = actions
   const instanceId = useId()
   const ids = useMemo(() => data.items.map((item) => item.id), [data.items])
   const hasPinned = data.items.some((item) => item.pinned)
@@ -46,7 +52,10 @@ export function DataTableSmartLists({
   const reorder = useSmartListReorder(data.items, onReorder)
   const viewport = useSmartListViewport(data.items.length, hasPinned)
   const onKeyDown = useSmartListNavigation(ids, data.activeId, onSelect)
-  const tabActions = useMemo(() => ({ onSelect, onKeyDown }), [onSelect, onKeyDown])
+  const tabActions = useMemo(
+    () => ({ onSelect, onKeyDown, itemMenu, menuLabel }),
+    [onSelect, onKeyDown, itemMenu, menuLabel],
+  )
 
   useSmartListReveal(viewport.ref, data.activeId, viewport.pinnedWidth)
   useSmartListHotkeys(ids, onSelect, hotkeys)
@@ -63,7 +72,7 @@ export function DataTableSmartLists({
       >
         <div
           ref={viewport.ref}
-          className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="min-w-0 flex-1 overflow-x-auto scrollbar-hidden"
           style={viewport.style}
         >
           <DndContext

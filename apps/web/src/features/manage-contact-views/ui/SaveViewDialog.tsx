@@ -7,12 +7,7 @@ import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { DialogActions } from '@/shared/ui/molecules/dialog-actions'
 import { FieldError } from '@/shared/ui/molecules/field-error'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/shadcn/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/shadcn/dialog'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
 
 import { useViewForm } from '../model/useViewForm'
@@ -45,9 +40,11 @@ function SaveViewForm({
         <ControlledField
           control={form.control}
           name="name"
-          label={t('contacts.views.name')}
-          placeholder={t('contacts.views.namePlaceholder')}
-          required
+          field={{
+            label: t('contacts.views.name'),
+            placeholder: t('contacts.views.namePlaceholder'),
+            required: true,
+          }}
         />
         <div>
           <FieldLabel htmlFor="view-description">{t('contacts.views.description')}</FieldLabel>

@@ -423,6 +423,7 @@ const en = {
       saved: '"{{name}}" saved',
       updated: 'List updated',
       deleted: 'List deleted',
+      menu: 'List options',
       nameRequired: 'Give the list a name',
       nameTooLong: 'Max 120 characters',
       descriptionTooLong: 'Max 300 characters',
@@ -434,6 +435,7 @@ const en = {
     searchPlaceholder: 'Name, email, phone or document',
     lists: {
       all: 'All',
+      manage: 'Manage lists',
       new: 'New',
       descriptions: {
         all: 'Every {{entity}} in your workspace.',
