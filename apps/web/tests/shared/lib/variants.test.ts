@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DURATION,
+  dockRevealSpring,
+  dockSlideSpring,
   EASE_SMOOTH,
   fade,
   fadeSlideUp,
@@ -120,5 +122,10 @@ describe('animation variants', () => {
 
   it('snappySpring is a no-overshoot quick spring', () => {
     expect(snappySpring).toEqual({ type: 'spring', duration: 0.2, bounce: 0 })
+  })
+
+  it('dock springs carry the exact physics', () => {
+    expect(dockSlideSpring).toEqual({ type: 'spring', stiffness: 650, damping: 44, mass: 0.7 })
+    expect(dockRevealSpring).toEqual({ type: 'spring', stiffness: 460, damping: 42, mass: 0.9 })
   })
 })

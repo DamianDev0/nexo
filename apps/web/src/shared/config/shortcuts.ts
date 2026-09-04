@@ -1,0 +1,28 @@
+export const SHORTCUTS = {
+  commandMenu: ['mod', 'K'],
+  globalSearch: ['/'],
+  save: ['mod', 'S'],
+  escape: ['esc'],
+  undo: ['mod', 'Z'],
+  redo: ['mod', 'shift', 'Z'],
+  copy: ['mod', 'C'],
+  paste: ['mod', 'V'],
+  selectAll: ['mod', 'A'],
+  duplicate: ['mod', 'D'],
+  deleteSelection: ['mod', 'backspace'],
+  newRecord: ['N'],
+  editRecord: ['E'],
+  toggleFilters: ['F'],
+  refresh: ['R'],
+  nextItem: ['J'],
+  previousItem: ['K'],
+  bold: ['mod', 'B'],
+  italic: ['mod', 'I'],
+  underline: ['mod', 'U'],
+  strikethrough: ['mod', 'shift', 'X'],
+  insertLink: ['mod', 'shift', 'K'],
+  bulletList: ['mod', 'shift', '8'],
+  numberedList: ['mod', 'shift', '7'],
+} as const satisfies Record<string, readonly string[]>
+
+export type ShortcutId = keyof typeof SHORTCUTS

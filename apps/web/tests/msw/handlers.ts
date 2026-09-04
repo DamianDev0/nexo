@@ -62,6 +62,7 @@ function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
     createdById: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    noteCount: 0,
     ...overrides,
   }
 }

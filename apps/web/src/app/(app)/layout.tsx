@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
+import { CallDock } from '@/features/place-call'
 import { LanguageSwitcher } from '@/features/switch-language'
 import { APP_SCROLL_ID } from '@/shared/lib/hooks/useScrollTopOnChange'
 import { prefetchAppShell } from '@/shared/query/prefetch-session'
@@ -58,6 +59,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
               {children}
             </div>
           </SidebarInset>
+          <CallDock />
         </SidebarProvider>
       </AppMotionProvider>
     </HydrationBoundary>
