@@ -17,24 +17,16 @@ import {
 
 import { IMPORT_PREVIEW_COLUMNS } from '../config/import-contacts.constants'
 import { fieldLabel, mappedFieldsInOrder } from '../lib/import-mapping'
+import { cellValue } from '../lib/import-preview'
 
 import type { ImportMapping } from '../model/types/import.types'
 import type { ImportFieldDef, ValidationPreview } from '@repo/shared-types'
 
-interface ImportPreviewProps {
+type ImportPreviewProps = {
   readonly preview: ValidationPreview
   readonly fields: ReadonlyArray<ImportFieldDef>
   readonly mapping: ImportMapping
   readonly isStale: boolean
-}
-
-const EMPTY_CELL = '—'
-
-function cellValue(value: unknown): string {
-  if (Array.isArray(value)) return value.join(', ') || EMPTY_CELL
-  if (typeof value === 'string') return value || EMPTY_CELL
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
-  return EMPTY_CELL
 }
 
 export function ImportPreview({ preview, fields, mapping, isStale }: Readonly<ImportPreviewProps>) {

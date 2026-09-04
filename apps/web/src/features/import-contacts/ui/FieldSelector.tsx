@@ -22,7 +22,7 @@ import { fieldLabel } from '../lib/import-mapping'
 
 import type { ImportFieldDef } from '@repo/shared-types'
 
-interface FieldSelectorProps {
+type FieldSelectorProps = {
   readonly fields: ReadonlyArray<ImportFieldDef>
   readonly value: string | null
   readonly label: string

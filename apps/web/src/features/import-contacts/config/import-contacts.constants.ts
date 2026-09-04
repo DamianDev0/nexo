@@ -15,3 +15,7 @@ export const IMPORT_PREVIEW_COLUMNS = 4
 export const IMPORT_ISSUES_SHOWN = 25
 
 export const IMPORT_ISSUE_FILTERS = ['all', 'errors', 'warnings'] as const
+
+export const IMPORT_EMPTY_CELL = '—'
+
+export const IMPORT_SHELL_CLASS = 'mx-auto w-full max-w-5xl px-8'

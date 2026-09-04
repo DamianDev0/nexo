@@ -24,12 +24,13 @@ export function DeleteViewDialog({
       open={open}
       onOpenChange={onOpenChange}
       onConfirm={onConfirm}
-      tone="destructive"
+      tone="slide-destructive"
       copy={{
         title: t('contacts.views.deleteTitle', { name }),
         description: t('contacts.views.deleteDescription'),
-        confirmLabel: t('common.delete'),
+        confirmLabel: t('contacts.views.slideToDelete'),
         cancelLabel: t('common.cancel'),
+        confirmedLabel: t('contacts.views.deleted'),
       }}
     />
   )

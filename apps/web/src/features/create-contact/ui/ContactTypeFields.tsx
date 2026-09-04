@@ -16,7 +16,7 @@ import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { Control } from 'react-hook-form'
 
-interface ContactTypeFieldsProps {
+type ContactTypeFieldsProps = {
   readonly control: Control<ContactFormValues>
   readonly choices: ReadonlyArray<TaxonomyChoice>
 }

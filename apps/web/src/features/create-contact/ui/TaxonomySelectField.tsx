@@ -14,7 +14,7 @@ import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { AsyncSelectSource } from '@/shared/ui/molecules/async-select'
 import type { Control } from 'react-hook-form'
 
-interface TaxonomySelectFieldProps {
+type TaxonomySelectFieldProps = {
   readonly control: Control<ContactFormValues>
   readonly name: 'status' | 'source' | 'type' | 'lifecycleStage'
   readonly label: string

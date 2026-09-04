@@ -4,11 +4,13 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { CONTACT_AVATARS } from '@/entities/contact'
-import { AddressField, MunicipalityCombobox, useResolveMunicipality } from '@/entities/geo'
+import { AddressField, MunicipalityCombobox } from '@/entities/geo'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { AvatarPicker } from '@/shared/ui/kokonutui/avatar-picker'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
+
+import { useAddressAutofill } from '../model/useAddressAutofill'
 
 import { ContactPhoneFields } from './ContactPhoneFields'
 import { ContactTypeFields } from './ContactTypeFields'
@@ -18,7 +20,7 @@ import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 
-interface ContactFormFieldsProps {
+type ContactFormFieldsProps = {
   readonly control: Control<ContactFormValues>
   readonly setValue: UseFormSetValue<ContactFormValues>
   readonly taxonomy: {
@@ -39,15 +41,7 @@ export function ContactFormFields({
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
   const { statuses, sources, types, lifecycleStages } = taxonomy
-  const resolveMunicipality = useResolveMunicipality()
-
-  const handlePlaceSelect = (secondaryText: string) => {
-    void resolveMunicipality(secondaryText).then((municipality) => {
-      if (!municipality) return
-      setValue('city', municipality.name, { shouldDirty: true })
-      setValue('municipioCode', municipality.code, { shouldDirty: true })
-    })
-  }
+  const handlePlaceSelect = useAddressAutofill(setValue)
 
   return (
     <div className="flex flex-col gap-3.5">

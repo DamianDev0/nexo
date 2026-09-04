@@ -14,7 +14,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/shadcn
 import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { Control } from 'react-hook-form'
 
-interface ContactPhoneFieldProps {
+type ContactPhoneFieldProps = {
   readonly control: Control<ContactFormValues>
   readonly name: 'phone' | 'whatsapp'
   readonly label: string

@@ -1,62 +1,43 @@
 'use client'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { t } from 'i18next'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
-import { sileo } from 'sileo'
-
-import { revalidateContacts } from '@/entities/contact'
-import contactsService from '@/shared/api/services/contacts.service'
-import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { applyMapping, missingRequiredFields } from '../lib/import-mapping'
 import { importInitialState, importReducer } from '../lib/import-reducer'
+import { useImportMutations } from '../query/useImportMutations'
 
 import type { ImportMapping, ImportStep } from './types/import.types'
 import type { DuplicateStrategy } from '@repo/shared-types'
 
 export function useContactImport(onFinished: () => void) {
-  const client = useQueryClient()
   const [{ step, analysis, mapping, preview, report, strategy, result }, dispatch] = useReducer(
     importReducer,
     importInitialState,
   )
 
-  const fileId = analysis?.fileId ?? ''
-
-  const analyze = useMutation({
-    mutationFn: (file: File) => contactsService.analyzeImport(file),
-    onSuccess: (data) => dispatch({ type: 'analyzed', analysis: data }),
-    onError: () => sileo.error({ title: t('contacts.import.errors.analyze') }),
-  })
+  const live = useRef({ fileId: '', mapping, strategy })
+  live.current = { fileId: analysis?.fileId ?? '', mapping, strategy }
 
   const latestMapping = useRef<ImportMapping | null>(null)
-  const refreshPreview = useMutation({
-    mutationFn: (next: ImportMapping) => contactsService.previewImport({ fileId, mapping: next }),
-    onSuccess: (data, variables) => {
-      if (variables !== latestMapping.current) return
-      dispatch({ type: 'previewed', preview: data })
+
+  const mutations = useImportMutations(
+    {
+      fileId: () => live.current.fileId,
+      mapping: () => live.current.mapping,
+      strategy: () => live.current.strategy,
     },
-  })
-
-  const validate = useMutation({
-    mutationFn: () => contactsService.validateImport({ fileId, mapping }),
-    onSuccess: (data) => dispatch({ type: 'validated', report: data }),
-    onError: () => sileo.error({ title: t('contacts.import.errors.validate') }),
-  })
-
-  const execute = useMutation({
-    mutationFn: () =>
-      contactsService.executeImport({ fileId, mapping, duplicateStrategy: strategy }),
-    onSuccess: async (data) => {
-      dispatch({ type: 'imported', result: data })
-      await revalidateContacts()
-      await client.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
+    {
+      onAnalyzed: (data) => dispatch({ type: 'analyzed', analysis: data }),
+      onPreviewed: (data, variables) => {
+        if (variables !== latestMapping.current) return
+        dispatch({ type: 'previewed', preview: data })
+      },
+      onValidated: (data) => dispatch({ type: 'validated', report: data }),
+      onImported: (data) => dispatch({ type: 'imported', result: data }),
     },
-    onError: () => sileo.error({ title: t('contacts.import.errors.execute') }),
-  })
+  )
 
-  const { mutate: previewMapping } = refreshPreview
+  const { previewMapping, validateImport } = mutations
   const remap = useCallback(
     (column: string, field: string) => {
       const next = applyMapping(mapping, column, field)
@@ -77,12 +58,12 @@ export function useContactImport(onFinished: () => void) {
   const goTo = useCallback(
     (next: ImportStep) => {
       if (next === 'review') {
-        validate.mutate()
+        validateImport()
         return
       }
       dispatch({ type: 'stepChanged', step: next })
     },
-    [validate],
+    [validateImport],
   )
 
   const finish = useCallback(() => {
@@ -95,9 +76,9 @@ export function useContactImport(onFinished: () => void) {
       mapping,
       preview: preview ?? analysis?.validationPreview ?? null,
       missingFields: missing,
-      isPreviewing: refreshPreview.isPending,
+      isPreviewing: mutations.pending.previewing,
     }),
-    [mapping, preview, analysis, missing, refreshPreview.isPending],
+    [mapping, preview, analysis, missing, mutations.pending.previewing],
   )
 
   return {
@@ -112,18 +93,18 @@ export function useContactImport(onFinished: () => void) {
       result,
       missingFields: missing,
       canContinueFromMap: missing.length === 0,
-      isAnalyzing: analyze.isPending,
-      isPreviewing: refreshPreview.isPending,
-      isValidating: validate.isPending,
-      isImporting: execute.isPending,
+      isAnalyzing: mutations.pending.analyzing,
+      isPreviewing: mutations.pending.previewing,
+      isValidating: mutations.pending.validating,
+      isImporting: mutations.pending.importing,
     },
     actions: {
-      onFile: (file: File) => analyze.mutateAsync(file),
+      onFile: (file: File) => mutations.analyzeFile(file),
       onRemap: remap,
       onStrategy: (next: DuplicateStrategy) =>
         dispatch({ type: 'strategyChanged', strategy: next }),
       onGoTo: goTo,
-      onImport: () => execute.mutate(),
+      onImport: () => mutations.executeImport(),
       onRestart: reset,
       onFinish: finish,
     },

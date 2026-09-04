@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 
-interface ContactDuplicateNoticeProps {
+type ContactDuplicateNoticeProps = {
   readonly notice: { readonly message: string; readonly canForce: boolean } | null
   readonly isEdit: boolean
   readonly onConfirm: () => void

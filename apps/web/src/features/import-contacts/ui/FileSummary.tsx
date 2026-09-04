@@ -8,7 +8,7 @@ import { CheckIcon } from '@/shared/ui/icons'
 
 import type { AnalyzeResult } from '@repo/shared-types'
 
-interface FileSummaryProps {
+type FileSummaryProps = {
   readonly analysis: AnalyzeResult
   readonly onRestart: () => void
 }

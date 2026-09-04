@@ -82,6 +82,7 @@ describe('toFormValues', () => {
       createdById: null,
       createdAt: '2026-01-01',
       updatedAt: '2026-01-01',
+      noteCount: 0,
     } satisfies ContactListItem
 
     const values = toFormValues(contact)

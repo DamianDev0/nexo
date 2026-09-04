@@ -1,15 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { sileo } from 'sileo'
 
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import contactsService from '@/shared/api/services/contacts.service'
-import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
-import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { CONTACT_FORM_DEFAULTS } from '../config/contact-form.constants'
 import { duplicateFormField, duplicateMessage } from '../lib/contact-duplicates'
@@ -17,25 +13,23 @@ import { stripNullValues, toFormValues, toInput } from '../lib/contact-form-mapp
 import { buildContactSchema, type ContactFormValues } from '../lib/contact-form.schema'
 import { validateCustomValues } from '../lib/custom-field-validation'
 import { useContactCustomFields } from '../query/useContactCustomFields'
+import { useProbeContactDuplicate } from '../query/useProbeContactDuplicate'
+import { useSaveContact } from '../query/useSaveContact'
 
-import type { ApiHandledError } from '@/shared/api/error-handler'
 import type {
-  Contact,
   ContactDuplicatePayload,
   ContactDuplicateProbeQuery,
   ContactListItem,
 } from '@repo/shared-types'
 
-type SubmitVariables = { values: ContactFormValues; addAnother: boolean; force?: boolean }
-
 type ProbeFieldName = 'email' | 'phone'
 
 export function useContactForm(contact: ContactListItem | null, onDone: () => void) {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
   const { statuses, sources, types, lifecycleStages } = useContactTaxonomy()
   const terms = useEntityTerms('contact')
   const customFieldDefs = useContactCustomFields()
+  const probeDuplicate = useProbeContactDuplicate()
   const [customValues, setCustomValues] = useState<Record<string, unknown>>(
     () => contact?.customFields ?? {},
   )
@@ -70,6 +64,38 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
     return () => subscription.unsubscribe()
   }, [form])
 
+  const markDuplicate = (duplicate: ContactDuplicatePayload) => {
+    const field = duplicateFormField(duplicate.field)
+    if (field) {
+      form.setError(field, {
+        type: 'duplicate',
+        message: duplicateMessage(t, duplicate, terms.lowerSingular),
+      })
+    }
+    if (duplicate.canForce || !field) setPendingDuplicate(duplicate)
+  }
+
+  const saver = useSaveContact<ContactFormValues>({
+    mutationFn: ({ values, force }) =>
+      contact
+        ? contactsService.update(contact.id, toInput(values, customValues), force)
+        : contactsService.create(toInput(values, stripNullValues(customValues)), force),
+    successTitle: () =>
+      t(contact ? 'contacts.toasts.updated' : 'contacts.toasts.created', {
+        entity: terms.singular,
+      }),
+    onDuplicate: markDuplicate,
+    onSubmitStart: () => setPendingDuplicate(null),
+    onSaved: (addAnother) => {
+      if (addAnother) {
+        form.reset(CONTACT_FORM_DEFAULTS)
+        setCustomValues({})
+        return
+      }
+      onDone()
+    },
+  })
+
   const probeField = async (field: ProbeFieldName): Promise<void> => {
     const value = form.getValues(field).trim()
     if (!value) return
@@ -79,18 +105,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
       field === 'email' ? { email: value } : { phone: value }
     if (contact) params.excludeId = contact.id
 
-    let duplicate: ContactDuplicatePayload | null
-    try {
-      ;({ duplicate } = await queryClient.fetchQuery({
-        queryKey: QUERY_KEYS.contacts.duplicateProbe(params),
-        queryFn: () => contactsService.probeDuplicates(params),
-        staleTime: 30_000,
-        retry: false,
-      }))
-    } catch {
-      return
-    }
-
+    const duplicate = await probeDuplicate(params)
     if (form.getValues(field).trim() !== value) return
 
     if (duplicate && duplicateFormField(duplicate.field) === field) {
@@ -99,50 +114,6 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
         message: duplicateMessage(t, duplicate, terms.lowerSingular),
       })
     }
-  }
-
-  const mutation = useMutation<Contact, ApiHandledError, SubmitVariables>({
-    mutationFn: ({ values, force }) =>
-      contact
-        ? contactsService.update(contact.id, toInput(values, customValues), force)
-        : contactsService.create(toInput(values, stripNullValues(customValues)), force),
-    onMutate: () => setPendingDuplicate(null),
-    onSuccess: (_, { addAnother }) => {
-      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
-      sileo.success({
-        title: t(contact ? 'contacts.toasts.updated' : 'contacts.toasts.created', {
-          entity: terms.singular,
-        }),
-      })
-      if (addAnother) {
-        form.reset(CONTACT_FORM_DEFAULTS)
-        setCustomValues({})
-        return
-      }
-      onDone()
-    },
-    onError: (error) => {
-      if (error.statusCode === 409 && error.message === 'contact_duplicate' && error.duplicate) {
-        const field = duplicateFormField(error.duplicate.field)
-        if (field) {
-          form.setError(field, {
-            type: 'duplicate',
-            message: duplicateMessage(t, error.duplicate, terms.lowerSingular),
-          })
-        }
-        if (error.duplicate.canForce || !field) {
-          setPendingDuplicate(error.duplicate)
-        }
-        return
-      }
-      notifySaveFailed(error)
-    },
-  })
-
-  const confirmDuplicate = () => {
-    const variables = mutation.variables
-    if (!variables) return
-    mutation.mutate({ ...variables, force: true })
   }
 
   const setCustomValue = (key: string, value: unknown) => {
@@ -162,7 +133,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
         setCustomErrors(errors)
         return
       }
-      mutation.mutate({ values, addAnother })
+      saver.save({ values, addAnother })
     })
 
   return {
@@ -175,7 +146,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
       setValue: setCustomValue,
     },
     isEdit: Boolean(contact),
-    isPending: mutation.isPending,
+    isPending: saver.isPending,
     probeField,
     handleSubmit: submitChecked(false),
     submitAndAddAnother: () => {
@@ -187,7 +158,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
           canForce: pendingDuplicate.canForce,
         }
       : null,
-    confirmDuplicate,
+    confirmDuplicate: saver.retryWithForce,
     dismissDuplicate: () => setPendingDuplicate(null),
   }
 }

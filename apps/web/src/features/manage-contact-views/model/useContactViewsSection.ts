@@ -3,7 +3,12 @@
 import { useCallback, useMemo } from 'react'
 
 import { VIEW_LIST_PREFIX } from '../config/view-list.constants'
-import { matchesSnapshot, viewConditions, viewSearch, type ViewSnapshot } from '../lib/view-snapshot'
+import {
+  matchesSnapshot,
+  viewConditions,
+  viewSearch,
+  type ViewSnapshot,
+} from '../lib/view-snapshot'
 
 import type { ContactSort } from '@/entities/contact'
 import type { SmartListItem } from '@/shared/ui/organisms/data-table'

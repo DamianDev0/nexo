@@ -49,6 +49,7 @@ const EXISTING_CONTACT: ContactListItem = {
   createdById: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+  noteCount: 0,
 }
 
 const EMPTY_TAXONOMY: ContactTaxonomy = {

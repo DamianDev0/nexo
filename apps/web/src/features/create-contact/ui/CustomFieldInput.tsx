@@ -1,6 +1,5 @@
 'use client'
 
-import { CENTAVOS_PER_PESO } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
 import { DatePicker } from '@/shared/ui/molecules/date-picker'
@@ -11,30 +10,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/shadcn/select'
-import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
+import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
+import { CUSTOM_FIELD_INPUT_TYPES } from '../config/custom-field-input.constants'
+import {
+  formatCustomFieldValue,
+  joinDateTime,
+  parseCustomFieldNumber,
+  splitDateTimeValue,
+  toggleListItem,
+} from '../lib/custom-field-input'
+
 import type { FieldDef } from '@repo/shared-types'
 
-interface CustomFieldInputProps {
+type CustomFieldInputProps = {
   readonly def: FieldDef
   readonly value: unknown
   readonly onChange: (value: unknown) => void
-}
-
-const INPUT_TYPE: Readonly<Record<string, string>> = {
-  number: 'number',
-  currency: 'number',
-  url: 'url',
-  phone: 'tel',
-  email: 'email',
-}
-
-function toggleItem(current: unknown, item: string): string[] {
-  const list = Array.isArray(current) ? (current as string[]) : []
-  return list.includes(item) ? list.filter((entry) => entry !== item) : [...list, item]
 }
 
 export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldInputProps>) {
@@ -83,7 +78,7 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
           <label key={option.value} className="flex items-center gap-2 text-sm text-body">
             <SmoothCheckbox
               checked={Array.isArray(value) && (value as string[]).includes(option.value)}
-              onCheckedChange={() => onChange(toggleItem(value, option.value))}
+              onCheckedChange={() => onChange(toggleListItem(value, option.value))}
               aria-label={option.label}
             />
             {option.label}
@@ -94,9 +89,7 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
   }
 
   if (def.type === 'date' || def.type === 'datetime') {
-    const raw = typeof value === 'string' ? value : ''
-    const datePart = raw.slice(0, 10)
-    const timePart = raw.slice(11, 16)
+    const { date: datePart, time: timePart } = splitDateTimeValue(value)
     if (def.type === 'date') {
       return (
         <DatePicker
@@ -111,7 +104,7 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
       <div className="flex gap-2">
         <DatePicker
           value={datePart}
-          onChange={(next) => onChange(`${next}T${timePart || '00:00'}`)}
+          onChange={(next) => onChange(joinDateTime(next, timePart))}
           placeholder={def.placeholder ?? t('contacts.form.pickDate')}
           aria-label={def.label}
         />
@@ -119,7 +112,7 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
           type="time"
           value={timePart}
           disabled={!datePart}
-          onChange={(event) => onChange(`${datePart}T${event.target.value || '00:00'}`)}
+          onChange={(event) => onChange(joinDateTime(datePart, event.target.value))}
           aria-label={t('contacts.form.pickTime')}
           className="w-28"
         />
@@ -129,24 +122,13 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
 
   const isCurrency = def.type === 'currency'
   const isNumeric = def.type === 'number' || isCurrency
-  const shown = value === undefined || value === null ? '' : value
   return (
     <Input
-      type={INPUT_TYPE[def.type] ?? 'text'}
-      value={
-        isCurrency && typeof shown === 'number' ? String(shown / CENTAVOS_PER_PESO) : String(shown)
-      }
+      type={CUSTOM_FIELD_INPUT_TYPES[def.type] ?? 'text'}
+      value={formatCustomFieldValue(value, isCurrency)}
       onChange={(event) => {
         const raw = event.target.value
-        if (!isNumeric) {
-          onChange(raw)
-          return
-        }
-        if (raw === '') {
-          onChange('')
-          return
-        }
-        onChange(isCurrency ? Math.round(Number(raw) * CENTAVOS_PER_PESO) : Number(raw))
+        onChange(isNumeric ? parseCustomFieldNumber(raw, isCurrency) : raw)
       }}
       placeholder={def.placeholder}
       aria-label={def.label}

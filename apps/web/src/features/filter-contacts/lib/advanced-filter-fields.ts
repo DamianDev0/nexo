@@ -1,57 +1,18 @@
-import {
-  CUSTOM_COLUMN_PREFIX,
-  type ContactColumnDef,
-  type FilterFieldType,
-} from '@repo/shared-types'
+import { CUSTOM_COLUMN_PREFIX, type ContactColumnDef } from '@repo/shared-types'
 
-import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
+import {
+  CORE_FIELDS,
+  CUSTOM_TYPE_MAP,
+  NAME_FILTER_FIELD,
+  type AdvancedFieldSources,
+} from '../config/advanced-filter-fields.constants'
+
 import type { AppIcon } from '@/shared/ui/icons'
-import type { FilterFieldDef, FilterFieldOption } from '@/shared/ui/organisms/filter-bar'
+import type { FilterFieldDef } from '@/shared/ui/organisms/filter-bar'
 
 type TranslateFn = (key: string) => string
 
-export type AdvancedFieldSources = {
-  readonly statuses: ReadonlyArray<TaxonomyChoice>
-  readonly sources: ReadonlyArray<TaxonomyChoice>
-  readonly lifecycleStages: ReadonlyArray<TaxonomyChoice>
-  readonly tags: ReadonlyArray<string>
-}
-
-type CoreFieldSpec = {
-  readonly type: FilterFieldType
-  readonly options?: (sources: AdvancedFieldSources) => ReadonlyArray<FilterFieldOption>
-}
-
-const toOptions = (choices: ReadonlyArray<TaxonomyChoice>): ReadonlyArray<FilterFieldOption> =>
-  choices.map((choice) => ({ value: choice.key, label: choice.label, color: choice.color }))
-
-const CORE_FIELDS: Readonly<Record<string, CoreFieldSpec>> = {
-  name: { type: 'text' },
-  email: { type: 'text' },
-  phone: { type: 'text' },
-  whatsapp: { type: 'text' },
-  city: { type: 'text' },
-  status: { type: 'select', options: (s) => toOptions(s.statuses) },
-  source: { type: 'select', options: (s) => toOptions(s.sources) },
-  lifecycleStage: { type: 'select', options: (s) => toOptions(s.lifecycleStages) },
-  tags: {
-    type: 'multi',
-    options: (s) => s.tags.map((tag) => ({ value: tag, label: tag })),
-  },
-  leadScore: { type: 'number' },
-  createdAt: { type: 'date' },
-  updatedAt: { type: 'date' },
-  lastContactedAt: { type: 'date' },
-}
-
-const NAME_FILTER_FIELD = 'name'
-
-const CUSTOM_TYPE_MAP: Readonly<Partial<Record<string, FilterFieldType>>> = {
-  select: 'select',
-  multiselect: 'select',
-  number: 'text',
-  currency: 'text',
-}
+export type { AdvancedFieldSources }
 
 export function buildAdvancedFilterFields(
   t: TranslateFn,

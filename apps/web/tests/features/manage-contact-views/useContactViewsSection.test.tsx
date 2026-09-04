@@ -1,7 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-
 import type { ViewSnapshot } from '@/features/manage-contact-views'
 import type { ContactView } from '@repo/shared-types'
 

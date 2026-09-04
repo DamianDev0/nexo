@@ -6,7 +6,7 @@ import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { TrashIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
-interface ContactsBulkActionsProps {
+type ContactsBulkActionsProps = {
   readonly onArchive: () => void
   readonly disabled: boolean
 }

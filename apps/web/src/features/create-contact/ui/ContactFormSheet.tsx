@@ -23,7 +23,7 @@ import { CustomFieldsSection } from './CustomFieldsSection'
 
 import type { ContactListItem } from '@repo/shared-types'
 
-interface ContactFormSheetProps {
+type ContactFormSheetProps = {
   readonly contact: ContactListItem | null
   readonly open: boolean
   readonly onOpenChange: (open: boolean) => void

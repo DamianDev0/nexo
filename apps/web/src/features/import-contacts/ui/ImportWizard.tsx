@@ -11,6 +11,7 @@ import { Text } from '@/shared/ui/atoms/text'
 import { CaretLeftIcon } from '@/shared/ui/icons'
 import AnimatedStepper from '@/shared/ui/smoothui/animated-stepper'
 
+import { IMPORT_SHELL_CLASS } from '../config/import-contacts.constants'
 import { buildStepDefs, stepIndex } from '../lib/import-steps'
 import { useContactImport } from '../model/useContactImport'
 
@@ -19,8 +20,6 @@ import { DoneStep } from './steps/DoneStep'
 import { MapStep } from './steps/MapStep'
 import { ReviewStep } from './steps/ReviewStep'
 import { UploadStep } from './steps/UploadStep'
-
-const SHELL = 'mx-auto w-full max-w-5xl px-8'
 
 export function ImportWizard() {
   const { t } = useTranslation()
@@ -33,7 +32,7 @@ export function ImportWizard() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <header className={`${SHELL} shrink-0 pb-6 pt-8`}>
+      <header className={`${IMPORT_SHELL_CLASS} shrink-0 pb-6 pt-8`}>
         <div className="flex items-center gap-3">
           <PillButton
             variant="ghost"
@@ -60,7 +59,7 @@ export function ImportWizard() {
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className={`${SHELL} pb-8`}>
+        <div className={`${IMPORT_SHELL_CLASS} pb-8`}>
           {state.step === 'upload' && (
             <UploadStep onFile={actions.onFile} isBusy={state.isAnalyzing} />
           )}
@@ -89,7 +88,7 @@ export function ImportWizard() {
       </div>
 
       <footer className="shrink-0 border-t border-border bg-card">
-        <div className={`${SHELL} flex items-center justify-end gap-2 py-4`}>
+        <div className={`${IMPORT_SHELL_CLASS} flex items-center justify-end gap-2 py-4`}>
           {state.step === 'configure' && (
             <>
               <PillButton variant="ghost" size="md" onClick={actions.onRestart}>

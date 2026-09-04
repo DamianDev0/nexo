@@ -10,7 +10,7 @@ import { CustomFieldInput } from './CustomFieldInput'
 
 import type { FieldDef } from '@repo/shared-types'
 
-interface CustomFieldsSectionProps {
+type CustomFieldsSectionProps = {
   readonly data: {
     readonly defs: ReadonlyArray<FieldDef>
     readonly values: Readonly<Record<string, unknown>>
