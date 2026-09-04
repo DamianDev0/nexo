@@ -1,7 +1,7 @@
 import type { Contact, ContactActivity, ContactDeal, ContactListItem } from '@repo/shared-types'
 import type { ActivityRow, ContactRow, DealRow } from '../interfaces/contact-row.interfaces'
 
-export function mapContactListItem(r: ContactRow): ContactListItem {
+export function mapContact(r: ContactRow): Contact {
   return {
     id: r.id,
     firstName: r.first_name,
@@ -9,7 +9,7 @@ export function mapContactListItem(r: ContactRow): ContactListItem {
     email: r.email,
     phone: r.phone,
     whatsapp: r.whatsapp,
-    documentType: r.document_type as ContactListItem['documentType'],
+    documentType: r.document_type as Contact['documentType'],
     documentNumber: r.document_number,
     jobTitle: r.job_title ?? null,
     linkedinUrl: r.linkedin_url ?? null,
@@ -19,11 +19,11 @@ export function mapContactListItem(r: ContactRow): ContactListItem {
     department: r.department,
     municipioCode: r.municipio_code,
     country: r.country ?? 'CO',
-    status: r.status as ContactListItem['status'],
+    status: r.status as Contact['status'],
     statusChangedAt: r.status_changed_at ?? null,
     avatarUrl: r.avatar_url ?? null,
-    lifecycleStage: (r.lifecycle_stage ?? 'subscriber') as ContactListItem['lifecycleStage'],
-    source: r.source as ContactListItem['source'],
+    lifecycleStage: (r.lifecycle_stage ?? 'subscriber') as Contact['lifecycleStage'],
+    source: r.source as Contact['source'],
     type: r.type ?? null,
     typeLabel: r.type_label ?? null,
     leadScore: r.lead_score,
@@ -45,10 +45,10 @@ export function mapContactListItem(r: ContactRow): ContactListItem {
   }
 }
 
-export function mapContact(r: ContactRow): Contact {
+export function mapContactListItem(r: ContactRow): ContactListItem {
   return {
-    ...mapContactListItem(r),
-    customFields: r.custom_fields ?? {},
+    ...mapContact(r),
+    noteCount: r.note_count ?? 0,
   }
 }
 

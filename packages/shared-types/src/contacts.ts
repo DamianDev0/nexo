@@ -45,6 +45,7 @@ export type Contact = {
 
 export type ContactListItem = Omit<Contact, 'customFields'> & {
   customFields?: Record<string, unknown>
+  noteCount: number
 }
 
 export type ContactInput = {

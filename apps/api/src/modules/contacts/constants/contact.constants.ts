@@ -2,10 +2,7 @@ import type { FilterableColumn } from '@/shared/database/advanced-filter-sql'
 import type { SearchSource } from '@/shared/database/search-sql'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateContactDto } from '../dto/contact.dto'
-import type {
-  ContactListQuery,
-  CreateContactData,
-} from '../interfaces/contact-row.interfaces'
+import type { ContactListQuery, CreateContactData } from '../interfaces/contact-row.interfaces'
 
 export const OTHER_CONTACT_TYPE = 'other'
 
@@ -93,7 +90,9 @@ export const CONTACT_LIST_COLUMNS = `
   data_consent, consent_date, consent_source,
   opt_out_email, opt_out_sms, opt_out_whatsapp, last_contacted_at,
   avatar_url, tags, company_id, assigned_to_id,
-  custom_fields, is_active, created_by, created_at, updated_at
+  custom_fields, is_active, created_by, created_at, updated_at,
+  (SELECT COUNT(*)::int FROM activities a
+   WHERE a.contact_id = contacts.id AND a.activity_type = 'note') AS note_count
 `
 
 export type TaxonomyColumn = 'status' | 'source' | 'type' | 'lifecycle'

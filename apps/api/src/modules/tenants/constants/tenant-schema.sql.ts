@@ -318,6 +318,7 @@ export function getTenantSchemaSQL(schema: string): string {
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       owner_id UUID NOT NULL REFERENCES "${schema}".users(id),
       name VARCHAR(120) NOT NULL,
+      description TEXT,
       filters JSONB NOT NULL DEFAULT '{}',
       advanced_filters JSONB,
       columns JSONB NOT NULL DEFAULT '{}',

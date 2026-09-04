@@ -13,6 +13,8 @@ import {
 } from 'class-validator'
 import { MAX_PAGE_SIZE } from '@repo/shared-utils'
 
+export const ACTIVITY_DESCRIPTION_MAX = 5000
+
 export class CreateActivityDto {
   @IsString()
   @IsNotEmpty()
@@ -26,6 +28,7 @@ export class CreateActivityDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(ACTIVITY_DESCRIPTION_MAX)
   description?: string
 
   @IsOptional()

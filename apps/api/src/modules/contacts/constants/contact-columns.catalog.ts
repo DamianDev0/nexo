@@ -128,6 +128,15 @@ export const CONTACT_COLUMN_CATALOG: readonly ContactColumnDef[] = [
     minWidth: 120,
   },
   {
+    key: 'notes',
+    labelKey: 'contacts.columns.notes',
+    hintKey: 'contacts.columnHints.notes',
+    sortField: null,
+    defaultVisible: false,
+    defaultWidth: 120,
+    minWidth: 100,
+  },
+  {
     key: 'createdAt',
     labelKey: 'contacts.columns.createdAt',
     hintKey: 'contacts.columnHints.createdAt',

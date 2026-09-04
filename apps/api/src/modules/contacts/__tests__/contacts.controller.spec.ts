@@ -53,7 +53,8 @@ const mockContact: Contact = {
   updatedAt: '2024-01-01T00:00:00Z',
 }
 
-const { customFields: _cf, ...mockContactListItem } = mockContact
+const { customFields: _cf, ...contactBase } = mockContact
+const mockContactListItem = { ...contactBase, noteCount: 0 }
 const mockPaginated: PaginatedContacts = {
   data: [mockContactListItem],
   total: 1,

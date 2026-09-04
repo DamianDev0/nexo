@@ -40,6 +40,7 @@ export interface ContactRow {
   created_by: string | null
   created_at: string
   updated_at: string
+  note_count?: number
 }
 
 export interface ActivityRow {
