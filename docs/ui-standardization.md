@@ -99,6 +99,43 @@ Ejecutar por slices (settings → setup-workspace → import-contacts → resto)
 - Story por componente canónico con: Default, estados (hover/focus/disabled), Loading, Empty, Error donde aplique, WorstCase (convención de casa), Playground.
 - Los cops aplican a stories (no comments, no colores crudos).
 
+## Fase 8 — Edición inline de campos custom en la tabla
+
+Infraestructura lista: `features/edit-contact-field` (mutación optimista de `customFields`, merge completo del mapa — nunca enviar una sola key), `ContactRowActions.onCustomFieldsChange`, lib pura `entities/contact/lib/custom-field-edit.ts`, renderers en `entities/contact/ui/columns/custom-field-cells.tsx`. El `CalendarPanel` tiene drill mes/año (click en el header) para fechas lejanas tipo cumpleaños.
+
+| Tipo                       | Estado    | Cómo                                                                                                                           |
+| -------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| date / datetime            | ✅        | `ContactDateFieldCell`: `—` + ícono calendario al hover, popover con CalendarPanel; datetime conserva la hora guardada         |
+| boolean                    | ✅        | `ContactBooleanFieldCell`: AnimatedToggle inline                                                                               |
+| select                     | pendiente | GroovyPopover + `SearchableCommand` single (patrón quick-filter)                                                               |
+| multiselect                | pendiente | popover multi con `OptionRow` (checkbox glyph)                                                                                 |
+| text / url / email / phone | pendiente | popover con `SmoothInput`, Enter guarda, Escape cancela; validar url/email con zod del campo                                   |
+| number                     | pendiente | `SmoothInput` numérico con `tabular-nums`                                                                                      |
+| currency                   | pendiente | ⚠️ ADR-0002: el valor viaja en centavos COP BIGINT — el editor debe convertir pesos↔centavos y assertar entero; no improvisar |
+| textarea / file            | no inline | abrir el sheet de edición (`onOpen`) — contenido largo no cabe en celda                                                        |
+
+Regla: cada editor de celda usa el **nombre del campo** (`def.label`) como aria-label; celdas vacías muestran `—` y el affordance aparece al hover (nunca texto repetido por fila).
+
+## Decisiones de la auditoría (2026-09-04)
+
+- Mutaciones: patrón optimista (snapshot + rollback) obligatorio para ediciones inline de lista/tabla (status, custom fields); submits terminales de composers (nota, tags, mensaje) pueden ser invalidate-on-success — el panel se cierra, no hay estado intermedio que fingir.
+- Cop nuevo en `check-html-primitives`: importar `@/shared/ui/shadcn/button` fuera de `shared/ui` es violación (Fase 5 ahora es CI-enforced).
+- Composers montados por contacto llevan `key={contact.id}` — RHF no re-aplica defaultValues sin remount (bug de draft cruzado cazado y corregido).
+- Storage cliente con PII (historial del dialer) se namespacea por tenant: clave `nexo-call-log:<slug>`.
+- Backlog: `rich-textarea/useRichEditor` usa `document.execCommand` (deprecado) — aceptable mientras `sendAvailable: false`; reemplazar antes de activar envío real de email.
+
+## Reorganización FSD del vertical contacts (2026-09-04) ✅
+
+Tres olas ejecutadas sobre 3 mapas de auditoría (entities/widgets/views · features core · composers/dialer):
+
+- **Segmentos corregidos**: 12 helpers puros salieron de `ui/` a `lib/` (taxonomyLabel, commCellActions, contactAccessor, resolveMessageChannel, skeletonCells, cellValue, contactNumber, callStatusLabel, custom-field-input, comm-action-items…), todos con test. Constantes inline → `config/` (toolbars del composer, dock tabs, template CSV, advanced-filter fields, sentinels EMPTY\_\* con identidad referencial única).
+- **Hooks con JSX eliminados**: `useViewTabMenu` es model puro + container `ViewTabDialogs`; `useListMenu` vive en `model/` del widget; `ContactsTable` ya no renderiza `dialogs` ajenos.
+- **TanStack solo en `query/`**: `useSaveContact` + `useProbeContactDuplicate` (create-contact), `useImportMutations` (import), `useOptimisticContactListPatch` genérico en `entities/contact` que unifica status y custom-fields (dedup ~90%).
+- **Composer des-acoplado de contacts**: labels y toolbar en namespace i18n `composer.*`, builder en `shared/ui/organisms/composer/lib`; `Composer.StandardHeader` y `Composer.Actions` matan el boilerplate de los 3 composers.
+- **Bugs de integridad**: `useDialer` desconecta el adapter en unmount (testeado). Conversión pesos↔centavos del CustomFieldInput ahora en lib con tests de redondeo exacto (ADR-0002).
+- **Naming**: convención confirmada y aplicada — hooks `useX.ts` camelCase (place-call renombrado), archivos no-componente kebab, `type` sobre `interface` en props.
+- **Data-driven backlog**: límites SMS/email hardcodeados sin contrato backend (module `message-templates` del api existe y nadie lo consume — send es stub); template CSV de import no incluye custom fields del tenant; dirty-guard/draft de composers pendiente de decisión de producto.
+
 ## Reglas de oro al ejecutar
 
 1. Un PR/commit por fase o sub-fase; nunca big-bang.
