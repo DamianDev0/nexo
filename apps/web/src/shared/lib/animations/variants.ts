@@ -108,6 +108,20 @@ export const snappySpring = {
   bounce: 0,
 }
 
+export const dockSlideSpring = {
+  type: 'spring' as const,
+  stiffness: 650,
+  damping: 44,
+  mass: 0.7,
+}
+
+export const dockRevealSpring = {
+  type: 'spring' as const,
+  stiffness: 460,
+  damping: 42,
+  mass: 0.9,
+}
+
 export const subtlePopover: Variants = {
   initial: { opacity: 0, scale: 0.97 },
   animate: { opacity: 1, scale: 1 },

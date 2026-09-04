@@ -5,6 +5,7 @@ import {
   contactMailHref,
   contactPhoneLabel,
   contactScoreBand,
+  contactDialNumber,
   contactTelHref,
   contactWaHref,
   daysSince,
@@ -19,6 +20,12 @@ describe('contactTelHref', () => {
 
   it('strips an existing country code', () => {
     expect(contactTelHref('+57 300 123 4567')).toBe('tel:+573001234567')
+  })
+})
+
+describe('contactDialNumber', () => {
+  it('normalizes to e164 for the dialer', () => {
+    expect(contactDialNumber('300 123 4567')).toBe('+573001234567')
   })
 })
 

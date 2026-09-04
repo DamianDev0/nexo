@@ -16,6 +16,8 @@ export {
   quickEase,
   indicatorSpring,
   gooeyPopover,
+  dockRevealSpring,
+  dockSlideSpring,
   gooeySpring,
   snappySpring,
   subtlePopover,

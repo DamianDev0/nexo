@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 
 import { queryWrapper as wrapper } from '../../../../../query-wrapper'
 
@@ -14,27 +15,40 @@ describe('DataTable.CellHint', () => {
 })
 
 describe('DataTable.CellFrame', () => {
-  it('stacks the value over its actions by default', () => {
-    const { container } = render(
-      <DataTable.CellFrame display="+57 300 123 4567">
-        <span>action</span>
-      </DataTable.CellFrame>,
+  it('floats the action dock over the row on hover and runs the picked action', async () => {
+    const onCopy = vi.fn()
+    render(
+      <DataTable.CellFrame
+        display="+57 300 123 4567"
+        actions={{
+          label: 'Acciones',
+          items: [{ id: 'copy', label: 'Copiar', icon: <svg aria-hidden />, onClick: onCopy }],
+        }}
+      />,
       { wrapper },
     )
 
-    expect(screen.getByText('+57 300 123 4567')).toBeInTheDocument()
-    expect(screen.getByText('action')).toBeInTheDocument()
-    expect(container.querySelector('.flex-col')).not.toBeNull()
+    expect(screen.queryByRole('toolbar')).not.toBeInTheDocument()
+    await userEvent.hover(screen.getByText('+57 300 123 4567'))
+
+    const dock = await screen.findByRole('toolbar', { name: 'Acciones' })
+    expect(dock).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Copiar' }))
+    expect(onCopy).toHaveBeenCalledOnce()
   })
 
-  it('keeps the value and its actions on one line when dense', () => {
-    const { container } = render(
-      <DataTable.CellFrame dense display="value">
-        <span>action</span>
-      </DataTable.CellFrame>,
+  it('keeps status hints always visible without opening the dock', () => {
+    render(
+      <DataTable.CellFrame
+        display="value"
+        hint={<span>blocked</span>}
+        actions={{ label: 'Acciones', items: [] }}
+      />,
       { wrapper },
     )
 
-    expect(container.querySelector('.flex-col')).toBeNull()
+    expect(screen.getByText('blocked')).toBeVisible()
+    expect(screen.queryByRole('toolbar')).not.toBeInTheDocument()
   })
 })

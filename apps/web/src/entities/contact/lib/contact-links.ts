@@ -16,6 +16,10 @@ export function contactTelHref(phone: string): string {
   return `tel:${coPhoneE164(phone)}`
 }
 
+export function contactDialNumber(phone: string): string {
+  return coPhoneE164(phone)
+}
+
 export function contactWaHref(whatsapp: string): string {
   return `https://wa.me/${coPhoneE164(whatsapp).slice(1)}`
 }

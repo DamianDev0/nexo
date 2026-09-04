@@ -19,7 +19,7 @@ import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 import { ContactsPagination } from './ContactsPagination'
 
 import type { ContactsBoard } from '../model/useContactsBoard'
-import type { ListMenu } from './containers/useListMenu'
+import type { ListMenu } from '../model/useListMenu'
 
 type ContactsTableProps = Readonly<
   Pick<ContactsBoard, 'instance' | 'lists' | 'state' | 'actions'> & { listMenu: ListMenu }
@@ -42,7 +42,11 @@ export function ContactsTable({ instance, lists, state, actions, listMenu }: Con
         }}
         hotkeys
       >
-        <SaveViewControls snapshot={state.viewSnapshot} activeView={state.activeView} />
+        <SaveViewControls
+          snapshot={state.viewSnapshot}
+          activeView={state.activeView}
+          onRevert={actions.onRevertFilters}
+        />
         <PillButton asChild variant="ghost" size="sm" className="gap-1.5 rounded-md">
           <Link href={ROUTES.app.contacts.import}>
             <CloudArrowUpIcon className="size-4" />
@@ -54,7 +58,6 @@ export function ContactsTable({ instance, lists, state, actions, listMenu }: Con
           {t('contacts.lists.new')}
         </PillButton>
       </DataTable.SmartLists>
-      {listMenu.dialogs}
 
       <DataTable.QuickFilters
         filters={state.quickFilters}

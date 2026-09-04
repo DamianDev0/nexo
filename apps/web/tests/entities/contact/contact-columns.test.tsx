@@ -70,11 +70,12 @@ describe('buildContactColumns', () => {
     expect(screen.getAllByText('+57 300 123 4567')).toHaveLength(2)
   })
 
-  it('formats dates without slashes so the day and month never read ambiguously', () => {
+  it('formats the created date as DD/MM/YYYY with the Bogota time below', () => {
     const contact = { ...CONTACTS_FIXTURE[0]!, createdAt: '2026-08-14T15:00:00.000Z' }
 
     render(<CellUnderTest contact={contact} columnId="createdAt" />, { wrapper })
 
-    expect(screen.getByText('14 ago 2026')).toBeInTheDocument()
+    expect(screen.getByText('14/08/2026')).toBeInTheDocument()
+    expect(screen.getByText(/10:00/)).toBeInTheDocument()
   })
 })

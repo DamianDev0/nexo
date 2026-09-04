@@ -1,15 +1,12 @@
-import { CUSTOM_COLUMN_PREFIX } from '@repo/shared-types'
-import { formatDateShortCO } from '@repo/shared-utils'
-
-import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
 import { CONTACT_SCORE_LABEL_KEY } from '../../config/contact-columns.constants'
+import { commCellActions } from '../../lib/comm-actions'
 import { buildContactCellLabels } from '../../lib/contact-cell-labels'
 import { contactPlaceLabel } from '../../lib/contact-display'
 import { contactScoreBand } from '../../lib/contact-links'
-import { customFieldBadges, customFieldDisplay } from '../../lib/custom-field-display'
+import { taxonomyLabel } from '../../lib/contact-taxonomy-label'
 import {
   ContactDocumentCell,
   ContactEmailCell,
@@ -19,18 +16,19 @@ import {
 import { ContactNameCell } from '../cells/ContactNameCell'
 import { ContactTagsCell } from '../cells/ContactTagsCell'
 import {
+  ContactCreatedCell,
   ContactRelativeCell,
   ContactScoreCell,
   ContactStageCell,
   ContactStatusCell,
 } from '../cells/ContactValueCells'
+import { ContactNotesCell } from '../containers/ContactNotesHoverCard'
 
 import type {
   ContactColumnContext,
   ContactRenderContext,
 } from '../../model/types/contact-cells.types'
-import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
-import type { ContactColumnDef, ContactListItem } from '@repo/shared-types'
+import type { ContactListItem } from '@repo/shared-types'
 import type { ReactNode } from 'react'
 
 type ContactCellRenderer = (contact: ContactListItem, context: ContactRenderContext) => ReactNode
@@ -45,36 +43,6 @@ function text(value: string | number | null): ReactNode {
 
 function muted(value: string | null): ReactNode {
   return <DataTable.CellText muted>{value}</DataTable.CellText>
-}
-
-function numeric(value: string | number | null): ReactNode {
-  return <DataTable.CellText numeric>{value}</DataTable.CellText>
-}
-
-function labelFor(map: ReadonlyMap<string, TaxonomyChoice>, key: string | null): string | null {
-  if (!key) return null
-  return map.get(key)?.label ?? key
-}
-
-export function customFieldCellRenderer(def: ContactColumnDef): ContactCellRenderer {
-  const fieldKey = def.key.slice(CUSTOM_COLUMN_PREFIX.length)
-  return function CustomFieldCell(contact, { t }) {
-    const value = contact.customFields?.[fieldKey]
-    const badges = customFieldBadges(def, value)
-    if (badges.length > 0) {
-      return (
-        <span className="flex items-center gap-1 overflow-hidden">
-          {badges.map((badge) => (
-            <BadgeSoft key={badge.label} color={badge.color}>
-              {badge.label}
-            </BadgeSoft>
-          ))}
-        </span>
-      )
-    }
-    const display = customFieldDisplay(def, value, t)
-    return display.numeric ? numeric(display.text) : text(display.text)
-  }
 }
 
 const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
@@ -99,12 +67,15 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
   tags: (contact, { tagsByName, labels }) => (
     <ContactTagsCell tags={contact.tags} labels={labels.tags} byName={tagsByName} />
   ),
+  notes: (contact, { actions, labels }) => (
+    <ContactNotesCell contact={contact} labels={labels.name.notes} onAddNote={actions?.onAddNote} />
+  ),
   phone: (contact, { actions, dense, labels }) => (
     <ContactPhoneCell
       value={contact.phone}
       whatsapp={contact.whatsapp}
       labels={labels.phone}
-      onCopy={actions?.onCopy}
+      actions={commCellActions(actions, 'sms', contact)}
       dense={dense}
     />
   ),
@@ -112,7 +83,7 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
     <ContactWhatsAppCell
       value={contact.whatsapp}
       labels={labels.whatsapp}
-      onCopy={actions?.onCopy}
+      actions={commCellActions(actions, 'whatsapp', contact)}
       dense={dense}
       blocked={contact.optOutWhatsapp}
     />
@@ -121,7 +92,7 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
     <ContactEmailCell
       value={contact.email}
       labels={labels.email}
-      onCopy={actions?.onCopy}
+      actions={commCellActions(actions, 'email', contact)}
       dense={dense}
       blocked={contact.optOutEmail}
     />
@@ -154,18 +125,22 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
     ) : (
       muted(null)
     ),
-  source: (contact, { taxonomy }) => muted(labelFor(taxonomy.sourceByKey, contact.source)),
+  source: (contact, { taxonomy }) => muted(taxonomyLabel(taxonomy.sourceByKey, contact.source)),
   type: (contact, { taxonomy }) =>
-    muted(contact.typeLabel ?? labelFor(taxonomy.typeByKey, contact.type)),
+    muted(contact.typeLabel ?? taxonomyLabel(taxonomy.typeByKey, contact.type)),
   lifecycleStage: (contact, { taxonomy }) => (
     <ContactStageCell
-      label={labelFor(taxonomy.lifecycleByKey, contact.lifecycleStage) ?? contact.lifecycleStage}
+      label={
+        taxonomyLabel(taxonomy.lifecycleByKey, contact.lifecycleStage) ?? contact.lifecycleStage
+      }
     />
   ),
   lastContactedAt: (contact, { locale, labels }) => (
     <ContactRelativeCell iso={contact.lastContactedAt} locale={locale} staleLabel={labels.stale} />
   ),
-  createdAt: (contact) => numeric(formatDateShortCO(contact.createdAt)),
+  createdAt: (contact, { locale }) => (
+    <ContactCreatedCell iso={contact.createdAt} locale={locale} />
+  ),
 }
 
 export function contactCellRenderer(key: string): ContactCellRenderer {

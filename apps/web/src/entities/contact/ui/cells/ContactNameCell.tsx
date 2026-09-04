@@ -1,12 +1,13 @@
 import { cn } from '@/shared/lib/cn'
 import { Avatar } from '@/shared/ui/atoms/avatar'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { SidebarSimpleIcon, TagIcon } from '@/shared/ui/icons'
+import { NotePencilIcon, SidebarSimpleIcon, TagIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 
 import { CONTACT_NAME_TEXT, CONTACT_STRIP_BUTTON } from '../../config/contact-columns.constants'
 import { contactAvatarUrl, contactFullName } from '../../lib/contact-display'
+import { ContactNotesHoverCard } from '../containers/ContactNotesHoverCard'
 
 import { ContactTagsHoverCard } from './ContactTagsCell'
 
@@ -39,29 +40,78 @@ type StripContext = Readonly<{
   tagsByName?: ReadonlyMap<string, Tag>
 }>
 
-function TagsStripAction({ contact, labels, tagsByName }: Omit<StripContext, 'actions'>) {
+function TagsStripAction({ contact, labels, actions, tagsByName }: StripContext) {
   const { tags } = contact
-  if (tags.length === 0) return null
+  const onEditTags = actions.onEditTags
+  if (tags.length === 0 && !onEditTags) return null
 
+  const button = (
+    <PillButton
+      variant="ghost"
+      size="xs"
+      aria-label={onEditTags ? labels.editTags : labels.tags.title}
+      onClick={onEditTags ? () => onEditTags(contact) : undefined}
+      className={cn('w-8 px-0', CONTACT_STRIP_BUTTON)}
+    >
+      <TagIcon className="size-3.5" />
+      <CountBadge count={tags.length} />
+    </PillButton>
+  )
+
+  if (tags.length === 0) return button
   return (
     <ContactTagsHoverCard tags={tags} labels={labels.tags} byName={tagsByName}>
-      <PillButton
-        variant="ghost"
-        size="xs"
-        aria-label={labels.tags.title}
-        className={cn('w-8 px-0', CONTACT_STRIP_BUTTON)}
-      >
-        <TagIcon className="size-3.5" />
-        <CountBadge count={tags.length} />
-      </PillButton>
+      {button}
     </ContactTagsHoverCard>
   )
 }
 
+function NotesStripAction({ contact, labels, actions }: Omit<StripContext, 'tagsByName'>) {
+  const button = (
+    <PillButton
+      variant="ghost"
+      size="xs"
+      aria-label={labels.addNote}
+      onClick={() => actions.onAddNote?.(contact)}
+      className={cn('w-8 px-0', CONTACT_STRIP_BUTTON)}
+    >
+      <NotePencilIcon className="size-3.5" />
+      <CountBadge count={contact.noteCount} />
+    </PillButton>
+  )
+
+  if (contact.noteCount === 0) {
+    return (
+      <HintTooltip asChild hint={labels.addNote}>
+        {button}
+      </HintTooltip>
+    )
+  }
+  return (
+    <ContactNotesHoverCard contactId={contact.id} labels={labels.notes}>
+      {button}
+    </ContactNotesHoverCard>
+  )
+}
+
 function ActionStrip({ contact, labels, actions, tagsByName }: StripContext) {
+  const hasLeadingActions =
+    contact.tags.length > 0 || Boolean(actions.onEditTags) || Boolean(actions.onAddNote)
+
   return (
     <span className="-ml-0.5 flex shrink-0 items-center gap-1">
-      <TagsStripAction contact={contact} labels={labels} tagsByName={tagsByName} />
+      <TagsStripAction
+        contact={contact}
+        labels={labels}
+        actions={actions}
+        tagsByName={tagsByName}
+      />
+      {actions.onAddNote && (
+        <NotesStripAction contact={contact} labels={labels} actions={actions} />
+      )}
+      {actions.onPreview && hasLeadingActions && (
+        <span aria-hidden className="mx-0.5 h-3.5 w-px shrink-0 bg-border" />
+      )}
       {actions.onPreview && (
         <HintTooltip asChild hint={labels.preview}>
           <PillButton

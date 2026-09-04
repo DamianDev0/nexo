@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   contactAvatarTone,
+  contactCreatedParts,
   contactAvatarUrl,
   contactFullName,
   contactInitials,
@@ -82,5 +83,22 @@ describe('contactAvatarUrl', () => {
     const picked = 'https://res.cloudinary.com/dpqbn1gqb/image/upload/v1/peep-1.png'
 
     expect(contactAvatarUrl({ id: 'contact-1', avatarUrl: picked })).toBe(picked)
+  })
+})
+
+describe('contactCreatedParts', () => {
+  const iso = '2026-03-19T15:00:00.000Z'
+
+  it('formats the date as DD/MM/YYYY in America/Bogota', () => {
+    expect(contactCreatedParts(iso, 'es').date).toBe('19/03/2026')
+  })
+
+  it('formats the time in 12h Bogota time per locale', () => {
+    expect(contactCreatedParts(iso, 'en').time).toBe('10:00 AM')
+    expect(contactCreatedParts(iso, 'es').time.replaceAll(' ', ' ')).toContain('10:00')
+  })
+
+  it('rolls the date back when UTC midnight is still the previous day in Bogota', () => {
+    expect(contactCreatedParts('2026-03-20T02:00:00.000Z', 'es').date).toBe('19/03/2026')
   })
 })

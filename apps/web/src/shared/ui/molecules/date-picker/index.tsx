@@ -61,3 +61,5 @@ export function DatePicker({
     </GroovyPopover>
   )
 }
+
+export { CalendarPanel } from './calendar-panel'

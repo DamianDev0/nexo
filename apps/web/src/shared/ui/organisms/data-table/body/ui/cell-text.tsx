@@ -15,8 +15,8 @@ export function DataTableCellText({
   return (
     <TruncateTip
       className={cn(
-        muted && 'text-muted-foreground',
-        numeric && 'tabular-nums text-muted-foreground',
+        muted && 'font-light text-muted-foreground',
+        numeric && 'font-light tabular-nums text-muted-foreground',
       )}
     >
       {children}

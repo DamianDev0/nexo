@@ -8,7 +8,6 @@ import { useContactTaxonomy, useTaxonomyUsage } from '@/entities/contact-taxonom
 import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
 import { buildBulkLabels, useArchiveContacts } from '@/features/archive-contacts'
-import { useCreateFromUrl } from '@/features/create-contact'
 import { useContactsLayout, useContactWorkspace } from '@/features/customize-contacts-table'
 import {
   buildContactHints,
@@ -19,24 +18,14 @@ import {
   useContactsTable,
   useAdvancedFilterFields,
 } from '@/features/filter-contacts'
-import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
+import { EMPTY_COLUMNS, EMPTY_TABLE_STATE, EMPTY_VIEWS } from '../config/board-empty.constants'
+
+import { useBoardEditors } from './useBoardEditors'
 import { useBoardSelection } from './useBoardSelection'
 import { useBoardViews } from './useBoardViews'
-import { useContactRowActions } from './useContactRowActions'
 import { useSkeletonHintSync } from './useSkeletonHintSync'
-
-import type {
-  ContactColumnDef,
-  ContactListItem,
-  ContactTableState,
-  ContactView,
-} from '@repo/shared-types'
-
-const NO_COLUMNS: ReadonlyArray<ContactColumnDef> = []
-const NO_TABLE_STATE: ContactTableState = {}
-const NO_VIEWS: ReadonlyArray<ContactView> = []
 
 export function useContactsBoard() {
   const { t, i18n } = useTranslation()
@@ -44,25 +33,18 @@ export function useContactsBoard() {
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
   const terms = useEntityTerms('contact')
-  const sheet = useEntityEditor<ContactListItem>()
-  const preview = useEntityEditor<ContactListItem>()
+  const { sheet, preview, composers, rowActions } = useBoardEditors()
   const { archive, isArchiving } = useArchiveContacts()
   const workspace = useContactWorkspace()
   const usage = useTaxonomyUsage()
-  useCreateFromUrl(sheet.openCreate)
 
-  const catalog = workspace.data?.columns ?? NO_COLUMNS
+  const catalog = workspace.data?.columns ?? EMPTY_COLUMNS
   const { handleSort } = table
   const { layout, sort, setListOrder, saveStatus } = useContactsLayout(
     catalog,
-    workspace.data?.tableState ?? NO_TABLE_STATE,
+    workspace.data?.tableState ?? EMPTY_TABLE_STATE,
     { value: table.sort, onChange: handleSort },
   )
-
-  const rowActions = useContactRowActions({
-    onOpen: sheet.openEdit,
-    onPreview: preview.openEdit,
-  })
 
   const tagsByName = useTagCatalog('contact')
 
@@ -159,7 +141,7 @@ export function useContactsBoard() {
       advancedFields,
       viewSnapshot: boardViews.viewSnapshot,
       activeView: boardViews.activeView,
-      views: workspace.data?.views ?? NO_VIEWS,
+      views: workspace.data?.views ?? EMPTY_VIEWS,
       quickFilters: buildQuickFilterDefs(
         t,
         table.filters,
@@ -183,7 +165,9 @@ export function useContactsBoard() {
       onToggleFilter: table.handleToggleFilter,
       onClearFilters: table.handleClearFilters,
       onArchiveSelected: archiveSelected,
+      onRevertFilters: boardViews.revertFilters,
     },
+    composers,
     sheet: { contact: sheet.editing, open: sheet.open, onOpenChange: sheet.setOpen },
     preview: {
       contact: preview.editing,

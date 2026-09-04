@@ -2,29 +2,11 @@
 
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 
+import { HEADER_TABS } from '../config/skeleton.constants'
+import { skeletonCells } from '../lib/skeleton-cells'
 import { useSkeletonHint } from '../model/useSkeletonHint'
 
-const HEADER_TABS = [
-  ['all', 'w-24'],
-  ['new', 'w-16'],
-  ['contacted', 'w-28'],
-  ['qualified', 'w-20'],
-  ['nurturing', 'w-20'],
-] as const
-
-interface SkeletonCell {
-  readonly id: string
-  readonly width: number
-  readonly kind: 'select' | 'lead' | 'plain'
-}
-
-function toCells(widths: ReadonlyArray<number>): ReadonlyArray<SkeletonCell> {
-  return widths.map((width, index) => ({
-    id: `col-${index + 1}`,
-    width,
-    kind: index === 0 ? 'select' : index === 1 ? 'lead' : 'plain',
-  }))
-}
+import type { SkeletonCell } from '../lib/skeleton-cells'
 
 function SkeletonCells({
   cells,
@@ -56,7 +38,7 @@ function SkeletonCells({
 
 export function ContactsSkeleton() {
   const hint = useSkeletonHint()
-  const cells = toCells(hint.widths)
+  const cells = skeletonCells(hint.widths)
 
   return (
     <div className="flex flex-1 flex-col" aria-busy>

@@ -8,14 +8,14 @@ import { useViewTabMenu } from '@/features/manage-contact-views'
 import { ROUTES } from '@/shared/config/routes'
 import { GearIcon } from '@/shared/ui/icons'
 
+import type { ViewMenuController } from '@/features/manage-contact-views'
 import type { SmartListItem, SmartListMenuAction } from '@/shared/ui/organisms/data-table'
 import type { ContactView } from '@repo/shared-types'
-import type { ReactNode } from 'react'
 
 export type ListMenu = {
   readonly itemMenu: (item: SmartListItem) => ReadonlyArray<SmartListMenuAction>
   readonly menuLabel: string
-  readonly dialogs: ReactNode
+  readonly viewMenu: ViewMenuController
 }
 
 export function useListMenu(views: ReadonlyArray<ContactView>): ListMenu {
@@ -40,5 +40,5 @@ export function useListMenu(views: ReadonlyArray<ContactView>): ListMenu {
     [viewMenu, t, router],
   )
 
-  return { itemMenu, menuLabel: viewMenu.menuLabel, dialogs: viewMenu.dialogs }
+  return { itemMenu, menuLabel: viewMenu.menuLabel, viewMenu }
 }

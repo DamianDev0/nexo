@@ -17,6 +17,7 @@ import {
 } from '@/shared/ui/shadcn/dropdown-menu'
 
 import { CONTACT_SCORE_DOT, CONTACT_STALE_DAYS } from '../../config/contact-columns.constants'
+import { contactCreatedParts } from '../../lib/contact-display'
 import { contactScoreBand, daysSince } from '../../lib/contact-links'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
@@ -124,5 +125,18 @@ export function ContactScoreCell({
         {score}
       </Text>
     </HintTooltip>
+  )
+}
+
+export function ContactCreatedCell({ iso, locale }: Readonly<{ iso: string; locale: string }>) {
+  const { date, time } = contactCreatedParts(iso, locale)
+
+  return (
+    <span className="flex min-w-0 flex-col">
+      <Text className="truncate tabular-nums">{date}</Text>
+      <Text variant="faint" className="truncate font-light tabular-nums">
+        {time}
+      </Text>
+    </span>
   )
 }

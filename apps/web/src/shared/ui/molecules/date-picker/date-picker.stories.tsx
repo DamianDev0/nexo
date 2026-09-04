@@ -45,3 +45,19 @@ export const Default: Story = {
 export const Empty: Story = {
   render: () => <ControlledDatePicker />,
 }
+
+export const BirthdayNavigation: Story = {
+  render: () => <ControlledDatePicker initial="2026-09-15" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const trigger = canvas.getByRole('button', { name: 'Fecha' })
+    await userEvent.click(trigger)
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(await body.findByRole('button', { name: /septiembre/i }))
+    await userEvent.click(await body.findByRole('button', { name: '2026' }))
+    await userEvent.click(await body.findByRole('button', { name: '2024' }))
+    await userEvent.click(await body.findByRole('button', { name: /^ene/i }))
+    await userEvent.click(await body.findByRole('button', { name: '15' }))
+    await expect(trigger).toHaveTextContent('15/01/2024')
+  },
+}

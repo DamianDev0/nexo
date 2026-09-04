@@ -29,6 +29,10 @@ function dateText(value: unknown): string {
   return formatDateShortCO(raw)
 }
 
+export function customFieldLabel(def: ContactColumnDef, fieldKey: string): string {
+  return def.label ?? fieldKey
+}
+
 export type CustomFieldBadge = {
   label: string
   color?: string

@@ -9,6 +9,7 @@ export type { AvatarTone } from './lib/contact-display'
 export { buildContactColumns } from './ui/columns/contact-columns'
 export type {
   ContactColumnContext,
+  ContactComposeChannel,
   ContactRowActions,
   ContactTaxonomyMaps,
 } from './model/types/contact-cells.types'
@@ -22,4 +23,6 @@ export {
   type ContactSort,
 } from './lib/contact-sort'
 export { useContactList, usePrefetchContactList } from './query/useContactList'
+export { useOptimisticContactListPatch } from './query/useOptimisticContactListPatch'
+export { contactDialNumber, contactPhoneLabel } from './lib/contact-links'
 export { readSkeletonHint, writeSkeletonHint, type ContactsSkeletonHint } from './lib/skeleton-hint'

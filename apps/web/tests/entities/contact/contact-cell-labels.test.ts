@@ -8,7 +8,12 @@ describe('buildContactCellLabels', () => {
   it('resolves every cell label once from the shared namespaces', () => {
     const labels = buildContactCellLabels(t)
 
-    expect(labels.phone).toEqual({ copy: 'common.copy', action: 'contacts.rowActions.call' })
+    expect(labels.phone).toEqual({
+      copy: 'common.copy',
+      menu: 'common.table.actions',
+      action: 'contacts.rowActions.call',
+      compose: 'contacts.rowActions.sms',
+    })
     expect(labels.whatsapp.blocked).toBe('contacts.optOut.whatsapp')
     expect(labels.email.blocked).toBe('contacts.optOut.email')
     expect(labels.document.invalid).toBe('contacts.document.invalid')

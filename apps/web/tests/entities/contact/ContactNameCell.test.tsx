@@ -12,10 +12,13 @@ const FULL_NAME = `${CONTACT.firstName} ${CONTACT.lastName}`
 
 const LABELS = {
   preview: 'Vista rápida',
+  addNote: 'Agregar nota',
+  editTags: 'Editar etiquetas',
   tags: {
     title: 'Etiquetas',
     count: (total: number) => `${total} etiquetas`,
   },
+  notes: { title: 'Notas' },
 }
 
 describe('ContactNameCell', () => {

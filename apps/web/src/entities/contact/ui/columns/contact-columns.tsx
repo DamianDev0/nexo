@@ -1,15 +1,10 @@
-import { CUSTOM_COLUMN_PREFIX } from '@repo/shared-types'
-
-import { contactFullName } from '@/entities/contact'
 import { selectionColumn } from '@/shared/ui/organisms/data-table'
 
 import { CONTACT_COLUMN_ALIGN, CONTACT_GROW_COLUMN } from '../../config/contact-columns.constants'
+import { contactAccessor } from '../../lib/contact-accessor'
 
-import {
-  contactCellRenderer,
-  customFieldCellRenderer,
-  withContactCellLabels,
-} from './cell-renderers'
+import { contactCellRenderer, withContactCellLabels } from './cell-renderers'
+import { customFieldCellRenderer } from './custom-field-cells'
 
 import type {
   ContactColumnContext,
@@ -20,22 +15,13 @@ import type { ColumnDef } from '@tanstack/react-table'
 
 type ContactColumn = ColumnDef<ContactListItem, unknown>
 
-function accessorFor(key: string): (contact: ContactListItem) => unknown {
-  if (key === 'name') return contactFullName
-  if (key.startsWith(CUSTOM_COLUMN_PREFIX)) {
-    const fieldKey = key.slice(CUSTOM_COLUMN_PREFIX.length)
-    return (contact) => contact.customFields?.[fieldKey]
-  }
-  return (contact) => Reflect.get(contact, key)
-}
-
 function dataColumn(def: ContactColumnDef, context: ContactRenderContext): ContactColumn {
   const render = def.custom ? customFieldCellRenderer(def) : contactCellRenderer(def.key)
   const label = def.custom ? (def.label ?? def.key) : context.t(def.labelKey)
 
   return {
     id: def.key,
-    accessorFn: accessorFor(def.key),
+    accessorFn: contactAccessor(def.key),
     header: label,
     size: def.defaultWidth,
     minSize: def.minWidth,

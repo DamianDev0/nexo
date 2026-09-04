@@ -47,10 +47,11 @@ describe('contactCellRenderer', () => {
     expect(screen.getByText('Distribuidor')).toBeInTheDocument()
   })
 
-  it('renders dates in the Colombian short format', () => {
+  it('renders the created date with its Bogota time', () => {
     renderCell('createdAt', { createdAt: '2026-08-14T15:00:00.000Z' })
 
-    expect(screen.getByText('14 ago 2026')).toBeInTheDocument()
+    expect(screen.getByText('14/08/2026')).toBeInTheDocument()
+    expect(screen.getByText(/10:00/)).toBeInTheDocument()
   })
 
   it('renders an empty marker for a missing value instead of blowing up', () => {

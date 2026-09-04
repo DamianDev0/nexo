@@ -1,49 +1,44 @@
 import {
+  ChatTextIcon,
   CopyIcon,
   EnvelopeSimpleIcon,
-  PhoneIcon,
-  ProhibitIcon,
   WarningCircleIcon,
   WhatsappLogoIcon,
 } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
+import { callAction, copyAction } from '../../lib/comm-action-items'
 import {
   contactDocumentLabel,
   contactMailHref,
   contactPhoneLabel,
-  contactTelHref,
   contactWaHref,
   isValidContactDocument,
-  sameCOPhone,
 } from '../../lib/contact-links'
 
-import type { CommCellLabels, DocumentCellLabels } from '../../model/types/contact-cells.types'
+import { OptOutHint } from './OptOutHint'
+
+import type {
+  CommCellActions,
+  CommCellLabels,
+  DocumentCellLabels,
+} from '../../model/types/contact-cells.types'
+import type { ActionDockItem } from '@/shared/ui/molecules/action-dock'
 import type { DocumentType } from '@repo/shared-types'
 
 type CommCellProps = {
   readonly value: string | null
   readonly labels: CommCellLabels
-  readonly onCopy?: (value: string) => void
+  readonly actions?: CommCellActions
   readonly dense?: boolean
   readonly blocked?: boolean
-}
-
-function OptOutHint({ label }: Readonly<{ label?: string }>) {
-  if (label === undefined) return null
-
-  return (
-    <DataTable.CellHint hint={label}>
-      <ProhibitIcon className="size-3.5 text-warning-deep" />
-    </DataTable.CellHint>
-  )
 }
 
 type ContactPhoneCellProps = {
   readonly value: string | null
   readonly whatsapp: string | null
   readonly labels: CommCellLabels
-  readonly onCopy?: (value: string) => void
+  readonly actions?: CommCellActions
   readonly dense?: boolean
 }
 
@@ -51,76 +46,112 @@ export function ContactPhoneCell({
   value,
   whatsapp,
   labels,
-  onCopy,
+  actions,
   dense,
 }: Readonly<ContactPhoneCellProps>) {
   const number = value ?? whatsapp
   if (!number) return <DataTable.CellText>{null}</DataTable.CellText>
 
   const display = contactPhoneLabel(number)
-  const reachableOnWhatsApp = whatsapp !== null && sameCOPhone(number, whatsapp)
+  const items: ActionDockItem[] = [callAction(number, labels.action, actions?.onCall)]
+  if (actions?.onCompose && labels.compose) {
+    items.push({
+      id: 'compose',
+      label: labels.compose,
+      icon: <ChatTextIcon />,
+      onClick: actions.onCompose,
+    })
+  }
+  items.push(copyAction(labels.copy, display, actions))
 
   return (
-    <DataTable.CellFrame dense={dense} numeric display={display}>
-      <DataTable.CellAction label={labels.action} href={contactTelHref(number)}>
-        <PhoneIcon />
-      </DataTable.CellAction>
-      <DataTable.CellAction label={labels.copy} onClick={() => onCopy?.(display)}>
-        <CopyIcon />
-      </DataTable.CellAction>
-      {reachableOnWhatsApp && (
-        <WhatsappLogoIcon aria-hidden className="size-3.5 self-center text-faint" />
-      )}
-    </DataTable.CellFrame>
+    <DataTable.CellFrame
+      dense={dense}
+      numeric
+      display={display}
+      actions={{ label: labels.menu, items }}
+    />
   )
 }
 
 export function ContactWhatsAppCell({
   value,
   labels,
-  onCopy,
+  actions,
   dense,
   blocked,
 }: Readonly<CommCellProps>) {
   if (!value) return <DataTable.CellText>{null}</DataTable.CellText>
   const display = contactPhoneLabel(value)
 
+  const items: ActionDockItem[] = []
+  if (!blocked) {
+    items.push(
+      actions?.onCompose
+        ? {
+            id: 'send',
+            label: labels.action,
+            icon: <WhatsappLogoIcon />,
+            onClick: actions.onCompose,
+          }
+        : {
+            id: 'send',
+            label: labels.action,
+            icon: <WhatsappLogoIcon />,
+            href: contactWaHref(value),
+            external: true,
+          },
+    )
+  }
+  items.push(copyAction(labels.copy, display, actions))
+
   return (
-    <DataTable.CellFrame dense={dense} numeric display={display}>
-      {!blocked && (
-        <DataTable.CellAction label={labels.action} href={contactWaHref(value)} external>
-          <WhatsappLogoIcon />
-        </DataTable.CellAction>
-      )}
-      <DataTable.CellAction label={labels.copy} onClick={() => onCopy?.(display)}>
-        <CopyIcon />
-      </DataTable.CellAction>
-      {blocked && <OptOutHint label={labels.blocked} />}
-    </DataTable.CellFrame>
+    <DataTable.CellFrame
+      dense={dense}
+      numeric
+      display={display}
+      hint={blocked && <OptOutHint label={labels.blocked} />}
+      actions={{ label: labels.menu, items }}
+    />
   )
 }
 
 export function ContactEmailCell({
   value,
   labels,
-  onCopy,
+  actions,
   dense,
   blocked,
 }: Readonly<CommCellProps>) {
   if (!value) return <DataTable.CellText>{null}</DataTable.CellText>
 
+  const items: ActionDockItem[] = []
+  if (!blocked) {
+    items.push(
+      actions?.onCompose
+        ? {
+            id: 'send',
+            label: labels.action,
+            icon: <EnvelopeSimpleIcon />,
+            onClick: actions.onCompose,
+          }
+        : {
+            id: 'send',
+            label: labels.action,
+            icon: <EnvelopeSimpleIcon />,
+            href: contactMailHref(value),
+          },
+    )
+  }
+  items.push(copyAction(labels.copy, value, actions))
+
   return (
-    <DataTable.CellFrame dense={dense} display={value}>
-      {!blocked && (
-        <DataTable.CellAction label={labels.action} href={contactMailHref(value)}>
-          <EnvelopeSimpleIcon />
-        </DataTable.CellAction>
-      )}
-      <DataTable.CellAction label={labels.copy} onClick={() => onCopy?.(value)}>
-        <CopyIcon />
-      </DataTable.CellAction>
-      {blocked && <OptOutHint label={labels.blocked} />}
-    </DataTable.CellFrame>
+    <DataTable.CellFrame
+      dense={dense}
+      display={value}
+      hint={blocked && <OptOutHint label={labels.blocked} />}
+      actions={{ label: labels.menu, items }}
+    />
   )
 }
 
@@ -142,15 +173,23 @@ export function ContactDocumentCell({
   if (!value) return <DataTable.CellText>{null}</DataTable.CellText>
 
   return (
-    <DataTable.CellFrame dense={dense} numeric display={contactDocumentLabel(docType, value)}>
-      <DataTable.CellAction label={labels.copy} onClick={() => onCopy?.(value)}>
-        <CopyIcon />
-      </DataTable.CellAction>
-      {!isValidContactDocument(docType, value) && (
-        <DataTable.CellHint hint={labels.invalid}>
-          <WarningCircleIcon className="size-3.5 text-warning-deep" />
-        </DataTable.CellHint>
-      )}
-    </DataTable.CellFrame>
+    <DataTable.CellFrame
+      dense={dense}
+      numeric
+      display={contactDocumentLabel(docType, value)}
+      hint={
+        !isValidContactDocument(docType, value) && (
+          <DataTable.CellHint hint={labels.invalid}>
+            <WarningCircleIcon className="size-3.5 text-warning-deep" />
+          </DataTable.CellHint>
+        )
+      }
+      actions={{
+        label: labels.menu,
+        items: [
+          { id: 'copy', label: labels.copy, icon: <CopyIcon />, onClick: () => onCopy?.(value) },
+        ],
+      }}
+    />
   )
 }
