@@ -16,6 +16,8 @@ import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { FilterChips, FilterTrigger } from '@/shared/ui/organisms/filter-bar'
 import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 
+import { CONTACTS_TOOLBAR_LINK } from '../config/toolbar.constants'
+
 import { ContactsPagination } from './ContactsPagination'
 
 import type { ContactsBoard } from '../model/useContactsBoard'
@@ -54,14 +56,14 @@ export function ContactsTable({
           activeView={state.activeView}
           onRevert={actions.onRevertFilters}
         />
-        <span className="flex items-center gap-0.5">
-          <PillButton asChild variant="ghost" size="sm" className="gap-1.5 rounded-md">
+        <span className="flex items-center">
+          <PillButton asChild variant="ghost" size="sm" className={CONTACTS_TOOLBAR_LINK}>
             <Link href={ROUTES.app.bulkActions}>
               <StackIcon className="size-4" />
               {t('bulkActions.title')}
             </Link>
           </PillButton>
-          <PillButton asChild variant="ghost" size="sm" className="gap-1.5 rounded-md">
+          <PillButton asChild variant="ghost" size="sm" className={CONTACTS_TOOLBAR_LINK}>
             <Link href={ROUTES.app.contacts.import}>
               <CloudArrowUpIcon className="size-4" />
               {t('contacts.import.cta')}
