@@ -696,6 +696,9 @@ const es = {
         cancelled: '{{kind}}: acción masiva cancelada',
       },
     },
+    toolbar: {
+      more: 'Más acciones',
+    },
     rowActions: {
       preview: 'Vista rápida',
       call: 'Llamar',

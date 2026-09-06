@@ -691,6 +691,9 @@ const en = {
         cancelled: '{{kind}}: bulk action cancelled',
       },
     },
+    toolbar: {
+      more: 'More actions',
+    },
     rowActions: {
       preview: 'Quick view',
       call: 'Call',

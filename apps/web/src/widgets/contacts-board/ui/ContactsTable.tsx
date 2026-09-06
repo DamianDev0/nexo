@@ -1,22 +1,21 @@
 'use client'
 
-import Link from 'next/link'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
 import { BulkActionBar, BulkDialogs } from '@/features/bulk-actions'
 import { ContactsListHint } from '@/features/filter-contacts'
 import { SaveViewControls } from '@/features/manage-contact-views'
-import { ROUTES } from '@/shared/config/routes'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { CloudArrowUpIcon, PlusIcon, StackIcon, UsersThreeIcon } from '@/shared/ui/icons'
+import { DotsThreeVerticalIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
+import { ActionMenu } from '@/shared/ui/molecules/action-menu'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { FilterChips, FilterTrigger } from '@/shared/ui/organisms/filter-bar'
 import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 
-import { CONTACTS_TOOLBAR_LINK } from '../config/toolbar.constants'
+import { buildToolbarMenu } from '../lib/toolbar-menu'
 
 import { ContactsPagination } from './ContactsPagination'
 
@@ -38,6 +37,7 @@ export function ContactsTable({
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
   const scrollRef = useRef<HTMLDivElement>(null)
+  const toolbarMenu = useMemo(() => buildToolbarMenu(t), [t])
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -56,20 +56,16 @@ export function ContactsTable({
           activeView={state.activeView}
           onRevert={actions.onRevertFilters}
         />
-        <span className="flex items-center">
-          <PillButton asChild variant="ghost" size="sm" className={CONTACTS_TOOLBAR_LINK}>
-            <Link href={ROUTES.app.bulkActions}>
-              <StackIcon className="size-4" />
-              {t('bulkActions.title')}
-            </Link>
+        <ActionMenu items={toolbarMenu} align="end">
+          <PillButton
+            variant="ghost"
+            size="sm"
+            className="w-9 px-0"
+            aria-label={t('contacts.toolbar.more')}
+          >
+            <DotsThreeVerticalIcon className="size-4" />
           </PillButton>
-          <PillButton asChild variant="ghost" size="sm" className={CONTACTS_TOOLBAR_LINK}>
-            <Link href={ROUTES.app.contacts.import}>
-              <CloudArrowUpIcon className="size-4" />
-              {t('contacts.import.cta')}
-            </Link>
-          </PillButton>
-        </span>
+        </ActionMenu>
         <PillButton size="sm" className="gap-1.5 rounded-md" onClick={actions.onCreate}>
           <PlusIcon className="size-4" />
           {t('contacts.lists.new')}
