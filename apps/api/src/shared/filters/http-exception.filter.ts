@@ -15,6 +15,8 @@ import type {
   ValidationErrorDetail,
 } from '../interfaces/api-response.interface'
 
+const QUOTED_FIELD = /"([^"]+)"/
+
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name)
@@ -36,7 +38,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (status === HttpStatus.BAD_REQUEST && this.isValidationError(exceptionResponse)) {
       const validationResponse: ApiValidationErrorResponse = {
         ...base,
-        message: 'Validation failed',
+        message: this.extractValidationMessage(exceptionResponse as object),
         error: 'BAD_REQUEST',
         errors: this.extractValidationErrors(exceptionResponse as object),
       }
@@ -62,10 +64,22 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private isValidationError(exceptionResponse: string | object): boolean {
-    if (typeof exceptionResponse !== 'object' || !('message' in exceptionResponse)) {
-      return false
+    if (typeof exceptionResponse !== 'object') return false
+    return this.validationMessages(exceptionResponse) !== null
+  }
+
+  private validationMessages(exceptionResponse: object): string[] | null {
+    const { message, errors } = exceptionResponse as { message?: unknown; errors?: unknown }
+    if (Array.isArray(message)) return message as string[]
+    if (Array.isArray(errors) && errors.every((entry) => typeof entry === 'string')) {
+      return errors as string[]
     }
-    return Array.isArray(exceptionResponse.message)
+    return null
+  }
+
+  private extractValidationMessage(exceptionResponse: object): string {
+    const { message } = exceptionResponse as { message?: unknown }
+    return typeof message === 'string' ? message : 'Validation failed'
   }
 
   private extractMessage(exceptionResponse: string | object, exception: HttpException): string {
@@ -108,11 +122,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private extractValidationErrors(exceptionResponse: object): ValidationErrorDetail[] {
-    const messages = (exceptionResponse as { message: string[] }).message
+    const messages = this.validationMessages(exceptionResponse) ?? []
 
     return messages.map((msg) => {
+      const quoted = QUOTED_FIELD.exec(msg)?.[1]
       const spaceIndex = msg.indexOf(' ')
-      const field = spaceIndex > 0 ? msg.substring(0, spaceIndex) : 'unknown'
+      const field = quoted ?? (spaceIndex > 0 ? msg.substring(0, spaceIndex) : 'unknown')
 
       return {
         field,

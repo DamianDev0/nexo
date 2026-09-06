@@ -1,41 +1,34 @@
 import { Injectable } from '@nestjs/common'
-import type { BulkActionKind } from '@repo/shared-types'
+import type { BulkActionKind, BulkExportFormat, BulkExportParams } from '@repo/shared-types'
+import { slugify } from '@repo/shared-utils'
 import { S3Service } from '@/shared/integrations/aws/s3.service'
 import { S3Category } from '@/shared/integrations/aws/s3.types'
 import {
-  BULK_EXPORT_HIDDEN_COLUMNS,
+  BULK_EXPORT_FILE_META,
   BULK_EXPORT_URL_TTL_SECONDS,
 } from '../constants/bulk-action.constants'
 import type { BatchOutcome, BulkRunContext } from '../interfaces/bulk-action-row.interfaces'
+import { serializeExport } from '../mappers/export-file.mapper'
 import { BulkActionsRepository } from '../repositories/bulk-actions.repository'
 import { BulkTargetsRepository } from '../repositories/bulk-targets.repository'
 import type { BulkActionHandler } from './bulk-action-handler.interface'
 
-function csvCell(value: unknown): string {
-  if (value === null || value === undefined) return ''
-  const text =
-    value instanceof Date
-      ? value.toISOString()
-      : typeof value === 'object'
-        ? JSON.stringify(value)
-        : String(value)
-  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
-}
+const DEFAULT_FORMAT: BulkExportFormat = 'csv'
 
-export function toCsv(rows: ReadonlyArray<Record<string, unknown>>, columns?: string[]): string {
-  const first = rows[0]
-  const headers = (columns?.length ? columns : first ? Object.keys(first) : []).filter(
-    (column) => !BULK_EXPORT_HIDDEN_COLUMNS.has(column),
-  )
-  const lines = rows.map((row) => headers.map((column) => csvCell(row[column])).join(','))
-  return [headers.join(','), ...lines].join('\n')
+type ExportRow = Record<string, unknown>
+
+export function exportFileName(ctx: BulkRunContext, params: BulkExportParams): string {
+  const format = params.format ?? DEFAULT_FORMAT
+  const base = params.fileName ? slugify(params.fileName) : ''
+  const name = base || `${ctx.action.entity}-${ctx.action.id}`
+  return `${name}${BULK_EXPORT_FILE_META[format].extension}`
 }
 
 @Injectable()
 export class ExportHandler implements BulkActionHandler {
   readonly kinds: ReadonlyArray<BulkActionKind> = ['export']
 
-  private readonly chunks = new Map<string, string[]>()
+  private readonly buffers = new Map<string, ExportRow[]>()
 
   constructor(
     private readonly targets: BulkTargetsRepository,
@@ -45,12 +38,10 @@ export class ExportHandler implements BulkActionHandler {
 
   async run(ctx: BulkRunContext, ids: string[]): Promise<BatchOutcome> {
     const rows = await this.targets.findRowsForExport(ctx.schemaName, ctx.action.entity, ids)
-    const columns = ctx.action.params['columns'] as string[] | undefined
     const seen = new Set(rows.map((row) => row['id'] as string))
-    const buffer = this.chunks.get(ctx.action.id) ?? []
-    const csv = toCsv(rows, columns)
-    buffer.push(buffer.length === 0 ? csv : csv.split('\n').slice(1).join('\n'))
-    this.chunks.set(ctx.action.id, buffer)
+    const buffer = this.buffers.get(ctx.action.id) ?? []
+    buffer.push(...rows)
+    this.buffers.set(ctx.action.id, buffer)
 
     const done = ctx.action.processed + ids.length >= ctx.action.total
     if (done) await this.flush(ctx, buffer)
@@ -61,14 +52,16 @@ export class ExportHandler implements BulkActionHandler {
     }
   }
 
-  private async flush(ctx: BulkRunContext, buffer: string[]): Promise<void> {
-    this.chunks.delete(ctx.action.id)
-    const content = Buffer.from(buffer.filter((chunk) => chunk.length > 0).join('\n'), 'utf8')
+  private async flush(ctx: BulkRunContext, rows: ExportRow[]): Promise<void> {
+    this.buffers.delete(ctx.action.id)
+    const params = ctx.action.params as BulkExportParams
+    const format = params.format ?? DEFAULT_FORMAT
+    const content = await serializeExport(format, rows, params.columns)
     const upload = await this.s3.upload(
       {
         fieldname: 'file',
-        originalname: `${ctx.action.entity}-${ctx.action.id}.csv`,
-        mimetype: 'text/csv',
+        originalname: exportFileName(ctx, params),
+        mimetype: BULK_EXPORT_FILE_META[format].mimeType,
         size: content.length,
         buffer: content,
       },

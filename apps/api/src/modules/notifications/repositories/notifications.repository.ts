@@ -110,6 +110,7 @@ export class NotificationsRepository {
       body: string | null
       entityType: string | null
       entityId: string | null
+      data: Record<string, unknown> | null
     },
   ): Promise<NotificationRow | null> {
     return this.db.query(schemaName, async (qr): Promise<NotificationRow | null> => {
@@ -120,10 +121,18 @@ export class NotificationsRepository {
 
       const rows = await sqlRows<NotificationRow[]>(
         qr,
-        `INSERT INTO notifications (user_id, notification_type, title, body, entity_type, entity_id)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO notifications (user_id, notification_type, title, body, entity_type, entity_id, data)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
          RETURNING *`,
-        [userId, data.type, data.title, data.body, data.entityType, data.entityId],
+        [
+          userId,
+          data.type,
+          data.title,
+          data.body,
+          data.entityType,
+          data.entityId,
+          data.data ? JSON.stringify(data.data) : null,
+        ],
       )
 
       const row = rows[0]

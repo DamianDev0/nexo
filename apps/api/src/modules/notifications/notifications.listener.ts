@@ -18,6 +18,7 @@ export class NotificationsListener {
   @OnEvent('stock.**')
   @OnEvent('import.**')
   @OnEvent('bulk_action.completed')
+  @OnEvent('contact.assigned')
   async handleNotificationEvent(event: NotificationEvent): Promise<void> {
     const notification = await this.notificationsService.send(event.schemaName, event.userId, {
       type: event.type,
@@ -25,6 +26,7 @@ export class NotificationsListener {
       body: event.body,
       entityType: event.entityType,
       entityId: event.entityId,
+      data: event.data,
     })
 
     if (notification) {

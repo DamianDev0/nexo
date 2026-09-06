@@ -4,6 +4,7 @@ import type {
   NotificationPreferences,
   NotificationType,
   PaginatedNotifications,
+  NotificationData,
 } from '@repo/shared-types'
 import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 import type { NotificationQueryDto, UpdatePreferencesDto } from '../dto/notification.dto'
@@ -63,6 +64,7 @@ export class NotificationsService {
       body?: string
       entityType?: string
       entityId?: string
+      data?: NotificationData
     },
   ): Promise<Notification | null> {
     const row = await this.repository.create(schemaName, userId, {
@@ -71,6 +73,7 @@ export class NotificationsService {
       body: payload.body ?? null,
       entityType: payload.entityType ?? null,
       entityId: payload.entityId ?? null,
+      data: payload.data ?? null,
     })
 
     return row ? mapNotification(row) : null

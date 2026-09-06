@@ -168,8 +168,11 @@ export class ContactsController {
 
   @Get('counts')
   @ApiEndpoint({ summary: 'Contact totals grouped by status', roles: [UserRole.VIEWER] })
-  counts(@TenantCtx() ctx: TenantContext): Promise<ContactCounts> {
-    return this.contactsService.counts(ctx.schemaName)
+  counts(
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<ContactCounts> {
+    return this.contactsService.counts(ctx.schemaName, user.id)
   }
 
   @Get('taxonomy-usage')
@@ -229,7 +232,10 @@ export class ContactsController {
   ): Promise<Contact> {
     await this.customFields.validate(ctx.tenantId, 'contacts', dto.customFields, 'update')
     const taxonomy = await this.tenantConfig.getContactTaxonomy(ctx.tenantId)
-    return this.contactsService.update(ctx.schemaName, id, dto, force ?? false, taxonomy, user.id)
+    return this.contactsService.update(ctx.schemaName, id, dto, force ?? false, taxonomy, {
+      id: user.id,
+      tenantId: ctx.tenantId,
+    })
   }
 
   @Delete(':id')

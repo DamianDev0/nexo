@@ -676,4 +676,10 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       UPDATE "${schema}".contact_views SET sort = NULL WHERE sort->>'field' = 'score';
     `,
   },
+  {
+    id: '0038_notifications_data',
+    up: (schema) => `
+      ALTER TABLE "${schema}".notifications ADD COLUMN IF NOT EXISTS data JSONB;
+    `,
+  },
 ]

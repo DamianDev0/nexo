@@ -31,6 +31,7 @@ export type Contact = {
 
 export type ContactListItem = Omit<Contact, 'customFields'> & {
   customFields?: Record<string, unknown>
+  assignedToName?: string | null
   noteCount: number
   optedOutChannels: ConsentChannel[]
 }
@@ -64,6 +65,7 @@ export type ContactListQuery = {
   tags?: string[]
   companyId?: string
   assignedToId?: string
+  unassigned?: boolean
   city?: string
   createdFrom?: string
   createdTo?: string

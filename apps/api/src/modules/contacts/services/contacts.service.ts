@@ -5,7 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
-import { DEFAULT_CONTACT_TAXONOMY, DOMAIN_EVENTS, firstEnabledOptionKey } from '@repo/shared-types'
+import {
+  DEFAULT_CONTACT_TAXONOMY,
+  DOMAIN_EVENTS,
+  NotificationType,
+  firstEnabledOptionKey,
+} from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { EventBusService } from '@/shared/events/event-bus.service'
 import {
@@ -36,6 +41,8 @@ import type {
   ContactListQuery,
 } from '../interfaces/contact-row.interfaces'
 import { UPDATABLE_FIELDS } from '../constants/contact.constants'
+
+type ContactActor = { readonly id: string; readonly tenantId: string }
 import { ContactsRepository } from '../repositories/contacts.repository'
 import {
   mapContact,
@@ -78,10 +85,11 @@ export class ContactsService {
     return { data: rows.map((r) => mapContactListItem(r)), total, page, limit }
   }
 
-  async counts(schemaName: string): Promise<ContactCounts> {
-    const [rows, archived] = await Promise.all([
+  async counts(schemaName: string, userId: string): Promise<ContactCounts> {
+    const [rows, archived, ownership] = await Promise.all([
       this.repository.countByStatus(schemaName),
       this.repository.countArchived(schemaName),
+      this.repository.countOwnership(schemaName, userId),
     ])
     const byStatus: Record<string, number> = {}
     let total = 0
@@ -90,7 +98,7 @@ export class ContactsService {
       byStatus[row.status] = value
       total += value
     }
-    return { total, archived, byStatus }
+    return { total, archived, ...ownership, byStatus }
   }
 
   async taxonomyUsage(schemaName: string): Promise<ContactTaxonomyUsage> {
@@ -179,13 +187,19 @@ export class ContactsService {
     dto: UpdateContactDto,
     force = false,
     taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
-    changedBy?: string,
+    actor?: ContactActor,
   ): Promise<Contact> {
     this.assertTaxonomyKeys(dto, taxonomy)
+    const changedBy = actor?.id
     let lifecycleFrom: string | null | undefined
+    let ownerChanged = false
     const result = await this.db.transactional(schemaName, async (qr): Promise<Contact> => {
       const previous = await this.repository.findActiveById(qr, contactId)
       if (!previous) throw new NotFoundException(`Contact ${contactId} not found`)
+      ownerChanged =
+        dto.assignedToId !== undefined &&
+        dto.assignedToId !== null &&
+        dto.assignedToId !== previous.assigned_to_id
       await this.duplicates.assertNoDuplicates(qr, dto, { force, excludeId: contactId })
 
       const sanitized =
@@ -230,7 +244,25 @@ export class ContactsService {
         changedBy: changedBy ?? null,
       })
     }
+    if (ownerChanged && actor && result.assignedToId) {
+      this.notifyAssignment(schemaName, actor, result)
+    }
     return result
+  }
+
+  private notifyAssignment(schemaName: string, actor: ContactActor, contact: Contact): void {
+    if (!contact.assignedToId || contact.assignedToId === actor.id) return
+    const contactName = [contact.firstName, contact.lastName].filter(Boolean).join(' ')
+    this.eventBus.emit(DOMAIN_EVENTS.CONTACT_ASSIGNED, {
+      schemaName,
+      tenantId: actor.tenantId,
+      userId: contact.assignedToId,
+      type: NotificationType.CONTACT_ASSIGNED,
+      title: `Te asignaron el contacto ${contactName}`,
+      entityType: 'contact',
+      entityId: contact.id,
+      data: { contactId: contact.id, contactName, assignedById: actor.id, count: 1 },
+    })
   }
 
   async remove(schemaName: string, contactId: string): Promise<void> {

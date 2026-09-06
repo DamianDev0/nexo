@@ -99,7 +99,14 @@ export interface BulkRecipientRow {
   opted_out: boolean
 }
 
-export const SNAPSHOT_COLUMNS = ['tags', 'status', 'assigned_to_id', 'is_active'] as const
+export const SNAPSHOT_COLUMNS = [
+  'tags',
+  'status',
+  'lifecycle_stage',
+  'source',
+  'assigned_to_id',
+  'is_active',
+] as const
 
 export type SnapshotColumn = (typeof SNAPSHOT_COLUMNS)[number]
 

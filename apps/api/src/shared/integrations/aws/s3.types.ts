@@ -93,8 +93,12 @@ export const S3_CATEGORY_CONFIG: Record<S3Category, CategoryConfig> = {
   },
   [S3Category.BULK_EXPORT]: {
     pathPrefix: (slug) => `${slug}/exports`,
-    allowedMimeTypes: ['text/csv'],
-    allowedExtensions: ['.csv'],
+    allowedMimeTypes: [
+      'text/csv',
+      'application/json',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ],
+    allowedExtensions: ['.csv', '.json', '.xlsx'],
     maxSizeBytes: 100 * 1024 * 1024, // 100 MB
     public: false,
   },

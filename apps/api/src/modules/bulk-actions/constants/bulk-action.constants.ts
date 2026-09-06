@@ -1,5 +1,5 @@
 import { UserRole } from '@repo/shared-types'
-import type { BulkActionKind, CustomFieldEntity } from '@repo/shared-types'
+import type { BulkActionKind, BulkExportFormat, CustomFieldEntity } from '@repo/shared-types'
 import type { SnapshotColumn } from '../interfaces/bulk-action-row.interfaces'
 
 export const BULK_BATCH_SIZE = 500
@@ -60,6 +60,8 @@ export const BULK_CONTACT_FIELD_SQL: Readonly<Record<string, string>> = {
 
 export const BULK_SNAPSHOT_COLUMN_BY_FIELD: Readonly<Record<string, SnapshotColumn>> = {
   status: 'status',
+  lifecycleStage: 'lifecycle_stage',
+  source: 'source',
 }
 
 export const BULK_CUSTOM_FIELD_PREFIX = 'custom:'
@@ -73,6 +75,17 @@ export const BULK_MESSAGE_CHANNEL: Readonly<
 }
 
 export const BULK_EXPORT_HIDDEN_COLUMNS: ReadonlySet<string> = new Set(['is_active'])
+
+export const BULK_EXPORT_FILE_META: Readonly<
+  Record<BulkExportFormat, { readonly extension: string; readonly mimeType: string }>
+> = {
+  csv: { extension: '.csv', mimeType: 'text/csv' },
+  xlsx: {
+    extension: '.xlsx',
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  },
+  json: { extension: '.json', mimeType: 'application/json' },
+}
 
 export const BULK_ACTION_COLUMNS = `
   id, entity, action, params, selection_mode, selection_ids, selection_query,

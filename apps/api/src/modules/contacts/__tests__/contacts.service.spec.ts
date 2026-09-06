@@ -330,7 +330,10 @@ describe('ContactsService', () => {
         .mockResolvedValueOnce([makeContactRow({ lifecycle_stage: 'customer' })])
         .mockResolvedValueOnce([])
 
-      await service.update(SCHEMA, 'c-1', { lifecycleStage: 'customer' }, false, undefined, 'u-1')
+      await service.update(SCHEMA, 'c-1', { lifecycleStage: 'customer' }, false, undefined, {
+        id: 'u-1',
+        tenantId: 't-1',
+      })
 
       const historyCall = qr.query.mock.calls.find(([sql]) =>
         (sql as string).includes('contact_lifecycle_history'),

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
-import type { TenantContext } from '@repo/shared-types'
+import type { TeamMember, TenantContext } from '@repo/shared-types'
 import type { UserRole } from '@repo/shared-types'
 import { canAssignRole } from '@repo/shared-utils'
 import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
@@ -17,6 +17,8 @@ import { AuthRepository } from '@/modules/auth/repositories/auth.repository'
 import { TokenService } from '@/modules/auth/services/token.service'
 import { UserTenantMapService } from '@/modules/tenants/services/user-tenant-map.service'
 import { InvitationRepository } from '../repositories/invitation.repository'
+import { MembersRepository } from '../repositories/members.repository'
+import { mapMember } from '../mappers/member.mapper'
 import type { InviteUserDto, InviteUserResponseDto } from '../dto/invite-user.dto'
 import type { AcceptInviteDto } from '../dto/accept-invite.dto'
 import type { UserRow, RequestMeta } from '@/modules/auth/interfaces/auth-rows.interface'
@@ -29,6 +31,7 @@ export class UsersService {
     @InjectPinoLogger(UsersService.name)
     private readonly logger: PinoLogger,
     private readonly invitationRepo: InvitationRepository,
+    private readonly members: MembersRepository,
     private readonly authRepo: AuthRepository,
     private readonly password: PasswordService,
     private readonly token: TokenService,
@@ -37,6 +40,11 @@ export class UsersService {
     private readonly config: ConfigService,
     private readonly userTenantMap: UserTenantMapService,
   ) {}
+
+  async listMembers(schemaName: string): Promise<TeamMember[]> {
+    const rows = await this.members.listActive(schemaName)
+    return rows.map(mapMember)
+  }
 
   async invite(
     dto: InviteUserDto,

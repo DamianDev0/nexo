@@ -10,6 +10,7 @@ export function mapNotification(r: NotificationRow): Notification {
     body: r.body,
     entityType: r.entity_type,
     entityId: r.entity_id,
+    data: r.data ?? null,
     isRead: r.is_read,
     readAt: r.read_at,
     createdAt: r.created_at,

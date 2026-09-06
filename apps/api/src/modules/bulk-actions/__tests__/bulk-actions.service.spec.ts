@@ -246,6 +246,26 @@ describe('BulkActionsService', () => {
       ).rejects.toThrow(/Unknown custom field/)
     })
 
+    it('rejects unknown export formats and over-long file names', async () => {
+      await expect(
+        service.create(ctx, user(), {
+          entity: 'contacts',
+          action: 'export',
+          params: { format: 'pdf' },
+          selection: { mode: 'ids', ids: [ID_A] },
+        }),
+      ).rejects.toThrow(/params.format/)
+
+      await expect(
+        service.create(ctx, user(), {
+          entity: 'contacts',
+          action: 'export',
+          params: { format: 'xlsx', fileName: 'x'.repeat(81) },
+          selection: { mode: 'ids', ids: [ID_A] },
+        }),
+      ).rejects.toThrow(/params.fileName/)
+    })
+
     it('requires a template id for send actions and a user id for assign', async () => {
       await expect(
         service.create(ctx, user(UserRole.MARKETING), {

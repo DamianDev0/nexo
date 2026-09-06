@@ -501,6 +501,7 @@ export function getTenantSchemaSQL(schema: string): string {
       body TEXT,
       entity_type VARCHAR(30),
       entity_id UUID,
+      data JSONB,
       is_read BOOLEAN DEFAULT false,
       read_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ DEFAULT NOW()

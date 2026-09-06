@@ -29,6 +29,18 @@ export const BULK_ACTION_STATUSES = [
 
 export type BulkActionStatus = (typeof BULK_ACTION_STATUSES)[number]
 
+export const BULK_EXPORT_FORMATS = ['csv', 'xlsx', 'json'] as const
+
+export type BulkExportFormat = (typeof BULK_EXPORT_FORMATS)[number]
+
+export const BULK_EXPORT_FILE_NAME_MAX = 80
+
+export type BulkExportParams = {
+  format?: BulkExportFormat
+  fileName?: string
+  columns?: string[]
+}
+
 export const BULK_REVERTIBLE_KINDS: ReadonlyArray<BulkActionKind> = [
   'add_tags',
   'remove_tags',

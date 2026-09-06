@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
+import { CONTACT_UNASSIGNED_RECENT_DAYS } from '@repo/shared-types'
 import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
 import type {
   ActivityRow,
@@ -55,6 +56,31 @@ export class ContactsRepository {
       )
 
       return { rows, total, page, limit }
+    })
+  }
+
+  async countOwnership(
+    schemaName: string,
+    userId: string,
+  ): Promise<{ mine: number; unassigned: number; unassignedRecent: number }> {
+    return this.db.query(schemaName, async (qr) => {
+      const rows = await sqlRows<[{ mine: string; unassigned: string; unassigned_recent: string }]>(
+        qr,
+        `SELECT
+           COUNT(*) FILTER (WHERE assigned_to_id = $1)::text AS mine,
+           COUNT(*) FILTER (WHERE assigned_to_id IS NULL)::text AS unassigned,
+           COUNT(*) FILTER (
+             WHERE assigned_to_id IS NULL
+               AND created_at >= NOW() - make_interval(days => $2)
+           )::text AS unassigned_recent
+         FROM contacts WHERE is_active = true`,
+        [userId, CONTACT_UNASSIGNED_RECENT_DAYS],
+      )
+      return {
+        mine: Number.parseInt(rows[0].mine, 10),
+        unassigned: Number.parseInt(rows[0].unassigned, 10),
+        unassignedRecent: Number.parseInt(rows[0].unassigned_recent, 10),
+      }
     })
   }
 

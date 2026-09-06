@@ -73,11 +73,19 @@ describe('ContactsService query extensions', () => {
         { status: 'client', count: '2' },
       ])
       .mockResolvedValueOnce([{ count: '3' }])
+      .mockResolvedValueOnce([{ mine: '2', unassigned: '1', unassigned_recent: '1' }])
 
-    const counts = await service.counts(SCHEMA)
+    const counts = await service.counts(SCHEMA, 'u-1')
 
-    expect(qr.query).toHaveBeenCalledTimes(2)
-    expect(counts).toEqual({ total: 6, archived: 3, byStatus: { new: 4, client: 2 } })
+    expect(qr.query).toHaveBeenCalledTimes(3)
+    expect(counts).toEqual({
+      total: 6,
+      archived: 3,
+      mine: 2,
+      unassigned: 1,
+      unassignedRecent: 1,
+      byStatus: { new: 4, client: 2 },
+    })
   })
 
   it('lists archived contacts when the archived flag is set', async () => {

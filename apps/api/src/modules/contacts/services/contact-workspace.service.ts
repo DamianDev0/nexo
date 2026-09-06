@@ -55,7 +55,7 @@ export class ContactWorkspaceService {
   ): Promise<ContactWorkspace> {
     const [views, counts, state] = await Promise.all([
       this.views.findAll(schemaName, userId),
-      this.contacts.counts(schemaName),
+      this.contacts.counts(schemaName, userId),
       this.repository.findState(schemaName, userId),
     ])
 

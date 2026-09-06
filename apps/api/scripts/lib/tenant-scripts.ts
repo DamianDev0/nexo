@@ -45,7 +45,7 @@ export async function upsertContactTagCatalog(runner: QueryRunner, schema: strin
   for (const tag of CONTACT_TAG_CATALOG) {
     await runner.query(
       `INSERT INTO "${schema}".tags (name, color, description, entity_type)
-       SELECT $1, $2, $3, 'contact'
+       SELECT $1::text, $2::text, $3::text, 'contact'
        WHERE NOT EXISTS (
          SELECT 1 FROM "${schema}".tags WHERE entity_type = 'contact' AND LOWER(name) = LOWER($1)
        )`,

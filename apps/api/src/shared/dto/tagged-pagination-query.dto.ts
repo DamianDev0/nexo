@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator'
+import { IsBoolean, IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator'
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform, Type } from 'class-transformer'
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@repo/shared-utils'
@@ -17,6 +17,12 @@ export class TaggedPaginationQueryDto {
   @IsOptional()
   @IsUUID()
   assignedToId?: string
+
+  @ApiPropertyOptional({ description: 'Only records without an owner' })
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  unassigned?: boolean
 
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()

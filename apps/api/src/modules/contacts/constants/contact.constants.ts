@@ -63,7 +63,8 @@ export const CONTACT_LIST_COLUMNS = `
   (SELECT COUNT(*)::int FROM activities a
    WHERE a.contact_id = contacts.id AND a.activity_type = 'note') AS note_count,
   ARRAY(SELECT dc.channel FROM data_consents dc
-        WHERE dc.contact_id = contacts.id AND dc.granted = false) AS opted_out_channels
+        WHERE dc.contact_id = contacts.id AND dc.granted = false) AS opted_out_channels,
+  (SELECT u.full_name FROM users u WHERE u.id = contacts.assigned_to_id) AS assigned_to_name
 `
 
 export type TaxonomyColumn = 'status' | 'source' | 'lifecycle'

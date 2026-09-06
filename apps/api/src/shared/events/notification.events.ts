@@ -1,4 +1,4 @@
-import type { NotificationType } from '@repo/shared-types'
+import type { NotificationData, NotificationType } from '@repo/shared-types'
 
 export interface NotificationEvent {
   schemaName: string
@@ -9,4 +9,5 @@ export interface NotificationEvent {
   body?: string
   entityType?: string
   entityId?: string
+  data?: NotificationData
 }

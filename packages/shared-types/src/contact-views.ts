@@ -52,9 +52,14 @@ export type ContactView = {
   updatedAt: string
 }
 
+export const CONTACT_UNASSIGNED_RECENT_DAYS = 30
+
 export type ContactCounts = {
   total: number
   archived: number
+  mine: number
+  unassigned: number
+  unassignedRecent: number
   byStatus: Record<string, number>
 }
 
@@ -145,4 +150,7 @@ export type ContactViewInput = {
   columns?: ContactViewColumns
   sort?: ContactViewSort | null
   density?: ContactViewDensity
+  isDefault?: boolean
+  isFavorite?: boolean
+  visibility?: ContactViewVisibility
 }

@@ -74,6 +74,15 @@ export const CONTACT_COLUMN_CATALOG: readonly ContactColumnDef[] = [
     minWidth: 100,
   },
   {
+    key: 'assignedTo',
+    labelKey: 'contacts.columns.assignedTo',
+    hintKey: 'contacts.columnHints.assignedTo',
+    sortField: null,
+    defaultVisible: true,
+    defaultWidth: 160,
+    minWidth: 120,
+  },
+  {
     key: 'tags',
     labelKey: 'contacts.columns.tags',
     hintKey: 'contacts.columnHints.tags',

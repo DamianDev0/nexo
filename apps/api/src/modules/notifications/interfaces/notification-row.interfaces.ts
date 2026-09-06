@@ -6,6 +6,7 @@ export interface NotificationRow {
   body: string | null
   entity_type: string | null
   entity_id: string | null
+  data: Record<string, string | number | boolean | null> | null
   is_read: boolean
   read_at: string | null
   created_at: string

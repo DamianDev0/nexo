@@ -33,6 +33,7 @@ export function mapContact(r: ContactRow): Contact {
 export function mapContactListItem(r: ContactRow): ContactListItem {
   return {
     ...mapContact(r),
+    assignedToName: r.assigned_to_name ?? null,
     noteCount: r.note_count ?? 0,
     optedOutChannels: r.opted_out_channels ?? [],
   }

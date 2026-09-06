@@ -27,6 +27,7 @@ export interface ContactRow {
   updated_at: string
   note_count?: number
   opted_out_channels?: ConsentChannel[]
+  assigned_to_name?: string | null
 }
 
 export interface ActivityRow {

@@ -2,6 +2,8 @@ import type { NotificationType } from './enums'
 
 export type NotificationChannel = 'in_app' | 'email' | 'push'
 
+export type NotificationData = Record<string, string | number | boolean | null>
+
 export type Notification = {
   id: string
   userId: string
@@ -10,6 +12,7 @@ export type Notification = {
   body: string | null
   entityType: string | null
   entityId: string | null
+  data: NotificationData | null
   isRead: boolean
   readAt: string | null
   createdAt: string
@@ -40,6 +43,7 @@ export type NotificationPayload = {
   body?: string
   entityType?: string
   entityId?: string
+  data?: NotificationData
 }
 
 export type UnreadCountPayload = {

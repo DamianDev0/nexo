@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Req, Res, HttpCode, HttpStatus } from '@nestjs/common'
+import { Body, Controller, Get, Post, Req, Res, HttpCode, HttpStatus } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
-import type { TenantContext, AuthenticatedUser } from '@repo/shared-types'
+import type { TeamMember, TenantContext, AuthenticatedUser } from '@repo/shared-types'
 import { UserRole } from '@repo/shared-types'
 import { Public } from '@/shared/decorators/public.decorator'
 import { Auth } from '@/shared/decorators/auth.decorator'
+import { ApiEndpoint } from '@/shared/decorators/api-endpoint.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { extractMeta, setAuthCookies } from '@/modules/auth/utils/auth-request.util'
@@ -21,6 +22,12 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
   ) {}
+
+  @Get()
+  @ApiEndpoint({ summary: 'List active team members', roles: [UserRole.VIEWER] })
+  listMembers(@TenantCtx() tenantCtx: TenantContext): Promise<TeamMember[]> {
+    return this.usersService.listMembers(tenantCtx.schemaName)
+  }
 
   @Post('invite')
   @HttpCode(HttpStatus.CREATED)

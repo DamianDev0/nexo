@@ -8,13 +8,15 @@ jest.mock('@aws-sdk/client-s3', () => ({
 jest.mock('@aws-sdk/s3-request-presigner', () => ({ getSignedUrl: jest.fn() }))
 
 import { Test } from '@nestjs/testing'
+import ExcelJS from 'exceljs'
 import { getQueueToken } from '@nestjs/bullmq'
 import { QUEUE_NAMES } from '@/shared/queue/queue-names'
 import { type S3Service } from '@/shared/integrations/aws/s3.service'
 import { TagsHandler } from '../handlers/tags.handler'
 import { UpdateFieldHandler } from '../handlers/update-field.handler'
 import { SendMessageHandler } from '../handlers/send-message.handler'
-import { ExportHandler, toCsv } from '../handlers/export.handler'
+import { ExportHandler, exportFileName } from '../handlers/export.handler'
+import { toCsv, toJson, toXlsx } from '../mappers/export-file.mapper'
 import { RevertHandler } from '../handlers/revert.handler'
 import { type BulkSnapshotsRepository } from '../repositories/bulk-snapshots.repository'
 import { outcomeFromReturnedIds } from '../handlers/bulk-action-handler.interface'
@@ -251,10 +253,65 @@ describe('ExportHandler', () => {
     )
 
     expect(outcome.succeeded).toEqual(['b'])
-    const file = s3.upload.mock.calls[0][0] as { buffer: Buffer; mimetype: string }
+    const file = s3.upload.mock.calls[0][0] as {
+      buffer: Buffer
+      mimetype: string
+      originalname: string
+    }
     expect(file.mimetype).toBe('text/csv')
+    expect(file.originalname).toBe('contacts-ba-1.csv')
     expect(file.buffer.toString('utf8')).toBe('id,first_name\na,Ana\nb,Beto')
     expect(actions.setResultFile).toHaveBeenCalledWith('tenant_acme', 'ba-1', 'https://signed')
+  })
+
+  it('serializes JSON with the same column filter and null padding', () => {
+    const json = toJson([{ id: '1', name: 'Ana', is_active: true }, { id: '2' }], ['id', 'name'])
+    expect(JSON.parse(json)).toEqual([
+      { id: '1', name: 'Ana' },
+      { id: '2', name: null },
+    ])
+  })
+
+  it('serializes XLSX with a header row and one row per record', async () => {
+    const buffer = await toXlsx([{ id: '1', name: 'Ana', tags: ['vip'] }])
+    const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.load(buffer as unknown as ExcelJS.Buffer)
+    const sheet = workbook.getWorksheet(1)
+    if (!sheet) throw new Error('missing sheet')
+    expect(sheet.getRow(1).values).toEqual([undefined, 'id', 'name', 'tags'])
+    expect(sheet.getRow(2).values).toEqual([undefined, '1', 'Ana', '["vip"]'])
+  })
+
+  it('names the file after the requested format and a slugified custom name', () => {
+    const context = ctx({ action: 'export', entity: 'contacts' })
+    expect(exportFileName(context, { format: 'xlsx', fileName: 'Clientes Medellín 2026' })).toBe(
+      'clientes-medellin-2026.xlsx',
+    )
+    expect(exportFileName(context, { format: 'json' })).toBe('contacts-ba-1.json')
+    expect(exportFileName(context, {})).toBe('contacts-ba-1.csv')
+  })
+
+  it('uploads an xlsx with the spreadsheet mime type when asked', async () => {
+    const targets = {
+      findRowsForExport: jest.fn().mockResolvedValue([{ id: 'a', first_name: 'Ana' }]),
+    }
+    const actions = { setResultFile: jest.fn() }
+    const s3 = {
+      upload: jest.fn().mockResolvedValue({ key: 'k', url: 'u' }),
+      presignedUrl: jest.fn().mockResolvedValue('https://signed'),
+    }
+    const handler = new ExportHandler(
+      targets as unknown as BulkTargetsRepository,
+      actions as unknown as BulkActionsRepository,
+      s3 as unknown as S3Service,
+    )
+    await handler.run(
+      ctx({ action: 'export', params: { format: 'xlsx' }, total: 1, processed: 0 }),
+      ['a'],
+    )
+    const file = s3.upload.mock.calls[0][0] as { mimetype: string; originalname: string }
+    expect(file.mimetype).toContain('spreadsheetml')
+    expect(file.originalname).toBe('contacts-ba-1.xlsx')
   })
 })
 

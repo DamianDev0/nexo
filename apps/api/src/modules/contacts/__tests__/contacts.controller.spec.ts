@@ -39,7 +39,12 @@ const mockContact: Contact = {
 }
 
 const { customFields: _cf, ...contactBase } = mockContact
-const mockContactListItem = { ...contactBase, noteCount: 0, optedOutChannels: [] }
+const mockContactListItem = {
+  ...contactBase,
+  assignedToName: null,
+  noteCount: 0,
+  optedOutChannels: [],
+}
 const mockPaginated: PaginatedContacts = {
   data: [mockContactListItem],
   total: 1,
@@ -164,7 +169,7 @@ describe('ContactsController', () => {
         { firstName: 'Jane' },
         false,
         DEFAULT_CONTACT_TAXONOMY,
-        mockUser.id,
+        { id: mockUser.id, tenantId: mockCtx.tenantId },
       )
       expect(result.firstName).toBe('Jane')
     })
@@ -181,12 +186,20 @@ describe('ContactsController', () => {
 
   describe('counts', () => {
     it('delegates to service with schema', async () => {
-      service.counts.mockResolvedValue({ total: 5, archived: 0, byStatus: { new: 5 } })
+      const counts = {
+        total: 5,
+        archived: 0,
+        mine: 1,
+        unassigned: 4,
+        unassignedRecent: 2,
+        byStatus: { new: 5 },
+      }
+      service.counts.mockResolvedValue(counts)
 
-      const result = await controller.counts(mockCtx)
+      const result = await controller.counts(mockCtx, mockUser)
 
-      expect(service.counts).toHaveBeenCalledWith(mockCtx.schemaName)
-      expect(result).toEqual({ total: 5, archived: 0, byStatus: { new: 5 } })
+      expect(service.counts).toHaveBeenCalledWith(mockCtx.schemaName, mockUser.id)
+      expect(result).toEqual(counts)
     })
   })
 

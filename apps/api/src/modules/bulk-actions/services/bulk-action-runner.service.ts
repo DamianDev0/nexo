@@ -197,6 +197,12 @@ export class BulkActionRunnerService {
       body: `${finished.succeeded} procesados, ${finished.failed} con error`,
       entityType: 'bulk_action',
       entityId: finished.id,
+      data: {
+        action: finished.action,
+        succeeded: finished.succeeded,
+        failed: finished.failed,
+        total: finished.total,
+      },
     })
   }
 }

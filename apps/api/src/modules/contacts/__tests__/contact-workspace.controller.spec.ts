@@ -16,7 +16,7 @@ const mockWorkspace: ContactWorkspace = {
   tableState: {},
   columns: [],
   quickFilters: { statuses: [], sources: [], lifecycleStages: [] },
-  counts: { total: 0, archived: 0, byStatus: {} },
+  counts: { total: 0, archived: 0, mine: 0, unassigned: 0, unassignedRecent: 0, byStatus: {} },
 }
 
 function buildServiceMock() {

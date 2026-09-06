@@ -5,6 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import {
+  BULK_EXPORT_FILE_NAME_MAX,
+  BULK_EXPORT_FORMATS,
   BULK_REVERTIBLE_KINDS,
   DEFAULT_CONTACT_TAXONOMY,
   activeFieldDefs,
@@ -13,6 +15,7 @@ import type {
   AuthenticatedUser,
   BulkAction,
   BulkActionKind,
+  BulkExportFormat,
   ContactTaxonomy,
   CustomFieldsConfig,
   PaginatedBulkActions,
@@ -265,12 +268,33 @@ export class BulkActionsService {
         }
         return
       case 'export':
-        if (params['columns'] !== undefined) this.assertStringList(params['columns'], 'columns')
+        this.validateExport(params)
         return
       case 'archive':
       case 'restore':
       case 'revert':
         return
+    }
+  }
+
+  private validateExport(params: Record<string, unknown>): void {
+    if (params['columns'] !== undefined) this.assertStringList(params['columns'], 'columns')
+    const format = params['format']
+    if (format !== undefined && !BULK_EXPORT_FORMATS.includes(format as BulkExportFormat)) {
+      throw new BadRequestException(
+        `params.format must be one of: ${BULK_EXPORT_FORMATS.join(', ')}`,
+      )
+    }
+    const fileName = params['fileName']
+    if (fileName === undefined) return
+    if (
+      typeof fileName !== 'string' ||
+      fileName.trim().length === 0 ||
+      fileName.length > BULK_EXPORT_FILE_NAME_MAX
+    ) {
+      throw new BadRequestException(
+        `params.fileName must be a non-empty string up to ${BULK_EXPORT_FILE_NAME_MAX} characters`,
+      )
     }
   }
 
