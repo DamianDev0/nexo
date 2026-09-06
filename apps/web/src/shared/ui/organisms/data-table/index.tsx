@@ -5,7 +5,6 @@ import { DataTableColumnEditor } from './column-editor'
 import { DataTableGrid, DataTableRoot, DataTableScroller, DataTableSkeleton } from './grid'
 import { DataTableHeader } from './header'
 import { DataTableQuickFilters } from './quick-filters'
-import { DataTableSelectionBanner } from './selection'
 import { DataTableSmartLists } from './smart-list'
 import { DataTableDensity, DataTableSearch, DataTableToolbar } from './toolbar'
 
@@ -22,7 +21,6 @@ export type { DataTableBulkConfig, DataTableBulkLabels } from './toolbar'
 export type { SmartListItem, SmartListMenuAction } from './smart-list'
 export type { QuickFilterDef, QuickFilterOption } from './quick-filters'
 export { selectionColumn } from './selection'
-export type { SelectionBannerLabels, SelectionBannerProps } from './selection'
 
 export const DataTable = Object.assign(DataTableRoot, {
   SmartLists: DataTableSmartLists,
@@ -35,7 +33,6 @@ export const DataTable = Object.assign(DataTableRoot, {
   Header: DataTableHeader,
   Body: DataTableBody,
   Scroller: DataTableScroller,
-  SelectionBanner: DataTableSelectionBanner,
   Skeleton: DataTableSkeleton,
   CellText: DataTableCellText,
   CellFrame: DataTableCellFrame,

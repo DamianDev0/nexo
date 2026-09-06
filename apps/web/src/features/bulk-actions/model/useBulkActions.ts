@@ -14,7 +14,7 @@ import {
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { BULK_STATUS_FIELD } from '../config/bulk-actions.constants'
-import { buildBulkLabels, buildSelectionBannerLabels } from '../lib/bulk-labels'
+import { buildBulkLabels } from '../lib/bulk-labels'
 import { buildBulkRequest, filterSelection, idsSelection, selectionSize } from '../lib/bulk-request'
 
 import type { BulkDialogKind } from './types/bulk-actions.types'
@@ -78,25 +78,13 @@ export function useBulkActions({
     [selection, total, create, clearSelection],
   )
 
-  const labels = useMemo(
-    () => buildBulkLabels(t, allMatching ? total : undefined),
-    [t, allMatching, total],
-  )
-  const bannerLabels = useMemo(() => buildSelectionBannerLabels(t), [t])
+  const labels = useMemo(() => buildBulkLabels(t, allMatching), [t, allMatching])
   const isBusy = create.isPending || activeId !== null
 
   return {
     bar: {
       labels,
-      banner: {
-        allSelected: allMatching,
-        labels: bannerLabels,
-        onSelectAll: () => setAllMatching(true),
-        onClear: () => {
-          setAllMatching(false)
-          clearSelection()
-        },
-      },
+      onSelectAll: allMatching ? undefined : () => setAllMatching(true),
       archived,
       isBusy,
       progress: status.data && isBulkActionActive(status.data.status) ? status.data : null,

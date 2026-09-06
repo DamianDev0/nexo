@@ -80,6 +80,7 @@ const LAYOUT = { value: { pinnedLeft: ['name'] }, onChange: () => undefined }
 
 const BULK_LABELS = {
   selected: (count: number) => `${count} selected`,
+  selectAll: (total: number) => `Select all ${total}`,
   clear: 'Clear selection',
 }
 
@@ -108,6 +109,7 @@ function ContactsTable({ rows }: Readonly<{ rows: ReadonlyArray<ContactRow> }>) 
           <DataTable.Toolbar
             bulk={{
               labels: BULK_LABELS,
+              onSelectAll: () => instance.table.toggleAllRowsSelected(true),
               actions: (
                 <Button variant="ghost" size="icon-sm" aria-label="Archive">
                   <TrashIcon className="size-4" />

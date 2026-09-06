@@ -2,10 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { TFunction } from 'i18next'
 
-import {
-  buildBulkLabels,
-  buildSelectionBannerLabels,
-} from '@/features/bulk-actions/lib/bulk-labels'
+import { buildBulkLabels } from '@/features/bulk-actions/lib/bulk-labels'
 
 const t = vi.fn(
   (key: string, options?: { count?: number }) => `${key}:${options?.count ?? ''}`,
@@ -16,18 +13,12 @@ describe('buildBulkLabels', () => {
     expect(buildBulkLabels(t).selected(25)).toBe('common.table.selection.selected:25')
   })
 
-  it('reports the override count once the whole filter is targeted', () => {
-    expect(buildBulkLabels(t, 3587).selected(2)).toBe('common.table.selection.selected:3587')
+  it('switches to the whole-filter wording once every match is targeted', () => {
+    expect(buildBulkLabels(t, true).selected(3587)).toBe('contacts.bulk.allMatching:3587')
   })
 
-  it('resolves the clear label eagerly', () => {
+  it('interpolates the total into the select-all label and resolves clear eagerly', () => {
+    expect(buildBulkLabels(t).selectAll(3587)).toBe('common.table.selection.selectAll:3587')
     expect(buildBulkLabels(t).clear).toBe('common.table.selection.clear:')
-  })
-
-  it('builds the page and whole-list banner copy', () => {
-    const labels = buildSelectionBannerLabels(t)
-    expect(labels.pageSelected(25)).toBe('common.table.selection.pageSelected:25')
-    expect(labels.allSelected(64)).toBe('common.table.selection.allSelected:64')
-    expect(labels.selectAll(64)).toBe('common.table.selection.selectAll:64')
   })
 })
