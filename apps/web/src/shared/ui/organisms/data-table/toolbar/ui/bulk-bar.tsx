@@ -7,9 +7,8 @@ import { useDataTableContext } from '../../model/context'
 
 import type { DataTableBulkConfig } from '../model/types'
 
-export function DataTableBulkBar({ labels, actions, onSelectAll }: Readonly<DataTableBulkConfig>) {
+export function DataTableBulkBar({ labels, actions }: Readonly<DataTableBulkConfig>) {
   const { selection } = useDataTableContext()
-  const canSelectAll = onSelectAll !== undefined && selection.count < selection.total
 
   return (
     <>
@@ -19,17 +18,6 @@ export function DataTableBulkBar({ labels, actions, onSelectAll }: Readonly<Data
       <span className="text-sm font-medium tabular-nums text-body">
         {labels.selected(selection.count)}
       </span>
-
-      {canSelectAll && (
-        <Button
-          variant="link"
-          size="sm"
-          onClick={onSelectAll}
-          className="h-8 px-1.5 text-sm font-medium text-primary-deep dark:text-primary"
-        >
-          {labels.selectAll(selection.total)}
-        </Button>
-      )}
 
       <Button
         variant="ghost"

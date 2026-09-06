@@ -23,11 +23,10 @@ const COLUMNS: ReadonlyArray<ColumnDef<Row, unknown>> = [
 
 const LABELS = {
   selected: (count: number) => `${count} seleccionados`,
-  selectAll: (total: number) => `Seleccionar los ${total}`,
   clear: 'Limpiar selección',
 }
 
-function Harness({ onSelectAll }: Readonly<{ onSelectAll?: () => void }>) {
+function Harness() {
   const instance = useDataTable({
     data: ROWS,
     columns: COLUMNS,
@@ -37,7 +36,7 @@ function Harness({ onSelectAll }: Readonly<{ onSelectAll?: () => void }>) {
 
   return (
     <DataTable instance={instance}>
-      <DataTable.Toolbar bulk={{ labels: LABELS, onSelectAll, actions: <span>bulk-actions</span> }}>
+      <DataTable.Toolbar bulk={{ labels: LABELS, actions: <span>bulk-actions</span> }}>
         <DataTable.Search value="" placeholder="Buscar" onChange={vi.fn()} />
       </DataTable.Toolbar>
       <DataTable.Grid>
@@ -81,19 +80,5 @@ describe('DataTable.Toolbar bulk swap', () => {
     await userEvent.click(screen.getByLabelText('Select all rows'))
 
     expect(await screen.findByText('2 seleccionados')).toBeInTheDocument()
-  })
-
-  it('offers select-all against the server total only when the feature handles it', async () => {
-    const onSelectAll = vi.fn()
-    const { rerender } = render(<Harness />)
-
-    await userEvent.click(screen.getAllByLabelText('Select row')[0]!)
-    await screen.findByText('1 seleccionados')
-    expect(screen.queryByText('Seleccionar los 3587')).not.toBeInTheDocument()
-
-    rerender(<Harness onSelectAll={onSelectAll} />)
-    await userEvent.click(await screen.findByText('Seleccionar los 3587'))
-
-    expect(onSelectAll).toHaveBeenCalledOnce()
   })
 })

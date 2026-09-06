@@ -50,6 +50,10 @@ const es = {
         selected_other: '{{count}} seleccionados',
         selectAll_one: 'Seleccionar el {{count}}',
         selectAll_other: 'Seleccionar los {{count}}',
+        pageSelected_one: 'Seleccionaste el {{count}} de esta página.',
+        pageSelected_other: 'Seleccionaste los {{count}} de esta página.',
+        allSelected_one: 'Seleccionaste el {{count}}.',
+        allSelected_other: 'Seleccionaste los {{count}}.',
         clear: 'Limpiar selección',
       },
       density: {
@@ -631,8 +635,6 @@ const es = {
       export: 'Exportar CSV',
       archive: 'Archivar seleccionados',
       restore: 'Restaurar seleccionados',
-      allMatching_one: 'Todo el filtro ({{count}})',
-      allMatching_other: 'Todo el filtro ({{count}})',
       progress: '{{processed}} / {{total}}',
       actions: {
         add_tags: 'Agregar etiquetas',

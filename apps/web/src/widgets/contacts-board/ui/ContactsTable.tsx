@@ -87,7 +87,6 @@ export function ContactsTable({
           <DataTable.Toolbar
             bulk={{
               labels: bulk.bar.labels,
-              onSelectAll: bulk.bar.onSelectAll,
               actions: <BulkActionBar bar={bulk.bar} />,
             }}
           >
@@ -153,6 +152,7 @@ export function ContactsTable({
 
           {!state.isPending && !state.isEmpty && !state.isUnavailable && (
             <>
+              <DataTable.SelectionBanner {...bulk.bar.banner} />
               <DataTable.Scroller ref={scrollRef} hideScrollbar className="min-h-0 flex-1">
                 <DataTable.Grid>
                   <DataTable.Header />

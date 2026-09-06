@@ -114,8 +114,8 @@ describe('useBulkActions', () => {
     )
     const { result } = setup()
 
-    act(() => result.current.bar.onSelectAll?.())
-    expect(result.current.bar.labels.selected(2)).toContain('allMatching')
+    act(() => result.current.bar.banner.onSelectAll())
+    expect(result.current.bar.banner.allSelected).toBe(true)
     expect(result.current.dialogs.count).toBe(40)
 
     act(() => result.current.bar.onExport())
@@ -178,14 +178,14 @@ describe('useBulkActions', () => {
       { wrapper },
     )
 
-    act(() => result.current.bar.onSelectAll?.())
-    expect(result.current.bar.onSelectAll).toBeUndefined()
+    act(() => result.current.bar.banner.onSelectAll())
+    expect(result.current.bar.banner.allSelected).toBe(true)
     expect(result.current.dialogs.count).toBe(40)
 
     count = 1
     rerender()
     expect(result.current.dialogs.count).toBe(2)
-    expect(result.current.bar.onSelectAll).toBeDefined()
+    expect(result.current.bar.banner.allSelected).toBe(false)
   })
 
   it('does nothing when the selection is empty', () => {
