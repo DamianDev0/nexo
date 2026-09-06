@@ -1,8 +1,10 @@
 'use client'
 
+import { cn } from '@/shared/lib/cn'
 import { XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 
+import { DATA_TABLE_TOOLBAR_BUTTON } from '../../config/table.constants'
 import { useDataTableContext } from '../../model/context'
 
 import type { DataTableBulkConfig } from '../model/types'
@@ -22,10 +24,12 @@ export function DataTableBulkBar({ labels, actions, onSelectAll }: Readonly<Data
 
       {canSelectAll && (
         <Button
-          variant="link"
-          size="sm"
+          variant="outline"
           onClick={onSelectAll}
-          className="h-8 px-1.5 text-sm font-medium text-primary-deep dark:text-primary"
+          className={cn(
+            DATA_TABLE_TOOLBAR_BUTTON,
+            'border-primary text-primary-deep hover:border-primary dark:text-primary',
+          )}
         >
           {labels.selectAll(selection.total)}
         </Button>
