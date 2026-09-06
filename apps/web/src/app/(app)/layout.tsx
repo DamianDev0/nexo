@@ -11,6 +11,7 @@ import {
   AppSidebar,
   HeaderBreadcrumb,
   HeaderNotifications,
+  HeaderPhone,
   HeaderQuickCreate,
   HeaderSearch,
   HeaderSettingsLink,
@@ -46,6 +47,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
               <div className="flex-1" />
               <div className="flex items-center gap-0.5">
                 <HeaderQuickCreate />
+                <HeaderPhone />
                 <HeaderSettingsLink />
                 <HeaderNotifications />
                 <LanguageSwitcher />

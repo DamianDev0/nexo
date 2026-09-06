@@ -40,8 +40,8 @@ export function useDialer() {
   }, [ensureAdapter])
 
   const callNumber = useCallback(
-    async (raw: string) => {
-      useCallStore.getState().dialNumber(raw)
+    async (raw: string, name?: string) => {
+      useCallStore.getState().dialNumber(raw, name)
       await placeCall()
     },
     [placeCall],
@@ -61,6 +61,12 @@ export function useDialer() {
     const next = !useCallStore.getState().held
     ensureAdapter().setHeld(next)
     useCallStore.getState().toggleHeld()
+  }, [ensureAdapter])
+
+  const toggleRecord = useCallback(() => {
+    const next = !useCallStore.getState().recording
+    ensureAdapter().setRecording(next)
+    useCallStore.getState().toggleRecording()
   }, [ensureAdapter])
 
   const toggleKeypad = useCallback(() => setKeypadOpen((open) => !open), [])
@@ -85,13 +91,16 @@ export function useDialer() {
     open: store.open,
     status: store.status,
     number: store.number,
+    callerName: store.callerName,
     muted: store.muted,
     held: store.held,
+    recording: store.recording,
     history: store.history,
     seconds,
     keypadOpen,
     dtmf,
     setOpen: store.setOpen,
+    setNumber: store.setNumber,
     appendDigit: store.appendDigit,
     deleteDigit: store.deleteDigit,
     placeCall,
@@ -99,6 +108,7 @@ export function useDialer() {
     hangUp,
     toggleMute,
     toggleHold,
+    toggleRecord,
     toggleKeypad,
     sendDtmf,
   }

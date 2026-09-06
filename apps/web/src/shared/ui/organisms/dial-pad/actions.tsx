@@ -25,20 +25,21 @@ export function DialPadCall({ label, onCall, disabled }: Readonly<DialPadCallPro
       transition={snappySpring}
       onClick={onCall}
       className={cn(
-        'flex size-13 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover active:bg-primary-pressed',
+        'flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary-hover active:bg-primary-pressed',
         'disabled:cursor-not-allowed disabled:opacity-40',
       )}
     >
-      <PhoneIcon className="size-5.5" />
+      <PhoneIcon className="size-4.5" />
     </motion.button>
   )
 }
 
 type DialPadBackspaceProps = {
   readonly label: string
+  readonly className?: string
 }
 
-export function DialPadBackspace({ label }: Readonly<DialPadBackspaceProps>) {
+export function DialPadBackspace({ label, className }: Readonly<DialPadBackspaceProps>) {
   const { value, onDelete } = useDialPad()
   return (
     <AnimatePresence initial={false}>
@@ -53,7 +54,10 @@ export function DialPadBackspace({ label }: Readonly<DialPadBackspaceProps>) {
           whileTap={{ scale: 0.9 }}
           transition={snappySpring}
           onClick={onDelete}
-          className="flex size-13 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className={cn(
+            'flex size-13 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+            className,
+          )}
         >
           <BackspaceIcon className="size-5" />
         </motion.button>

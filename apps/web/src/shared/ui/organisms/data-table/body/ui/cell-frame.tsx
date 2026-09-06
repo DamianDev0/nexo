@@ -15,6 +15,8 @@ const HINT_DELAY = 100
 const DOCK_OPEN_DELAY_MS = 150
 const DOCK_CLOSE_GRACE_MS = 120
 
+let closeActiveDock: (() => void) | null = null
+
 export function DataTableCellHint({
   hint,
   children,
@@ -55,20 +57,42 @@ export function DataTableCellFrame({
   const [open, setOpen] = useState(false)
   const timerRef = useRef<number | null>(null)
 
-  const schedule = useCallback((next: boolean, delay: number) => {
-    if (timerRef.current !== null) window.clearTimeout(timerRef.current)
-    timerRef.current = window.setTimeout(() => setOpen(next), delay)
-  }, [])
+  const close = useCallback(() => setOpen(false), [])
+
+  const schedule = useCallback(
+    (next: boolean, delay: number) => {
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current)
+      timerRef.current = window.setTimeout(() => {
+        if (next) {
+          if (closeActiveDock !== null && closeActiveDock !== close) closeActiveDock()
+          closeActiveDock = close
+        } else if (closeActiveDock === close) {
+          closeActiveDock = null
+        }
+        setOpen(next)
+      }, delay)
+    },
+    [close],
+  )
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (!next && closeActiveDock === close) closeActiveDock = null
+      setOpen(next)
+    },
+    [close],
+  )
 
   useEffect(
     () => () => {
       if (timerRef.current !== null) window.clearTimeout(timerRef.current)
+      if (closeActiveDock === close) closeActiveDock = null
     },
-    [],
+    [close],
   )
 
   return (
-    <GroovyPopover open={open} onOpenChange={setOpen}>
+    <GroovyPopover open={open} onOpenChange={handleOpenChange}>
       <GroovyPopover.Anchor asChild>
         <span
           onMouseEnter={() => schedule(true, DOCK_OPEN_DELAY_MS)}

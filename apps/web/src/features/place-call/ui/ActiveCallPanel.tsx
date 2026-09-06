@@ -2,35 +2,42 @@
 
 import { useTranslation } from 'react-i18next'
 
-import { cn } from '@/shared/lib'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import {
+  CircleIcon,
+  DotsThreeIcon,
   GridNineIcon,
   MicrophoneIcon,
   MicrophoneSlashIcon,
   PauseIcon,
-  PhoneDisconnectIcon,
   PhoneIcon,
+  PlusIcon,
 } from '@/shared/ui/icons'
+import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { DialPad } from '@/shared/ui/organisms/dial-pad'
 
+import { formatCallDuration } from '../lib/call-duration'
 import { statusLabel } from '../lib/call-status-label'
 
+import { CallControl, GhostControl } from './CallControls'
+
 import type { CallStatus } from '../model/types/call.types'
-import type { ReactNode } from 'react'
 
 type ActiveCallPanelProps = {
   readonly call: {
     readonly number: string
+    readonly name: string | null
     readonly status: CallStatus
     readonly seconds: number
     readonly muted: boolean
     readonly held: boolean
+    readonly recording: boolean
   }
   readonly actions: {
     readonly onToggleMute: () => void
     readonly onToggleHold: () => void
+    readonly onToggleRecord: () => void
     readonly onHangUp: () => void
   }
   readonly keypad: {
@@ -41,103 +48,133 @@ type ActiveCallPanelProps = {
   }
 }
 
-type CallControlProps = {
-  readonly label: string
-  readonly icon: ReactNode
-  readonly active?: boolean
-  readonly disabled?: boolean
-  readonly onPress: () => void
-}
-
-function CallControl({ label, icon, active, disabled, onPress }: Readonly<CallControlProps>) {
-  return (
-    <span className="flex flex-col items-center gap-1.5">
-      <PillButton
-        variant="icon"
-        size="md"
-        aria-label={label}
-        aria-pressed={active}
-        disabled={disabled}
-        onClick={onPress}
-        className={cn('size-12 rounded-full', active && 'bg-accent')}
-      >
-        {icon}
-      </PillButton>
-      <Text variant="micro">{label}</Text>
-    </span>
-  )
-}
-
 export function ActiveCallPanel({ call, actions, keypad }: Readonly<ActiveCallPanelProps>) {
   const { t } = useTranslation()
-  const ended = call.status === 'ended'
+  const active = call.status === 'active'
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-between px-4 pt-5 pb-4">
-      <div className="flex flex-col items-center gap-2">
-        <div className="flex size-12 items-center justify-center rounded-full bg-primary/15 text-primary-deep dark:text-primary">
-          <PhoneIcon className="size-5.5" />
-        </div>
-        <Text variant="strong" className="text-lg tracking-wide tabular-nums">
-          {call.number}
+    <div className="flex flex-1 flex-col">
+      <div className="flex h-12 shrink-0 items-center justify-between bg-sidebar px-4">
+        <Text className="flex items-center gap-2 text-[11px] font-black tracking-[0.14em] text-sidebar-foreground uppercase">
+          <span aria-hidden className="size-2 rounded-full bg-primary" />
+          {statusLabel(call.status, call.held, t)}
         </Text>
-        <Text variant="muted" className="tabular-nums" aria-live="polite">
-          {statusLabel(call.status, call.seconds, t)}
+        <Text className="font-mono text-sm text-sidebar-foreground tabular-nums" aria-live="polite">
+          {active ? formatCallDuration(call.seconds) : ''}
         </Text>
       </div>
       {keypad.open ? (
-        <DialPad value={keypad.digits} onDigit={keypad.onDigit} onDelete={() => undefined}>
-          <Text variant="hint" className="h-4 tabular-nums">
+        <div className="flex flex-1 flex-col items-center px-4 pt-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+              <PhoneIcon className="size-4" />
+            </div>
+            <span className="flex min-w-0 flex-col">
+              <Text className="text-sm font-bold tracking-tight">
+                {call.name ?? t('dialer.unknown')}
+              </Text>
+              <Text variant="hint" className="tabular-nums">
+                {call.number}
+              </Text>
+            </span>
+          </div>
+          <Text variant="strong" className="mt-1.5 h-5 text-base tabular-nums">
             {keypad.digits}
           </Text>
-          <DialPad.Keypad className="gap-1.5 [&>button]:size-11" />
-        </DialPad>
-      ) : (
-        <div className="grid grid-cols-3 gap-4">
-          <CallControl
-            label={call.muted ? t('dialer.unmute') : t('dialer.mute')}
-            icon={
-              call.muted ? (
-                <MicrophoneSlashIcon className="size-4.5" />
-              ) : (
-                <MicrophoneIcon className="size-4.5" />
-              )
-            }
-            active={call.muted}
-            disabled={ended}
-            onPress={actions.onToggleMute}
-          />
-          <CallControl
-            label={t('dialer.keypad')}
-            icon={<GridNineIcon className="size-4.5" />}
-            disabled={ended || call.status !== 'active'}
-            onPress={keypad.onToggle}
-          />
-          <CallControl
-            label={call.held ? t('dialer.resume') : t('dialer.hold')}
-            icon={<PauseIcon className="size-4.5" />}
-            active={call.held}
-            disabled={ended || call.status !== 'active'}
-            onPress={actions.onToggleHold}
-          />
+          <DialPad
+            value={keypad.digits}
+            onDigit={keypad.onDigit}
+            onDelete={() => undefined}
+            className="flex-1 justify-center"
+          >
+            <DialPad.Keypad className="gap-x-9 gap-y-3 [&>button]:size-11 [&>button]:border-0 [&>button]:bg-transparent [&>button]:hover:bg-muted" />
+          </DialPad>
         </div>
+      ) : (
+        <>
+          <div className="flex shrink-0 flex-col items-center gap-1 px-4 pt-5 pb-4">
+            <div className="mb-1.5 flex size-14 items-center justify-center rounded-3xl bg-accent text-accent-foreground">
+              <PhoneIcon className="size-6" />
+            </div>
+            <Text className="text-lg font-bold tracking-tight">
+              {call.name ?? t('dialer.unknown')}
+            </Text>
+            <Text variant="muted" className="tabular-nums">
+              {call.number}
+            </Text>
+          </div>
+          <div className="grid flex-1 grid-cols-3 content-start gap-y-3 px-5">
+            <CallControl
+              label={call.muted ? t('dialer.unmute') : t('dialer.mute')}
+              icon={
+                call.muted ? (
+                  <MicrophoneSlashIcon className="size-5" />
+                ) : (
+                  <MicrophoneIcon className="size-5" />
+                )
+              }
+              active={call.muted}
+              disabled={!active}
+              onPress={actions.onToggleMute}
+            />
+            <CallControl
+              label={t('dialer.keypad')}
+              icon={<GridNineIcon className="size-5" />}
+              disabled={!active}
+              onPress={keypad.onToggle}
+            />
+            <CallControl
+              label={call.held ? t('dialer.resume') : t('dialer.hold')}
+              icon={<PauseIcon className="size-5" />}
+              active={call.held}
+              disabled={!active}
+              onPress={actions.onToggleHold}
+            />
+            <GhostControl
+              label={t('dialer.addCall')}
+              icon={<PlusIcon className="size-5" />}
+              hint={t('dialer.comingSoon')}
+            />
+            <CallControl
+              label={t('dialer.record')}
+              icon={<CircleIcon className="size-5" />}
+              active={call.recording}
+              disabled={!active}
+              onPress={actions.onToggleRecord}
+            />
+            <GhostControl
+              label={t('dialer.callActions')}
+              icon={<DotsThreeIcon className="size-5" />}
+              hint={t('dialer.comingSoon')}
+            />
+          </div>
+        </>
       )}
-      <div className="flex items-center gap-4">
-        {keypad.open ? (
-          <PillButton variant="outline" size="xs" onClick={keypad.onToggle}>
-            {t('dialer.hideKeypad')}
-          </PillButton>
-        ) : null}
+      <div className="flex shrink-0 items-center justify-center gap-4 px-4 pt-2 pb-4">
         <PillButton
           variant="destructive"
           size="md"
           aria-label={t('dialer.hangUp')}
-          disabled={ended}
+          disabled={call.status === 'ended'}
           onClick={actions.onHangUp}
-          className="w-16 rounded-full px-0"
+          className="size-13 rounded-full px-0"
         >
-          <PhoneDisconnectIcon className="size-5" />
+          <PhoneIcon className="size-5.5 rotate-135" />
         </PillButton>
+        {keypad.open ? (
+          <HintTooltip asChild hint={t('dialer.hideKeypad')}>
+            <PillButton
+              variant="icon"
+              size="md"
+              aria-label={t('dialer.hideKeypad')}
+              aria-pressed
+              onClick={keypad.onToggle}
+              className="size-13 rounded-full bg-accent"
+            >
+              <GridNineIcon className="size-5" />
+            </PillButton>
+          </HintTooltip>
+        ) : null}
       </div>
     </div>
   )

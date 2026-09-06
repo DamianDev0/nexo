@@ -6,8 +6,7 @@ import { cn } from '@/shared/lib'
 
 import { DialPadBackspace, DialPadCall } from './actions'
 import { DialPadContext } from './context'
-import { DialPadDisplay } from './display'
-import { DialPadKey, DialPadKeypad } from './keypad'
+import { DialPadKeypad } from './keypad'
 
 import type { ReactNode } from 'react'
 
@@ -37,9 +36,7 @@ function DialPadRoot({
 }
 
 export const DialPad = Object.assign(DialPadRoot, {
-  Display: DialPadDisplay,
   Keypad: DialPadKeypad,
-  Key: DialPadKey,
   Call: DialPadCall,
   Backspace: DialPadBackspace,
 })

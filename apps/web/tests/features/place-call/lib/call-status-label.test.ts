@@ -5,20 +5,20 @@ import { statusLabel } from '@/features/place-call/lib/call-status-label'
 const t = (key: string) => key
 
 describe('statusLabel', () => {
-  it('formats the elapsed duration while the call is active', () => {
-    expect(statusLabel('active', 65, t)).toBe('01:05')
+  it('labels an active call', () => {
+    expect(statusLabel('active', false, t)).toBe('dialer.inCall')
   })
 
-  it('formats zero seconds when the active call just connected', () => {
-    expect(statusLabel('active', 0, t)).toBe('00:00')
+  it('labels a held call', () => {
+    expect(statusLabel('active', true, t)).toBe('dialer.onHold')
   })
 
-  it('translates the ended state', () => {
-    expect(statusLabel('ended', 12, t)).toBe('dialer.ended')
+  it('labels the ended state even while held', () => {
+    expect(statusLabel('ended', true, t)).toBe('dialer.ended')
   })
 
-  it('translates connecting for idle and connecting states', () => {
-    expect(statusLabel('connecting', 0, t)).toBe('dialer.connecting')
-    expect(statusLabel('idle', 0, t)).toBe('dialer.connecting')
+  it('labels connecting for idle and connecting states', () => {
+    expect(statusLabel('connecting', false, t)).toBe('dialer.connecting')
+    expect(statusLabel('idle', false, t)).toBe('dialer.connecting')
   })
 })

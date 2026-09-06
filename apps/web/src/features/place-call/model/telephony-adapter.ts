@@ -23,6 +23,7 @@ export function createStubTelephony(connectDelayMs: number): TelephonyAdapter {
     },
     setMuted: () => undefined,
     setHeld: () => undefined,
+    setRecording: () => undefined,
     sendDigit: () => undefined,
   }
 }

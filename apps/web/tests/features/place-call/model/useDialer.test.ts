@@ -118,6 +118,19 @@ describe('useDialer', () => {
     expect(result.current.dtmf).toBe('')
   })
 
+  it('toggles recording state', async () => {
+    const { result } = dialedHook()
+
+    await act(async () => result.current.placeCall())
+    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+
+    act(() => result.current.toggleRecord())
+    expect(result.current.recording).toBe(true)
+
+    act(() => result.current.toggleRecord())
+    expect(result.current.recording).toBe(false)
+  })
+
   it('toggles hold state', async () => {
     const { result } = dialedHook()
 

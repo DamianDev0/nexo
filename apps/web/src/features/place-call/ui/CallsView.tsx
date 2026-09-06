@@ -17,7 +17,7 @@ import type { CallLogEntry } from '../model/types/call.types'
 type CallsViewProps = {
   readonly entries: readonly CallLogEntry[]
   readonly now: number
-  readonly onCall: (number: string) => void
+  readonly onCall: (number: string, name?: string) => void
 }
 
 export function CallsView({ entries, now, onCall }: Readonly<CallsViewProps>) {
@@ -35,8 +35,8 @@ export function CallsView({ entries, now, onCall }: Readonly<CallsViewProps>) {
             variant="ghost"
             size="sm"
             aria-label={t('dialer.callAgain')}
-            onClick={() => onCall(entry.number)}
-            className="h-14 w-full justify-start gap-3 rounded-none px-4"
+            onClick={() => onCall(entry.number, entry.name ?? undefined)}
+            className="h-14 w-full justify-start gap-3 rounded-none px-4 font-normal"
           >
             {entry.outcome === 'completed' ? (
               <PhoneIcon className="size-4.5 shrink-0 text-positive" />
@@ -44,14 +44,14 @@ export function CallsView({ entries, now, onCall }: Readonly<CallsViewProps>) {
               <PhoneDisconnectIcon className="size-4.5 shrink-0 text-destructive" />
             )}
             <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-              <Text variant="strong" className="tabular-nums">
-                {formatDialNumber(entry.number)}
+              <Text variant="strong" className="max-w-full truncate tabular-nums">
+                {entry.name ?? formatDialNumber(entry.number)}
               </Text>
               <Text variant="hint" className="tabular-nums">
                 {formatCallDuration(entry.durationSec)}
               </Text>
             </span>
-            <Text variant="hint" className="shrink-0 tabular-nums">
+            <Text variant="hint" className="shrink-0 font-light tabular-nums">
               {formatCallLogDate(entry.at, now)}
             </Text>
           </PillButton>

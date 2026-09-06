@@ -1,11 +1,27 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+const bucket = vi.hoisted(() => {
+  const store = new Map<string, string>()
+  Object.defineProperty(window, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => void store.set(key, value),
+      removeItem: (key: string) => void store.delete(key),
+    },
+  })
+  return store
+})
+
 import { DIALER_TIMINGS } from '@/features/place-call/config/dialer.config'
 import { useCallStore } from '@/features/place-call/model/call.store'
+import { tenantRef } from '@/shared/api/tenant-ref'
 
 describe('useCallStore', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    tenantRef.set(null)
+    bucket.clear()
     useCallStore.setState({
       open: false,
       status: 'idle',
@@ -76,6 +92,39 @@ describe('useCallStore', () => {
     expect(useCallStore.getState()).toMatchObject({ status: 'idle', number: '', muted: false })
   })
 
+  it('replaces the number from free text input, sanitized and capped', () => {
+    useCallStore.getState().setNumber('+57 (301) 998-4407')
+    expect(useCallStore.getState().number).toBe('+573019984407')
+
+    useCallStore.getState().setNumber('1'.repeat(30))
+    expect(useCallStore.getState().number).toHaveLength(15)
+
+    useCallStore.getState().callConnecting()
+    useCallStore.getState().setNumber('999')
+    expect(useCallStore.getState().number).toHaveLength(15)
+  })
+
+  it('keeps the caller name from a contact dial and logs it on hangup', () => {
+    useCallStore.getState().dialNumber('+573001234567', 'Marcela Rueda')
+    expect(useCallStore.getState().callerName).toBe('Marcela Rueda')
+
+    useCallStore.getState().callConnecting()
+    useCallStore.getState().callConnected()
+    useCallStore.getState().callEnded()
+
+    expect(useCallStore.getState().history[0]?.name).toBe('Marcela Rueda')
+  })
+
+  it('drops the caller name when the number is edited by hand', () => {
+    useCallStore.getState().dialNumber('300', 'Marcela Rueda')
+    useCallStore.getState().appendDigit('1')
+    expect(useCallStore.getState().callerName).toBeNull()
+
+    useCallStore.getState().dialNumber('300', 'Marcela Rueda')
+    useCallStore.getState().setNumber('301')
+    expect(useCallStore.getState().callerName).toBeNull()
+  })
+
   it('dials a sanitized number and opens the dock', () => {
     useCallStore.getState().dialNumber('+57 300-123 4567')
 
@@ -143,6 +192,29 @@ describe('useCallStore', () => {
 
     useCallStore.getState().callEnded()
     expect(useCallStore.getState().held).toBe(false)
+  })
+
+  it('persists history per tenant and never leaks across tenant switches', async () => {
+    tenantRef.set('tenant-a')
+    await useCallStore.persist.rehydrate()
+    useCallStore.getState().appendDigit('3')
+    useCallStore.getState().callEnded()
+    expect(bucket.has('nexo-call-log:tenant-a')).toBe(true)
+
+    tenantRef.set('tenant-b')
+    useCallStore.setState({ history: [] })
+    await useCallStore.persist.rehydrate()
+    expect(useCallStore.getState().history).toHaveLength(0)
+    expect(bucket.get('nexo-call-log:tenant-a')).toContain('canceled')
+
+    tenantRef.set('tenant-a')
+    await useCallStore.persist.rehydrate()
+    expect(useCallStore.getState().history).toHaveLength(1)
+
+    tenantRef.set(null)
+    useCallStore.setState({ history: [] })
+    expect(bucket.has('nexo-call-log:null')).toBe(false)
+    expect([...bucket.keys()].some((key) => key.includes('anon'))).toBe(false)
   })
 
   it('cancels the pending auto-reset when reset happens first', () => {
