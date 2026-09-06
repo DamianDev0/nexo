@@ -59,7 +59,7 @@ function ComposerRoot({ label, children, onClose, className }: Readonly<Composer
         exit={{ opacity: 0, scale: 0.96 }}
         transition={{ layout: layoutTransition }}
         className={cn(
-          'fixed right-6 bottom-6 z-50 flex max-h-[calc(100dvh-3rem)] w-130 max-w-[calc(100dvw-3rem)] flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-xl',
+          'fixed right-40 bottom-6 z-50 flex max-h-[calc(100dvh-3rem)] w-150 max-w-[calc(100dvw-11.5rem)] flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-xl',
           'group/composer',
           'data-minimized:w-80',
           'data-maximized:inset-0 data-maximized:m-auto data-maximized:h-[min(80dvh,46rem)] data-maximized:w-[min(56rem,calc(100dvw-3rem))] data-maximized:max-w-none',
