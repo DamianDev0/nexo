@@ -56,7 +56,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
             </header>
             <div
               id={APP_SCROLL_ID}
-              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto [scrollbar-gutter:stable] [&>*]:shrink-0"
+              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto [scrollbar-gutter:stable] has-[[data-fill-viewport]]:overflow-hidden has-[[data-fill-viewport]]:[scrollbar-gutter:auto] [&>*]:shrink-0"
             >
               {children}
             </div>
