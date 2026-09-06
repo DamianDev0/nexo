@@ -24,7 +24,7 @@ export function DeleteViewDialog({
       open={open}
       onOpenChange={onOpenChange}
       onConfirm={onConfirm}
-      tone="slide-destructive"
+      tone="destructive"
       copy={{
         title: t('contacts.views.deleteTitle', { name }),
         description: t('contacts.views.deleteDescription'),

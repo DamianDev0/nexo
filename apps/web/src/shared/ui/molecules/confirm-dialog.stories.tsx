@@ -1,4 +1,4 @@
-import { expect, fn, userEvent, within } from 'storybook/test'
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 
 import { ConfirmDialog } from './confirm-dialog'
 
@@ -34,16 +34,30 @@ export const Destructive: Story = {
     tone: 'destructive',
     copy: {
       title: 'Eliminar pipeline',
-      description: 'Los negocios asociados quedarán sin etapa. Esta acción no se puede deshacer.',
-      confirmLabel: 'Eliminar',
+      description: 'Los negocios asociados quedarán sin etapa.',
+      confirmLabel: 'Desliza para eliminar',
+      confirmedLabel: 'Eliminado',
       cancelLabel: 'Cancelar',
     },
   },
   play: async ({ args, canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body)
-    await userEvent.click(body.getByRole('button', { name: 'Eliminar' }))
-    await expect(args.onConfirm).toHaveBeenCalledOnce()
+    await waitFor(() => expect(body.getByRole('note')).toBeVisible())
+    await expect(body.getByText('Desliza para eliminar')).toBeVisible()
+    await userEvent.click(body.getByRole('button', { name: 'Cancelar' }))
     await expect(args.onOpenChange).toHaveBeenCalledWith(false)
+    await expect(args.onConfirm).not.toHaveBeenCalled()
+  },
+}
+
+export const DestructiveKeyboardConfirm: Story = {
+  args: Destructive.args,
+  play: async ({ args, canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body)
+    body.getByRole('button', { name: 'Desliza para eliminar' }).focus()
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(args.onConfirm).toHaveBeenCalledTimes(1))
+    await expect(body.getByText('Eliminado')).toBeVisible()
   },
 }
 

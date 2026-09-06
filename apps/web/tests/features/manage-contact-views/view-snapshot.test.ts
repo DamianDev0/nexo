@@ -5,10 +5,11 @@ import type { ContactView } from '@repo/shared-types'
 import {
   buildViewInput,
   isSnapshotDirty,
+  isViewOwner,
   matchesSnapshot,
+  type ViewSnapshot,
   viewConditions,
   viewSearch,
-  type ViewSnapshot,
 } from '@/features/manage-contact-views/lib/view-snapshot'
 
 const view = (overrides: Partial<ContactView>): ContactView => ({
@@ -88,5 +89,16 @@ describe('view-snapshot', () => {
       density: 'compact',
     })
     expect(viewSearch(view({ filters: { q: 'camila' } }))).toBe('camila')
+  })
+})
+
+describe('isViewOwner', () => {
+  it('denies ownership while the viewer is unknown and grants it only on an exact match', () => {
+    const mine = view({ ownerId: 'me' })
+
+    expect(isViewOwner(mine, 'me')).toBe(true)
+    expect(isViewOwner(mine, 'other')).toBe(false)
+    expect(isViewOwner(mine, null)).toBe(false)
+    expect(isViewOwner(mine, undefined)).toBe(false)
   })
 })

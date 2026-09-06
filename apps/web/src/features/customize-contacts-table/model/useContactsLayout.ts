@@ -43,5 +43,5 @@ export function useContactsLayout(
     [save],
   )
 
-  return { layout, sort, setListOrder, saveStatus }
+  return { layout, sort, setListOrder, applyState: save, saveStatus }
 }

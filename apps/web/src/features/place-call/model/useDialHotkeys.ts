@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 import { isEditableTarget } from '@/shared/lib/keyboard'
+import { playDtmf } from '@/shared/lib/sound'
 
 import { isDialChar } from '../lib/format-dial-number'
 
@@ -18,7 +19,10 @@ export function useDialHotkeys({ enabled, onDial }: Readonly<DialHotkeysOptions>
     if (!enabled) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (isEditableTarget(event.target)) return
-      if (isDialChar(event.key)) useCallStore.getState().appendDigit(event.key)
+      if (isDialChar(event.key)) {
+        playDtmf(event.key)
+        useCallStore.getState().appendDigit(event.key)
+      }
       if (event.key === 'Backspace') useCallStore.getState().deleteDigit()
       if (event.key === 'Enter') void onDial()
     }

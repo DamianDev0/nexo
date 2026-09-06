@@ -13,23 +13,27 @@ import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
 
 import type { Locale } from '@/shared/i18n/locale'
 
+const TOAST_DESCRIPTION_LAYOUT =
+  'flex! items-center! justify-between! gap-3! px-4! py-2.5! text-xs!'
+const TOAST_BUTTON_LAYOUT = 'mt-0! h-6! w-auto! shrink-0! px-2.5! text-xs! font-semibold!'
+
 const LIGHT_TOAST_OPTIONS = {
   fill: TOAST_FILL_LIGHT,
   styles: {
-    title: 'text-black!',
-    description: 'text-black/70!',
+    title: 'text-black! normal-case!',
+    description: `${TOAST_DESCRIPTION_LAYOUT} text-black/70!`,
     badge: 'bg-black/5!',
-    button: 'bg-black/5! hover:bg-black/10!',
+    button: `${TOAST_BUTTON_LAYOUT} bg-black/5! text-primary-deep! hover:bg-black/10!`,
   },
 } as const
 
 const DARK_TOAST_OPTIONS = {
   fill: TOAST_FILL_DARK,
   styles: {
-    title: 'text-white!',
-    description: 'text-white/75!',
+    title: 'text-white! normal-case!',
+    description: `${TOAST_DESCRIPTION_LAYOUT} text-white/75!`,
     badge: 'bg-white/10!',
-    button: 'bg-white/10! hover:bg-white/15!',
+    button: `${TOAST_BUTTON_LAYOUT} bg-white/10! text-primary! hover:bg-white/15!`,
   },
 } as const
 

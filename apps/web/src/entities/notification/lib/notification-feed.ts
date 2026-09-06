@@ -1,7 +1,10 @@
 import { DAY_MS, HOUR_MS, MINUTE_MS } from '../config/notification.constants'
 
+import { notificationCopy } from './notification-copy'
+
 import type { NotificationFeedItem } from '../model/types'
 import type { Notification } from '@repo/shared-types'
+import type { TFunction } from 'i18next'
 
 const formatters = new Map<string, Intl.RelativeTimeFormat>()
 
@@ -27,13 +30,13 @@ export function notificationTimeAgo(iso: string, locale: string, now: Date = new
 export function toNotificationFeed(
   notifications: ReadonlyArray<Notification>,
   locale: string,
+  t: TFunction,
   now?: Date,
 ): NotificationFeedItem[] {
   const at = now ?? new Date()
   return notifications.map((notification) => ({
     id: notification.id,
-    title: notification.title,
-    body: notification.body ?? '',
+    ...notificationCopy(t, notification),
     time: notificationTimeAgo(notification.createdAt, locale, at),
     unread: !notification.isRead,
   }))

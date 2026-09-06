@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   BULK_STATUS_TONE,
-  bulkKindLabel,
+  bulkActionLabel,
   bulkProgressPercent,
   bulkStatusLabel,
   isBulkActionActive,
@@ -17,6 +17,8 @@ import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { Progress } from '@/shared/ui/shadcn/progress'
 import { TableCell, TableRow } from '@/shared/ui/shadcn/table'
+
+import { BulkErrorsPopover } from './BulkErrorsPopover'
 
 import type { BulkHistoryRowActions } from '../model/useBulkHistory'
 import type { BulkAction } from '@repo/shared-types'
@@ -36,7 +38,7 @@ export function BulkHistoryRow({ action, actions }: Readonly<BulkHistoryRowProps
       <TableCell className="whitespace-nowrap tabular-nums">
         {formatDateTimeCO(action.createdAt)}
       </TableCell>
-      <TableCell className="font-medium">{bulkKindLabel(t, action.action)}</TableCell>
+      <TableCell className="font-medium">{bulkActionLabel(t, action)}</TableCell>
       <TableCell>{entityLabel(MODULE_ENTITY[action.entity] ?? 'contact', 'plural')}</TableCell>
       <TableCell>{action.createdByName ?? t('bulkActions.unknownActor')}</TableCell>
       <TableCell className="tabular-nums">
@@ -56,6 +58,7 @@ export function BulkHistoryRow({ action, actions }: Readonly<BulkHistoryRowProps
       </TableCell>
       <TableCell className="whitespace-nowrap text-right">
         <span className="inline-flex items-center gap-1.5">
+          {!active && <BulkErrorsPopover errors={action.errors} failed={action.failed} />}
           {action.resultFileUrl && (
             <PillButton asChild variant="outline" size="xs">
               <a href={action.resultFileUrl} target="_blank" rel="noreferrer noopener">
@@ -68,7 +71,7 @@ export function BulkHistoryRow({ action, actions }: Readonly<BulkHistoryRowProps
               variant="outline"
               size="xs"
               disabled={actions.isBusy}
-              onClick={() => actions.onRevert(action.id)}
+              onClick={() => actions.onRevert(action)}
             >
               {t('bulkActions.revert')}
             </PillButton>

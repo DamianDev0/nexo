@@ -3,6 +3,7 @@ import 'server-only'
 import { contactListQueryFromParams } from '@/features/filter-contacts'
 import { getContactCounts, getContactWorkspace, listContacts } from '@/shared/api/dal/contacts'
 import { listTagCatalog } from '@/shared/api/dal/tags'
+import { listTeamMembers } from '@/shared/api/dal/users'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 import { prefetch } from '@/shared/query/server-query'
 
@@ -23,5 +24,6 @@ export async function prefetchContacts(
     prefetch(client, QUERY_KEYS.tags.catalog(CONTACT_ENTITY_TYPE), () =>
       listTagCatalog(CONTACT_ENTITY_TYPE),
     ),
+    prefetch(client, QUERY_KEYS.team.members, listTeamMembers),
   ])
 }

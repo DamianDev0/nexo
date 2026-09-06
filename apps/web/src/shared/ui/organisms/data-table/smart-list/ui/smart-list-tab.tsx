@@ -93,6 +93,7 @@ function SmartListTabBase({
           transition={{ type: 'spring', stiffness: 550, damping: 45 }}
         />
       )}
+      {item.icon ? <item.icon className="size-3.5 shrink-0 text-primary-deep" /> : null}
       {item.label}
       {item.count !== undefined && (
         <span
@@ -159,7 +160,7 @@ function SmartListTabBase({
                   </kbd>
                 )}
               </span>
-              <span className="mt-0.5 block leading-snug opacity-70">{item.description}</span>
+              <span className="mt-0.5 block opacity-80">{item.description}</span>
             </>
           }
         >

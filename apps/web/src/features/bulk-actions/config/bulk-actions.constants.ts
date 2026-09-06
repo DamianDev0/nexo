@@ -1,32 +1,14 @@
-import {
-  ArrowCounterClockwiseIcon,
-  CircleIcon,
-  FileArrowDownIcon,
-  TagPlusIcon,
-  TagXIcon,
-  TrashIcon,
-} from '@/shared/ui/icons'
+import type { BulkExportFormat } from '@repo/shared-types'
 
-import type { BulkDialogKind } from '../model/types/bulk-actions.types'
-import type { AppIcon } from '@/shared/ui/icons'
-export type BulkBarButton = {
-  readonly id: BulkDialogKind | 'export'
+export const BULK_ACTIONABLE_TOAST_DURATION_MS = 9000
+
+export const BULK_ACTIONABLE_TOAST_AUTOPILOT = { expand: 300, collapse: 7000 } as const
+
+export const BULK_EXPORT_FORMAT_OPTIONS: ReadonlyArray<{
+  readonly value: BulkExportFormat
   readonly labelKey: string
-  readonly icon: AppIcon
-  readonly danger?: boolean
-}
-
-export const BULK_BAR_BUTTONS: ReadonlyArray<BulkBarButton> = [
-  { id: 'add_tags', labelKey: 'contacts.bulk.addTags', icon: TagPlusIcon },
-  { id: 'remove_tags', labelKey: 'contacts.bulk.removeTags', icon: TagXIcon },
-  { id: 'status', labelKey: 'contacts.bulk.changeStatus', icon: CircleIcon },
-  { id: 'export', labelKey: 'contacts.bulk.export', icon: FileArrowDownIcon },
-  { id: 'archive', labelKey: 'contacts.bulk.archive', icon: TrashIcon, danger: true },
+}> = [
+  { value: 'xlsx', labelKey: 'contacts.bulk.dialogs.export.formats.xlsx' },
+  { value: 'csv', labelKey: 'contacts.bulk.dialogs.export.formats.csv' },
+  { value: 'json', labelKey: 'contacts.bulk.dialogs.export.formats.json' },
 ]
-
-export const BULK_ARCHIVED_BAR_BUTTONS: ReadonlyArray<BulkBarButton> = [
-  { id: 'restore', labelKey: 'contacts.bulk.restore', icon: ArrowCounterClockwiseIcon },
-  { id: 'export', labelKey: 'contacts.bulk.export', icon: FileArrowDownIcon },
-]
-
-export const BULK_STATUS_FIELD = 'status'

@@ -5,7 +5,12 @@ import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
 import { BulkActionBar, BulkDialogs } from '@/features/bulk-actions'
-import { ContactsListHint } from '@/features/filter-contacts'
+import {
+  ContactsListHint,
+  LIST_ALL,
+  LIST_UNASSIGNED,
+  UnassignedBadge,
+} from '@/features/filter-contacts'
 import { SaveViewControls } from '@/features/manage-contact-views'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { DotsThreeVerticalIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
@@ -15,6 +20,7 @@ import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { FilterChips, FilterTrigger } from '@/shared/ui/organisms/filter-bar'
 import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 
+import { resolveEmptyKind } from '../lib/empty-kind'
 import { buildToolbarMenu } from '../lib/toolbar-menu'
 
 import { ContactsPagination } from './ContactsPagination'
@@ -22,22 +28,19 @@ import { ContactsPagination } from './ContactsPagination'
 import type { ContactsBoard } from '../model/useContactsBoard'
 import type { ListMenu } from '../model/useListMenu'
 
-type ContactsTableProps = Readonly<
-  Pick<ContactsBoard, 'instance' | 'lists' | 'state' | 'actions' | 'bulk'> & { listMenu: ListMenu }
->
+type ContactsTableProps = {
+  readonly board: Pick<ContactsBoard, 'instance' | 'lists' | 'state' | 'actions'>
+  readonly bulk: ContactsBoard['bulk']
+  readonly listMenu: ListMenu
+}
 
-export function ContactsTable({
-  instance,
-  lists,
-  state,
-  actions,
-  bulk,
-  listMenu,
-}: ContactsTableProps) {
+export function ContactsTable({ board, bulk, listMenu }: Readonly<ContactsTableProps>) {
+  const { instance, lists, state, actions } = board
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
   const scrollRef = useRef<HTMLDivElement>(null)
   const toolbarMenu = useMemo(() => buildToolbarMenu(t), [t])
+  const emptyKind = resolveEmptyKind(state)
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -96,6 +99,13 @@ export function ContactsTable({
               placeholder={t('contacts.searchPlaceholder')}
               onChange={actions.onSearch}
             />
+            <UnassignedBadge
+              count={state.unassignedRecent}
+              active={lists.activeId === LIST_UNASSIGNED}
+              terms={{ entity: terms.lowerSingular, entities: terms.lowerPlural }}
+              onSelect={() => actions.onSelectList(LIST_UNASSIGNED)}
+              onClear={() => actions.onSelectList(LIST_ALL)}
+            />
             <FilterChips
               fields={state.advancedFields}
               value={state.advanced}
@@ -135,15 +145,13 @@ export function ContactsTable({
             <EmptyState
               fill
               icon={<UsersThreeIcon className="size-5" />}
-              title={t(state.isFiltered ? 'contacts.noResults.title' : 'contacts.empty.title', {
+              title={t(`contacts.${emptyKind}.title`, { entities: terms.lowerPlural })}
+              description={t(`contacts.${emptyKind}.description`, {
+                entity: terms.lowerSingular,
                 entities: terms.lowerPlural,
               })}
-              description={t(
-                state.isFiltered ? 'contacts.noResults.description' : 'contacts.empty.description',
-                { entity: terms.lowerSingular },
-              )}
             >
-              {!state.isFiltered && (
+              {emptyKind === 'empty' && (
                 <PillButton size="md" onClick={actions.onCreate}>
                   {t('contacts.empty.cta', { entity: terms.lowerSingular })}
                 </PillButton>

@@ -74,6 +74,9 @@ const contactsService = {
 
   deleteView: (id: string) => request<void>({ method: 'delete', url: `/contacts/views/${id}` }),
 
+  duplicateView: (id: string) =>
+    request<ContactView>({ method: 'post', url: `/contacts/views/${id}/duplicate` }),
+
   saveTableState: (tableState: ContactTableState) =>
     request<void>({ method: 'patch', url: '/contacts/workspace', data: { tableState } }),
 

@@ -5,6 +5,7 @@ import { isComplete, parseConditions } from '@/shared/ui/organisms/filter-bar'
 import { EMPTY_QUICK_FILTERS, type QuickFilterState } from '../config/quick-filters.constants'
 import {
   isArchivedList,
+  ownerList,
   parseLimitParam,
   parseListParam,
   parsePageParam,
@@ -46,14 +47,18 @@ export function contactListQuery(
   filters: QuickFilterState = EMPTY_QUICK_FILTERS,
   pagination: ContactListPagination = DEFAULT_PAGINATION,
   advanced: ReadonlyArray<FilterCondition> = [],
+  viewerId?: string | null,
 ): ContactListQuery {
   const conditions = [...advanced, ...quickFilterConditions(filters)]
   const archived = isArchivedList(status)
+  const owner = ownerList(status)
   return {
     q: search.trim() || undefined,
     advanced: conditions.length > 0 ? conditions : undefined,
-    status: archived ? undefined : (status ?? undefined),
+    status: archived || owner ? undefined : (status ?? undefined),
     archived: archived || undefined,
+    assignedToId: owner === 'mine' && viewerId ? viewerId : undefined,
+    unassigned: owner === 'unassigned' || undefined,
     page: pagination.page,
     limit: pagination.limit,
     sortBy: pagination.sort?.field,

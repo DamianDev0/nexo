@@ -1,17 +1,25 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+
+import { collectTags } from '../lib/selection-scope'
 
 import type { useDataTable } from '@/shared/ui/organisms/data-table'
 import type { ContactListItem } from '@repo/shared-types'
 
 type BoardSelectionArgs = {
   readonly instance: ReturnType<typeof useDataTable<ContactListItem>>
+  readonly scopeKey: string
   readonly closePreview: () => void
   readonly openEdit: (contact: ContactListItem) => void
 }
 
-export function useBoardSelection({ instance, closePreview, openEdit }: BoardSelectionArgs) {
+export function useBoardSelection({
+  instance,
+  scopeKey,
+  closePreview,
+  openEdit,
+}: BoardSelectionArgs) {
   const openFromPreview = useCallback(
     (contact: ContactListItem) => {
       closePreview()
@@ -20,12 +28,21 @@ export function useBoardSelection({ instance, closePreview, openEdit }: BoardSel
     [closePreview, openEdit],
   )
 
-  const selectedIds = useCallback(
-    () => instance.table.getSelectedRowModel().rows.map((row) => row.id),
+  const selectedRows = useCallback(
+    () => instance.table.getSelectedRowModel().rows.map((row) => row.original),
     [instance.table],
   )
 
+  const selectedIds = useCallback(() => selectedRows().map((row) => row.id), [selectedRows])
+  const selectedTags = useCallback(() => collectTags(selectedRows()), [selectedRows])
   const clearSelection = useCallback(() => instance.table.resetRowSelection(), [instance.table])
 
-  return { openFromPreview, selectedIds, clearSelection }
+  const previousScope = useRef(scopeKey)
+  useEffect(() => {
+    if (previousScope.current === scopeKey) return
+    previousScope.current = scopeKey
+    clearSelection()
+  }, [scopeKey, clearSelection])
+
+  return { openFromPreview, selectedIds, selectedTags, clearSelection }
 }

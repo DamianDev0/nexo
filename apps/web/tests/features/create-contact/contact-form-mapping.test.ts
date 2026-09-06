@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest'
 import type { ContactFormValues } from '@/features/create-contact/lib/contact-form.schema'
 import type { ContactListItem } from '@repo/shared-types'
 
-import { toFormValues, toInput } from '@/features/create-contact/lib/contact-form-mapping'
+import {
+  pickCustomFieldValues,
+  toFormValues,
+  toInput,
+} from '@/features/create-contact/lib/contact-form-mapping'
 
 const VALUES: ContactFormValues = {
   firstName: 'Ana',
@@ -83,5 +87,14 @@ describe('toFormValues', () => {
     expect(values.status).toBe('new')
     expect(values.lifecycleStage).toBe('lead')
     expect(values.address).toBe('Carrera 7 #1-1')
+  })
+})
+
+describe('pickCustomFieldValues', () => {
+  it('keeps only the values the form can edit so legacy or inactive keys never reach the API', () => {
+    const values = { role: 'Director', metros: 120, address: 'Calle 1' }
+
+    expect(pickCustomFieldValues(values, [{ key: 'metros' }])).toEqual({ metros: 120 })
+    expect(pickCustomFieldValues(values, [])).toEqual({})
   })
 })

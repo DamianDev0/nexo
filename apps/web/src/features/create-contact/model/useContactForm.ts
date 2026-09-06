@@ -9,7 +9,12 @@ import contactsService from '@/shared/api/services/contacts.service'
 
 import { CONTACT_FORM_DEFAULTS } from '../config/contact-form.constants'
 import { duplicateFormField, duplicateMessage } from '../lib/contact-duplicates'
-import { stripNullValues, toFormValues, toInput } from '../lib/contact-form-mapping'
+import {
+  pickCustomFieldValues,
+  stripNullValues,
+  toFormValues,
+  toInput,
+} from '../lib/contact-form-mapping'
 import { buildContactSchema, type ContactFormValues } from '../lib/contact-form.schema'
 import { validateCustomValues } from '../lib/custom-field-validation'
 import { useContactCustomFields } from '../query/useContactCustomFields'
@@ -76,10 +81,12 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
   }
 
   const saver = useSaveContact<ContactFormValues>({
-    mutationFn: ({ values, force }) =>
-      contact
-        ? contactsService.update(contact.id, toInput(values, customValues), force)
-        : contactsService.create(toInput(values, stripNullValues(customValues)), force),
+    mutationFn: ({ values, force }) => {
+      const editable = pickCustomFieldValues(customValues, customFieldDefs)
+      return contact
+        ? contactsService.update(contact.id, toInput(values, editable), force)
+        : contactsService.create(toInput(values, stripNullValues(editable)), force)
+    },
     successTitle: () =>
       t(contact ? 'contacts.toasts.updated' : 'contacts.toasts.created', {
         entity: terms.singular,

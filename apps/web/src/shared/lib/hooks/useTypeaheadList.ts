@@ -16,7 +16,8 @@ export function useTypeaheadList<T>(items: ReadonlyArray<T>, source: TypeaheadSo
 
   const needle = normalizeSearchText(term.trim())
   const matches =
-    source.matches ?? ((item: T, n: string) => normalizeSearchText(source.getLabel(item)).includes(n))
+    source.matches ??
+    ((item: T, n: string) => normalizeSearchText(source.getLabel(item)).includes(n))
   const visible = needle ? items.filter((item) => matches(item, needle)) : items
 
   const first = visible[0]

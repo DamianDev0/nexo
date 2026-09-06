@@ -22,6 +22,9 @@ export const QUERY_KEYS = {
       ['contacts', 'duplicate-probe', params] as const,
     timeline: (id: string) => ['contacts', 'timeline', id] as const,
   },
+  team: {
+    members: ['team', 'members'] as const,
+  },
   bulkActions: {
     all: ['bulk-actions'] as const,
     list: (query: BulkActionListQuery) => ['bulk-actions', 'list', query] as const,

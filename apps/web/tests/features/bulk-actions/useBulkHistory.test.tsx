@@ -60,7 +60,14 @@ describe('useBulkHistory', () => {
     act(() => result.current.rowActions.onCancel('a'))
     await waitFor(() => expect(cancelled).toEqual(['a']))
 
-    act(() => result.current.rowActions.onRevert('b'))
+    const target = result.current.rows[1]
+    if (!target) throw new Error('missing row')
+    act(() => result.current.rowActions.onRevert(target))
+    expect(result.current.revertDialog.action?.id).toBe('b')
+    expect(reverted).toEqual([])
+
+    act(() => result.current.revertDialog.confirm())
     await waitFor(() => expect(reverted).toEqual(['b']))
+    expect(result.current.revertDialog.action).toBeNull()
   })
 })

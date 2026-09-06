@@ -17,6 +17,16 @@ vi.mock('@/entities/tag', () => ({
   useTagCatalog: () => new Map([['vip', { name: 'vip', color: '#000' }]]),
 }))
 
+vi.mock('@/entities/team-member', () => ({
+  useTeamMembers: () => [{ id: 'u-1', fullName: 'Ana', email: 'a@x.co', avatarUrl: null }],
+  memberOptions: (members: Array<{ id: string; fullName: string }>) =>
+    members.map((member) => ({ value: member.id, label: member.fullName })),
+}))
+
+vi.mock('@/entities/session', () => ({
+  useAuth: () => ({ data: { id: 'u-1' } }),
+}))
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => `t:${key}` }),
 }))

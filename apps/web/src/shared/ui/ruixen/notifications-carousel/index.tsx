@@ -3,7 +3,8 @@
 import { AnimatePresence } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { cn } from '@/shared/lib/index'
+import { cn } from '@/shared/lib'
+import { playTick } from '@/shared/lib/sound'
 
 import { CarouselRow } from './carousel-row'
 import { DRAG_STEP_THRESHOLD, FALLOFF_ROWS, VIEWPORT_HEIGHT, WHEEL_THRESHOLD } from './constants'
@@ -38,7 +39,7 @@ export function NotificationsCarousel({
   footer,
   onDismiss,
   onSelect,
-}: NotificationsCarouselProps) {
+}: Readonly<NotificationsCarouselProps>) {
   const [index, setIndex] = useState(0)
   const viewportRef = useRef<HTMLDivElement>(null)
   const wheelAccumulator = useRef(0)
@@ -47,6 +48,13 @@ export function NotificationsCarousel({
 
   const lastIndex = Math.max(0, items.length - 1)
   const activeIndex = clamp(index, 0, lastIndex)
+  const announcedIndex = useRef(activeIndex)
+
+  useEffect(() => {
+    if (announcedIndex.current === activeIndex) return
+    announcedIndex.current = activeIndex
+    playTick()
+  }, [activeIndex])
 
   const goTo = useCallback(
     (next: number) => {

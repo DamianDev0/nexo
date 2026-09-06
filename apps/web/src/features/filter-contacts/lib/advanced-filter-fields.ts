@@ -3,7 +3,7 @@ import { CUSTOM_COLUMN_PREFIX, type ContactColumnDef } from '@repo/shared-types'
 import {
   CORE_FIELDS,
   CUSTOM_TYPE_MAP,
-  NAME_FILTER_FIELD,
+  FILTER_KEY_BY_COLUMN,
   type AdvancedFieldSources,
 } from '../config/advanced-filter-fields.constants'
 
@@ -41,7 +41,7 @@ export function buildAdvancedFilterFields(
     const spec = CORE_FIELDS[column.key]
     if (!spec) continue
     fields.push({
-      key: column.key === 'name' ? NAME_FILTER_FIELD : column.key,
+      key: FILTER_KEY_BY_COLUMN[column.key] ?? column.key,
       label: t(column.labelKey),
       icon: icons[column.key],
       type: spec.type,

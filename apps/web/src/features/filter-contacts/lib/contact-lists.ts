@@ -9,12 +9,22 @@ import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { SmartListItem } from '@/shared/ui/organisms/data-table'
 import type { TFunction } from 'i18next'
 
-const LIST_ALL = 'all'
+export const LIST_ALL = 'all'
 
 export const LIST_ARCHIVED = 'archived'
 
+export const LIST_MINE = 'mine'
+
+export const LIST_UNASSIGNED = 'unassigned'
+
+export type OwnerList = typeof LIST_MINE | typeof LIST_UNASSIGNED
+
 export function isArchivedList(id: string | null): boolean {
   return id === LIST_ARCHIVED
+}
+
+export function ownerList(id: string | null): OwnerList | null {
+  return id === LIST_MINE || id === LIST_UNASSIGNED ? id : null
 }
 
 export function buildSmartLists(
@@ -33,6 +43,12 @@ export function buildSmartLists(
         entities: terms?.entities ?? '',
       }),
       pinned: true,
+    },
+    {
+      id: LIST_MINE,
+      label: t('contacts.lists.mine'),
+      count: counts[LIST_MINE] ?? 0,
+      description: t('contacts.lists.descriptions.mine', { entities: terms?.entities ?? '' }),
     },
     {
       id: LIST_ARCHIVED,

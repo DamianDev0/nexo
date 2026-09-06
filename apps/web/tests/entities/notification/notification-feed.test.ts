@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Notification } from '@repo/shared-types'
+import type { TFunction } from 'i18next'
 
 import {
   notificationTimeAgo,
@@ -8,6 +9,8 @@ import {
 } from '@/entities/notification/lib/notification-feed'
 
 const NOW = new Date('2026-08-14T12:00:00.000Z')
+const t = ((key: string, options?: Record<string, unknown>) =>
+  options ? `${key}:${JSON.stringify(options)}` : key) as unknown as TFunction
 
 function notification(overrides: Partial<Notification> = {}): Notification {
   return {
@@ -18,6 +21,7 @@ function notification(overrides: Partial<Notification> = {}): Notification {
     body: 'Maria Lopez fue creada',
     entityType: 'contact',
     entityId: 'c1',
+    data: null,
     isRead: false,
     readAt: null,
     createdAt: '2026-08-14T11:30:00.000Z',
@@ -49,7 +53,7 @@ describe('notificationTimeAgo', () => {
 
 describe('toNotificationFeed', () => {
   it('maps a notification into a feed item', () => {
-    expect(toNotificationFeed([notification()], 'en', NOW)).toEqual([
+    expect(toNotificationFeed([notification()], 'en', t, NOW)).toEqual([
       expect.objectContaining({
         id: 'n1',
         title: 'Nuevo contacto',
@@ -60,18 +64,52 @@ describe('toNotificationFeed', () => {
   })
 
   it('replaces a null body with an empty string', () => {
-    expect(toNotificationFeed([notification({ body: null })], 'en', NOW)).toEqual([
+    expect(toNotificationFeed([notification({ body: null })], 'en', t, NOW)).toEqual([
       expect.objectContaining({ body: '' }),
     ])
   })
 
   it('marks read notifications as not unread', () => {
-    expect(toNotificationFeed([notification({ isRead: true })], 'en', NOW)).toEqual([
+    expect(toNotificationFeed([notification({ isRead: true })], 'en', t, NOW)).toEqual([
       expect.objectContaining({ unread: false }),
     ])
   })
 
   it('returns an empty feed for an empty list', () => {
-    expect(toNotificationFeed([], 'en', NOW)).toEqual([])
+    expect(toNotificationFeed([], 'en', t, NOW)).toEqual([])
+  })
+
+  it('translates bulk action notifications from their structured data', () => {
+    const [item] = toNotificationFeed(
+      [
+        notification({
+          notificationType: 'bulk_action.completed' as Notification['notificationType'],
+          title: 'Acción masiva archive terminada',
+          data: { action: 'archive', succeeded: 25, failed: 0, total: 25 },
+        }),
+      ],
+      'en',
+      t,
+      NOW,
+    )
+    expect(item?.title).toBe(
+      'notifications.types.bulkActionCompleted.title:{"kind":"contacts.bulk.actions.archive"}',
+    )
+    expect(item?.body).toContain('"succeeded":25')
+  })
+
+  it('falls back to the stored copy when a bulk notification has no data', () => {
+    const [item] = toNotificationFeed(
+      [
+        notification({
+          notificationType: 'bulk_action.completed' as Notification['notificationType'],
+          title: 'Acción masiva archive terminada',
+        }),
+      ],
+      'en',
+      t,
+      NOW,
+    )
+    expect(item?.title).toBe('Acción masiva archive terminada')
   })
 })

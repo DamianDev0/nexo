@@ -10,31 +10,39 @@ import { useContactsBoard } from '../../model/useContactsBoard'
 import { useListMenu } from '../../model/useListMenu'
 import { ContactsTable } from '../ContactsTable'
 
-const ContactFormSheet = dynamic(() =>
-  import('@/features/create-contact').then((m) => m.ContactFormSheet),
+const ContactFormSheet = dynamic(
+  () => import('@/features/create-contact').then((m) => m.ContactFormSheet),
+  { loading: () => null, ssr: false },
 )
 
-const ContactPreviewSheet = dynamic(() =>
-  import('@/entities/contact').then((m) => m.ContactPreviewSheet),
+const ContactPreviewSheet = dynamic(
+  () => import('@/entities/contact').then((m) => m.ContactPreviewSheet),
+  { loading: () => null, ssr: false },
 )
 
-const NoteComposer = dynamic(() =>
-  import('@/features/add-contact-note').then((m) => m.NoteComposer),
+const NoteComposer = dynamic(
+  () => import('@/features/add-contact-note').then((m) => m.NoteComposer),
+  { loading: () => null, ssr: false },
 )
 
-const TagComposer = dynamic(() => import('@/features/tag-contact').then((m) => m.TagComposer))
+const TagComposer = dynamic(() => import('@/features/tag-contact').then((m) => m.TagComposer), {
+  loading: () => null,
+  ssr: false,
+})
 
-const MessageComposer = dynamic(() =>
-  import('@/features/compose-message').then((m) => m.MessageComposer),
+const MessageComposer = dynamic(
+  () => import('@/features/compose-message').then((m) => m.MessageComposer),
+  { loading: () => null, ssr: false },
 )
 
-const ViewTabDialogs = dynamic(() =>
-  import('@/features/manage-contact-views').then((m) => m.ViewTabDialogs),
+const ViewTabDialogs = dynamic(
+  () => import('@/features/manage-contact-views').then((m) => m.ViewTabDialogs),
+  { loading: () => null, ssr: false },
 )
 
 export function ContactsBoard() {
   const { instance, lists, state, actions, bulk, sheet, preview, composers } = useContactsBoard()
-  const listMenu = useListMenu(state.views)
+  const listMenu = useListMenu(state.views, state.viewerId)
   useComposerPreload()
 
   const viewDialogsMounted = useMountedOnce(listMenu.viewMenu.openMode !== null)
@@ -45,14 +53,7 @@ export function ContactsBoard() {
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <ContactsTable
-        instance={instance}
-        lists={lists}
-        state={state}
-        actions={actions}
-        bulk={bulk}
-        listMenu={listMenu}
-      />
+      <ContactsTable board={{ instance, lists, state, actions }} bulk={bulk} listMenu={listMenu} />
       {viewDialogsMounted && <ViewTabDialogs menu={listMenu.viewMenu} />}
       {formMounted && (
         <ContactFormSheet

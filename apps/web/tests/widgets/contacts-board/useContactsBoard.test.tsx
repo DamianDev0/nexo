@@ -26,7 +26,9 @@ function boardHandlers() {
       }),
     ),
     http.get(`${API}/contacts/counts`, () =>
-      HttpResponse.json({ data: { total: 2, byStatus: { new: 1, qualified: 1 } } }),
+      HttpResponse.json({
+        data: { total: 2, unassigned: 2, unassignedRecent: 1, byStatus: { new: 1, qualified: 1 } },
+      }),
     ),
     http.get(`${API}/settings/contact-taxonomy`, () =>
       HttpResponse.json({
@@ -67,9 +69,11 @@ describe('useContactsBoard', () => {
 
     const { result } = renderHook(() => useContactsBoard(), { wrapper })
 
-    await waitFor(() => expect(result.current.lists.items).toHaveLength(4))
-    const [all, archived, first] = result.current.lists.items
+    await waitFor(() => expect(result.current.lists.items).toHaveLength(5))
+    const [all, mine, archived, first] = result.current.lists.items
     expect(all).toMatchObject({ id: 'all', pinned: true, count: 2 })
+    expect(mine).toMatchObject({ id: 'mine', count: 0 })
+    expect(result.current.state.unassignedRecent).toBe(1)
     expect(archived).toMatchObject({ id: 'archived', count: 0 })
     expect(first).toMatchObject({ id: 'new', label: 'Nuevo', count: 1 })
     expect(result.current.lists.activeId).toBe('all')
@@ -106,6 +110,7 @@ describe('useContactsBoard', () => {
     await waitFor(() =>
       expect(result.current.lists.items.map((item) => item.id)).toEqual([
         'all',
+        'mine',
         'archived',
         'qualified',
         'new',
@@ -129,6 +134,7 @@ describe('useContactsBoard', () => {
     await waitFor(() =>
       expect(result.current.lists.items.map((item) => item.id)).toEqual([
         'all',
+        'mine',
         'archived',
         'qualified',
         'new',
@@ -139,6 +145,7 @@ describe('useContactsBoard', () => {
     await waitFor(() =>
       expect(result.current.lists.items.map((item) => item.id)).toEqual([
         'all',
+        'mine',
         'archived',
         'new',
         'qualified',
@@ -189,7 +196,7 @@ describe('useContactsBoard', () => {
     })
     await waitFor(() => expect(result.current.instance.selection.count).toBe(2))
 
-    act(() => result.current.bulk.dialogs.archive())
+    act(() => result.current.bulk.dialogs.submit('archive'))
 
     await waitFor(() => expect(received).not.toBeNull())
     expect(received).toMatchObject({
@@ -213,7 +220,7 @@ describe('useContactsBoard', () => {
     const { result } = renderHook(() => useContactsBoard(), { wrapper })
     await waitFor(() => expect(result.current.state.isPending).toBe(false))
 
-    act(() => result.current.bulk.dialogs.archive())
+    act(() => result.current.bulk.dialogs.submit('archive'))
 
     expect(posted).not.toHaveBeenCalled()
   })

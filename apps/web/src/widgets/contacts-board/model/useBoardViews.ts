@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 
+import { useAuth } from '@/entities/session'
 import { listIdToStatus, type useContactsTable } from '@/features/filter-contacts'
-import { useContactViewsSection } from '@/features/manage-contact-views'
+import { defaultView, useContactViewsSection } from '@/features/manage-contact-views'
 
 import { EMPTY_TABLE_STATE, EMPTY_VIEWS } from '../config/board-empty.constants'
 
@@ -15,9 +16,19 @@ type BoardViewsArgs = {
   readonly workspace: { views?: ContactView[]; tableState?: ContactTableState }
   readonly items: ReadonlyArray<SmartListItem>
   readonly fallbackActiveId: string
+  readonly applyTableState: (patch: ContactTableState) => void
 }
 
-export function useBoardViews({ table, workspace, items, fallbackActiveId }: BoardViewsArgs) {
+export function useBoardViews({
+  table,
+  workspace,
+  items,
+  fallbackActiveId,
+  applyTableState,
+}: BoardViewsArgs) {
+  const { data: me } = useAuth()
+  const viewerId = me?.id ?? null
+
   const viewSnapshot = useMemo(
     () => ({
       advanced: table.advanced,
@@ -28,16 +39,24 @@ export function useBoardViews({ table, workspace, items, fallbackActiveId }: Boa
     [table.advanced, table.search, table.sort, workspace.tableState],
   )
 
-  const section = useContactViewsSection(workspace.views ?? EMPTY_VIEWS, viewSnapshot, {
-    onAdvanced: table.handleAdvanced,
-    onSearch: table.handleSearch,
-    onSort: table.handleSort,
-    onStatus: table.handleStatus,
-  })
+  const views = workspace.views ?? EMPTY_VIEWS
+  const section = useContactViewsSection(
+    views,
+    viewSnapshot,
+    {
+      onAdvanced: table.handleAdvanced,
+      onSearch: table.handleSearch,
+      onSort: table.handleSort,
+      onStatus: table.handleStatus,
+      onLayout: (columns, density) => applyTableState({ columns, density }),
+    },
+    viewerId,
+  )
 
   const lastViewListIdRef = useRef<string | null>(null)
+  const defaultAppliedRef = useRef(false)
 
-  const { handleStatus, handleSearch, handleAdvanced } = table
+  const { handleStatus, handleSearch, handleAdvanced, isFiltered } = table
   const selectList = useCallback(
     (id: string) => {
       if (section.selectView(id)) {
@@ -49,6 +68,14 @@ export function useBoardViews({ table, workspace, items, fallbackActiveId }: Boa
     },
     [section, handleStatus],
   )
+
+  useEffect(() => {
+    if (defaultAppliedRef.current || views.length === 0) return
+    defaultAppliedRef.current = true
+    if (isFiltered) return
+    const view = defaultView(views, viewerId)
+    if (view) selectList(`view:${view.id}`)
+  }, [views, viewerId, isFiltered, selectList])
 
   const revertFilters = useCallback(() => {
     const last = lastViewListIdRef.current
@@ -64,6 +91,7 @@ export function useBoardViews({ table, workspace, items, fallbackActiveId }: Boa
     },
     viewSnapshot,
     activeView: section.activeView,
+    viewerId,
     selectList,
     revertFilters,
   }

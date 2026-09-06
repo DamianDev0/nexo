@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 
 import { cn } from '@/shared/lib'
 import { snappySpring } from '@/shared/lib/animations'
+import { playDtmf } from '@/shared/lib/sound'
 
 import { DIAL_KEYS } from './constants'
 import { useDialPad } from './context'
@@ -38,7 +39,10 @@ function DialPadKey({ digit, letters }: Readonly<DialPadKeyProps>) {
       data-slot="dial-pad-key"
       whileTap={{ scale: 0.92 }}
       transition={snappySpring}
-      onClick={() => onDigit(digit)}
+      onClick={() => {
+        playDtmf(digit)
+        onDigit(digit)
+      }}
       className="flex size-12 flex-col items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted active:bg-accent"
     >
       <span

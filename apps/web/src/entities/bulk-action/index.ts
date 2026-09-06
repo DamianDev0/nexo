@@ -1,5 +1,6 @@
 export { BULK_STATUS_TONE } from './config/bulk-status.constants'
 export {
+  bulkActionLabel,
   bulkKindLabel,
   bulkOutcomeToast,
   bulkProgressPercent,

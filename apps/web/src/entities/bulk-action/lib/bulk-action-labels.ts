@@ -3,6 +3,11 @@ import { BULK_ACTION_ACTIVE_STATUSES, BULK_REVERTIBLE_KINDS } from '@repo/shared
 import type { BulkAction, BulkActionStatus } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
+const FIELD_LABEL_KEYS: Readonly<Record<string, string>> = {
+  status: 'contacts.bulk.changeStatus',
+  lifecycleStage: 'contacts.bulk.changeLifecycle',
+}
+
 export function isBulkActionActive(status: BulkActionStatus): boolean {
   return BULK_ACTION_ACTIVE_STATUSES.includes(status)
 }
@@ -30,11 +35,23 @@ export function bulkKindLabel(t: TFunction, kind: BulkAction['action']): string 
   return t(`contacts.bulk.actions.${kind}`)
 }
 
+export function bulkActionLabel(
+  t: TFunction,
+  action: Pick<BulkAction, 'action' | 'params'>,
+): string {
+  if (action.action === 'update_field') {
+    const field = action.params['field']
+    const key = typeof field === 'string' ? FIELD_LABEL_KEYS[field] : undefined
+    if (key) return t(key)
+  }
+  return bulkKindLabel(t, action.action)
+}
+
 export function bulkOutcomeToast(
   t: TFunction,
-  action: Pick<BulkAction, 'status' | 'succeeded' | 'failed' | 'action'>,
+  action: Pick<BulkAction, 'status' | 'succeeded' | 'failed' | 'action' | 'params'>,
 ): { readonly tone: 'success' | 'error'; readonly title: string } {
-  const kind = bulkKindLabel(t, action.action)
+  const kind = bulkActionLabel(t, action)
   switch (action.status) {
     case 'completed':
       return {

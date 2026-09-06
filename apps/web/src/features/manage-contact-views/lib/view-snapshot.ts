@@ -38,6 +38,28 @@ export function matchesSnapshot(view: ContactView, snapshot: ViewSnapshot): bool
   )
 }
 
+export function sortViews(views: ReadonlyArray<ContactView>): ContactView[] {
+  return [...views].sort((a, b) => {
+    if (a.isFavorite !== b.isFavorite) return a.isFavorite ? -1 : 1
+    return a.position - b.position
+  })
+}
+
+export function isViewOwner(view: ContactView, viewerId?: string | null): boolean {
+  return viewerId != null && view.ownerId === viewerId
+}
+
+export function defaultView(
+  views: ReadonlyArray<ContactView>,
+  viewerId?: string | null,
+): ContactView | null {
+  return (
+    views.find((view) => view.isDefault && view.ownerId === viewerId) ??
+    views.find((view) => view.isDefault) ??
+    null
+  )
+}
+
 export function isSnapshotDirty(snapshot: ViewSnapshot): boolean {
   return snapshot.advanced.length > 0 || snapshot.search.trim().length > 0
 }

@@ -23,6 +23,7 @@ const SOURCES: AdvancedFieldSources = {
   sources: [{ key: 'whatsapp', label: 'WhatsApp', color: '#4ADE80' }],
   lifecycleStages: [],
   tags: ['vip'],
+  members: [{ value: 'u-1', label: 'Ana' }],
 }
 
 describe('buildAdvancedFilterFields', () => {
@@ -51,6 +52,20 @@ describe('buildAdvancedFilterFields', () => {
       ADVANCED_FILTER_ICONS,
     )
     expect(fields[0]?.key).toBe('name')
+  })
+
+  it('maps the owner column to the assignedToId filter fed by team members', () => {
+    const fields = buildAdvancedFilterFields(
+      t,
+      [column({ key: 'assignedTo', labelKey: 'contacts.columns.assignedTo' })],
+      SOURCES,
+      ADVANCED_FILTER_ICONS,
+    )
+    expect(fields[0]).toMatchObject({
+      key: 'assignedToId',
+      type: 'select',
+      options: [{ value: 'u-1', label: 'Ana' }],
+    })
   })
 
   it('exposes tenant custom fields under the custom prefix with their options', () => {

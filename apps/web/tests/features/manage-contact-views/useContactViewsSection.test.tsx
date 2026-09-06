@@ -35,11 +35,21 @@ const handlers = () => ({
 
 describe('useContactViewsSection', () => {
   it('exposes saved views as smart list items', () => {
-    const { result } = renderHook(() => useContactViewsSection([VIEW], SNAPSHOT, handlers()))
+    const { result } = renderHook(() =>
+      useContactViewsSection([VIEW], SNAPSHOT, handlers(), VIEW.ownerId),
+    )
     expect(result.current.items).toEqual([
-      { id: 'view:v1', label: 'VIP Medellín', description: 'Clientes top' },
+      { id: 'view:v1', label: 'VIP Medellín', description: 'Clientes top', icon: undefined },
     ])
     expect(result.current.activeView).toBeNull()
+  })
+
+  it('marks views as shared when they belong to someone else or the viewer is unknown', () => {
+    const other = renderHook(() => useContactViewsSection([VIEW], SNAPSHOT, handlers(), 'u2'))
+    const unknown = renderHook(() => useContactViewsSection([VIEW], SNAPSHOT, handlers(), null))
+
+    expect(other.result.current.items[0]?.icon).toBeDefined()
+    expect(unknown.result.current.items[0]?.icon).toBe(other.result.current.items[0]?.icon)
   })
 
   it('marks the view active when the snapshot matches it', () => {

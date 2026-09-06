@@ -18,10 +18,10 @@ export type ListMenu = {
   readonly viewMenu: ViewMenuController
 }
 
-export function useListMenu(views: ReadonlyArray<ContactView>): ListMenu {
+export function useListMenu(views: ReadonlyArray<ContactView>, viewerId?: string | null): ListMenu {
   const { t } = useTranslation()
   const router = useRouter()
-  const viewMenu = useViewTabMenu(views)
+  const viewMenu = useViewTabMenu(views, viewerId)
 
   const itemMenu = useCallback(
     (item: SmartListItem): ReadonlyArray<SmartListMenuAction> => {

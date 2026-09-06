@@ -1,105 +1,94 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { sileo } from 'sileo'
 
-import {
-  bulkOutcomeToast,
-  isBulkActionActive,
-  useBulkActionStatus,
-  useCreateBulkAction,
-} from '@/entities/bulk-action'
-import { QUERY_KEYS } from '@/shared/query/query-keys'
-
-import { BULK_STATUS_FIELD } from '../config/bulk-actions.constants'
 import { buildBulkLabels } from '../lib/bulk-labels'
-import { buildBulkRequest, filterSelection, idsSelection, selectionSize } from '../lib/bulk-request'
+import { buildActionRequest, bulkActionsFor, bulkScope } from '../lib/bulk-action-registry'
 
-import type { BulkDialogKind } from './types/bulk-actions.types'
-import type { BulkActionKind, ContactListQuery } from '@repo/shared-types'
+import { useBulkDialog } from './useBulkDialog'
+import { useBulkFeedback } from './useBulkFeedback'
+import { useBulkJob } from './useBulkJob'
+import { useBulkSelection } from './useBulkSelection'
+
+import type { BulkActionId } from '../config/bulk-action-registry.constants'
+import type { BulkActionSelection, CustomFieldEntity } from '@repo/shared-types'
 
 type BulkActionsArgs = {
-  readonly selectedIds: () => string[]
-  readonly selectedCount: number
-  readonly clearSelection: () => void
-  readonly query: ContactListQuery
+  readonly entity?: CustomFieldEntity
+  readonly archived: boolean
   readonly total: number
+  readonly rows: {
+    readonly selectedIds: () => string[]
+    readonly selectedTags: () => string[]
+    readonly selectedCount: number
+    readonly clear: () => void
+  }
+  readonly filterSelection: () => BulkActionSelection
 }
 
 export function useBulkActions({
-  selectedIds,
-  selectedCount,
-  clearSelection,
-  query,
+  entity = 'contacts',
+  archived,
   total,
+  rows,
+  filterSelection,
 }: BulkActionsArgs) {
-  const archived = query.archived === true
   const { t } = useTranslation()
-  const client = useQueryClient()
-  const [dialog, setDialog] = useState<BulkDialogKind | null>(null)
-  const [allMatching, setAllMatching] = useState(false)
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const create = useCreateBulkAction()
-  const status = useBulkActionStatus(activeId)
-  const announced = useRef<string | null>(null)
+  const selection = useBulkSelection({
+    selectedIds: rows.selectedIds,
+    selectedCount: rows.selectedCount,
+    total,
+    filterSelection,
+    clear: rows.clear,
+  })
+  const dialog = useBulkDialog()
+  const job = useBulkJob()
 
-  useEffect(() => setAllMatching(false), [selectedCount])
+  const { track } = job
+  const trackRevert = useCallback((revert: { id: string }) => track(revert.id), [track])
+  useBulkFeedback({ finished: job.finished, onAnnounced: job.release, onUndoQueued: trackRevert })
 
-  const finished = status.data && !isBulkActionActive(status.data.status) ? status.data : null
-  useEffect(() => {
-    if (!finished || announced.current === finished.id) return
-    announced.current = finished.id
-    const toast = bulkOutcomeToast(t, finished)
-    sileo[toast.tone]({ title: toast.title })
-    setActiveId(null)
-    void client.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
-  }, [finished, t, client])
-
-  const selection = useCallback(
-    () => (allMatching ? filterSelection(query) : idsSelection(selectedIds())),
-    [allMatching, query, selectedIds],
+  const { selectedTags } = rows
+  const openDialog = useCallback(
+    (id: BulkActionId) =>
+      dialog.open(id, {
+        tags: id === 'remove_tags' && !selection.allMatching ? selectedTags() : null,
+      }),
+    [dialog, selection.allMatching, selectedTags],
   )
 
-  const run = useCallback(
-    (action: BulkActionKind, params: Record<string, unknown> = {}) => {
-      const target = selection()
-      if (selectionSize(target, total) === 0) return
-      create.mutate(buildBulkRequest(action, target, params), {
-        onSuccess: (created) => {
-          setActiveId(created.id)
-          setDialog(null)
-          setAllMatching(false)
-          clearSelection()
-        },
+  const submit = useCallback(
+    (id: BulkActionId, params: Record<string, unknown> = {}) => {
+      if (selection.count === 0) return
+      job.start(buildActionRequest(id, entity, selection.current(), params), () => {
+        dialog.close()
+        selection.reset()
       })
     },
-    [selection, total, create, clearSelection],
+    [selection, job, entity, dialog],
   )
 
-  const labels = useMemo(() => buildBulkLabels(t, allMatching), [t, allMatching])
-  const isBusy = create.isPending || activeId !== null
+  const labels = useMemo(
+    () => buildBulkLabels(t, selection.allMatching, total),
+    [t, selection.allMatching, total],
+  )
 
   return {
     bar: {
       labels,
-      onSelectAll: allMatching ? undefined : () => setAllMatching(true),
-      archived,
-      isBusy,
-      progress: status.data && isBulkActionActive(status.data.status) ? status.data : null,
-      onOpen: (kind: BulkDialogKind) => setDialog(kind),
-      onExport: () => run('export'),
+      actions: bulkActionsFor(bulkScope(archived)),
+      onSelectAll: selection.allMatching ? undefined : selection.selectAll,
+      isBusy: job.isBusy,
+      progress: job.running,
+      onOpen: openDialog,
     },
     dialogs: {
-      open: dialog,
-      close: () => setDialog(null),
-      count: selectionSize(selection(), total),
-      addTags: (tags: string[]) => run('add_tags', { tags }),
-      removeTags: (tags: string[]) => run('remove_tags', { tags }),
-      setStatus: (value: string) => run('update_field', { field: BULK_STATUS_FIELD, value }),
-      archive: () => run('archive'),
-      restore: () => run('restore'),
+      open: dialog.kind,
+      context: dialog.context,
+      close: dialog.close,
+      count: selection.count,
+      submit,
     },
   }
 }

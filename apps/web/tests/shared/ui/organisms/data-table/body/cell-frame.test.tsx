@@ -38,6 +38,44 @@ describe('DataTable.CellFrame', () => {
     expect(onCopy).toHaveBeenCalledOnce()
   })
 
+  it('shows the full value inside the dock when the cell text is truncated', async () => {
+    render(
+      <DataTable.CellFrame
+        display="emiliano.cardenas14@example.co"
+        actions={{
+          label: 'Acciones',
+          items: [{ id: 'copy', label: 'Copiar', icon: <svg aria-hidden />, onClick: vi.fn() }],
+        }}
+      />,
+      { wrapper },
+    )
+    const text = screen.getByText('emiliano.cardenas14@example.co')
+    Object.defineProperty(text, 'scrollWidth', { value: 240, configurable: true })
+    Object.defineProperty(text, 'clientWidth', { value: 120, configurable: true })
+
+    await userEvent.hover(text)
+    const dock = await screen.findByRole('toolbar', { name: 'Acciones' })
+    expect(dock.querySelector('[data-slot="action-dock-title"]')).toHaveTextContent(
+      'emiliano.cardenas14@example.co',
+    )
+  })
+
+  it('omits the value from the dock when the text fits', async () => {
+    render(
+      <DataTable.CellFrame
+        display="short"
+        actions={{
+          label: 'Acciones',
+          items: [{ id: 'copy', label: 'Copiar', icon: <svg aria-hidden />, onClick: vi.fn() }],
+        }}
+      />,
+      { wrapper },
+    )
+    await userEvent.hover(screen.getByText('short'))
+    const dock = await screen.findByRole('toolbar', { name: 'Acciones' })
+    expect(dock.querySelector('[data-slot="action-dock-title"]')).toBeNull()
+  })
+
   it('keeps status hints always visible without opening the dock', () => {
     render(
       <DataTable.CellFrame

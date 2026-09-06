@@ -45,20 +45,40 @@ function action(overrides: Record<string, unknown>) {
   }
 }
 
-function setup(ids: string[] = ['a', 'b'], total = 40) {
-  const clearSelection = vi.fn()
+const FILTER = { mode: 'filter', query: { status: 'new' } } as const
+
+function setup(ids: string[] = ['a', 'b'], total = 40, archived = false) {
+  const clear = vi.fn()
   const hook = renderHook(
     () =>
       useBulkActions({
-        selectedIds: () => ids,
-        selectedCount: ids.length,
-        clearSelection,
-        query: { status: 'new', page: 2, limit: 25 },
+        archived,
         total,
+        rows: {
+          selectedIds: () => ids,
+          selectedTags: () => ['vip', 'seed'],
+          selectedCount: ids.length,
+          clear,
+        },
+        filterSelection: () => FILTER,
       }),
     { wrapper },
   )
-  return { ...hook, clearSelection }
+  return { ...hook, clear }
+}
+
+function captureCreate() {
+  const received: Array<Record<string, unknown>> = []
+  server.use(
+    http.post(`${API}/bulk-actions`, async ({ request }) => {
+      received.push((await request.json()) as Record<string, unknown>)
+      return HttpResponse.json({ data: action({ status: 'completed', succeeded: 2 }) })
+    }),
+    http.get(`${API}/bulk-actions/ba-1`, () =>
+      HttpResponse.json({ data: action({ status: 'completed', succeeded: 2 }) }),
+    ),
+  )
+  return received
 }
 
 beforeEach(() => {
@@ -68,155 +88,70 @@ beforeEach(() => {
 })
 
 describe('useBulkActions', () => {
-  it('posts the selected ids, clears the selection and closes the dialog', async () => {
-    let received: Record<string, unknown> | null = null
-    server.use(
-      http.post(`${API}/bulk-actions`, async ({ request }) => {
-        received = (await request.json()) as Record<string, unknown>
-        return HttpResponse.json({ data: action({}) })
-      }),
-      http.get(`${API}/bulk-actions/ba-1`, () =>
-        HttpResponse.json({ data: action({ status: 'running', processed: 1 }) }),
-      ),
-    )
-    const { result, clearSelection } = setup()
+  it('exposes the registry actions for the current list scope', () => {
+    expect(setup().result.current.bar.actions.map((def) => def.id)).toContain('assign')
+    expect(setup(['a'], 1, true).result.current.bar.actions.map((def) => def.id)).toEqual([
+      'restore',
+      'export',
+    ])
+  })
+
+  it('submits the checked ids, closes the dialog and clears the selection', async () => {
+    const received = captureCreate()
+    const { result, clear } = setup()
 
     act(() => result.current.bar.onOpen('add_tags'))
     expect(result.current.dialogs.open).toBe('add_tags')
     expect(result.current.dialogs.count).toBe(2)
 
-    act(() => result.current.dialogs.addTags(['vip']))
+    act(() => result.current.dialogs.submit('add_tags', { tags: ['vip'] }))
 
-    await waitFor(() => expect(received).not.toBeNull())
-    expect(received).toEqual({
+    await waitFor(() => expect(received).toHaveLength(1))
+    expect(received[0]).toEqual({
       entity: 'contacts',
       action: 'add_tags',
       params: { tags: ['vip'] },
       selection: { mode: 'ids', ids: ['a', 'b'] },
     })
     await waitFor(() => expect(result.current.dialogs.open).toBeNull())
-    expect(clearSelection).toHaveBeenCalled()
-    expect(sileoInfo).toHaveBeenCalled()
-    await waitFor(() => expect(result.current.bar.progress?.processed).toBe(1))
-    expect(result.current.bar.isBusy).toBe(true)
+    expect(clear).toHaveBeenCalled()
+    await waitFor(() => expect(sileoSuccess).toHaveBeenCalled())
   })
 
-  it('targets the whole filter after select-all, without paging', async () => {
-    let received: Record<string, unknown> | null = null
-    server.use(
-      http.post(`${API}/bulk-actions`, async ({ request }) => {
-        received = (await request.json()) as Record<string, unknown>
-        return HttpResponse.json({ data: action({ status: 'completed', total: 40 }) })
-      }),
-      http.get(`${API}/bulk-actions/ba-1`, () =>
-        HttpResponse.json({ data: action({ status: 'completed', total: 40, succeeded: 40 }) }),
-      ),
-    )
+  it('targets the whole filter after select-all and merges registry params', async () => {
+    const received = captureCreate()
     const { result } = setup()
 
     act(() => result.current.bar.onSelectAll?.())
     expect(result.current.bar.labels.selected(2)).toContain('allMatching')
     expect(result.current.dialogs.count).toBe(40)
 
-    act(() => result.current.bar.onExport())
+    act(() => result.current.dialogs.submit('lifecycle', { value: 'customer' }))
 
-    await waitFor(() => expect(received).not.toBeNull())
-    expect(received).toMatchObject({
-      action: 'export',
-      selection: { mode: 'filter', query: { status: 'new' } },
-    })
-    await waitFor(() => expect(sileoSuccess).toHaveBeenCalled())
-    expect(result.current.bar.isBusy).toBe(false)
-  })
-
-  it('switches the bar to restore mode on the archived list and posts a restore', async () => {
-    let received: Record<string, unknown> | null = null
-    server.use(
-      http.post(`${API}/bulk-actions`, async ({ request }) => {
-        received = (await request.json()) as Record<string, unknown>
-        return HttpResponse.json({ data: action({ action: 'restore', status: 'completed' }) })
-      }),
-      http.get(`${API}/bulk-actions/ba-1`, () =>
-        HttpResponse.json({
-          data: action({ action: 'restore', status: 'completed', succeeded: 2 }),
-        }),
-      ),
-    )
-    const { result } = renderHook(
-      () =>
-        useBulkActions({
-          selectedIds: () => ['a', 'b'],
-          selectedCount: 2,
-          clearSelection: vi.fn(),
-          query: { archived: true, page: 1, limit: 25 },
-          total: 2,
-        }),
-      { wrapper },
-    )
-
-    expect(result.current.bar.archived).toBe(true)
-    act(() => result.current.dialogs.restore())
-
-    await waitFor(() => expect(received).not.toBeNull())
-    expect(received).toMatchObject({
-      action: 'restore',
-      selection: { mode: 'ids', ids: ['a', 'b'] },
+    await waitFor(() => expect(received).toHaveLength(1))
+    expect(received[0]).toMatchObject({
+      action: 'update_field',
+      params: { field: 'lifecycleStage', value: 'customer' },
+      selection: FILTER,
     })
   })
 
-  it('drops the whole-filter mode as soon as the row selection changes', () => {
-    let count = 2
-    const { result, rerender } = renderHook(
-      () =>
-        useBulkActions({
-          selectedIds: () => ['a', 'b'],
-          selectedCount: count,
-          clearSelection: vi.fn(),
-          query: { page: 1, limit: 25 },
-          total: 40,
-        }),
-      { wrapper },
-    )
+  it('scopes the remove-tags dialog to the selected rows, but not in whole-filter mode', () => {
+    const { result } = setup()
 
+    act(() => result.current.bar.onOpen('remove_tags'))
+    expect(result.current.dialogs.context.tags).toEqual(['vip', 'seed'])
+
+    act(() => result.current.dialogs.close())
     act(() => result.current.bar.onSelectAll?.())
-    expect(result.current.bar.onSelectAll).toBeUndefined()
-    expect(result.current.dialogs.count).toBe(40)
-
-    count = 1
-    rerender()
-    expect(result.current.dialogs.count).toBe(2)
-    expect(result.current.bar.onSelectAll).toBeDefined()
+    act(() => result.current.bar.onOpen('remove_tags'))
+    expect(result.current.dialogs.context.tags).toBeNull()
   })
 
   it('does nothing when the selection is empty', () => {
-    const posted = vi.fn()
-    server.use(
-      http.post(`${API}/bulk-actions`, () => {
-        posted()
-        return HttpResponse.json({ data: action({}) })
-      }),
-    )
-    const { result } = setup([])
-
-    act(() => result.current.dialogs.archive())
-
-    expect(posted).not.toHaveBeenCalled()
-  })
-
-  it('reports a run that finished with errors through the error toast', async () => {
-    server.use(
-      http.post(`${API}/bulk-actions`, () => HttpResponse.json({ data: action({}) })),
-      http.get(`${API}/bulk-actions/ba-1`, () =>
-        HttpResponse.json({
-          data: action({ status: 'completed_with_errors', succeeded: 1, failed: 1, processed: 2 }),
-        }),
-      ),
-    )
-    const { result } = setup()
-
-    act(() => result.current.dialogs.setStatus('client'))
-
-    await waitFor(() => expect(sileoError).toHaveBeenCalled())
-    expect(result.current.bar.progress).toBeNull()
+    const received = captureCreate()
+    const { result } = setup([], 0)
+    act(() => result.current.dialogs.submit('archive'))
+    expect(received).toHaveLength(0)
   })
 })

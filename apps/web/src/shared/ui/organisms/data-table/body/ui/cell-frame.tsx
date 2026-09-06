@@ -6,7 +6,6 @@ import { cn } from '@/shared/lib/cn'
 import { ActionDock } from '@/shared/ui/molecules/action-dock'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
-import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 
 import type { ActionDockItem } from '@/shared/ui/molecules/action-dock'
 import type { ReactNode } from 'react'
@@ -55,7 +54,9 @@ export function DataTableCellFrame({
   actions,
 }: Readonly<DataTableCellFrameProps>) {
   const [open, setOpen] = useState(false)
+  const [overflows, setOverflows] = useState(false)
   const timerRef = useRef<number | null>(null)
+  const textRef = useRef<HTMLSpanElement>(null)
 
   const close = useCallback(() => setOpen(false), [])
 
@@ -95,13 +96,23 @@ export function DataTableCellFrame({
     <GroovyPopover open={open} onOpenChange={handleOpenChange}>
       <GroovyPopover.Anchor asChild>
         <span
-          onMouseEnter={() => schedule(true, DOCK_OPEN_DELAY_MS)}
+          onMouseEnter={() => {
+            const text = textRef.current
+            setOverflows(text ? text.scrollWidth > text.clientWidth + 1 : false)
+            schedule(true, DOCK_OPEN_DELAY_MS)
+          }}
           onMouseLeave={() => schedule(false, DOCK_CLOSE_GRACE_MS)}
           className={cn('flex h-full w-full min-w-0 items-center', dense ? 'gap-1' : 'gap-1.5')}
         >
-          <TruncateTip className={numeric ? 'tabular-nums text-muted-foreground' : undefined}>
+          <span
+            ref={textRef}
+            className={cn(
+              'block min-w-0 truncate',
+              numeric && 'tabular-nums text-muted-foreground',
+            )}
+          >
             {display}
-          </TruncateTip>
+          </span>
           {hint}
         </span>
       </GroovyPopover.Anchor>
@@ -117,6 +128,7 @@ export function DataTableCellFrame({
         <ActionDock
           items={actions.items}
           label={actions.label}
+          title={overflows ? display : undefined}
           className="border-0 bg-transparent p-0 shadow-none"
         />
       </GroovyPopover.Content>

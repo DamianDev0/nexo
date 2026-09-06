@@ -2,13 +2,21 @@ import { contactAvatarUrl } from '@/entities/contact'
 
 import { resolveWhatsapp, type ContactFormValues } from './contact-form.schema'
 
-import type { ContactInput, ContactListItem } from '@repo/shared-types'
+import type { ContactInput, ContactListItem, FieldDef } from '@repo/shared-types'
 
 export function stripNullValues(record: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(record).filter(([, value]) => value !== null))
 }
 
 export const ADDRESS_FIELD_KEY = 'address'
+
+export function pickCustomFieldValues(
+  values: Record<string, unknown>,
+  defs: ReadonlyArray<Pick<FieldDef, 'key'>>,
+): Record<string, unknown> {
+  const editable = new Set(defs.map((def) => def.key))
+  return Object.fromEntries(Object.entries(values).filter(([key]) => editable.has(key)))
+}
 
 function withAddress(
   values: ContactFormValues,

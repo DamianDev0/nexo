@@ -35,6 +35,15 @@ export function useContactViewsAdmin() {
     onError,
   })
 
+  const duplicate = useMutation({
+    mutationFn: (id: string) => contactsService.duplicateView(id),
+    onSuccess: async (view) => {
+      await refresh()
+      sileo.success({ title: t('contacts.views.duplicated', { name: view.name }) })
+    },
+    onError,
+  })
+
   const remove = useMutation({
     mutationFn: (id: string) => contactsService.deleteView(id),
     onSuccess: async () => {
@@ -47,7 +56,8 @@ export function useContactViewsAdmin() {
   return {
     create: create.mutate,
     update: update.mutate,
+    duplicate: duplicate.mutate,
     remove: remove.mutate,
-    isPending: create.isPending || update.isPending || remove.isPending,
+    isPending: create.isPending || update.isPending || duplicate.isPending || remove.isPending,
   }
 }

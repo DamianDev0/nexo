@@ -16,8 +16,8 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/shadcn/dropdown-menu'
 
-import { contactCreatedParts } from '../../lib/contact-display'
 import { CONTACT_STALE_DAYS } from '../../config/contact-columns.constants'
+import { contactCreatedParts } from '../../lib/contact-display'
 import { daysSince } from '../../lib/contact-links'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
@@ -114,11 +114,13 @@ export function ContactCreatedCell({ iso, locale }: Readonly<{ iso: string; loca
   const { date, time } = contactCreatedParts(iso, locale)
 
   return (
-    <span className="flex min-w-0 flex-col">
-      <Text className="truncate tabular-nums">{date}</Text>
-      <Text variant="faint" className="truncate font-light tabular-nums">
+    <time dateTime={iso} className="flex min-w-0 flex-col">
+      <Text title={date} className="truncate font-light tabular-nums">
+        {date}
+      </Text>
+      <Text variant="hint" title={time} className="truncate font-light tabular-nums">
         {time}
       </Text>
-    </span>
+    </time>
   )
 }

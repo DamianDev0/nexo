@@ -8,7 +8,10 @@ import type { ComponentProps } from 'react'
 export function DialogActions({ className, ...props }: Readonly<ComponentProps<'div'>>) {
   return (
     <DialogFooter
-      className={cn('-mx-6 -mt-1 -mb-2 border-t border-border px-6 pt-3', className)}
+      className={cn(
+        '-mx-6 -mb-6 mt-2 items-center rounded-b-lg border-t border-border bg-muted/40 px-6 py-4',
+        className,
+      )}
       {...props}
     />
   )

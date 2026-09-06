@@ -2,7 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
-import { bulkKindLabel, bulkProgressPercent } from '@/entities/bulk-action'
+import { bulkActionLabel, bulkProgressPercent } from '@/entities/bulk-action'
 import { Text } from '@/shared/ui/atoms/text'
 import { Progress } from '@/shared/ui/shadcn/progress'
 
@@ -15,7 +15,7 @@ export function BulkProgressChip({ action }: Readonly<{ action: BulkAction }>) {
     <span className="flex items-center gap-2 pl-1">
       <Progress value={bulkProgressPercent(action)} className="h-1.5 w-20" />
       <Text variant="faint" className="tabular-nums">
-        {bulkKindLabel(t, action.action)} ·{' '}
+        {bulkActionLabel(t, action)} ·{' '}
         {t('contacts.bulk.progress', { processed: action.processed, total: action.total })}
       </Text>
     </span>

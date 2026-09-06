@@ -22,7 +22,11 @@ export function ToolbarHintTip({ hint, children }: Readonly<ToolbarHintTipProps>
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side={hint.side ?? 'top'} sideOffset={8} className="flex items-center gap-2">
+      <TooltipContent
+        side={hint.side ?? 'top'}
+        sideOffset={8}
+        className="flex items-center gap-2 font-light"
+      >
         <span className="text-pretty">{hint.label}</span>
         {hint.keys?.length ? (
           <KbdGroup>

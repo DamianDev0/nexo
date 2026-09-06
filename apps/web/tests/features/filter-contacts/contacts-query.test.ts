@@ -22,6 +22,20 @@ describe('contactListQuery', () => {
     expect(contactListQuery('', 'new').archived).toBeUndefined()
   })
 
+  it('turns the ownership lists into owner filters instead of a status', () => {
+    const mine = contactListQuery('', 'mine', undefined, undefined, [], 'u-1')
+    expect(mine.assignedToId).toBe('u-1')
+    expect(mine.status).toBeUndefined()
+    expect(mine.unassigned).toBeUndefined()
+
+    const unassigned = contactListQuery('', 'unassigned', undefined, undefined, [], 'u-1')
+    expect(unassigned.unassigned).toBe(true)
+    expect(unassigned.assignedToId).toBeUndefined()
+    expect(unassigned.status).toBeUndefined()
+
+    expect(contactListQuery('', 'mine').assignedToId).toBeUndefined()
+  })
+
   it('sets q to undefined for an empty search', () => {
     const query = contactListQuery('   ', null)
 

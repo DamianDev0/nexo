@@ -14,6 +14,7 @@ export interface SmartListItem {
   readonly count?: number
   readonly description?: string
   readonly pinned?: boolean
+  readonly icon?: AppIcon
 }
 
 export interface SmartListsData {

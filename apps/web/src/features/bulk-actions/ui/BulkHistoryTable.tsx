@@ -2,8 +2,10 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { bulkActionLabel } from '@/entities/bulk-action'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { StackIcon } from '@/shared/ui/icons'
+import { ConfirmDialog } from '@/shared/ui/molecules/confirm-dialog'
 import { MorphingPageDots } from '@/shared/ui/molecules/morphing-page-dots'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/shared/ui/shadcn/table'
@@ -18,6 +20,7 @@ export function BulkHistoryTable() {
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
   const history = useBulkHistory()
+  const pending = history.revertDialog.action
 
   if (!history.isPending && history.total === 0) {
     return (
@@ -55,6 +58,23 @@ export function BulkHistoryTable() {
         page={history.pagination.page}
         onPageChange={history.pagination.onPageChange}
         label={t('settings.pagination.page')}
+      />
+      <ConfirmDialog
+        open={pending !== null}
+        onOpenChange={(open) => !open && history.revertDialog.close()}
+        onConfirm={history.revertDialog.confirm}
+        tone="destructive"
+        copy={{
+          title: t('bulkActions.revertDialog.title', {
+            kind: pending ? bulkActionLabel(t, pending) : '',
+          }),
+          description: t('bulkActions.revertDialog.description', {
+            count: pending?.succeeded ?? 0,
+          }),
+          confirmLabel: t('bulkActions.revertDialog.confirm'),
+          confirmedLabel: t('bulkActions.revertDialog.confirmed'),
+          cancelLabel: t('common.cancel'),
+        }}
       />
     </div>
   )

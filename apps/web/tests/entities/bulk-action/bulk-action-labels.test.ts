@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { TFunction } from 'i18next'
 
 import {
+  bulkActionLabel,
   bulkKindLabel,
   bulkOutcomeToast,
   bulkProgressPercent,
@@ -37,12 +38,30 @@ describe('labels', () => {
     expect(bulkStatusLabel(t, 'running')).toBe('contacts.bulk.status.running')
     expect(bulkKindLabel(t, 'add_tags')).toBe('contacts.bulk.actions.add_tags')
   })
+
+  it('names a status update after the field it touched and falls back to the kind', () => {
+    expect(bulkActionLabel(t, { action: 'update_field', params: { field: 'status' } })).toBe(
+      'contacts.bulk.changeStatus',
+    )
+    expect(bulkActionLabel(t, { action: 'update_field', params: { field: 'custom:eps' } })).toBe(
+      'contacts.bulk.actions.update_field',
+    )
+    expect(bulkActionLabel(t, { action: 'archive', params: {} })).toBe(
+      'contacts.bulk.actions.archive',
+    )
+  })
 })
 
 describe('bulkOutcomeToast', () => {
   it('celebrates a clean completion and flags partial or failed runs', () => {
     expect(
-      bulkOutcomeToast(t, { status: 'completed', succeeded: 4, failed: 0, action: 'archive' }),
+      bulkOutcomeToast(t, {
+        status: 'completed',
+        succeeded: 4,
+        failed: 0,
+        action: 'archive',
+        params: {},
+      }),
     ).toEqual({
       tone: 'success',
       title:
@@ -54,13 +73,26 @@ describe('bulkOutcomeToast', () => {
         succeeded: 3,
         failed: 1,
         action: 'add_tags',
+        params: {},
       }).tone,
     ).toBe('error')
     expect(
-      bulkOutcomeToast(t, { status: 'failed', succeeded: 0, failed: 0, action: 'export' }).title,
+      bulkOutcomeToast(t, {
+        status: 'failed',
+        succeeded: 0,
+        failed: 0,
+        action: 'export',
+        params: {},
+      }).title,
     ).toBe('contacts.bulk.toasts.failed:{"kind":"contacts.bulk.actions.export"}')
     expect(
-      bulkOutcomeToast(t, { status: 'cancelled', succeeded: 0, failed: 0, action: 'export' }).title,
+      bulkOutcomeToast(t, {
+        status: 'cancelled',
+        succeeded: 0,
+        failed: 0,
+        action: 'export',
+        params: {},
+      }).title,
     ).toContain('cancelled')
   })
 })

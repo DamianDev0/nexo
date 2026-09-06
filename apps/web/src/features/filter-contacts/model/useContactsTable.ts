@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useContactList, usePrefetchContactList } from '@/entities/contact'
 import { parseSortParam, type ContactSort } from '@/entities/contact'
+import { useAuth } from '@/entities/session'
 import { FIRST_PAGE } from '@/shared/config/pagination'
 import { useDebouncedValue } from '@/shared/lib/hooks/useDebouncedValue'
 import { pageCount } from '@/shared/lib/pagination'
@@ -59,6 +60,8 @@ export function useContactsTable() {
   }
 
   const debouncedSearch = useDebouncedValue(search)
+  const { data: me } = useAuth()
+  const viewerId = me?.id ?? null
 
   const commit = useCallback(
     (next: Partial<ContactsUrlState>) => {
@@ -98,8 +101,9 @@ export function useContactsTable() {
         filters,
         { page, limit, sort },
         advanced.filter((c) => isComplete(c)),
+        viewerId,
       ),
-    [urlSearch, status, filters, page, limit, sort, advanced],
+    [urlSearch, status, filters, page, limit, sort, advanced, viewerId],
   )
 
   const { data, isPending, isFetching } = useContactList(query)
@@ -141,9 +145,11 @@ export function useContactsTable() {
   const prefetchPage = useCallback(
     (value: number) => {
       if (value < FIRST_PAGE || value > totalPages || value === page) return
-      prefetchList(contactListQuery(urlSearch, status, filters, { page: value, limit, sort }))
+      prefetchList(
+        contactListQuery(urlSearch, status, filters, { page: value, limit, sort }, [], viewerId),
+      )
     },
-    [prefetchList, urlSearch, status, filters, page, limit, sort, totalPages],
+    [prefetchList, urlSearch, status, filters, page, limit, sort, totalPages, viewerId],
   )
 
   return {

@@ -7,6 +7,7 @@ export type AdvancedFieldSources = {
   readonly sources: ReadonlyArray<TaxonomyChoice>
   readonly lifecycleStages: ReadonlyArray<TaxonomyChoice>
   readonly tags: ReadonlyArray<string>
+  readonly members?: ReadonlyArray<FilterFieldOption>
 }
 
 type CoreFieldSpec = {
@@ -26,6 +27,7 @@ export const CORE_FIELDS: Readonly<Record<string, CoreFieldSpec>> = {
   status: { type: 'select', options: (s) => toOptions(s.statuses) },
   source: { type: 'select', options: (s) => toOptions(s.sources) },
   lifecycleStage: { type: 'select', options: (s) => toOptions(s.lifecycleStages) },
+  assignedTo: { type: 'select', options: (s) => s.members ?? [] },
   tags: {
     type: 'multi',
     options: (s) => s.tags.map((tag) => ({ value: tag, label: tag })),
@@ -36,6 +38,11 @@ export const CORE_FIELDS: Readonly<Record<string, CoreFieldSpec>> = {
 }
 
 export const NAME_FILTER_FIELD = 'name'
+
+export const FILTER_KEY_BY_COLUMN: Readonly<Record<string, string>> = {
+  name: NAME_FILTER_FIELD,
+  assignedTo: 'assignedToId',
+}
 
 export const CUSTOM_TYPE_MAP: Readonly<Partial<Record<string, FilterFieldType>>> = {
   select: 'select',

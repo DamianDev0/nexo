@@ -28,7 +28,8 @@ export function DeletePipelineDialog({
       copy={{
         title: t('settings.pipelines.deleteTitle'),
         description: t('settings.pipelines.deleteDescription', { name }),
-        confirmLabel: t('common.delete'),
+        confirmLabel: t('common.confirm.slideToDelete'),
+        confirmedLabel: t('common.confirm.deleted'),
         cancelLabel: t('common.cancel'),
       }}
     />

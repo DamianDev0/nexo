@@ -25,8 +25,8 @@ export function HeaderNotifications() {
   const { mutate: markAllAsRead, isPending: isClearing } = useMarkAllNotificationsRead()
 
   const items = useMemo(
-    () => toNotificationFeed(data?.data ?? [], i18n.language),
-    [data?.data, i18n.language],
+    () => toNotificationFeed(data?.data ?? [], i18n.language, t),
+    [data?.data, i18n.language, t],
   )
 
   const labels = useMemo(

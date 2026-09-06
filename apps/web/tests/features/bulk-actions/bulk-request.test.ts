@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  buildBulkRequest,
   filterSelection,
   idsSelection,
   selectionSize,
@@ -18,17 +17,6 @@ describe('filterSelection', () => {
 describe('idsSelection', () => {
   it('dedupes ids', () => {
     expect(idsSelection(['a', 'b', 'a'])).toEqual({ mode: 'ids', ids: ['a', 'b'] })
-  })
-})
-
-describe('buildBulkRequest', () => {
-  it('always targets contacts and defaults params to an empty object', () => {
-    expect(buildBulkRequest('archive', idsSelection(['a']))).toEqual({
-      entity: 'contacts',
-      action: 'archive',
-      params: {},
-      selection: { mode: 'ids', ids: ['a'] },
-    })
   })
 })
 

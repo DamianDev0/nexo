@@ -26,6 +26,7 @@ export type ActionDockItem = {
 type ActionDockProps = {
   readonly items: ReadonlyArray<ActionDockItem>
   readonly label?: string
+  readonly title?: ReactNode
   readonly className?: string
 }
 
@@ -36,7 +37,7 @@ function stop(event: MouseEvent) {
   event.stopPropagation()
 }
 
-export function ActionDock({ items, label, className }: Readonly<ActionDockProps>) {
+export function ActionDock({ items, label, title, className }: Readonly<ActionDockProps>) {
   const segRefs = useRef<Array<HTMLSpanElement | null>>([])
   const wasOpenRef = useRef(false)
   const [panel, setPanel] = useState({ width: 0, x: 0, open: false, appearing: true })
@@ -73,6 +74,17 @@ export function ActionDock({ items, label, className }: Readonly<ActionDockProps
         className,
       )}
     >
+      {title !== undefined && (
+        <>
+          <span
+            data-slot="action-dock-title"
+            className="flex h-6 max-w-96 items-center truncate px-2 text-xs font-medium text-foreground"
+          >
+            {title}
+          </span>
+          <span aria-hidden className="mx-0.5 h-4 w-px shrink-0 bg-border" />
+        </>
+      )}
       <motion.span
         aria-hidden
         initial={false}

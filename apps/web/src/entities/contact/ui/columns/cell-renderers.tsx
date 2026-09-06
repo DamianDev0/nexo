@@ -102,13 +102,14 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
       dense={dense}
     />
   ),
-  city: (contact) =>
-    contact.city ? (
-      <TruncateTip className="text-muted-foreground">{contact.city}</TruncateTip>
+  city: (contact) => muted(contact.city),
+  source: (contact, { taxonomy }) => muted(taxonomyLabel(taxonomy.sourceByKey, contact.source)),
+  assignedTo: (contact) =>
+    contact.assignedToName ? (
+      <TruncateTip className="text-body">{contact.assignedToName}</TruncateTip>
     ) : (
       muted(null)
     ),
-  source: (contact, { taxonomy }) => muted(taxonomyLabel(taxonomy.sourceByKey, contact.source)),
   lifecycleStage: (contact, { taxonomy }) => (
     <ContactStageCell
       label={

@@ -14,32 +14,15 @@ import { HeaderIconButton } from '@/shared/ui/molecules/header-icon-button'
 import { useComposer } from './context'
 
 import type { ComposerControlLabels } from './lib/labels'
-import type { ComponentProps, PointerEvent as ReactPointerEvent } from 'react'
+import type { ComponentProps } from 'react'
 
-type HeaderLeadingProps = {
-  readonly minimized: boolean
-  readonly dragLabel?: string
-  readonly onStartDrag: (event: ReactPointerEvent) => void
-}
-
-function HeaderLeading({ minimized, dragLabel, onStartDrag }: Readonly<HeaderLeadingProps>) {
+function HeaderLeading({ minimized }: Readonly<{ minimized: boolean }>) {
   if (minimized) {
     return (
       <CaretRightIcon
         aria-hidden
         className="size-4 shrink-0 text-muted-foreground transition-transform group-hover/composer:translate-x-0.5"
       />
-    )
-  }
-  if (dragLabel) {
-    return (
-      <HeaderIconButton
-        aria-label={dragLabel}
-        onPointerDown={onStartDrag}
-        className="cursor-grab active:cursor-grabbing"
-      >
-        <DotsSixVerticalIcon />
-      </HeaderIconButton>
     )
   }
   return (
@@ -59,9 +42,11 @@ export function ComposerHeader({
   return (
     <div
       data-slot="composer-header"
-      role={minimized ? 'button' : undefined}
+      role={minimized ? 'button' : 'group'}
       tabIndex={minimized ? 0 : undefined}
-      onPointerDown={minimized ? startDrag : undefined}
+      aria-label={dragLabel}
+      title={dragLabel}
+      onPointerDown={startDrag}
       onClick={
         minimized
           ? () => {
@@ -81,14 +66,14 @@ export function ComposerHeader({
           : undefined
       }
       className={cn(
-        'flex shrink-0 items-center gap-1.5 border-b bg-muted/40 py-2 pr-2 pl-2 select-none',
+        'flex shrink-0 cursor-grab items-center gap-1.5 border-b bg-muted/40 py-2 pr-2 pl-2 select-none active:cursor-grabbing',
         minimized &&
-          'cursor-pointer rounded-lg border-b-0 pl-3 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none active:cursor-grabbing',
+          'cursor-pointer rounded-lg border-b-0 pl-3 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none',
         className,
       )}
       {...props}
     >
-      <HeaderLeading minimized={minimized} dragLabel={dragLabel} onStartDrag={startDrag} />
+      <HeaderLeading minimized={minimized} />
       {children}
     </div>
   )
@@ -124,8 +109,7 @@ type ComposerControlsProps = {
 }
 
 export function ComposerControls({ labels, className }: Readonly<ComposerControlsProps>) {
-  const { minimized, maximized, toggleMinimized, toggleMaximized, onClose, startDrag } =
-    useComposer()
+  const { minimized, maximized, toggleMinimized, toggleMaximized, onClose } = useComposer()
   return (
     <div
       data-slot="composer-controls"
@@ -133,15 +117,6 @@ export function ComposerControls({ labels, className }: Readonly<ComposerControl
       onPointerDown={(event) => event.stopPropagation()}
       onClick={(event) => event.stopPropagation()}
     >
-      {minimized && (
-        <HeaderIconButton
-          aria-label={labels.drag}
-          onPointerDown={startDrag}
-          className="cursor-grab active:cursor-grabbing"
-        >
-          <DotsSixVerticalIcon />
-        </HeaderIconButton>
-      )}
       {!minimized && (
         <HeaderIconButton aria-label={labels.minimize} onClick={toggleMinimized}>
           <MinusIcon />

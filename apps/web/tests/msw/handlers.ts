@@ -100,6 +100,7 @@ export const CONTACT_COLUMNS_FIXTURE: ContactColumnDef[] = COLUMN_KEYS.map((key)
 }))
 
 export const handlers = [
+  http.get(`${API}/users`, () => HttpResponse.json({ statusCode: 200, message: 'OK', data: [] })),
   http.get(`${API}/contacts/workspace`, () =>
     HttpResponse.json({
       statusCode: 200,
@@ -110,7 +111,14 @@ export const handlers = [
         tableState: {},
         columns: CONTACT_COLUMNS_FIXTURE,
         quickFilters: { statuses: [], sources: [], lifecycleStages: [] },
-        counts: { total: CONTACTS_FIXTURE.length, archived: 0, byStatus: {} },
+        counts: {
+          total: CONTACTS_FIXTURE.length,
+          archived: 0,
+          mine: 2,
+          unassigned: 1,
+          unassignedRecent: 1,
+          byStatus: {},
+        },
       },
       timestamp: new Date().toISOString(),
       path: '/contacts/workspace',

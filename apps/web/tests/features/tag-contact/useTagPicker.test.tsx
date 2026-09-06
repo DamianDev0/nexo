@@ -22,7 +22,8 @@ const TAG = (name: string, color: string): Tag => ({
   createdAt: '2026-01-01T00:00:00.000Z',
 })
 
-vi.mock('@/entities/tag', () => ({
+vi.mock('@/entities/tag', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/entities/tag')>()),
   useTagCatalog: () => {
     const map = new Map<string, Tag>()
     map.set('vip', { ...TAG('VIP', '#f00'), description: 'Cliente de alto valor' })

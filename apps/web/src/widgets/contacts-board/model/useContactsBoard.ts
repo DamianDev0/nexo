@@ -1,19 +1,18 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { buildContactColumns } from '@/entities/contact'
 import { useContactTaxonomy, useTaxonomyUsage } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
-import { useBulkActions } from '@/features/bulk-actions'
+import { filterSelection, useBulkActions } from '@/features/bulk-actions'
 import { useContactsLayout, useContactWorkspace } from '@/features/customize-contacts-table'
 import {
   buildContactHints,
   buildQuickFilterDefs,
   buildSmartLists,
-  isArchivedList,
   statusToListId,
   useContactCounts,
   useContactsTable,
@@ -22,6 +21,8 @@ import {
 import { useDataTable } from '@/shared/ui/organisms/data-table'
 
 import { EMPTY_COLUMNS, EMPTY_TABLE_STATE, EMPTY_VIEWS } from '../config/board-empty.constants'
+import { orderSmartLists } from '../lib/order-smart-lists'
+import { selectionScopeKey } from '../lib/selection-scope'
 
 import { useBoardEditors } from './useBoardEditors'
 import { useBoardSelection } from './useBoardSelection'
@@ -40,7 +41,7 @@ export function useContactsBoard() {
 
   const catalog = workspace.data?.columns ?? EMPTY_COLUMNS
   const { handleSort } = table
-  const { layout, sort, setListOrder, saveStatus } = useContactsLayout(
+  const { layout, sort, setListOrder, applyState, saveStatus } = useContactsLayout(
     catalog,
     workspace.data?.tableState ?? EMPTY_TABLE_STATE,
     { value: table.sort, onChange: handleSort },
@@ -73,36 +74,38 @@ export function useContactsBoard() {
     totalRows: table.total,
   })
 
-  const { openFromPreview, selectedIds, clearSelection } = useBoardSelection({
+  const { openFromPreview, selectedIds, selectedTags, clearSelection } = useBoardSelection({
     instance,
+    scopeKey: selectionScopeKey(table.query),
     closePreview: () => preview.setOpen(false),
     openEdit: sheet.openEdit,
   })
+  const { query: tableQuery } = table
+  const bulkFilter = useCallback(() => filterSelection(tableQuery), [tableQuery])
   const bulk = useBulkActions({
-    selectedIds,
-    selectedCount: instance.selection.count,
-    clearSelection,
-    query: table.query,
+    archived: table.archived,
     total: table.total,
+    rows: {
+      selectedIds,
+      selectedTags,
+      selectedCount: instance.selection.count,
+      clear: clearSelection,
+    },
+    filterSelection: bulkFilter,
   })
 
   const listOrder = workspace.data?.tableState.listOrder
-  const items = useMemo(() => {
-    const built = buildSmartLists(t, counts, taxonomy.statuses, {
-      entity: terms.lowerSingular,
-      entities: terms.lowerPlural,
-    })
-    if (!listOrder) return built
-    const position = (id: string) => {
-      if (isArchivedList(id)) return -1
-      const index = listOrder.indexOf(id)
-      return index === -1 ? listOrder.length : index
-    }
-    return [...built].sort((a, b) => {
-      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
-      return position(a.id) - position(b.id)
-    })
-  }, [t, counts, taxonomy.statuses, listOrder, terms])
+  const items = useMemo(
+    () =>
+      orderSmartLists(
+        buildSmartLists(t, counts, taxonomy.statuses, {
+          entity: terms.lowerSingular,
+          entities: terms.lowerPlural,
+        }),
+        listOrder,
+      ),
+    [t, counts, taxonomy.statuses, listOrder, terms],
+  )
   const activeListId = statusToListId(table.status)
   const listHints = useMemo(
     () =>
@@ -127,6 +130,7 @@ export function useContactsBoard() {
     workspace: { views: workspace.data?.views, tableState: workspace.data?.tableState },
     items,
     fallbackActiveId: activeListId,
+    applyTableState: applyState,
   })
 
   return {
@@ -141,14 +145,17 @@ export function useContactsBoard() {
       isPending,
       isFetching: table.isFetching,
       isFiltered: table.isFiltered,
+      isArchived: table.archived,
       isEmpty: !isPending && table.rows.length === 0,
       isUnavailable,
       saveStatus,
+      unassignedRecent: counts.unassignedRecent ?? 0,
       listHints,
       advanced: table.advanced,
       advancedFields,
       viewSnapshot: boardViews.viewSnapshot,
       activeView: boardViews.activeView,
+      viewerId: boardViews.viewerId,
       views: workspace.data?.views ?? EMPTY_VIEWS,
       quickFilters: buildQuickFilterDefs(
         t,

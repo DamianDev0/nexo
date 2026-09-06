@@ -8,7 +8,11 @@ type HintContentProps = Omit<ComponentProps<typeof TooltipContent>, 'children'> 
 
 export function HintContent({ children, ...props }: Readonly<HintContentProps>) {
   return (
-    <TooltipContent sideOffset={6} className="max-w-64 text-pretty" {...props}>
+    <TooltipContent
+      sideOffset={6}
+      className="max-w-60 rounded-lg px-3 py-1.5 text-[11px] leading-4 font-light text-pretty"
+      {...props}
+    >
       <span className="line-clamp-5 block whitespace-pre-line break-words">{children}</span>
     </TooltipContent>
   )
