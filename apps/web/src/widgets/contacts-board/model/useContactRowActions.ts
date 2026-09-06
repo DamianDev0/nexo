@@ -2,12 +2,11 @@
 
 import { useMemo } from 'react'
 
+import { useRestoreContact } from '@/entities/contact'
 import { useChangeContactStatus } from '@/features/change-contact-status'
 import { useEditContactCustomFields } from '@/features/edit-contact-field'
 import { useDialNumber } from '@/features/place-call'
 import { copyToClipboard } from '@/shared/lib/copy-to-clipboard'
-
-import { useRestoreContact } from '@/entities/contact'
 
 import type { ContactComposeChannel, ContactRowActions } from '@/entities/contact'
 import type { ContactListItem } from '@repo/shared-types'

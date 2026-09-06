@@ -80,6 +80,7 @@ export function useContactsBoard() {
   })
   const bulk = useBulkActions({
     selectedIds,
+    selectedCount: instance.selection.count,
     clearSelection,
     query: table.query,
     total: table.total,

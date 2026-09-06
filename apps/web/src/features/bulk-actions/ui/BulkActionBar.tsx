@@ -29,7 +29,7 @@ export function BulkActionBar({ bar }: Readonly<{ bar: BulkActionsController['ba
               onClick={() => (id === 'export' ? bar.onExport() : bar.onOpen(id))}
               aria-label={label}
             >
-              <Icon className="size-4" />
+              <Icon className="size-3.5" />
             </PillButton>
           </HintTooltip>
         )

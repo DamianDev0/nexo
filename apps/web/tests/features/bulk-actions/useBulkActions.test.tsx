@@ -51,6 +51,7 @@ function setup(ids: string[] = ['a', 'b'], total = 40) {
     () =>
       useBulkActions({
         selectedIds: () => ids,
+        selectedCount: ids.length,
         clearSelection,
         query: { status: 'new', page: 2, limit: 25 },
         total,
@@ -113,7 +114,7 @@ describe('useBulkActions', () => {
     )
     const { result } = setup()
 
-    act(() => result.current.bar.onSelectAll())
+    act(() => result.current.bar.onSelectAll?.())
     expect(result.current.bar.labels.selected(2)).toContain('allMatching')
     expect(result.current.dialogs.count).toBe(40)
 
@@ -145,6 +146,7 @@ describe('useBulkActions', () => {
       () =>
         useBulkActions({
           selectedIds: () => ['a', 'b'],
+          selectedCount: 2,
           clearSelection: vi.fn(),
           query: { archived: true, page: 1, limit: 25 },
           total: 2,
@@ -160,6 +162,30 @@ describe('useBulkActions', () => {
       action: 'restore',
       selection: { mode: 'ids', ids: ['a', 'b'] },
     })
+  })
+
+  it('drops the whole-filter mode as soon as the row selection changes', () => {
+    let count = 2
+    const { result, rerender } = renderHook(
+      () =>
+        useBulkActions({
+          selectedIds: () => ['a', 'b'],
+          selectedCount: count,
+          clearSelection: vi.fn(),
+          query: { page: 1, limit: 25 },
+          total: 40,
+        }),
+      { wrapper },
+    )
+
+    act(() => result.current.bar.onSelectAll?.())
+    expect(result.current.bar.onSelectAll).toBeUndefined()
+    expect(result.current.dialogs.count).toBe(40)
+
+    count = 1
+    rerender()
+    expect(result.current.dialogs.count).toBe(2)
+    expect(result.current.bar.onSelectAll).toBeDefined()
   })
 
   it('does nothing when the selection is empty', () => {

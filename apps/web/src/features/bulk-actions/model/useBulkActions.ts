@@ -22,12 +22,19 @@ import type { BulkActionKind, ContactListQuery } from '@repo/shared-types'
 
 type BulkActionsArgs = {
   readonly selectedIds: () => string[]
+  readonly selectedCount: number
   readonly clearSelection: () => void
   readonly query: ContactListQuery
   readonly total: number
 }
 
-export function useBulkActions({ selectedIds, clearSelection, query, total }: BulkActionsArgs) {
+export function useBulkActions({
+  selectedIds,
+  selectedCount,
+  clearSelection,
+  query,
+  total,
+}: BulkActionsArgs) {
   const archived = query.archived === true
   const { t } = useTranslation()
   const client = useQueryClient()
@@ -37,6 +44,8 @@ export function useBulkActions({ selectedIds, clearSelection, query, total }: Bu
   const create = useCreateBulkAction()
   const status = useBulkActionStatus(activeId)
   const announced = useRef<string | null>(null)
+
+  useEffect(() => setAllMatching(false), [selectedCount])
 
   const finished = status.data && !isBulkActionActive(status.data.status) ? status.data : null
   useEffect(() => {
@@ -75,7 +84,7 @@ export function useBulkActions({ selectedIds, clearSelection, query, total }: Bu
   return {
     bar: {
       labels,
-      onSelectAll: () => setAllMatching(true),
+      onSelectAll: allMatching ? undefined : () => setAllMatching(true),
       archived,
       isBusy,
       progress: status.data && isBulkActionActive(status.data.status) ? status.data : null,
@@ -92,7 +101,6 @@ export function useBulkActions({ selectedIds, clearSelection, query, total }: Bu
       archive: () => run('archive'),
       restore: () => run('restore'),
     },
-    resetAllMatching: () => setAllMatching(false),
   }
 }
 
