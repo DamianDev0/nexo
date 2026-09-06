@@ -3,12 +3,15 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider, useTheme } from 'next-themes'
 import { useState, type ReactNode } from 'react'
+import { I18nextProvider } from 'react-i18next'
 import { Toaster } from 'sileo'
 
 import { TOAST_FILL_DARK, TOAST_FILL_LIGHT } from '@/shared/config/tokens/effects'
+import { createLocaleInstance } from '@/shared/i18n/config'
 import { createQueryClient } from '@/shared/query/query-client'
 import { TooltipProvider } from '@/shared/ui/shadcn/tooltip'
-import '@/shared/i18n/config'
+
+import type { Locale } from '@/shared/i18n/locale'
 
 const LIGHT_TOAST_OPTIONS = {
   fill: TOAST_FILL_LIGHT,
@@ -43,15 +46,23 @@ function SileoToaster() {
   )
 }
 
-export function Providers({ children }: Readonly<{ children: ReactNode }>) {
+type ProvidersProps = {
+  readonly locale: Locale
+  readonly children: ReactNode
+}
+
+export function Providers({ locale, children }: Readonly<ProvidersProps>) {
   const [queryClient] = useState(createQueryClient)
+  const [i18n] = useState(() => createLocaleInstance(locale))
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider delayDuration={400}>{children}</TooltipProvider>
-        <SileoToaster />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <I18nextProvider i18n={i18n}>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider delayDuration={400}>{children}</TooltipProvider>
+          <SileoToaster />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </I18nextProvider>
   )
 }

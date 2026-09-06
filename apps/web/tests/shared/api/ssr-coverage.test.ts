@@ -19,6 +19,7 @@ const ON_DEMAND_ONLY_KEYS = new Set([
   'contacts.timeline',
   'bulkActions.list',
   'bulkActions.detail',
+  'tags.trash',
 ])
 
 function read(patterns: string[]): string {
