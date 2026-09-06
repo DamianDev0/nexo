@@ -44,17 +44,6 @@ const TAXONOMY: ContactTaxonomy = {
       enabled: true,
     },
   ],
-  types: [
-    {
-      key: 'customer',
-      label: 'Cliente',
-      description: null,
-      color: '#A78BFA',
-      order: 1,
-      isSystem: true,
-      enabled: true,
-    },
-  ],
   lifecycleStages: [
     {
       key: 'lead',
@@ -71,7 +60,6 @@ const TAXONOMY: ContactTaxonomy = {
 let usage: ContactTaxonomyUsage = {
   statuses: {},
   sources: {},
-  types: {},
   lifecycleStages: {},
   tags: {},
 }
@@ -103,7 +91,7 @@ vi.mock('@/features/manage-settings/query/useTaxonomyUsage', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
-  usage = { statuses: {}, sources: {}, types: {}, lifecycleStages: {}, tags: {} }
+  usage = { statuses: {}, sources: {}, lifecycleStages: {}, tags: {} }
   contacts = {
     taxonomy: TAXONOMY,
     isLoading: false,
@@ -118,7 +106,7 @@ describe('useTaxonomyPane', () => {
   it.each([
     ['statuses', 'status'],
     ['sources', 'source'],
-    ['types', 'types'],
+    ['lifecycleStages', 'lifecycleStage'],
   ] as Array<[TaxonomyKind, string]>)('maps kind %s to namespace %s', (kind, namespace) => {
     const { result } = renderHook(() => useTaxonomyPane(kind))
 
@@ -206,9 +194,7 @@ describe('useTaxonomyPane', () => {
 
     const { result } = renderHook(() => useTaxonomyPane('statuses'))
 
-    const counts = Object.fromEntries(
-      result.current.rows.map((row) => [row.option.key, row.count]),
-    )
+    const counts = Object.fromEntries(result.current.rows.map((row) => [row.option.key, row.count]))
     expect(counts.new).toBe(7)
   })
 

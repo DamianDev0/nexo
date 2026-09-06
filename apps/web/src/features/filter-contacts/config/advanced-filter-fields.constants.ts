@@ -30,7 +30,6 @@ export const CORE_FIELDS: Readonly<Record<string, CoreFieldSpec>> = {
     type: 'multi',
     options: (s) => s.tags.map((tag) => ({ value: tag, label: tag })),
   },
-  leadScore: { type: 'number' },
   createdAt: { type: 'date' },
   updatedAt: { type: 'date' },
   lastContactedAt: { type: 'date' },

@@ -22,7 +22,7 @@ import {
 
 import { CONTACT_TAG_CHIP } from '../config/contact-columns.constants'
 import { contactAvatarUrl, contactFullName } from '../lib/contact-display'
-import { buildContactPreviewRows } from '../lib/contact-preview'
+import { buildContactPreviewRows, customText } from '../lib/contact-preview'
 
 import type { ContactTaxonomyMaps } from '../model/types/contact-cells.types'
 import type { ContactListItem } from '@repo/shared-types'
@@ -64,7 +64,7 @@ export function ContactPreviewSheet({
                 {name}
               </SheetTitle>
               <SheetDescription className="truncate text-xs text-muted-foreground">
-                {contact.jobTitle ?? terms.singular}
+                {customText(contact, 'role') ?? terms.singular}
               </SheetDescription>
             </span>
           </span>

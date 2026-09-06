@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-
 import type { StageDraft } from '@/features/manage-settings/lib/stage-edit'
 import type { PipelineStage } from '@repo/shared-types'
 

@@ -5,7 +5,6 @@ import type { SettingsNavLabels } from '@/features/manage-settings/lib/filter-se
 import { SETTINGS_GROUPS } from '@/features/manage-settings/config/settings-nav.constants'
 import { filterSettingsGroups } from '@/features/manage-settings/lib/filter-settings-nav'
 
-
 const labels: SettingsNavLabels = {
   section: (section) => `label ${section.key}`,
   child: (sectionKey, childKey) => `label ${sectionKey} ${childKey}`,

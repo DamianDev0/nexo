@@ -11,6 +11,12 @@ import type { TFunction } from 'i18next'
 
 const LIST_ALL = 'all'
 
+export const LIST_ARCHIVED = 'archived'
+
+export function isArchivedList(id: string | null): boolean {
+  return id === LIST_ARCHIVED
+}
+
 export function buildSmartLists(
   t: TFunction,
   counts: Record<string, number | undefined>,
@@ -27,6 +33,14 @@ export function buildSmartLists(
         entities: terms?.entities ?? '',
       }),
       pinned: true,
+    },
+    {
+      id: LIST_ARCHIVED,
+      label: t('contacts.lists.archived'),
+      count: counts[LIST_ARCHIVED] ?? 0,
+      description: t('contacts.lists.descriptions.archived', {
+        entities: terms?.entities ?? '',
+      }),
     },
     ...statuses.map((status) => ({
       id: status.key,

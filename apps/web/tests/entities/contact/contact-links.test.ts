@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 import {
   contactMailHref,
   contactPhoneLabel,
-  contactScoreBand,
   contactDialNumber,
   contactTelHref,
   contactWaHref,
@@ -44,17 +43,6 @@ describe('contactMailHref', () => {
 describe('contactPhoneLabel', () => {
   it('formats with country code and spaced groups', () => {
     expect(contactPhoneLabel('3001234567')).toBe('+57 300 123 4567')
-  })
-})
-
-describe('contactScoreBand', () => {
-  it('maps score ranges to bands', () => {
-    expect(contactScoreBand(99)).toBe('high')
-    expect(contactScoreBand(70)).toBe('high')
-    expect(contactScoreBand(69)).toBe('medium')
-    expect(contactScoreBand(40)).toBe('medium')
-    expect(contactScoreBand(39)).toBe('low')
-    expect(contactScoreBand(1)).toBe('low')
   })
 })
 

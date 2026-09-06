@@ -20,6 +20,7 @@ function tagMeta(name: string, description: string | null = null): Tag {
     color: '#3B82F6',
     description,
     enabled: true,
+    deletedAt: null,
     entityType: 'contact',
     createdAt: '2026-08-01T00:00:00.000Z',
   }

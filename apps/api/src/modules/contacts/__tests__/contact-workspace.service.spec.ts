@@ -60,13 +60,13 @@ describe('ContactWorkspaceService', () => {
   describe('getWorkspace', () => {
     it('composes views, counts, column catalog and quick filters', async () => {
       views.findAll.mockResolvedValue([makeView()])
-      contacts.counts.mockResolvedValue({ total: 3, byStatus: { new: 3 } })
+      contacts.counts.mockResolvedValue({ total: 3, archived: 0, byStatus: { new: 3 } })
       qr.query.mockResolvedValueOnce([])
 
       const workspace = await service.getWorkspace(SCHEMA, USER)
 
       expect(workspace.views).toHaveLength(1)
-      expect(workspace.counts).toEqual({ total: 3, byStatus: { new: 3 } })
+      expect(workspace.counts).toEqual({ total: 3, archived: 0, byStatus: { new: 3 } })
       expect(workspace.columns.length).toBeGreaterThan(0)
       expect(workspace.quickFilters.statuses.length).toBeGreaterThan(0)
       expect(workspace.quickFilters.sources.length).toBeGreaterThan(0)
@@ -75,7 +75,7 @@ describe('ContactWorkspaceService', () => {
 
     it('falls back to the default view when there is no saved state', async () => {
       views.findAll.mockResolvedValue([makeView({ id: 'view-default', isDefault: true })])
-      contacts.counts.mockResolvedValue({ total: 0, byStatus: {} })
+      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
       qr.query.mockResolvedValueOnce([])
 
       const workspace = await service.getWorkspace(SCHEMA, USER)
@@ -89,7 +89,7 @@ describe('ContactWorkspaceService', () => {
         makeView({ id: 'view-default', isDefault: true }),
         makeView({ id: 'view-saved' }),
       ])
-      contacts.counts.mockResolvedValue({ total: 0, byStatus: {} })
+      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
       qr.query.mockResolvedValueOnce([
         { active_view_id: 'view-saved', table_state: { density: 'compact' } },
       ])
@@ -102,7 +102,7 @@ describe('ContactWorkspaceService', () => {
 
     it('falls back to the default view when the saved active_view_id no longer exists', async () => {
       views.findAll.mockResolvedValue([makeView({ id: 'view-default', isDefault: true })])
-      contacts.counts.mockResolvedValue({ total: 0, byStatus: {} })
+      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
       qr.query.mockResolvedValueOnce([
         { active_view_id: 'view-deleted', table_state: { density: 'compact' } },
       ])
@@ -114,7 +114,7 @@ describe('ContactWorkspaceService', () => {
 
     it('falls back to null when the saved view is gone and there is no default', async () => {
       views.findAll.mockResolvedValue([makeView({ id: 'view-other', ownerId: 'someone-else' })])
-      contacts.counts.mockResolvedValue({ total: 0, byStatus: {} })
+      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
       qr.query.mockResolvedValueOnce([{ active_view_id: 'view-deleted', table_state: {} }])
 
       const workspace = await service.getWorkspace(SCHEMA, USER)
@@ -126,7 +126,7 @@ describe('ContactWorkspaceService', () => {
       views.findAll.mockResolvedValue([
         makeView({ id: 'view-other-default', ownerId: 'someone-else', isDefault: true }),
       ])
-      contacts.counts.mockResolvedValue({ total: 0, byStatus: {} })
+      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
       qr.query.mockResolvedValueOnce([])
 
       const workspace = await service.getWorkspace(SCHEMA, USER)

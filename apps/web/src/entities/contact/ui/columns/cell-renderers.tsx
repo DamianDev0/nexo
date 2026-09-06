@@ -1,11 +1,8 @@
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
-import { CONTACT_SCORE_LABEL_KEY } from '../../config/contact-columns.constants'
 import { commCellActions } from '../../lib/comm-actions'
 import { buildContactCellLabels } from '../../lib/contact-cell-labels'
-import { contactPlaceLabel } from '../../lib/contact-display'
-import { contactScoreBand } from '../../lib/contact-links'
 import { taxonomyLabel } from '../../lib/contact-taxonomy-label'
 import {
   ContactDocumentCell,
@@ -18,7 +15,6 @@ import { ContactTagsCell } from '../cells/ContactTagsCell'
 import {
   ContactCreatedCell,
   ContactRelativeCell,
-  ContactScoreCell,
   ContactStageCell,
   ContactStatusCell,
 } from '../cells/ContactValueCells'
@@ -85,7 +81,7 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
       labels={labels.whatsapp}
       actions={commCellActions(actions, 'whatsapp', contact)}
       dense={dense}
-      blocked={contact.optOutWhatsapp}
+      blocked={contact.optedOutChannels.includes('whatsapp')}
     />
   ),
   email: (contact, { actions, dense, labels }) => (
@@ -94,7 +90,7 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
       labels={labels.email}
       actions={commCellActions(actions, 'email', contact)}
       dense={dense}
-      blocked={contact.optOutEmail}
+      blocked={contact.optedOutChannels.includes('email')}
     />
   ),
   documentNumber: (contact, { actions, dense, labels }) => (
@@ -106,28 +102,13 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
       dense={dense}
     />
   ),
-  leadScore: (contact, { t }) => (
-    <ContactScoreCell
-      score={contact.leadScore}
-      bandLabel={t(CONTACT_SCORE_LABEL_KEY[contactScoreBand(contact.leadScore)], {
-        score: contact.leadScore,
-      })}
-    />
-  ),
   city: (contact) =>
     contact.city ? (
-      <TruncateTip
-        className="text-muted-foreground"
-        hint={contact.department ? contactPlaceLabel(contact.city, contact.department) : undefined}
-      >
-        {contact.city}
-      </TruncateTip>
+      <TruncateTip className="text-muted-foreground">{contact.city}</TruncateTip>
     ) : (
       muted(null)
     ),
   source: (contact, { taxonomy }) => muted(taxonomyLabel(taxonomy.sourceByKey, contact.source)),
-  type: (contact, { taxonomy }) =>
-    muted(contact.typeLabel ?? taxonomyLabel(taxonomy.typeByKey, contact.type)),
   lifecycleStage: (contact, { taxonomy }) => (
     <ContactStageCell
       label={

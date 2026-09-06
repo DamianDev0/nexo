@@ -1,4 +1,4 @@
-export const SMART_LIST_MAX_VISIBLE = 9
+export const SMART_LIST_MAX_VISIBLE = 10
 
 export const SMART_LIST_FADE_WIDTH = '3rem'
 

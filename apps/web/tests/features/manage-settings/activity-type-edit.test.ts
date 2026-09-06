@@ -7,7 +7,6 @@ import {
   withActivityPatch,
 } from '@/features/manage-settings/lib/activity-type-edit'
 
-
 function activityType(overrides: Partial<ActivityTypeDef> = {}): ActivityTypeDef {
   return {
     key: 'call',

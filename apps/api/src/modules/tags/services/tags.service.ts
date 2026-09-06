@@ -10,12 +10,13 @@ export class TagsService {
 
   async findAll(
     schemaName: string,
-    query: { entityType?: TagEntityType; page?: number; limit?: number } = {},
+    query: { entityType?: TagEntityType; deleted?: boolean; page?: number; limit?: number } = {},
   ): Promise<PaginatedTags> {
     const page = query.page ?? 1
     const limit = query.limit ?? DEFAULT_PAGE_SIZE
     const { rows, total } = await this.tagsRepository.findPage(schemaName, {
       entityType: query.entityType,
+      deleted: query.deleted,
       page,
       limit,
     })
@@ -41,5 +42,10 @@ export class TagsService {
 
   async remove(schemaName: string, tagId: string): Promise<void> {
     return this.tagsRepository.remove(schemaName, tagId)
+  }
+
+  async restore(schemaName: string, tagId: string): Promise<Tag> {
+    const row = await this.tagsRepository.restore(schemaName, tagId)
+    return mapTagRow(row)
   }
 }

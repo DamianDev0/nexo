@@ -12,7 +12,6 @@ const USAGE_STALE_MS = 60 * 1000
 const EMPTY_USAGE: ContactTaxonomyUsage = {
   statuses: {},
   sources: {},
-  types: {},
   lifecycleStages: {},
   tags: {},
 }

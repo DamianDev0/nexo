@@ -16,8 +16,22 @@ vi.mock('sileo', () => ({ sileo: { error: vi.fn(), success: vi.fn() } }))
 const server = createMswServer()
 
 const TYPES: ActivityTypeDef[] = [
-  { key: 'call', label: 'Llamada', icon: 'phone', color: '#22C55E', trackDuration: true, isSystem: true },
-  { key: 'visita', label: 'Visita', icon: 'map-pin', color: '#60A5FA', trackDuration: false, isSystem: false },
+  {
+    key: 'call',
+    label: 'Llamada',
+    icon: 'phone',
+    color: '#22C55E',
+    trackDuration: true,
+    isSystem: true,
+  },
+  {
+    key: 'visita',
+    label: 'Visita',
+    icon: 'map-pin',
+    color: '#60A5FA',
+    trackDuration: false,
+    isSystem: false,
+  },
 ]
 
 function listHandler(data: ActivityTypeDef[]) {

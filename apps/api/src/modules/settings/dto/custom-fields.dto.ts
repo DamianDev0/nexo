@@ -11,6 +11,8 @@ import {
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { ApiProperty, ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger'
+import { FIELD_GROUPS } from '@repo/shared-types'
+import type { FieldGroup } from '@repo/shared-types'
 import type {
   CustomFieldType,
   SelectOption,
@@ -55,6 +57,8 @@ export class FieldDefDto implements FieldDef {
   @ApiProperty() @IsBoolean() unique: boolean
   @ApiProperty() @IsInt() @Min(1) order: number
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isActive?: boolean
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() isSystem?: boolean
+  @ApiPropertyOptional({ enum: FIELD_GROUPS }) @IsOptional() @IsIn(FIELD_GROUPS) group?: FieldGroup
   @ApiPropertyOptional() @IsOptional() @IsBoolean() showInForm?: boolean
   @ApiPropertyOptional() @IsOptional() @IsBoolean() filterable?: boolean
   @ApiPropertyOptional() @IsOptional() @IsBoolean() sortable?: boolean

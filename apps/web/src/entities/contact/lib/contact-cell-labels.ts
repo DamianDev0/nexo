@@ -16,6 +16,7 @@ export function buildContactCellLabels(t: TFunction): ContactCellLabels {
       preview: t('contacts.rowActions.preview'),
       addNote: t('contacts.rowActions.addNote'),
       editTags: t('contacts.rowActions.editTags'),
+      restore: t('contacts.rowActions.restore'),
       tags,
       notes: { title: t('contacts.notesPopover.title') },
     },

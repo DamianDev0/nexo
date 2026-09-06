@@ -12,9 +12,7 @@ export type ActivityTypeFormValues = {
 const ACTIVITY_KEY_MAX = 30
 
 function uniqueActivityKey(label: string, taken: ReadonlySet<string>): string {
-  const root = slugifyTaxonomyKey(label, taken)
-    .slice(0, ACTIVITY_KEY_MAX)
-    .replace(/_+$/, '')
+  const root = slugifyTaxonomyKey(label, taken).slice(0, ACTIVITY_KEY_MAX).replace(/_+$/, '')
   if (!taken.has(root)) return root
 
   for (let suffix = 2; ; suffix += 1) {

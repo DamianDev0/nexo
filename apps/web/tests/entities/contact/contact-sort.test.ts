@@ -27,9 +27,9 @@ describe('parseSortParam', () => {
 
 describe('serializeSort', () => {
   it('round-trips through the URL param', () => {
-    const sort = parseSortParam('-leadScore')
+    const sort = parseSortParam('-createdAt')
 
-    expect(serializeSort(sort)).toBe('-leadScore')
+    expect(serializeSort(sort)).toBe('-createdAt')
   })
 
   it('drops the param when nothing is sorted', () => {

@@ -17,6 +17,8 @@ const ON_DEMAND_ONLY_KEYS = new Set([
   'geo.colombiaMap',
   'contacts.duplicateProbe',
   'contacts.timeline',
+  'bulkActions.list',
+  'bulkActions.detail',
 ])
 
 function read(patterns: string[]): string {

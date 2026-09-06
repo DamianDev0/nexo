@@ -17,6 +17,7 @@ export class NotificationsListener {
   @OnEvent('payment.**')
   @OnEvent('stock.**')
   @OnEvent('import.**')
+  @OnEvent('bulk_action.completed')
   async handleNotificationEvent(event: NotificationEvent): Promise<void> {
     const notification = await this.notificationsService.send(event.schemaName, event.userId, {
       type: event.type,

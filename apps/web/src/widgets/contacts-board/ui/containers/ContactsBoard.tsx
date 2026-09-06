@@ -33,7 +33,7 @@ const ViewTabDialogs = dynamic(() =>
 )
 
 export function ContactsBoard() {
-  const { instance, lists, state, actions, sheet, preview, composers } = useContactsBoard()
+  const { instance, lists, state, actions, bulk, sheet, preview, composers } = useContactsBoard()
   const listMenu = useListMenu(state.views)
   useComposerPreload()
 
@@ -50,6 +50,7 @@ export function ContactsBoard() {
         lists={lists}
         state={state}
         actions={actions}
+        bulk={bulk}
         listMenu={listMenu}
       />
       {viewDialogsMounted && <ViewTabDialogs menu={listMenu.viewMenu} />}

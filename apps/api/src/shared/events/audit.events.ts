@@ -15,6 +15,7 @@ export enum AuditEntityType {
   Activity = 'activity',
   Workflow = 'workflow',
   Notification = 'notification',
+  BulkAction = 'bulk_action',
   RefreshToken = 'refresh_token',
   System = 'system',
 }
@@ -44,6 +45,10 @@ export enum AuditAction {
   ContactAssigned = 'contact.assigned',
   ContactTagged = 'contact.tagged',
   ContactImported = 'contact.imported',
+
+  BulkActionStarted = 'bulk_action.started',
+  BulkActionCompleted = 'bulk_action.completed',
+  BulkActionCancelled = 'bulk_action.cancelled',
 
   CompanyCreated = 'company.created',
   CompanyUpdated = 'company.updated',

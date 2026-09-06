@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import {
   IsBoolean,
   IsIn,
@@ -21,6 +21,11 @@ export class TagQueryDto {
   @IsOptional()
   @IsIn(TAG_ENTITY_TYPES)
   entityType?: TagEntityType
+
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => value === true || value === 'true')
+  @IsBoolean()
+  deleted?: boolean
 
   @IsOptional()
   @Type(() => Number)

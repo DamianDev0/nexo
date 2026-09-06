@@ -12,11 +12,6 @@ export function contactFullName(contact: Pick<ContactListItem, 'firstName' | 'la
   return [contact.firstName, contact.lastName].filter(Boolean).join(' ')
 }
 
-export function contactPlaceLabel(city: string | null, department: string | null): string | null {
-  const place = [city, department].filter(Boolean).join(', ')
-  return place === '' ? null : place
-}
-
 export function contactInitials(contact: Pick<ContactListItem, 'firstName' | 'lastName'>): string {
   const first = contact.firstName.charAt(0)
   const last = contact.lastName?.charAt(0) ?? contact.firstName.charAt(1)

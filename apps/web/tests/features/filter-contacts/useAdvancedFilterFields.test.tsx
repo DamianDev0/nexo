@@ -5,7 +5,6 @@ import type { ContactColumnDef } from '@repo/shared-types'
 
 import { useAdvancedFilterFields } from '@/features/filter-contacts'
 
-
 vi.mock('@/entities/contact-taxonomy', () => ({
   useContactTaxonomy: () => ({
     statuses: [{ key: 'new', label: 'Nuevo', color: '#60A5FA' }],
@@ -48,9 +47,7 @@ describe('useAdvancedFilterFields', () => {
     const { result } = renderHook(() => useAdvancedFilterFields(CATALOG))
 
     expect(result.current.map((field) => field.key)).toEqual(['status', 'tags'])
-    expect(result.current[0]?.options).toEqual([
-      { value: 'new', label: 'Nuevo', color: '#60A5FA' },
-    ])
+    expect(result.current[0]?.options).toEqual([{ value: 'new', label: 'Nuevo', color: '#60A5FA' }])
     expect(result.current[1]?.options).toEqual([{ value: 'vip', label: 'vip' }])
   })
 })

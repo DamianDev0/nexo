@@ -29,6 +29,7 @@ const mockTag: Tag = {
   description: null,
   enabled: true,
   entityType: 'contact',
+  deletedAt: null,
   createdAt: '2024-01-01T00:00:00Z',
 }
 
@@ -38,6 +39,7 @@ function buildServiceMock() {
     create: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    restore: jest.fn(),
   }
 }
 
@@ -118,6 +120,15 @@ describe('TagsController', () => {
       await expect(controller.update('missing', { name: 'Ghost' }, mockCtx)).rejects.toThrow(
         NotFoundException,
       )
+    })
+  })
+
+  describe('restore', () => {
+    it('delegates to service and returns the revived tag', async () => {
+      service.restore.mockResolvedValue({ id: 'tag-1', deletedAt: null })
+
+      await expect(controller.restore('tag-1', mockCtx)).resolves.toMatchObject({ id: 'tag-1' })
+      expect(service.restore).toHaveBeenCalledWith(mockCtx.schemaName, 'tag-1')
     })
   })
 

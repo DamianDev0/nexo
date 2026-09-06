@@ -63,8 +63,6 @@ export function usePipelinesPane() {
       openCreate: () => setCreatorOpen(true),
       onSubmit: onCreate,
     },
-    removal: removing
-      ? { name: removing.name, cancel: closeRemove, confirm: confirmRemove }
-      : null,
+    removal: removing ? { name: removing.name, cancel: closeRemove, confirm: confirmRemove } : null,
   }
 }

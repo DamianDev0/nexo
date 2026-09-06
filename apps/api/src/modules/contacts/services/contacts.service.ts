@@ -28,11 +28,14 @@ import type {
 import type {
   CreateContactDto,
   UpdateContactDto,
-  ContactQueryDto,
   ProbeContactDuplicatesDto,
 } from '../dto/contact.dto'
-import type { ContactColumnChange, CreateContactData, ContactListQuery } from '../interfaces/contact-row.interfaces'
-import { OTHER_CONTACT_TYPE, UPDATABLE_FIELDS } from '../constants/contact.constants'
+import type {
+  ContactColumnChange,
+  CreateContactData,
+  ContactListQuery,
+} from '../interfaces/contact-row.interfaces'
+import { UPDATABLE_FIELDS } from '../constants/contact.constants'
 import { ContactsRepository } from '../repositories/contacts.repository'
 import {
   mapContact,
@@ -76,7 +79,10 @@ export class ContactsService {
   }
 
   async counts(schemaName: string): Promise<ContactCounts> {
-    const rows = await this.repository.countByStatus(schemaName)
+    const [rows, archived] = await Promise.all([
+      this.repository.countByStatus(schemaName),
+      this.repository.countArchived(schemaName),
+    ])
     const byStatus: Record<string, number> = {}
     let total = 0
     for (const row of rows) {
@@ -84,7 +90,7 @@ export class ContactsService {
       byStatus[row.status] = value
       total += value
     }
-    return { total, byStatus }
+    return { total, archived, byStatus }
   }
 
   async taxonomyUsage(schemaName: string): Promise<ContactTaxonomyUsage> {
@@ -94,7 +100,6 @@ export class ContactsService {
     return {
       statuses: toRecord(raw.statuses),
       sources: toRecord(raw.sources),
-      types: toRecord(raw.types),
       lifecycleStages: toRecord(raw.lifecycleStages),
       tags: toRecord(raw.tags),
     }
@@ -247,6 +252,28 @@ export class ContactsService {
     })
   }
 
+  async restore(schemaName: string, contactId: string, userId?: string): Promise<Contact> {
+    const restored = await this.db.transactional(schemaName, async (qr): Promise<Contact> => {
+      const row = await this.repository.restoreById(qr, contactId)
+      if (!row) throw new NotFoundException(`Archived contact ${contactId} not found`)
+      this.emitAudit(
+        schemaName,
+        AuditAction.ContactUpdated,
+        contactId,
+        userId,
+        `Contact ${contactId} restored`,
+      )
+      return mapContact(row)
+    })
+    this.eventBus.emitCrm(DOMAIN_EVENTS.CONTACT_UPDATED, {
+      schemaName,
+      entityType: 'contact',
+      entityId: contactId,
+      contact: restored,
+    })
+    return restored
+  }
+
   async getTimeline(schemaName: string, contactId: string): Promise<ContactTimeline> {
     return this.db.query(schemaName, async (qr): Promise<ContactTimeline> => {
       await this.assertContactExists(qr, contactId)
@@ -267,7 +294,6 @@ export class ContactsService {
     const checks: Array<[string | undefined, keyof ContactTaxonomy]> = [
       [dto.status, 'statuses'],
       [dto.source, 'sources'],
-      [dto.type, 'types'],
       [dto.lifecycleStage, 'lifecycleStages'],
     ]
 
@@ -327,26 +353,12 @@ export class ContactsService {
       whatsapp: dto.whatsapp ?? null,
       documentType: dto.documentType ?? null,
       documentNumber: dto.documentNumber ?? null,
-      jobTitle: dto.jobTitle ?? null,
-      linkedinUrl: dto.linkedinUrl ?? null,
-      birthday: dto.birthday ?? null,
-      address: dto.address ?? null,
+      avatarUrl: dto.avatarUrl ?? null,
       city: dto.city ?? null,
-      department: dto.department ?? null,
       municipioCode: dto.municipioCode ?? null,
       status: dto.status ?? firstEnabledOptionKey(taxonomy.statuses),
       lifecycleStage: dto.lifecycleStage ?? firstEnabledOptionKey(taxonomy.lifecycleStages),
       source: dto.source ?? null,
-      type: dto.type ?? null,
-      typeLabel: dto.type === OTHER_CONTACT_TYPE ? (dto.typeLabel ?? null) : null,
-      avatarUrl: dto.avatarUrl ?? null,
-      leadScore: dto.leadScore ?? 0,
-      dataConsent: dto.dataConsent ?? false,
-      consentDate: dto.dataConsent ? new Date() : null,
-      consentSource: dto.consentSource ?? null,
-      optOutEmail: dto.optOutEmail ?? false,
-      optOutSms: dto.optOutSms ?? false,
-      optOutWhatsapp: dto.optOutWhatsapp ?? false,
       tags: dto.tags ?? [],
       companyId: dto.companyId ?? null,
       assignedToId: dto.assignedToId ?? null,
@@ -360,20 +372,6 @@ export class ContactsService {
 
     for (const [dtoKey, col] of UPDATABLE_FIELDS) {
       if (dto[dtoKey] !== undefined) changes.push({ column: col, value: dto[dtoKey] })
-    }
-
-    if (dto.dataConsent !== undefined) {
-      changes.push({ column: 'consent_date', value: dto.dataConsent ? new Date() : null })
-    }
-
-    if (dto.type !== undefined) {
-      changes.push({ column: 'type', value: dto.type })
-      changes.push({
-        column: 'type_label',
-        value: dto.type === OTHER_CONTACT_TYPE ? (dto.typeLabel ?? null) : null,
-      })
-    } else if (dto.typeLabel !== undefined) {
-      changes.push({ column: 'type_label', value: dto.typeLabel })
     }
 
     return changes

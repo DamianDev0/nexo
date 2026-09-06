@@ -54,18 +54,18 @@ export type ContactView = {
 
 export type ContactCounts = {
   total: number
+  archived: number
   byStatus: Record<string, number>
 }
 
 export type ContactTaxonomyUsage = {
   statuses: Record<string, number>
   sources: Record<string, number>
-  types: Record<string, number>
   lifecycleStages: Record<string, number>
   tags: Record<string, number>
 }
 
-export type TaxonomyReassignKind = 'status' | 'source' | 'type' | 'lifecycle' | 'tag'
+export type TaxonomyReassignKind = 'status' | 'source' | 'lifecycle' | 'tag'
 
 export type ContactColumnDef = {
   key: string

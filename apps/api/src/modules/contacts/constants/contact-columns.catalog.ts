@@ -56,15 +56,6 @@ export const CONTACT_COLUMN_CATALOG: readonly ContactColumnDef[] = [
     minWidth: 120,
   },
   {
-    key: 'jobTitle',
-    labelKey: 'contacts.columns.jobTitle',
-    hintKey: 'contacts.columnHints.jobTitle',
-    sortField: null,
-    defaultVisible: false,
-    defaultWidth: 150,
-    minWidth: 120,
-  },
-  {
     key: 'lifecycleStage',
     labelKey: 'contacts.columns.lifecycleStage',
     hintKey: 'contacts.columnHints.lifecycleStage',
@@ -80,15 +71,6 @@ export const CONTACT_COLUMN_CATALOG: readonly ContactColumnDef[] = [
     sortField: null,
     defaultVisible: false,
     defaultWidth: 130,
-    minWidth: 100,
-  },
-  {
-    key: 'type',
-    labelKey: 'contacts.columns.type',
-    hintKey: 'contacts.columnHints.type',
-    sortField: null,
-    defaultVisible: false,
-    defaultWidth: 120,
     minWidth: 100,
   },
   {
@@ -108,15 +90,6 @@ export const CONTACT_COLUMN_CATALOG: readonly ContactColumnDef[] = [
     defaultVisible: true,
     defaultWidth: 130,
     minWidth: 100,
-  },
-  {
-    key: 'leadScore',
-    labelKey: 'contacts.columns.leadScore',
-    hintKey: 'contacts.columnHints.leadScore',
-    sortField: 'leadScore',
-    defaultVisible: false,
-    defaultWidth: 110,
-    minWidth: 90,
   },
   {
     key: 'lastContactedAt',

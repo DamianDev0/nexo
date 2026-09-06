@@ -1,4 +1,3 @@
-import { contactPlaceLabel } from './contact-display'
 import {
   contactDocumentLabel,
   contactMailHref,
@@ -47,12 +46,13 @@ export function buildContactPreviewRows(
         ? contactDocumentLabel(contact.documentType, contact.documentNumber)
         : null,
     },
-    { key: 'jobTitle', label: t('contacts.columns.jobTitle'), value: contact.jobTitle },
-    {
-      key: 'city',
-      label: t('contacts.form.city'),
-      value: contactPlaceLabel(contact.city, contact.department),
-    },
-    { key: 'address', label: t('contacts.form.address'), value: contact.address },
+    { key: 'role', label: t('contacts.form.role'), value: customText(contact, 'role') },
+    { key: 'city', label: t('contacts.form.city'), value: contact.city },
+    { key: 'address', label: t('contacts.form.address'), value: customText(contact, 'address') },
   ]
+}
+
+export function customText(contact: ContactListItem, key: string): string | null {
+  const value = contact.customFields?.[key]
+  return typeof value === 'string' && value.length > 0 ? value : null
 }

@@ -7,12 +7,13 @@ import { buildContactColumns } from '@/entities/contact'
 import { useContactTaxonomy, useTaxonomyUsage } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { useTagCatalog } from '@/entities/tag'
-import { buildBulkLabels, useArchiveContacts } from '@/features/archive-contacts'
+import { useBulkActions } from '@/features/bulk-actions'
 import { useContactsLayout, useContactWorkspace } from '@/features/customize-contacts-table'
 import {
   buildContactHints,
   buildQuickFilterDefs,
   buildSmartLists,
+  isArchivedList,
   statusToListId,
   useContactCounts,
   useContactsTable,
@@ -34,7 +35,6 @@ export function useContactsBoard() {
   const taxonomy = useContactTaxonomy()
   const terms = useEntityTerms('contact')
   const { sheet, preview, composers, rowActions } = useBoardEditors()
-  const { archive, isArchiving } = useArchiveContacts()
   const workspace = useContactWorkspace()
   const usage = useTaxonomyUsage()
 
@@ -73,11 +73,16 @@ export function useContactsBoard() {
     totalRows: table.total,
   })
 
-  const { openFromPreview, archiveSelected } = useBoardSelection({
+  const { openFromPreview, selectedIds, clearSelection } = useBoardSelection({
     instance,
-    archive,
     closePreview: () => preview.setOpen(false),
     openEdit: sheet.openEdit,
+  })
+  const bulk = useBulkActions({
+    selectedIds,
+    clearSelection,
+    query: table.query,
+    total: table.total,
   })
 
   const listOrder = workspace.data?.tableState.listOrder
@@ -87,12 +92,16 @@ export function useContactsBoard() {
       entities: terms.lowerPlural,
     })
     if (!listOrder) return built
+    const position = (id: string) => {
+      if (isArchivedList(id)) return -1
+      const index = listOrder.indexOf(id)
+      return index === -1 ? listOrder.length : index
+    }
     return [...built].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
-      return listOrder.indexOf(a.id) - listOrder.indexOf(b.id)
+      return position(a.id) - position(b.id)
     })
   }, [t, counts, taxonomy.statuses, listOrder, terms])
-  const bulkLabels = useMemo(() => buildBulkLabels(t), [t])
   const activeListId = statusToListId(table.status)
   const listHints = useMemo(
     () =>
@@ -134,9 +143,7 @@ export function useContactsBoard() {
       isEmpty: !isPending && table.rows.length === 0,
       isUnavailable,
       saveStatus,
-      isArchiving,
       listHints,
-      bulkLabels,
       advanced: table.advanced,
       advancedFields,
       viewSnapshot: boardViews.viewSnapshot,
@@ -164,10 +171,10 @@ export function useContactsBoard() {
       onCreate: sheet.openCreate,
       onToggleFilter: table.handleToggleFilter,
       onClearFilters: table.handleClearFilters,
-      onArchiveSelected: archiveSelected,
       onRevertFilters: boardViews.revertFilters,
     },
     composers,
+    bulk,
     sheet: { contact: sheet.editing, open: sheet.open, onOpenChange: sheet.setOpen },
     preview: {
       contact: preview.editing,

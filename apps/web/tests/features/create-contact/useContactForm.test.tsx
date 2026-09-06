@@ -19,28 +19,13 @@ const EXISTING_CONTACT: ContactListItem = {
   whatsapp: '3001234567',
   documentType: DocumentType.CC,
   documentNumber: '123456789',
-  jobTitle: null,
-  linkedinUrl: null,
-  birthday: null,
-  address: 'Calle 100 #7-21',
   city: 'Bogota',
-  department: null,
   municipioCode: '11001',
-  country: 'CO',
   status: 'qualified',
   statusChangedAt: '2026-08-01T00:00:00.000Z',
   avatarUrl: null,
   lifecycleStage: LifecycleStage.LEAD,
   source: 'manual',
-  type: 'customer',
-  typeLabel: null,
-  leadScore: 0,
-  dataConsent: true,
-  consentDate: null,
-  consentSource: null,
-  optOutEmail: false,
-  optOutSms: false,
-  optOutWhatsapp: false,
   lastContactedAt: null,
   tags: [],
   companyId: null,
@@ -50,6 +35,8 @@ const EXISTING_CONTACT: ContactListItem = {
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   noteCount: 0,
+  optedOutChannels: [],
+  customFields: { address: 'Calle 100 #7-21' },
 }
 
 const EMPTY_TAXONOMY: ContactTaxonomy = {
@@ -65,7 +52,6 @@ const EMPTY_TAXONOMY: ContactTaxonomy = {
     },
   ],
   sources: [],
-  types: [],
   lifecycleStages: [],
 }
 
@@ -90,8 +76,6 @@ describe('useContactForm', () => {
     await waitFor(() => expect(result.current.form.getValues('firstName')).toBe('Maria'))
     expect(result.current.form.getValues('status')).toBe('qualified')
     expect(result.current.form.getValues('source')).toBe('manual')
-    expect(result.current.form.getValues('type')).toBe('customer')
-    expect(result.current.form.getValues('typeLabel')).toBe('')
     expect(result.current.form.getValues('address')).toBe('Calle 100 #7-21')
     expect(result.current.form.getValues('whatsappSameAsPhone')).toBe(true)
     expect(result.current.isEdit).toBe(true)
@@ -115,12 +99,10 @@ describe('useContactForm', () => {
       email: null,
       phone: null,
       whatsapp: null,
-      address: null,
       city: null,
       municipioCode: null,
       source: null,
-      type: null,
-      typeLabel: null,
+      customFields: {},
     }
 
     const { result } = renderHook(() => useContactForm(contact, vi.fn()), { wrapper })
@@ -136,8 +118,6 @@ describe('useContactForm', () => {
       city: '',
       municipioCode: '',
       source: '',
-      type: '',
-      typeLabel: '',
     })
   })
 
@@ -169,8 +149,6 @@ describe('useContactForm', () => {
         status: 'new',
         avatarUrl: '',
         source: 'manual',
-        type: 'customer',
-        typeLabel: '',
         lifecycleStage: '',
       })
     })
@@ -186,12 +164,11 @@ describe('useContactForm', () => {
       email: 'valentina@nexo.test',
       phone: '3001234567',
       whatsapp: '3001234567',
-      address: 'Calle 100 #7-21',
       city: 'Bogotá',
       municipioCode: '11001',
       status: 'new',
       source: 'manual',
-      type: 'customer',
+      customFields: { address: 'Calle 100 #7-21' },
     })
   })
 
@@ -244,91 +221,5 @@ describe('useContactForm', () => {
     await waitFor(() => expect(onDone).toHaveBeenCalled())
     expect(receivedBody).toMatchObject({ firstName: 'Carlos' })
     expect(receivedBody).not.toHaveProperty('source')
-  })
-
-  it('sends the free-text typeLabel when the type is other', async () => {
-    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
-    let receivedBody: Record<string, unknown> | null = null
-    server.use(
-      http.post(`${API}/contacts`, async ({ request }) => {
-        receivedBody = (await request.json()) as Record<string, unknown>
-        return HttpResponse.json({ data: EXISTING_CONTACT })
-      }),
-    )
-
-    const onDone = vi.fn()
-    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
-    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
-
-    act(() => {
-      result.current.form.setValue('firstName', 'Camila')
-      result.current.form.setValue('type', 'other')
-      result.current.form.setValue('typeLabel', 'Inversionista')
-    })
-
-    await act(async () => {
-      await result.current.handleSubmit()
-    })
-
-    await waitFor(() => expect(onDone).toHaveBeenCalled())
-    expect(receivedBody).toMatchObject({ type: 'other', typeLabel: 'Inversionista' })
-  })
-
-  it('omits typeLabel when the type is not other', async () => {
-    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
-    let receivedBody: Record<string, unknown> | null = null
-    server.use(
-      http.post(`${API}/contacts`, async ({ request }) => {
-        receivedBody = (await request.json()) as Record<string, unknown>
-        return HttpResponse.json({ data: EXISTING_CONTACT })
-      }),
-    )
-
-    const onDone = vi.fn()
-    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
-    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
-
-    act(() => {
-      result.current.form.setValue('firstName', 'Camila')
-      result.current.form.setValue('type', 'customer')
-      result.current.form.setValue('typeLabel', 'Inversionista')
-    })
-
-    await act(async () => {
-      await result.current.handleSubmit()
-    })
-
-    await waitFor(() => expect(onDone).toHaveBeenCalled())
-    expect(receivedBody).toMatchObject({ type: 'customer' })
-    expect(receivedBody).not.toHaveProperty('typeLabel')
-  })
-
-  it('blocks submit when the type is other and typeLabel is empty', async () => {
-    server.use(taxonomyHandler(), customFieldsHandler(), customFieldsHandler())
-    const posted = vi.fn()
-    server.use(
-      http.post(`${API}/contacts`, () => {
-        posted()
-        return HttpResponse.json({ data: EXISTING_CONTACT })
-      }),
-    )
-
-    const onDone = vi.fn()
-    const { result } = renderHook(() => useContactForm(null, onDone), { wrapper })
-    await waitFor(() => expect(result.current.form.getValues('status')).toBe('new'))
-
-    act(() => {
-      result.current.form.setValue('firstName', 'Camila')
-      result.current.form.setValue('type', 'other')
-    })
-
-    await act(async () => {
-      await result.current.handleSubmit()
-    })
-
-    expect(posted).not.toHaveBeenCalled()
-    expect(result.current.form.getFieldState('typeLabel').error?.message).toBe(
-      'contacts.errors.typeOtherRequired',
-    )
   })
 })

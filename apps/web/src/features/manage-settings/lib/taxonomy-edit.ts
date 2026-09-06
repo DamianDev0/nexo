@@ -7,12 +7,12 @@ import type { TFunction } from 'i18next'
 
 export type TaxonomyKind = keyof ContactTaxonomy
 
-export type TaxonomyNamespace = 'status' | 'source' | 'types' | 'lifecycleStage'
+export type TaxonomyNamespace = 'status' | 'source' | 'lifecycleStage'
 
 export function taxonomyNamespace(kind: TaxonomyKind): TaxonomyNamespace {
   if (kind === 'statuses') return 'status'
   if (kind === 'sources') return 'source'
-  return kind === 'lifecycleStages' ? 'lifecycleStage' : 'types'
+  return 'lifecycleStage'
 }
 
 export function optionLabel(
@@ -114,7 +114,6 @@ export function sameTaxonomy(
   return (
     sameOptions(a.statuses, b.statuses) &&
     sameOptions(a.sources, b.sources) &&
-    sameOptions(a.types, b.types) &&
     sameOptions(a.lifecycleStages, b.lifecycleStages)
   )
 }

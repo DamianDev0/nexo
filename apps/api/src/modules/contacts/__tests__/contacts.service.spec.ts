@@ -24,11 +24,9 @@ function makeContactRow(overrides: Record<string, unknown> = {}) {
     document_type: 'cc',
     document_number: '123456789',
     city: 'Bogotá',
-    department: 'Cundinamarca',
     municipio_code: '11001',
     status: 'new',
     source: 'manual',
-    lead_score: 0,
     tags: [],
     company_id: null,
     assigned_to_id: null,
@@ -261,88 +259,15 @@ describe('ContactsService', () => {
       expect(event.schemaName).toBe(SCHEMA)
     })
 
-    it('defaults jobTitle to null and lifecycleStage to subscriber when omitted', async () => {
+    it('defaults lifecycleStage to subscriber and never writes columns that left the core', async () => {
       qr.query.mockResolvedValueOnce([makeContactRow()])
 
       await service.create(SCHEMA, { firstName: 'Jane' }, 'user-1')
-
-      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[7]).toBeNull()
-      expect(params[15]).toBe(LifecycleStage.SUBSCRIBER)
-      expect(LifecycleStage.SUBSCRIBER).toBe('subscriber')
-    })
-
-    it('passes jobTitle through when provided', async () => {
-      qr.query.mockResolvedValueOnce([makeContactRow()])
-
-      await service.create(SCHEMA, { firstName: 'Jane', jobTitle: 'CFO' }, 'user-1')
-
-      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[7]).toBe('CFO')
-    })
-
-    it('stores a consent_date only when dataConsent is true', async () => {
-      qr.query.mockResolvedValueOnce([makeContactRow()])
-
-      await service.create(SCHEMA, { firstName: 'Jane', dataConsent: true }, 'user-1')
-
-      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[19]).toBeInstanceOf(Date)
-    })
-
-    it('stores a null consent_date when dataConsent is false or omitted', async () => {
-      qr.query.mockResolvedValueOnce([makeContactRow()])
-
-      await service.create(SCHEMA, { firstName: 'Jane' }, 'user-1')
-
-      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[19]).toBeNull()
-    })
-
-    it('nulls typeLabel when type is not other', async () => {
-      qr.query.mockResolvedValueOnce([makeContactRow({ type: 'customer' })])
-
-      await service.create(
-        SCHEMA,
-        { firstName: 'Jane', type: 'customer', typeLabel: 'Distribuidor' },
-        'user-1',
-      )
 
       const insertQuery: string = qr.query.mock.calls[0][0] as string
-      expect(insertQuery).toContain('type, type_label')
       const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[29]).toBe('customer')
-      expect(params[30]).toBeNull()
-    })
-
-    it('persists typeLabel when type is other', async () => {
-      qr.query.mockResolvedValueOnce([
-        makeContactRow({ type: 'other', type_label: 'Distribuidor' }),
-      ])
-
-      const result = await service.create(
-        SCHEMA,
-        { firstName: 'Jane', type: 'other', typeLabel: 'Distribuidor' },
-        'user-1',
-      )
-
-      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[29]).toBe('other')
-      expect(params[30]).toBe('Distribuidor')
-      expect(result.type).toBe('other')
-      expect(result.typeLabel).toBe('Distribuidor')
-    })
-
-    it('defaults type and typeLabel to null when omitted', async () => {
-      qr.query.mockResolvedValueOnce([makeContactRow()])
-
-      const result = await service.create(SCHEMA, { firstName: 'Jane' }, 'user-1')
-
-      const params: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(params[29]).toBeNull()
-      expect(params[30]).toBeNull()
-      expect(result.type).toBeNull()
-      expect(result.typeLabel).toBeNull()
+      expect(params[11]).toBe(LifecycleStage.SUBSCRIBER)
+      expect(insertQuery).not.toMatch(/job_title|lead_score|score|type_label|opt_out_|data_consent/)
     })
   })
 
@@ -469,50 +394,6 @@ describe('ContactsService', () => {
         { email: 'new@example.com' },
         { force: true, excludeId: 'c-1' },
       )
-    })
-
-    it('clears type_label when the type changes away from other', async () => {
-      qr.query
-        .mockResolvedValueOnce([{ id: 'c-1' }])
-        .mockResolvedValueOnce([makeContactRow({ type: 'customer' })])
-
-      const result = await service.update(SCHEMA, 'c-1', { type: 'customer' })
-
-      const updateQuery: string = qr.query.mock.calls[1][0] as string
-      expect(updateQuery).toContain('type = $')
-      expect(updateQuery).toContain('type_label = $')
-      const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(params[0]).toBe('customer')
-      expect(params[1]).toBeNull()
-      expect(result.type).toBe('customer')
-      expect(result.typeLabel).toBeNull()
-    })
-
-    it('persists typeLabel when the type changes to other', async () => {
-      qr.query
-        .mockResolvedValueOnce([{ id: 'c-1' }])
-        .mockResolvedValueOnce([makeContactRow({ type: 'other', type_label: 'Aliado' })])
-
-      const result = await service.update(SCHEMA, 'c-1', { type: 'other', typeLabel: 'Aliado' })
-
-      const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(params[0]).toBe('other')
-      expect(params[1]).toBe('Aliado')
-      expect(result.typeLabel).toBe('Aliado')
-    })
-
-    it('updates only type_label when typeLabel comes without type', async () => {
-      qr.query
-        .mockResolvedValueOnce([{ id: 'c-1' }])
-        .mockResolvedValueOnce([makeContactRow({ type: 'other', type_label: 'Mentor' })])
-
-      await service.update(SCHEMA, 'c-1', { typeLabel: 'Mentor' })
-
-      const updateQuery: string = qr.query.mock.calls[1][0] as string
-      expect(updateQuery).toContain('type_label = $')
-      expect(updateQuery).not.toContain('SET type = $')
-      const params: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(params[0]).toBe('Mentor')
     })
 
     it('emits a ContactUpdated audit event for the updated contact', async () => {

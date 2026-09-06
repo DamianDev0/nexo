@@ -2,17 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq'
 import { Logger } from '@nestjs/common'
 import type { Job } from 'bullmq'
 import { QUEUE_NAMES } from '@/shared/queue/queue-names'
-
-export interface MessageJobData {
-  schemaName: string
-  tenantId: string
-  templateId: string
-  channel: string
-  recipient: string
-  subject: string | null
-  renderedBody: string
-  variables: Record<string, string>
-}
+import type { MessageJobData } from '@/shared/queue/message-job.interfaces'
 
 @Processor(QUEUE_NAMES.MESSAGES)
 export class MessageQueueProcessor extends WorkerHost {

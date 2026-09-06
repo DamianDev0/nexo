@@ -4,7 +4,6 @@ import type { TFunction } from 'i18next'
 
 import { buildFieldFormSchema } from '@/features/manage-settings/lib/field-form.schema'
 
-
 const t = ((key: string) => key) as TFunction
 const schema = buildFieldFormSchema(t)
 

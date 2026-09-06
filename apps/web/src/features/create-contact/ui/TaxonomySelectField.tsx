@@ -16,7 +16,7 @@ import type { Control } from 'react-hook-form'
 
 type TaxonomySelectFieldProps = {
   readonly control: Control<ContactFormValues>
-  readonly name: 'status' | 'source' | 'type' | 'lifecycleStage'
+  readonly name: 'status' | 'source' | 'lifecycleStage'
   readonly label: string
   readonly placeholder?: string
   readonly choices: ReadonlyArray<TaxonomyChoice>

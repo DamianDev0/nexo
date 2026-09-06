@@ -16,16 +16,12 @@ import type {
 import {
   CONTACT_COLUMNS,
   CONTACT_LIST_COLUMNS,
-  CONTACT_LIST_FILTERS,
-  CONTACT_SEARCH,
-  FILTERABLE_COLUMNS,
   REASSIGN_TAXONOMY_SQL,
   SORTABLE_COLUMNS,
   TAXONOMY_USAGE_SQL,
   type TaxonomyColumn,
 } from '../constants/contact.constants'
-import { advancedFilterClauses } from '@/shared/database/advanced-filter-sql'
-import { searchClause } from '@/shared/database/search-sql'
+import { buildContactWhereClause } from '@/shared/database/contact-filter-sql'
 import { sqlRows } from '@/shared/database/sql.util'
 
 @Injectable()
@@ -38,7 +34,7 @@ export class ContactsRepository {
       const limit = query.limit ?? DEFAULT_PAGE_SIZE
       const offset = (page - 1) * limit
 
-      const { where, params } = this.buildWhereClause(query)
+      const { where, params } = buildContactWhereClause(query)
 
       const countRows = await sqlRows<[{ count: string }]>(
         qr,
@@ -62,6 +58,27 @@ export class ContactsRepository {
     })
   }
 
+  async countArchived(schemaName: string): Promise<number> {
+    return this.db.query(schemaName, async (qr): Promise<number> => {
+      const rows = await sqlRows<[{ count: string }]>(
+        qr,
+        `SELECT COUNT(*)::text AS count FROM contacts WHERE is_active = false`,
+      )
+      return Number.parseInt(rows[0].count, 10)
+    })
+  }
+
+  async restoreById(qr: QueryRunner, contactId: string): Promise<ContactRow | null> {
+    const rows = await sqlRows<ContactRow[]>(
+      qr,
+      `UPDATE contacts SET is_active = true, updated_at = NOW()
+       WHERE id = $1 AND is_active = false
+       RETURNING ${CONTACT_COLUMNS}`,
+      [contactId],
+    )
+    return rows[0] ?? null
+  }
+
   async countByStatus(schemaName: string): Promise<ContactStatusCountRow[]> {
     return this.db.query(schemaName, async (qr): Promise<ContactStatusCountRow[]> => {
       const rows = await sqlRows<ContactStatusCountRow[]>(
@@ -78,7 +95,6 @@ export class ContactsRepository {
   async taxonomyUsage(schemaName: string): Promise<{
     statuses: TaxonomyUsageCountRow[]
     sources: TaxonomyUsageCountRow[]
-    types: TaxonomyUsageCountRow[]
     lifecycleStages: TaxonomyUsageCountRow[]
     tags: TaxonomyUsageCountRow[]
   }> {
@@ -86,10 +102,9 @@ export class ContactsRepository {
       const grouped = (column: TaxonomyColumn) =>
         sqlRows<TaxonomyUsageCountRow[]>(qr, TAXONOMY_USAGE_SQL[column])
 
-      const [statuses, sources, types, lifecycleStages, tags] = await Promise.all([
+      const [statuses, sources, lifecycleStages, tags] = await Promise.all([
         grouped('status'),
         grouped('source'),
-        grouped('type'),
         grouped('lifecycle'),
         sqlRows<TaxonomyUsageCountRow[]>(
           qr,
@@ -100,7 +115,7 @@ export class ContactsRepository {
         ),
       ])
 
-      return { statuses, sources, types, lifecycleStages, tags }
+      return { statuses, sources, lifecycleStages, tags }
     })
   }
 
@@ -172,14 +187,10 @@ export class ContactsRepository {
       qr,
       `INSERT INTO contacts (
          first_name, last_name, email, phone, whatsapp,
-         document_type, document_number, job_title, linkedin_url, birthday,
-         address, city, department, municipio_code,
-         status, lifecycle_stage, source, lead_score,
-         data_consent, consent_date, consent_source,
-         opt_out_email, opt_out_sms, opt_out_whatsapp,
-         tags, company_id, assigned_to_id, custom_fields, created_by,
-         type, type_label, avatar_url
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32)
+         document_type, document_number, avatar_url, city, municipio_code,
+         status, lifecycle_stage, source,
+         tags, company_id, assigned_to_id, custom_fields, created_by
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
        RETURNING ${CONTACT_COLUMNS}`,
       [
         data.firstName,
@@ -189,31 +200,17 @@ export class ContactsRepository {
         data.whatsapp,
         data.documentType,
         data.documentNumber,
-        data.jobTitle,
-        data.linkedinUrl,
-        data.birthday,
-        data.address,
+        data.avatarUrl,
         data.city,
-        data.department,
         data.municipioCode,
         data.status,
         data.lifecycleStage,
         data.source,
-        data.leadScore,
-        data.dataConsent,
-        data.consentDate,
-        data.consentSource,
-        data.optOutEmail,
-        data.optOutSms,
-        data.optOutWhatsapp,
         data.tags,
         data.companyId,
         data.assignedToId,
         data.customFields,
         data.createdBy,
-        data.type,
-        data.typeLabel,
-        data.avatarUrl,
       ],
     )
     return rows[0] ?? null
@@ -276,7 +273,7 @@ export class ContactsRepository {
   async findEnabledTagNames(qr: QueryRunner): Promise<string[]> {
     const rows = await sqlRows<Array<{ name: string }>>(
       qr,
-      `SELECT name FROM tags WHERE entity_type = 'contact' AND enabled = true`,
+      `SELECT name FROM tags WHERE entity_type = 'contact' AND enabled = true AND deleted_at IS NULL`,
       [],
     )
     return rows.map((row) => row.name)
@@ -307,31 +304,6 @@ export class ContactsRepository {
       [contactId],
     )
     return rows
-  }
-
-  private buildWhereClause(query: ContactListQuery): { where: string; params: unknown[] } {
-    const conditions: string[] = ['is_active = true']
-    const params: unknown[] = []
-
-    const push = (condition: string, value: unknown) => {
-      params.push(value)
-      conditions.push(condition.replace('?', `$${params.length}`))
-    }
-
-    if (query.q) conditions.push(searchClause(query.q, CONTACT_SEARCH, params))
-
-    for (const [key, clause] of CONTACT_LIST_FILTERS) {
-      const value = query[key]
-      if (value === undefined || value === null || value === '') continue
-      if (Array.isArray(value) && value.length === 0) continue
-      push(clause, value)
-    }
-
-    if (query.advanced?.length) {
-      conditions.push(...advancedFilterClauses(query.advanced, FILTERABLE_COLUMNS, params))
-    }
-
-    return { where: conditions.join(' AND '), params }
   }
 
   private buildOrderClause(query: ContactListQuery): string {

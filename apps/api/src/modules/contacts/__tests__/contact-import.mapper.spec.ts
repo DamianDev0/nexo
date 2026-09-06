@@ -35,11 +35,6 @@ describe('contactImportMapper', () => {
         'Referido',
       ])
     })
-
-    it('reads a lead score out of a noisy cell', () => {
-      expect(contactImportMapper.normalizeValue('leadScore', '82 pts')).toBe(82)
-      expect(contactImportMapper.normalizeValue('leadScore', 'n/a')).toBe(0)
-    })
   })
 
   describe('validateField', () => {
@@ -60,11 +55,6 @@ describe('contactImportMapper', () => {
     it('rejects unknown document types', () => {
       expect(contactImportMapper.validateField('documentType', 'passport')).not.toBeNull()
       expect(contactImportMapper.validateField('documentType', 'cc')).toBeNull()
-    })
-
-    it('keeps the lead score inside its range', () => {
-      expect(contactImportMapper.validateField('leadScore', 140)).not.toBeNull()
-      expect(contactImportMapper.validateField('leadScore', 82)).toBeNull()
     })
 
     it('leaves tenant taxonomy values alone — the tenant owns those keys', () => {

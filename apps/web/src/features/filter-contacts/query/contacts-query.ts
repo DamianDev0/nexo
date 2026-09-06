@@ -3,7 +3,12 @@ import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from '@/shared/config/pagination'
 import { isComplete, parseConditions } from '@/shared/ui/organisms/filter-bar'
 
 import { EMPTY_QUICK_FILTERS, type QuickFilterState } from '../config/quick-filters.constants'
-import { parseLimitParam, parseListParam, parsePageParam } from '../lib/contact-lists'
+import {
+  isArchivedList,
+  parseLimitParam,
+  parseListParam,
+  parsePageParam,
+} from '../lib/contact-lists'
 import { parseQuickFilters } from '../lib/quick-filters'
 
 import type { ContactListQuery, FilterCondition } from '@repo/shared-types'
@@ -43,10 +48,12 @@ export function contactListQuery(
   advanced: ReadonlyArray<FilterCondition> = [],
 ): ContactListQuery {
   const conditions = [...advanced, ...quickFilterConditions(filters)]
+  const archived = isArchivedList(status)
   return {
     q: search.trim() || undefined,
     advanced: conditions.length > 0 ? conditions : undefined,
-    status: status ?? undefined,
+    status: archived ? undefined : (status ?? undefined),
+    archived: archived || undefined,
     page: pagination.page,
     limit: pagination.limit,
     sortBy: pagination.sort?.field,

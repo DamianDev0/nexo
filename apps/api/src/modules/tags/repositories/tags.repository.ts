@@ -1,10 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import type { QueryRunner } from 'typeorm'
 import type { TagEntityType } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import type { TagRow } from '../interfaces/tag-row.interfaces'
+import type { DeletedTagRow, TagRow } from '../interfaces/tag-row.interfaces'
 import { sqlRows } from '@/shared/database/sql.util'
 
-const TAG_COLUMNS = 'id, name, color, description, enabled, entity_type, created_at'
+const TAG_COLUMNS = 'id, name, color, description, enabled, entity_type, deleted_at, created_at'
+
+type TagLookup = { id: string; deleted_at: string | null }
 
 @Injectable()
 export class TagsRepository {
@@ -12,11 +15,16 @@ export class TagsRepository {
 
   async findPage(
     schemaName: string,
-    query: { entityType?: TagEntityType; page: number; limit: number },
+    query: { entityType?: TagEntityType; deleted?: boolean; page: number; limit: number },
   ): Promise<{ rows: TagRow[]; total: number }> {
     return this.db.query(schemaName, async (qr): Promise<{ rows: TagRow[]; total: number }> => {
-      const whereParams: unknown[] = query.entityType ? [query.entityType] : []
-      const where = query.entityType ? ` WHERE entity_type = $1` : ''
+      const conditions = [query.deleted ? 'deleted_at IS NOT NULL' : 'deleted_at IS NULL']
+      const whereParams: unknown[] = []
+      if (query.entityType) {
+        whereParams.push(query.entityType)
+        conditions.push(`entity_type = $${whereParams.length}`)
+      }
+      const where = ` WHERE ${conditions.join(' AND ')}`
 
       const countRows = await sqlRows<Array<{ count: string }>>(
         qr,
@@ -41,14 +49,16 @@ export class TagsRepository {
     data: { name: string; color?: string; description?: string; entityType: TagEntityType },
   ): Promise<TagRow> {
     return this.db.query(schemaName, async (qr): Promise<TagRow> => {
-      const existing = await sqlRows<TagRow[]>(
+      const existing = await sqlRows<TagLookup[]>(
         qr,
-        `SELECT id FROM tags WHERE entity_type = $1 AND LOWER(name) = LOWER($2)`,
+        `SELECT id, deleted_at FROM tags WHERE entity_type = $1 AND LOWER(name) = LOWER($2)`,
         [data.entityType, data.name],
       )
-      if (existing.length > 0) {
+      const match = existing[0]
+      if (match?.deleted_at === null) {
         throw new BadRequestException(`Tag "${data.name}" already exists for ${data.entityType}`)
       }
+      if (match) return this.reviveAs(qr, match.id, data)
 
       const rows = await sqlRows<TagRow[]>(
         qr,
@@ -87,9 +97,11 @@ export class TagsRepository {
       }
 
       if (sets.length === 0) {
-        const rows = await sqlRows<TagRow[]>(qr, `SELECT ${TAG_COLUMNS} FROM tags WHERE id = $1`, [
-          tagId,
-        ])
+        const rows = await sqlRows<TagRow[]>(
+          qr,
+          `SELECT ${TAG_COLUMNS} FROM tags WHERE id = $1 AND deleted_at IS NULL`,
+          [tagId],
+        )
         if (!rows[0]) throw new NotFoundException(`Tag ${tagId} not found`)
         return rows[0]
       }
@@ -98,7 +110,7 @@ export class TagsRepository {
       if (data.name) {
         const previous = await sqlRows<Array<{ name: string }>>(
           qr,
-          `SELECT name FROM tags WHERE id = $1`,
+          `SELECT name FROM tags WHERE id = $1 AND deleted_at IS NULL`,
           [tagId],
         )
         if (!previous[0]) throw new NotFoundException(`Tag ${tagId} not found`)
@@ -108,7 +120,7 @@ export class TagsRepository {
       params.push(tagId)
       const result = await sqlRows<unknown>(
         qr,
-        `UPDATE tags SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING ${TAG_COLUMNS}`,
+        `UPDATE tags SET ${sets.join(', ')} WHERE id = $${params.length} AND deleted_at IS NULL RETURNING ${TAG_COLUMNS}`,
         params,
       )
 
@@ -128,9 +140,17 @@ export class TagsRepository {
 
   async remove(schemaName: string, tagId: string): Promise<void> {
     return this.db.query(schemaName, async (qr): Promise<void> => {
-      const result = await sqlRows<unknown>(qr, `DELETE FROM tags WHERE id = $1 RETURNING name`, [
-        tagId,
-      ])
+      const result = await sqlRows<unknown>(
+        qr,
+        `UPDATE tags
+         SET deleted_at = NOW(),
+             deleted_from_contact_ids = COALESCE(
+               (SELECT array_agg(c.id) FROM contacts c WHERE tags.name = ANY(c.tags)), '{}'
+             )
+         WHERE id = $1 AND deleted_at IS NULL
+         RETURNING name`,
+        [tagId],
+      )
       const row = firstReturnedRow<{ name: string }>(result)
       if (!row) throw new NotFoundException(`Tag ${tagId} not found`)
 
@@ -138,6 +158,49 @@ export class TagsRepository {
         row.name,
       ])
     })
+  }
+
+  async restore(schemaName: string, tagId: string): Promise<TagRow> {
+    return this.db.query(schemaName, async (qr): Promise<TagRow> => {
+      const deleted = await sqlRows<DeletedTagRow[]>(
+        qr,
+        `SELECT name, deleted_from_contact_ids FROM tags WHERE id = $1 AND deleted_at IS NOT NULL`,
+        [tagId],
+      )
+      const row = deleted[0]
+      if (!row) throw new NotFoundException(`Deleted tag ${tagId} not found`)
+
+      const rows = await sqlRows<TagRow[]>(
+        qr,
+        `UPDATE tags SET deleted_at = NULL, deleted_from_contact_ids = '{}'
+         WHERE id = $1 RETURNING ${TAG_COLUMNS}`,
+        [tagId],
+      )
+      if (row.deleted_from_contact_ids.length > 0) {
+        await qr.query(
+          `UPDATE contacts SET tags = array_append(tags, $1), updated_at = NOW()
+           WHERE id = ANY($2::uuid[]) AND NOT ($1 = ANY(tags))`,
+          [row.name, row.deleted_from_contact_ids],
+        )
+      }
+      return rows[0]!
+    })
+  }
+
+  private async reviveAs(
+    qr: QueryRunner,
+    tagId: string,
+    data: { name: string; color?: string; description?: string },
+  ): Promise<TagRow> {
+    const rows = await sqlRows<TagRow[]>(
+      qr,
+      `UPDATE tags
+       SET deleted_at = NULL, deleted_from_contact_ids = '{}', name = $2,
+           color = COALESCE($3, color), description = COALESCE($4, description)
+       WHERE id = $1 RETURNING ${TAG_COLUMNS}`,
+      [tagId, data.name, data.color ?? null, data.description ?? null],
+    )
+    return rows[0]!
   }
 }
 

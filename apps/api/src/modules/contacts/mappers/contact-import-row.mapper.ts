@@ -66,8 +66,6 @@ function toContactData(
     status: string
   },
 ): CreateContactData {
-  const leadScore = data['leadScore']
-
   return {
     firstName: resolved.firstName,
     lastName: text(data, 'lastName'),
@@ -76,26 +74,12 @@ function toContactData(
     whatsapp: text(data, 'whatsapp'),
     documentType: resolved.documentType,
     documentNumber: resolved.documentNumber,
-    jobTitle: text(data, 'jobTitle'),
-    linkedinUrl: null,
-    birthday: null,
-    address: text(data, 'address'),
+    avatarUrl: null,
     city: text(data, 'city'),
-    department: text(data, 'department'),
     municipioCode: null,
     status: resolved.status,
     lifecycleStage: resolved.lifecycleStage,
     source: text(data, 'source') ?? 'import',
-    type: text(data, 'type'),
-    typeLabel: null,
-    avatarUrl: null,
-    leadScore: typeof leadScore === 'number' ? leadScore : 0,
-    dataConsent: false,
-    consentDate: null,
-    consentSource: null,
-    optOutEmail: false,
-    optOutSms: false,
-    optOutWhatsapp: false,
     tags: resolved.tags,
     companyId: null,
     assignedToId: null,

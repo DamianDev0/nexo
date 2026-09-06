@@ -18,11 +18,7 @@ function bind(params: unknown[], value: unknown): string {
   return `$${params.length}`
 }
 
-function textClause(
-  expr: string,
-  condition: FilterCondition,
-  params: unknown[],
-): string | null {
+function textClause(expr: string, condition: FilterCondition, params: unknown[]): string | null {
   const value = String(condition.value ?? '')
   switch (condition.operator) {
     case 'contains':

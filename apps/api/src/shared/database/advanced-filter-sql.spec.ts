@@ -57,7 +57,7 @@ describe('advancedFilterClauses', () => {
       COLUMNS,
       params,
     )
-    expect(clauses).toEqual(["LOWER(custom_fields->>$1) = LOWER($2)"])
+    expect(clauses).toEqual(['LOWER(custom_fields->>$1) = LOWER($2)'])
     expect(params).toEqual(['presupuesto', '5000'])
   })
 
@@ -92,8 +92,6 @@ describe('advancedFilterClauses', () => {
 
   it('skips value-requiring conditions with no value', () => {
     const params: unknown[] = []
-    expect(
-      advancedFilterClauses([{ field: 'email', operator: 'is' }], COLUMNS, params),
-    ).toEqual([])
+    expect(advancedFilterClauses([{ field: 'email', operator: 'is' }], COLUMNS, params)).toEqual([])
   })
 })

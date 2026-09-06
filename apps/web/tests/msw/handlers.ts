@@ -32,28 +32,13 @@ function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
     whatsapp: null,
     documentType: DocumentType.CC,
     documentNumber: '123456789',
-    jobTitle: null,
-    linkedinUrl: null,
-    birthday: null,
-    address: null,
     city: 'Bogota',
-    department: null,
     municipioCode: null,
-    country: 'CO',
     status: 'new',
     statusChangedAt: new Date().toISOString(),
     avatarUrl: null,
     lifecycleStage: LifecycleStage.LEAD,
     source: 'manual',
-    type: null,
-    typeLabel: null,
-    leadScore: 0,
-    dataConsent: true,
-    consentDate: null,
-    consentSource: null,
-    optOutEmail: false,
-    optOutSms: false,
-    optOutWhatsapp: false,
     lastContactedAt: null,
     tags: [],
     companyId: null,
@@ -63,6 +48,7 @@ function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     noteCount: 0,
+    optedOutChannels: [],
     ...overrides,
   }
 }
@@ -84,13 +70,10 @@ const COLUMN_KEYS = [
   'phone',
   'whatsapp',
   'documentNumber',
-  'jobTitle',
   'lifecycleStage',
   'source',
-  'type',
   'tags',
   'city',
-  'leadScore',
   'lastContactedAt',
   'createdAt',
 ] as const
@@ -100,12 +83,11 @@ const SORT_FIELD_BY_COLUMN: Partial<Record<(typeof COLUMN_KEYS)[number], Contact
   status: 'status',
   email: 'email',
   city: 'city',
-  leadScore: 'leadScore',
   lastContactedAt: 'lastContactedAt',
   createdAt: 'createdAt',
 }
 
-const HIDDEN_BY_DEFAULT = new Set<string>(['whatsapp', 'documentNumber', 'jobTitle', 'type'])
+const HIDDEN_BY_DEFAULT = new Set<string>(['whatsapp', 'documentNumber'])
 
 export const CONTACT_COLUMNS_FIXTURE: ContactColumnDef[] = COLUMN_KEYS.map((key) => ({
   key,
@@ -128,7 +110,7 @@ export const handlers = [
         tableState: {},
         columns: CONTACT_COLUMNS_FIXTURE,
         quickFilters: { statuses: [], sources: [], lifecycleStages: [] },
-        counts: { total: CONTACTS_FIXTURE.length, byStatus: {} },
+        counts: { total: CONTACTS_FIXTURE.length, archived: 0, byStatus: {} },
       },
       timestamp: new Date().toISOString(),
       path: '/contacts/workspace',

@@ -1,4 +1,11 @@
-import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsObject, IsString, MaxLength } from 'class-validator'
+import {
+  ArrayMaxSize,
+  ArrayNotEmpty,
+  IsArray,
+  IsObject,
+  IsString,
+  MaxLength,
+} from 'class-validator'
 
 export class SendTemplateDto {
   @IsArray()

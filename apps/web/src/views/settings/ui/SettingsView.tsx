@@ -11,7 +11,7 @@ import {
   StatusPane,
   TagsPane,
   ThemePane,
-  TypesPane,
+  TrashPane,
   TypographyPane,
 } from '@/features/manage-settings'
 
@@ -25,11 +25,11 @@ const PANES = {
   contactStatus: StatusPane,
   contactLifecycle: LifecyclePane,
   contactSources: SourcesPane,
-  contactTypes: TypesPane,
   contactTags: TagsPane,
   fields: FieldsPane,
   pipelines: PipelinesPane,
   activities: ActivitiesPane,
+  trash: TrashPane,
 } as const
 
 type SettingsPaneKey = keyof typeof PANES

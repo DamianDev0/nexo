@@ -243,6 +243,21 @@ export class ContactsController {
     return this.contactsService.remove(ctx.schemaName, id)
   }
 
+  @Post(':id/restore')
+  @ApiEndpoint({
+    summary: 'Restore an archived contact',
+    roles: [UserRole.MANAGER],
+    param: 'Contact UUID',
+    status: HttpStatus.OK,
+  })
+  restore(
+    @Param('id', ParseUUIDPipe) id: string,
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<Contact> {
+    return this.contactsService.restore(ctx.schemaName, id, user.id)
+  }
+
   @Get(':id/timeline')
   @ApiEndpoint({
     summary: 'Get contact timeline (activities + deals)',

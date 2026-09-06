@@ -3,11 +3,7 @@ import { CREATABLE_FIELD_TYPES } from '../config/custom-fields.constants'
 import { buildSelectOptions, fieldHasOptions } from './custom-field-edit'
 import { slugifyTaxonomyKey } from './taxonomy-edit'
 
-import type {
-  CustomFieldHeaderSuggestion,
-  CustomFieldType,
-  FieldDef,
-} from '@repo/shared-types'
+import type { CustomFieldHeaderSuggestion, CustomFieldType, FieldDef } from '@repo/shared-types'
 
 export type HeaderImportRow = {
   column: string

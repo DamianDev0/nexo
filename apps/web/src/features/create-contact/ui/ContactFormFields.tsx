@@ -13,7 +13,6 @@ import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 import { useAddressAutofill } from '../model/useAddressAutofill'
 
 import { ContactPhoneFields } from './ContactPhoneFields'
-import { ContactTypeFields } from './ContactTypeFields'
 import { TaxonomySelectField } from './TaxonomySelectField'
 
 import type { ContactFormValues } from '../lib/contact-form.schema'
@@ -26,7 +25,6 @@ type ContactFormFieldsProps = {
   readonly taxonomy: {
     readonly statuses: ReadonlyArray<TaxonomyChoice>
     readonly sources: ReadonlyArray<TaxonomyChoice>
-    readonly types: ReadonlyArray<TaxonomyChoice>
     readonly lifecycleStages: ReadonlyArray<TaxonomyChoice>
   }
   readonly onProbeField?: (field: 'email' | 'phone') => void
@@ -40,7 +38,7 @@ export function ContactFormFields({
 }: Readonly<ContactFormFieldsProps>) {
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
-  const { statuses, sources, types, lifecycleStages } = taxonomy
+  const { statuses, sources, lifecycleStages } = taxonomy
   const handlePlaceSelect = useAddressAutofill(setValue)
 
   return (
@@ -148,7 +146,6 @@ export function ContactFormFields({
           choices={lifecycleStages}
         />
       </div>
-      <ContactTypeFields control={control} choices={types} />
     </div>
   )
 }

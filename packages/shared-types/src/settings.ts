@@ -210,6 +210,16 @@ export type SelectOption = {
   color?: string
 }
 
+export const FIELD_GROUPS = [
+  'identity',
+  'commercial',
+  'location',
+  'communication',
+  'other',
+] as const
+
+export type FieldGroup = (typeof FIELD_GROUPS)[number]
+
 export type FieldDef = {
   key: string
   label: string
@@ -218,6 +228,8 @@ export type FieldDef = {
   unique: boolean
   order: number
   isActive?: boolean
+  isSystem?: boolean
+  group?: FieldGroup
   showInForm?: boolean
   filterable?: boolean
   sortable?: boolean
@@ -457,7 +469,6 @@ export type TaxonomyOption = {
 export type ContactTaxonomy = {
   statuses: TaxonomyOption[]
   sources: TaxonomyOption[]
-  types: TaxonomyOption[]
   lifecycleStages: TaxonomyOption[]
 }
 
@@ -492,13 +503,6 @@ const DEFAULT_CONTACT_SOURCES: TaxonomyOption[] = [
   systemOption('chat', '#818CF8', 13),
 ]
 
-const DEFAULT_CONTACT_TYPES: TaxonomyOption[] = [
-  systemOption('customer', '#60A5FA', 1),
-  systemOption('supplier', '#FBBF24', 2),
-  systemOption('partner', '#A78BFA', 3),
-  systemOption('other', '#9CA3AF', 4),
-]
-
 const DEFAULT_LIFECYCLE_STAGES: TaxonomyOption[] = [
   systemOption(LifecycleStage.SUBSCRIBER, '#94A3B8', 1),
   systemOption(LifecycleStage.LEAD, '#60A5FA', 2),
@@ -512,7 +516,6 @@ const DEFAULT_LIFECYCLE_STAGES: TaxonomyOption[] = [
 export const DEFAULT_CONTACT_TAXONOMY: ContactTaxonomy = {
   statuses: DEFAULT_CONTACT_STATUSES,
   sources: DEFAULT_CONTACT_SOURCES,
-  types: DEFAULT_CONTACT_TYPES,
   lifecycleStages: DEFAULT_LIFECYCLE_STAGES,
 }
 

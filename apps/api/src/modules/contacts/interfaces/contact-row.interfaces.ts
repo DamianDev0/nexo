@@ -1,4 +1,4 @@
-import type { ContactSortField, FilterCondition } from '@repo/shared-types'
+import type { ConsentChannel, ContactSortField, FilterCondition } from '@repo/shared-types'
 
 export interface ContactRow {
   id: string
@@ -9,28 +9,13 @@ export interface ContactRow {
   whatsapp: string | null
   document_type: string | null
   document_number: string | null
-  job_title: string | null
-  linkedin_url: string | null
-  birthday: string | null
-  address: string | null
+  avatar_url: string | null
   city: string | null
-  department: string | null
   municipio_code: string | null
-  country: string | null
   status: string
   status_changed_at: string | null
-  avatar_url: string | null
   lifecycle_stage: string | null
   source: string | null
-  type: string | null
-  type_label: string | null
-  lead_score: number
-  data_consent: boolean | null
-  consent_date: string | null
-  consent_source: string | null
-  opt_out_email: boolean | null
-  opt_out_sms: boolean | null
-  opt_out_whatsapp: boolean | null
   last_contacted_at: string | null
   tags: string[]
   company_id: string | null
@@ -41,6 +26,7 @@ export interface ContactRow {
   created_at: string
   updated_at: string
   note_count?: number
+  opted_out_channels?: ConsentChannel[]
 }
 
 export interface ActivityRow {
@@ -80,6 +66,7 @@ export interface ContactListQuery {
   createdTo?: string
   lastContactedFrom?: string
   lastContactedTo?: string
+  archived?: boolean
   sortBy?: ContactSortField
   sortDir?: 'asc' | 'desc'
   page?: number
@@ -111,26 +98,12 @@ export interface CreateContactData {
   whatsapp: string | null
   documentType: string | null
   documentNumber: string | null
-  jobTitle: string | null
-  linkedinUrl: string | null
-  birthday: string | null
-  address: string | null
+  avatarUrl: string | null
   city: string | null
-  department: string | null
   municipioCode: string | null
   status: string
   lifecycleStage: string
   source: string | null
-  type: string | null
-  typeLabel: string | null
-  avatarUrl: string | null
-  leadScore: number
-  dataConsent: boolean
-  consentDate: Date | null
-  consentSource: string | null
-  optOutEmail: boolean
-  optOutSms: boolean
-  optOutWhatsapp: boolean
   tags: string[]
   companyId: string | null
   assignedToId: string | null

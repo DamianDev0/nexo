@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-
 import type { HeaderImportRow } from '@/features/manage-settings/lib/header-import'
 import type { CustomFieldHeaderSuggestion, FieldDef } from '@repo/shared-types'
 
@@ -115,10 +114,7 @@ describe('buildImportFieldDefs', () => {
   })
 
   it('seeds select options from the sample values', () => {
-    const defs = buildImportFieldDefs(
-      [row({ type: 'select', sampleValues: ['Alta', 'Baja'] })],
-      [],
-    )
+    const defs = buildImportFieldDefs([row({ type: 'select', sampleValues: ['Alta', 'Baja'] })], [])
 
     expect(defs[0]?.options?.map((option) => option.label)).toEqual(['Alta', 'Baja'])
   })

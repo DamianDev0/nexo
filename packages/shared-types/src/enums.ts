@@ -75,6 +75,7 @@ export enum NotificationType {
   PAYMENT_FAILED = 'payment.failed',
   STOCK_LOW = 'stock.low',
   IMPORT_COMPLETED = 'import.completed',
+  BULK_ACTION_COMPLETED = 'bulk_action.completed',
   WHATSAPP_NEW_MESSAGE = 'whatsapp.new_message',
   MENTION = 'mention',
   SYSTEM = 'system',

@@ -8,6 +8,11 @@ import { TenantConfigRepository } from '../repositories/tenant-config.repository
 import { DEFAULT_THEME } from '../constants/default-theme'
 import { DEFAULT_NOMENCLATURE } from '../constants/default-nomenclature'
 import { defaultSidebarFor } from '../constants/default-sidebar'
+import {
+  missingContactSystemFields,
+  retypedContactSystemFields,
+  withContactSystemFields,
+} from '../constants/contact-system-fields'
 import { withModuleStatus } from '../mappers/sidebar.mapper'
 import type { TenantTheme } from '../interfaces/tenant-theme.interface'
 import type { TenantNomenclature } from '../interfaces/nomenclature.interface'
@@ -152,7 +157,11 @@ export class TenantConfigService {
 
   async getCustomFields(tenantId: string): Promise<CustomFieldsConfig> {
     const config = await this.getRawConfig(tenantId)
-    return config.customFields ?? { contacts: [], companies: [], deals: [] }
+    const stored = config.customFields ?? { contacts: [], companies: [], deals: [] }
+    return {
+      ...stored,
+      contacts: withContactSystemFields(stored.contacts ?? [], config.industry?.sector),
+    }
   }
 
   async updateCustomFields(
@@ -160,6 +169,18 @@ export class TenantConfigService {
     updated: CustomFieldsConfig,
     slug: string,
   ): Promise<CustomFieldsConfig> {
+    const missing = missingContactSystemFields(updated.contacts)
+    if (missing.length > 0) {
+      throw new BadRequestException(
+        `System contact fields cannot be removed: ${missing.join(', ')}`,
+      )
+    }
+    const retyped = retypedContactSystemFields(updated.contacts)
+    if (retyped.length > 0) {
+      throw new BadRequestException(
+        `System contact fields cannot change type: ${retyped.join(', ')}`,
+      )
+    }
     await this.saveConfigSection(tenantId, 'customFields', updated)
     await this.cache.del(`tenant:slug:${slug}`)
     return updated
@@ -316,7 +337,6 @@ function normalizeTaxonomy(stored: Partial<ContactTaxonomy> | undefined): Contac
   return {
     statuses: normalizeOptions(stored?.statuses, DEFAULT_CONTACT_TAXONOMY.statuses),
     sources: normalizeOptions(stored?.sources, DEFAULT_CONTACT_TAXONOMY.sources),
-    types: normalizeOptions(stored?.types, DEFAULT_CONTACT_TAXONOMY.types),
     lifecycleStages: normalizeOptions(
       stored?.lifecycleStages,
       DEFAULT_CONTACT_TAXONOMY.lifecycleStages,

@@ -7,7 +7,7 @@
  *   pnpm --filter api seed:contacts --tenant damiantest --purge
  *
  * Rows are tagged `seed` so `--purge` can remove exactly what this script created
- * without touching real data. Status, source and type keys are read from the
+ * without touching real data. Status and source keys are read from the
  * tenant's own contactTaxonomy, so the seeded rows always land in existing smart lists.
  */
 
@@ -35,7 +35,6 @@ interface TaxonomyEntry {
 interface TaxonomyConfig {
   statuses?: TaxonomyEntry[]
   sources?: TaxonomyEntry[]
-  types?: TaxonomyEntry[]
 }
 
 interface Options {
@@ -214,16 +213,13 @@ function buildRow(index: number, taxonomy: TaxonomyConfig) {
     phoneNumber(index),
     'CC',
     documentNumber(index),
-    pick(JOB_TITLES, index),
     place.city,
-    place.department,
     place.code,
     pick(enabledKeys(taxonomy.statuses, FALLBACK_STATUSES), index),
     pick(LIFECYCLE_STAGES, index),
     pick(enabledKeys(taxonomy.sources, FALLBACK_SOURCES), index),
-    pick(enabledKeys(taxonomy.types, FALLBACK_TYPES), index),
-    (index * 13) % 100,
     tagsFor(index),
+    JSON.stringify({ role: pick(JOB_TITLES, index) }),
   ]
 }
 
@@ -234,16 +230,13 @@ const COLUMNS = [
   'phone',
   'document_type',
   'document_number',
-  'job_title',
   'city',
-  'department',
   'municipio_code',
   'status',
   'lifecycle_stage',
   'source',
-  'type',
-  'lead_score',
   'tags',
+  'custom_fields',
 ]
 
 function insertStatement(schema: string, rowCount: number): string {

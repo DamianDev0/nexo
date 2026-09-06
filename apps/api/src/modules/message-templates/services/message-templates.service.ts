@@ -11,7 +11,7 @@ import type {
 } from '@repo/shared-types'
 import { QUEUE_NAMES } from '@/shared/queue/queue-names'
 import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
-import type { MessageJobData } from '../message-queue.processor'
+import type { MessageJobData } from '@/shared/queue/message-job.interfaces'
 import { MessageTemplatesRepository } from '../repositories/message-templates.repository'
 import { mapTemplate } from '../mappers/message-template.mapper'
 

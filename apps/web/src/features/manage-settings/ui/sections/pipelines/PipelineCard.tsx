@@ -34,9 +34,7 @@ export function PipelineCard({ pipeline, expanded, actions }: Readonly<PipelineC
           aria-label={expanded ? t('settings.pipelines.collapse') : t('settings.pipelines.expand')}
           onClick={() => actions.onToggleExpand(pipeline.id)}
         >
-          <CaretDownIcon
-            className={cn('size-4 transition-transform', expanded && 'rotate-180')}
-          />
+          <CaretDownIcon className={cn('size-4 transition-transform', expanded && 'rotate-180')} />
         </PillButton>
 
         <Input

@@ -6,12 +6,6 @@ import {
   validateDocumentNumber,
 } from '@repo/shared-utils'
 
-import {
-  CONTACT_HIGH_SCORE,
-  CONTACT_MEDIUM_SCORE,
-  type ScoreBand,
-} from '../config/contact-columns.constants'
-
 export function contactTelHref(phone: string): string {
   return `tel:${coPhoneE164(phone)}`
 }
@@ -34,12 +28,6 @@ export function contactPhoneLabel(phone: string): string {
 
 export function contactDocumentLabel(type: DocumentType | null, number: string): string {
   return type ? `${type.toUpperCase()} ${number}` : number
-}
-
-export function contactScoreBand(score: number): ScoreBand {
-  if (score >= CONTACT_HIGH_SCORE) return 'high'
-  if (score >= CONTACT_MEDIUM_SCORE) return 'medium'
-  return 'low'
 }
 
 export function daysSince(iso: string): number {

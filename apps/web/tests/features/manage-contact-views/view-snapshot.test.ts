@@ -11,7 +11,6 @@ import {
   type ViewSnapshot,
 } from '@/features/manage-contact-views/lib/view-snapshot'
 
-
 const view = (overrides: Partial<ContactView>): ContactView => ({
   id: 'v1',
   ownerId: 'u1',

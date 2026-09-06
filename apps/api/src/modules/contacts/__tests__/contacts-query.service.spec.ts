@@ -31,12 +31,12 @@ describe('ContactsService query extensions', () => {
     qr.query.mockResolvedValueOnce([{ count: '0' }]).mockResolvedValueOnce([])
 
     await service.findAll(SCHEMA, {
-      sortBy: 'leadScore',
+      sortBy: 'email',
       sortDir: 'asc',
     } as ContactListQuery)
 
     const [dataSql] = qr.query.mock.calls[1] as [string]
-    expect(dataSql).toContain('ORDER BY lead_score ASC NULLS LAST, id ASC')
+    expect(dataSql).toContain('ORDER BY email ASC NULLS LAST, id ASC')
   })
 
   it('falls back to created_at DESC when no sort is provided', async () => {
@@ -66,15 +66,27 @@ describe('ContactsService query extensions', () => {
     expect(params).toEqual(['customer', 'Bogota', '2026-01-01T00:00:00Z', '2026-07-01T00:00:00Z'])
   })
 
-  it('aggregates counts grouped by status in a single query', async () => {
-    qr.query.mockResolvedValueOnce([
-      { status: 'new', count: '4' },
-      { status: 'client', count: '2' },
-    ])
+  it('aggregates active counts by status and archived separately', async () => {
+    qr.query
+      .mockResolvedValueOnce([
+        { status: 'new', count: '4' },
+        { status: 'client', count: '2' },
+      ])
+      .mockResolvedValueOnce([{ count: '3' }])
 
     const counts = await service.counts(SCHEMA)
 
-    expect(qr.query).toHaveBeenCalledTimes(1)
-    expect(counts).toEqual({ total: 6, byStatus: { new: 4, client: 2 } })
+    expect(qr.query).toHaveBeenCalledTimes(2)
+    expect(counts).toEqual({ total: 6, archived: 3, byStatus: { new: 4, client: 2 } })
+  })
+
+  it('lists archived contacts when the archived flag is set', async () => {
+    qr.query.mockResolvedValueOnce([{ count: '0' }]).mockResolvedValueOnce([])
+
+    await service.findAll(SCHEMA, { archived: true } as ContactListQuery)
+
+    const [countSql] = qr.query.mock.calls[0] as [string]
+    expect(countSql).toContain('is_active = false')
+    expect(countSql).not.toContain('is_active = true')
   })
 })

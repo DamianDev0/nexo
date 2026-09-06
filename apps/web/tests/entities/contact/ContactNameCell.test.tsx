@@ -14,6 +14,7 @@ const LABELS = {
   preview: 'Vista rápida',
   addNote: 'Agregar nota',
   editTags: 'Editar etiquetas',
+  restore: 'restore',
   tags: {
     title: 'Etiquetas',
     count: (total: number) => `${total} etiquetas`,

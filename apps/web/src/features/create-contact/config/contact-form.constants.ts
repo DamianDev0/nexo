@@ -13,7 +13,5 @@ export const CONTACT_FORM_DEFAULTS: ContactFormValues = {
   avatarUrl: '',
   status: '',
   source: '',
-  type: '',
-  typeLabel: '',
   lifecycleStage: '',
 }

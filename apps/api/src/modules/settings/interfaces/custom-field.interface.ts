@@ -3,6 +3,7 @@ export type {
   CustomFieldEntity,
   SelectOption,
   FieldDef,
+  FieldGroup,
   CustomFieldsConfig,
   FieldPermissionLevel,
   FieldPermission,

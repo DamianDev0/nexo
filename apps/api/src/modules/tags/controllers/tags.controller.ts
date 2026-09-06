@@ -48,9 +48,19 @@ export class TagsController {
     return this.tagsService.update(ctx.schemaName, id, dto)
   }
 
+  @Post(':id/restore')
+  @ApiEndpoint({
+    summary: 'Restore a deleted tag and put it back on the contacts that had it',
+    roles: [UserRole.ADMIN],
+    status: HttpStatus.OK,
+  })
+  restore(@Param('id', ParseUUIDPipe) id: string, @TenantCtx() ctx: TenantContext): Promise<Tag> {
+    return this.tagsService.restore(ctx.schemaName, id)
+  }
+
   @Delete(':id')
   @ApiEndpoint({
-    summary: 'Delete a tag',
+    summary: 'Move a tag to the trash and take it off every contact',
     roles: [UserRole.ADMIN],
     status: HttpStatus.NO_CONTENT,
   })

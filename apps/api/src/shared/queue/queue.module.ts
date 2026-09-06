@@ -27,6 +27,7 @@ import { QUEUE_NAMES } from './queue-names'
       { name: QUEUE_NAMES.MESSAGES },
       { name: QUEUE_NAMES.INVOICES },
       { name: QUEUE_NAMES.IMPORTS },
+      { name: QUEUE_NAMES.BULK_ACTIONS },
     ),
   ],
   exports: [BullModule],

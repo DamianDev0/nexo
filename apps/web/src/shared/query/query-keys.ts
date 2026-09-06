@@ -1,4 +1,8 @@
-import type { ContactDuplicateProbeQuery, ContactListQuery } from '@repo/shared-types'
+import type {
+  BulkActionListQuery,
+  ContactDuplicateProbeQuery,
+  ContactListQuery,
+} from '@repo/shared-types'
 
 const CONTACTS_LIST = ['contacts', 'list'] as const
 
@@ -17,6 +21,11 @@ export const QUERY_KEYS = {
     duplicateProbe: (params: ContactDuplicateProbeQuery) =>
       ['contacts', 'duplicate-probe', params] as const,
     timeline: (id: string) => ['contacts', 'timeline', id] as const,
+  },
+  bulkActions: {
+    all: ['bulk-actions'] as const,
+    list: (query: BulkActionListQuery) => ['bulk-actions', 'list', query] as const,
+    detail: (id: string) => ['bulk-actions', 'detail', id] as const,
   },
   notifications: {
     all: ['notifications'] as const,
@@ -37,6 +46,7 @@ export const QUERY_KEYS = {
     all: ['tags'] as const,
     page: (entityType: string, page: number) => ['tags', entityType, 'page', page] as const,
     catalog: (entityType: string) => ['tags', entityType, 'catalog'] as const,
+    trash: (entityType: string, page: number) => ['tags', entityType, 'trash', page] as const,
   },
   geo: {
     colombiaMap: ['geo', 'colombia-map'] as const,

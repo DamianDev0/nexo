@@ -7,5 +7,11 @@ export interface TagRow {
   description: string | null
   enabled: boolean
   entity_type: TagEntityType
+  deleted_at: string | null
   created_at: string
+}
+
+export interface DeletedTagRow {
+  name: string
+  deleted_from_contact_ids: string[]
 }

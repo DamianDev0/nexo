@@ -69,28 +69,13 @@ export function getTenantSchemaSQL(schema: string): string {
       whatsapp VARCHAR(20),
       document_type VARCHAR(10),
       document_number VARCHAR(20),
-      job_title VARCHAR(200),
-      linkedin_url VARCHAR(500),
-      birthday DATE,
-      address TEXT,
+      avatar_url TEXT,
       city VARCHAR(100),
-      department VARCHAR(100),
       municipio_code VARCHAR(5),
-      country VARCHAR(3) DEFAULT 'CO',
       status VARCHAR(30) DEFAULT 'new',
       status_changed_at TIMESTAMPTZ DEFAULT NOW(),
-      avatar_url TEXT,
       lifecycle_stage VARCHAR(30) DEFAULT 'subscriber',
       source VARCHAR(50),
-      type VARCHAR(30),
-      type_label VARCHAR(50),
-      lead_score INTEGER DEFAULT 0,
-      data_consent BOOLEAN DEFAULT false,
-      consent_date TIMESTAMPTZ,
-      consent_source VARCHAR(100),
-      opt_out_email BOOLEAN DEFAULT false,
-      opt_out_sms BOOLEAN DEFAULT false,
-      opt_out_whatsapp BOOLEAN DEFAULT false,
       last_contacted_at TIMESTAMPTZ,
       tags TEXT[] DEFAULT '{}',
       company_id UUID REFERENCES "${schema}".companies(id),
@@ -101,6 +86,68 @@ export function getTenantSchemaSQL(schema: string): string {
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    -- Consent per channel (Ley 1581 / Ley 2300): one row per contact + channel
+    CREATE TABLE "${schema}".data_consents (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      contact_id UUID NOT NULL REFERENCES "${schema}".contacts(id) ON DELETE CASCADE,
+      channel VARCHAR(20) NOT NULL,
+      granted BOOLEAN NOT NULL,
+      granted_at TIMESTAMPTZ,
+      revoked_at TIMESTAMPTZ,
+      source VARCHAR(100),
+      reason TEXT,
+      evidence JSONB,
+      recorded_by UUID,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT data_consents_channel_valid
+        CHECK (channel IN ('data_processing', 'email', 'sms', 'whatsapp', 'call'))
+    );
+    CREATE UNIQUE INDEX uq_${schema}_data_consents_contact_channel
+      ON "${schema}".data_consents (contact_id, channel);
+
+    -- Bulk actions: orchestrated mass mutations with actor, progress and per-row errors
+    CREATE TABLE "${schema}".bulk_actions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      entity VARCHAR(20) NOT NULL,
+      action VARCHAR(30) NOT NULL,
+      params JSONB NOT NULL DEFAULT '{}',
+      selection_mode VARCHAR(10) NOT NULL,
+      selection_ids UUID[] NOT NULL DEFAULT '{}',
+      selection_query JSONB,
+      status VARCHAR(30) NOT NULL DEFAULT 'queued',
+      total INTEGER NOT NULL DEFAULT 0,
+      processed INTEGER NOT NULL DEFAULT 0,
+      succeeded INTEGER NOT NULL DEFAULT 0,
+      failed INTEGER NOT NULL DEFAULT 0,
+      errors JSONB NOT NULL DEFAULT '[]',
+      result_file_url TEXT,
+      drip JSONB,
+      job_id VARCHAR(100),
+      reverted_at TIMESTAMPTZ,
+      reverts_id UUID REFERENCES "${schema}".bulk_actions(id) ON DELETE SET NULL,
+      created_by UUID NOT NULL REFERENCES "${schema}".users(id),
+      started_at TIMESTAMPTZ,
+      finished_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT bulk_actions_entity_valid CHECK (entity IN ('contacts', 'companies', 'deals')),
+      CONSTRAINT bulk_actions_selection_mode_valid CHECK (selection_mode IN ('ids', 'filter'))
+    );
+    CREATE INDEX idx_${schema}_bulk_actions_created ON "${schema}".bulk_actions (created_at DESC);
+    CREATE INDEX idx_${schema}_bulk_actions_actor ON "${schema}".bulk_actions (created_by, created_at DESC);
+
+    -- Previous values per record so a bulk action can be reverted exactly
+    CREATE TABLE "${schema}".bulk_action_snapshots (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      bulk_action_id UUID NOT NULL REFERENCES "${schema}".bulk_actions(id) ON DELETE CASCADE,
+      entity_id UUID NOT NULL,
+      before JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE UNIQUE INDEX uq_${schema}_bulk_snapshots_action_entity
+      ON "${schema}".bulk_action_snapshots (bulk_action_id, entity_id);
 
     -- Pipelines
     CREATE TABLE "${schema}".pipelines (
@@ -299,6 +346,8 @@ export function getTenantSchemaSQL(schema: string): string {
       description VARCHAR(200),
       enabled BOOLEAN NOT NULL DEFAULT true,
       entity_type VARCHAR(30) NOT NULL,
+      deleted_at TIMESTAMPTZ,
+      deleted_from_contact_ids UUID[] NOT NULL DEFAULT '{}',
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
 
@@ -639,7 +688,8 @@ export function getTenantIndicesSQL(schema: string): string {
       WHERE is_active = true AND status = 'pending';
 
     CREATE INDEX idx_${schema}_tags_entity ON "${schema}".tags (entity_type, name);
-    CREATE UNIQUE INDEX idx_${schema}_tags_unique ON "${schema}".tags (entity_type, LOWER(name));
+    CREATE UNIQUE INDEX uq_${schema}_tags_active_name ON "${schema}".tags (entity_type, LOWER(name))
+      WHERE deleted_at IS NULL;
 
     CREATE INDEX idx_${schema}_saved_filters_user ON "${schema}".saved_filters (user_id, entity_type);
     CREATE INDEX idx_${schema}_contact_views_owner ON "${schema}".contact_views (owner_id);

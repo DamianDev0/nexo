@@ -7,6 +7,7 @@ export type Tag = {
   description: string | null
   enabled: boolean
   entityType: TagEntityType
+  deletedAt: string | null
   createdAt: string
 }
 

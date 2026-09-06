@@ -5,7 +5,6 @@ import type { TFunction } from 'i18next'
 import { OPTION_NAME_MAX } from '@/features/manage-settings/config/option-form.constants'
 import { buildActivityTypeFormSchema } from '@/features/manage-settings/lib/activity-type-form.schema'
 
-
 const t = vi.fn((key: string) => key) as unknown as TFunction
 
 const VALID = { label: 'Llamada', icon: 'phone', color: '#84cc16', trackDuration: false }

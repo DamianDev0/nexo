@@ -18,7 +18,6 @@ import { useContactForm } from '@/features/create-contact/model/useContactForm'
 const EMPTY_TAXONOMY: ContactTaxonomy = {
   statuses: [],
   sources: [],
-  types: [],
   lifecycleStages: [],
 }
 

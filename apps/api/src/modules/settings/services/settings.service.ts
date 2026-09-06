@@ -8,6 +8,7 @@ import { AuditLogService } from '@/modules/audit-log/services/audit-log.service'
 import type { AuditMeta } from '@/modules/audit-log/interfaces/audit-log.interfaces'
 import { DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
 import { INDUSTRY_PRESETS } from '../constants/industry-presets'
+import { withContactSystemFields } from '../constants/contact-system-fields'
 import type { IndustryPreset } from '../constants/industry-presets'
 import type { TenantSettingsRow } from '../interfaces/settings.interface'
 import type { TenantFullConfig } from '../interfaces/tenant-config.interface'
@@ -114,7 +115,14 @@ export class SettingsService {
       storedFields !== undefined &&
       Object.values(storedFields).some((defs) => Array.isArray(defs) && defs.length > 0)
     if (!hasFields) {
-      await this.tenantConfig.updateCustomFields(tenantId, preset.customFields, slug)
+      await this.tenantConfig.updateCustomFields(
+        tenantId,
+        {
+          ...preset.customFields,
+          contacts: withContactSystemFields(preset.customFields.contacts, sector),
+        },
+        slug,
+      )
     }
 
     await this.presetRepo.insertTagsIfEmpty(schemaName, preset.tags)

@@ -14,6 +14,7 @@ export type SettingsSectionKey =
   | 'pipelines'
   | 'activities'
   | 'contacts'
+  | 'trash'
 
 export interface SettingsChild {
   readonly key: string

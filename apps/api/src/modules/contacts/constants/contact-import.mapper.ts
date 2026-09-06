@@ -1,7 +1,7 @@
 import { DocumentType } from '@repo/shared-types'
 import type { FieldDef } from '@repo/shared-types'
 import { normalizeText, phoneDigits, validateDocumentNumber } from '@repo/shared-utils'
-import { parseIntOrZero, splitList } from '@/shared/imports/constants/import.constants'
+import { splitList } from '@/shared/imports/constants/import.constants'
 import type {
   ImportFieldDef,
   ImportFieldError,
@@ -12,7 +12,6 @@ export const CUSTOM_FIELD_PREFIX = 'custom:'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const MIN_PHONE_DIGITS = 7
-const MAX_LEAD_SCORE = 100
 
 const CONTACT_FIELD_DEFS: ImportFieldDef[] = [
   {
@@ -58,28 +57,10 @@ const CONTACT_FIELD_DEFS: ImportFieldDef[] = [
     aliases: ['documento', 'cedula', 'cédula', 'nit', 'identificacion', 'cc', 'document'],
   },
   {
-    field: 'jobTitle',
-    label: 'Job title',
-    required: false,
-    aliases: ['cargo', 'puesto', 'position', 'title', 'job'],
-  },
-  {
-    field: 'address',
-    label: 'Address',
-    required: false,
-    aliases: ['direccion', 'dirección', 'domicilio'],
-  },
-  {
     field: 'city',
     label: 'City',
     required: false,
     aliases: ['ciudad', 'municipio', 'town'],
-  },
-  {
-    field: 'department',
-    label: 'Department',
-    required: false,
-    aliases: ['departamento', 'provincia', 'state', 'region'],
   },
   {
     field: 'status',
@@ -94,22 +75,10 @@ const CONTACT_FIELD_DEFS: ImportFieldDef[] = [
     aliases: ['origen', 'fuente', 'canal', 'channel'],
   },
   {
-    field: 'type',
-    label: 'Type',
-    required: false,
-    aliases: ['tipo', 'tipo contacto', 'relacion'],
-  },
-  {
     field: 'lifecycleStage',
     label: 'Lifecycle stage',
     required: false,
     aliases: ['ciclo de vida', 'lifecycle', 'stage', 'etapa'],
-  },
-  {
-    field: 'leadScore',
-    label: 'Lead score',
-    required: false,
-    aliases: ['puntaje', 'score', 'calificacion', 'calificación'],
   },
   {
     field: 'tags',
@@ -142,12 +111,8 @@ export const contactImportMapper: ImportRowMapper = {
       case 'documentType':
       case 'status':
       case 'source':
-      case 'type':
       case 'lifecycleStage':
         return normalizeEnum(value)
-
-      case 'leadScore':
-        return parseIntOrZero(value)
 
       case 'tags':
         return splitList(value)
@@ -177,12 +142,6 @@ export const contactImportMapper: ImportRowMapper = {
       case 'documentType':
         if (typeof value === 'string' && !isDocumentType(value)) {
           return { field, message: 'Unknown document type', value }
-        }
-        break
-
-      case 'leadScore':
-        if (typeof value === 'number' && (value < 0 || value > MAX_LEAD_SCORE)) {
-          return { field, message: 'Lead score must be between 0 and 100', value: String(value) }
         }
         break
     }

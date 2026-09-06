@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next'
 
 import {
   buildSmartLists,
+  isArchivedList,
   contactsQueryString,
   listIdToStatus,
   parseListParam,
@@ -26,21 +27,29 @@ describe('buildSmartLists', () => {
   it('returns the "all" list plus one entry per taxonomy status', () => {
     const lists = buildSmartLists(t, { all: 12, new: 3 }, STATUSES)
 
-    expect(lists).toHaveLength(4)
+    expect(lists).toHaveLength(5)
     expect(lists[0]).toMatchObject({ id: 'all', label: 'contacts.lists.all', count: 12 })
     expect(lists[0]?.description).toBe('contacts.lists.descriptions.all')
     expect(lists[0]?.pinned).toBe(true)
-    expect(lists[1]).toMatchObject({ id: 'new', label: 'New', count: 3 })
-    expect(lists[1]?.pinned).toBeUndefined()
-    expect(lists[1]?.description).toBe('Fresh leads')
-    expect(lists.map((l) => l.id)).toEqual(['all', 'new', 'in_contact', 'vip'])
+    expect(lists[2]).toMatchObject({ id: 'new', label: 'New', count: 3 })
+    expect(lists[2]?.pinned).toBeUndefined()
+    expect(lists[2]?.description).toBe('Fresh leads')
+    expect(lists.map((l) => l.id)).toEqual(['all', 'archived', 'new', 'in_contact', 'vip'])
   })
 
   it('defaults missing counts to zero and custom descriptions to undefined', () => {
     const lists = buildSmartLists(t, {}, STATUSES)
 
-    expect(lists[3]).toMatchObject({ id: 'vip', label: 'VIP', count: 0 })
-    expect(lists[3]?.description).toBeUndefined()
+    expect(lists[4]).toMatchObject({ id: 'vip', label: 'VIP', count: 0 })
+    expect(lists[4]?.description).toBeUndefined()
+  })
+
+  it('places the archived list right after all, fed by its own count', () => {
+    const lists = buildSmartLists(t, { archived: 7 }, STATUSES)
+
+    expect(lists[1]).toMatchObject({ id: 'archived', label: 'contacts.lists.archived', count: 7 })
+    expect(isArchivedList('archived')).toBe(true)
+    expect(isArchivedList('new')).toBe(false)
   })
 })
 

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-
 import type { AdvancedFieldSources } from '@/features/filter-contacts/lib/advanced-filter-fields'
 import type { ContactColumnDef } from '@repo/shared-types'
 

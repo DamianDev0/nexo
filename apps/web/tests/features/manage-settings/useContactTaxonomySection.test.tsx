@@ -46,17 +46,6 @@ const TAXONOMY: ContactTaxonomy = {
       enabled: true,
     },
   ],
-  types: [
-    {
-      key: 'customer',
-      label: 'Cliente',
-      description: null,
-      color: '#8B5CF6',
-      order: 1,
-      isSystem: true,
-      enabled: true,
-    },
-  ],
   lifecycleStages: [
     {
       key: 'lead',

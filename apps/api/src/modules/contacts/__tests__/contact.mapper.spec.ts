@@ -12,11 +12,9 @@ const baseRow = {
   document_type: 'CC',
   document_number: '1000324679',
   city: 'Medellín',
-  department: 'Antioquia',
   municipio_code: '05001',
   status: 'new',
   source: 'web',
-  lead_score: 10,
   tags: [],
   company_id: null,
   assigned_to_id: null,
@@ -31,6 +29,13 @@ describe('mapContactListItem', () => {
   it('maps note_count into noteCount and defaults it to zero', () => {
     expect(mapContactListItem({ ...baseRow, note_count: 3 }).noteCount).toBe(3)
     expect(mapContactListItem(baseRow).noteCount).toBe(0)
+  })
+
+  it('exposes revoked consent channels and defaults to none', () => {
+    expect(
+      mapContactListItem({ ...baseRow, opted_out_channels: ['email', 'sms'] }).optedOutChannels,
+    ).toEqual(['email', 'sms'])
+    expect(mapContactListItem(baseRow).optedOutChannels).toEqual([])
   })
 })
 

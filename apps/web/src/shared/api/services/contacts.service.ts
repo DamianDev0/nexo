@@ -110,6 +110,8 @@ const contactsService = {
 
   archive: (id: string) => request<void>({ method: 'delete', url: `/contacts/${id}` }),
 
+  restore: (id: string) => request<Contact>({ method: 'post', url: `/contacts/${id}/restore` }),
+
   timeline: (id: string) =>
     request<ContactTimeline>({ method: 'get', url: `/contacts/${id}/timeline` }),
 }

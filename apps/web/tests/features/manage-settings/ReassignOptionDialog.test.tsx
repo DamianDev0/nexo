@@ -6,7 +6,6 @@ import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import { ReassignOptionDialog } from '@/features/manage-settings/ui/sections/contacts/ReassignOptionDialog'
 
-
 vi.mock('@/entities/nomenclature', () => ({
   useEntityTerms: () => ({ lowerSingular: 'contact', lowerPlural: 'contacts' }),
 }))

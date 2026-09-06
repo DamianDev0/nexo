@@ -16,28 +16,13 @@ const BASE: ContactListItem = {
   whatsapp: null,
   documentType: DocumentType.CC,
   documentNumber: '1000324679',
-  jobTitle: 'Directora Comercial',
-  linkedinUrl: null,
-  birthday: null,
-  address: 'Calle 100 #7-21',
   city: 'Medellín',
-  department: 'Antioquia',
   municipioCode: null,
-  country: 'CO',
   status: 'new',
   statusChangedAt: null,
   avatarUrl: null,
   lifecycleStage: LifecycleStage.LEAD,
   source: null,
-  type: null,
-  typeLabel: null,
-  leadScore: 50,
-  dataConsent: true,
-  consentDate: null,
-  consentSource: null,
-  optOutEmail: false,
-  optOutSms: false,
-  optOutWhatsapp: false,
   lastContactedAt: null,
   tags: [],
   companyId: null,
@@ -47,6 +32,8 @@ const BASE: ContactListItem = {
   createdAt: '2026-08-01T00:00:00.000Z',
   updatedAt: '2026-08-01T00:00:00.000Z',
   noteCount: 0,
+  optedOutChannels: [],
+  customFields: { role: 'Directora Comercial', address: 'Calle 100 #7-21' },
 }
 
 describe('buildContactPreviewRows', () => {
@@ -58,15 +45,17 @@ describe('buildContactPreviewRows', () => {
     expect(rows.find((row) => row.key === 'phone')?.value).toBe('+57 300 123 4567')
   })
 
-  it('joins document type with number and city with department', () => {
+  it('joins document type with number and reads role and address from system fields', () => {
     const rows = buildContactPreviewRows(t, BASE)
 
     expect(rows.find((row) => row.key === 'document')?.value).toBe('CC 1000324679')
-    expect(rows.find((row) => row.key === 'city')?.value).toBe('Medellín, Antioquia')
+    expect(rows.find((row) => row.key === 'city')?.value).toBe('Medellín')
+    expect(rows.find((row) => row.key === 'role')?.value).toBe('Directora Comercial')
+    expect(rows.find((row) => row.key === 'address')?.value).toBe('Calle 100 #7-21')
   })
 
   it('leaves missing values as null without links', () => {
-    const rows = buildContactPreviewRows(t, { ...BASE, whatsapp: null, address: null })
+    const rows = buildContactPreviewRows(t, { ...BASE, whatsapp: null, customFields: {} })
 
     const whatsapp = rows.find((row) => row.key === 'whatsapp')
     expect(whatsapp?.value).toBeNull()

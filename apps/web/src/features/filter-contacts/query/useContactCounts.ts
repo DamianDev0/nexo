@@ -12,5 +12,5 @@ export function useContactCounts(): Record<string, number | undefined> {
     staleTime: COUNT_STALE_MS,
   })
 
-  return { all: data?.total, ...data?.byStatus }
+  return { all: data?.total, archived: data?.archived, ...data?.byStatus }
 }

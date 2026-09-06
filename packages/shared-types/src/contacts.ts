@@ -1,3 +1,4 @@
+import type { ConsentChannel } from './consents'
 import type { DocumentType } from './enums'
 import type { FilterCondition } from './filters'
 
@@ -10,28 +11,13 @@ export type Contact = {
   whatsapp: string | null
   documentType: DocumentType | null
   documentNumber: string | null
-  jobTitle: string | null
-  linkedinUrl: string | null
-  birthday: string | null
-  address: string | null
+  avatarUrl: string | null
   city: string | null
-  department: string | null
   municipioCode: string | null
-  country: string
   status: string
   statusChangedAt: string | null
-  avatarUrl: string | null
   lifecycleStage: string
   source: string | null
-  type: string | null
-  typeLabel: string | null
-  leadScore: number
-  dataConsent: boolean
-  consentDate: string | null
-  consentSource: string | null
-  optOutEmail: boolean
-  optOutSms: boolean
-  optOutWhatsapp: boolean
   lastContactedAt: string | null
   tags: string[]
   companyId: string | null
@@ -46,6 +32,7 @@ export type Contact = {
 export type ContactListItem = Omit<Contact, 'customFields'> & {
   customFields?: Record<string, unknown>
   noteCount: number
+  optedOutChannels: ConsentChannel[]
 }
 
 export type ContactInput = {
@@ -56,16 +43,11 @@ export type ContactInput = {
   whatsapp?: string
   documentType?: DocumentType
   documentNumber?: string
-  address?: string
   city?: string
-  department?: string
   municipioCode?: string
   status?: string
   source?: string
-  type?: string
-  typeLabel?: string
   lifecycleStage?: string
-  leadScore?: number
   tags?: string[]
   companyId?: string
   assignedToId?: string
@@ -87,6 +69,7 @@ export type ContactListQuery = {
   createdTo?: string
   lastContactedFrom?: string
   lastContactedTo?: string
+  archived?: boolean
   sortBy?: ContactSortField
   sortDir?: 'asc' | 'desc'
   page?: number
@@ -101,7 +84,6 @@ export const CONTACT_SORT_FIELDS = [
   'email',
   'city',
   'status',
-  'leadScore',
   'lastContactedAt',
 ] as const
 

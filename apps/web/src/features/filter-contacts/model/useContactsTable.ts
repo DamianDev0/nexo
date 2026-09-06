@@ -12,6 +12,7 @@ import { isComplete, parseConditions, serializeConditions } from '@/shared/ui/or
 
 import {
   contactsQueryString,
+  isArchivedList,
   parseLimitParam,
   parseListParam,
   parsePageParam,
@@ -91,7 +92,13 @@ export function useContactsTable() {
 
   const query = useMemo(
     () =>
-      contactListQuery(urlSearch, status, filters, { page, limit, sort }, advanced.filter((c) => isComplete(c))),
+      contactListQuery(
+        urlSearch,
+        status,
+        filters,
+        { page, limit, sort },
+        advanced.filter((c) => isComplete(c)),
+      ),
     [urlSearch, status, filters, page, limit, sort, advanced],
   )
 
@@ -141,6 +148,8 @@ export function useContactsTable() {
 
   return {
     rows: data?.data ?? NO_ROWS,
+    query,
+    archived: isArchivedList(status),
     total,
     totalPages,
     page,

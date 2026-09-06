@@ -18,8 +18,6 @@ const VALUES: ContactFormValues = {
   status: 'new',
   avatarUrl: '',
   source: '',
-  type: '',
-  typeLabel: '',
   lifecycleStage: 'lead',
 }
 
@@ -33,6 +31,12 @@ describe('toInput', () => {
 
     expect(input.customFields).toEqual({ metros_cuadrados: 120 })
     expect(input.firstName).toBe('Ana')
+  })
+
+  it('stores the address as the address system field', () => {
+    const input = toInput({ ...VALUES, address: 'Calle 100 #7-21' }, { eps: 'Sura' })
+
+    expect(input.customFields).toEqual({ eps: 'Sura', address: 'Calle 100 #7-21' })
   })
 
   it('sends the lifecycle stage only when set', () => {
@@ -52,28 +56,13 @@ describe('toFormValues', () => {
       whatsapp: '3000000000',
       documentType: null,
       documentNumber: null,
-      jobTitle: null,
-      linkedinUrl: null,
-      birthday: null,
-      address: null,
       city: null,
-      department: null,
       municipioCode: null,
-      country: 'CO',
       status: 'new',
       statusChangedAt: null,
       avatarUrl: null,
       lifecycleStage: 'lead',
       source: null,
-      type: null,
-      typeLabel: null,
-      leadScore: 0,
-      dataConsent: false,
-      consentDate: null,
-      consentSource: null,
-      optOutEmail: false,
-      optOutSms: false,
-      optOutWhatsapp: false,
       lastContactedAt: null,
       tags: [],
       companyId: null,
@@ -83,6 +72,8 @@ describe('toFormValues', () => {
       createdAt: '2026-01-01',
       updatedAt: '2026-01-01',
       noteCount: 0,
+      optedOutChannels: [],
+      customFields: { address: 'Carrera 7 #1-1' },
     } satisfies ContactListItem
 
     const values = toFormValues(contact)
@@ -91,5 +82,6 @@ describe('toFormValues', () => {
     expect(values.whatsappSameAsPhone).toBe(true)
     expect(values.status).toBe('new')
     expect(values.lifecycleStage).toBe('lead')
+    expect(values.address).toBe('Carrera 7 #1-1')
   })
 })

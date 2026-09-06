@@ -27,7 +27,6 @@ const EMPTY_TAXONOMY: ContactTaxonomy = {
     },
   ],
   sources: [],
-  types: [],
   lifecycleStages: [],
 }
 

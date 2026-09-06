@@ -507,4 +507,173 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ALTER COLUMN channel SET DEFAULT 'whatsapp';
     `,
   },
+  {
+    id: '0032_data_consents',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".data_consents (
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        contact_id  UUID NOT NULL REFERENCES "${schema}".contacts(id) ON DELETE CASCADE,
+        channel     VARCHAR(20) NOT NULL,
+        granted     BOOLEAN NOT NULL,
+        granted_at  TIMESTAMPTZ,
+        revoked_at  TIMESTAMPTZ,
+        source      VARCHAR(100),
+        reason      TEXT,
+        evidence    JSONB,
+        recorded_by UUID,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT data_consents_channel_valid
+          CHECK (channel IN ('data_processing', 'email', 'sms', 'whatsapp', 'call'))
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_data_consents_contact_channel"
+        ON "${schema}".data_consents (contact_id, channel);
+      DO $$ BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = '${schema}' AND table_name = 'contacts' AND column_name = 'data_consent'
+        ) THEN
+          INSERT INTO "${schema}".data_consents (contact_id, channel, granted, granted_at, source)
+            SELECT id, 'data_processing', true, COALESCE(consent_date, created_at), consent_source
+            FROM "${schema}".contacts WHERE data_consent = true
+            ON CONFLICT (contact_id, channel) DO NOTHING;
+          INSERT INTO "${schema}".data_consents (contact_id, channel, granted, revoked_at)
+            SELECT id, 'email', false, updated_at FROM "${schema}".contacts WHERE opt_out_email = true
+            ON CONFLICT (contact_id, channel) DO NOTHING;
+          INSERT INTO "${schema}".data_consents (contact_id, channel, granted, revoked_at)
+            SELECT id, 'sms', false, updated_at FROM "${schema}".contacts WHERE opt_out_sms = true
+            ON CONFLICT (contact_id, channel) DO NOTHING;
+          INSERT INTO "${schema}".data_consents (contact_id, channel, granted, revoked_at)
+            SELECT id, 'whatsapp', false, updated_at FROM "${schema}".contacts WHERE opt_out_whatsapp = true
+            ON CONFLICT (contact_id, channel) DO NOTHING;
+        END IF;
+      END $$;
+    `,
+  },
+  {
+    id: '0033_contacts_core_prune',
+    up: (schema) => `
+      DO $$ BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = '${schema}' AND table_name = 'contacts' AND column_name = 'job_title'
+        ) THEN
+          UPDATE "${schema}".contacts
+            SET custom_fields = jsonb_strip_nulls(
+              COALESCE(custom_fields, '{}'::jsonb) || jsonb_build_object(
+                'role', job_title,
+                'social_url', linkedin_url,
+                'birth_date', birthday::text,
+                'address', address
+              )
+            )
+            WHERE job_title IS NOT NULL OR linkedin_url IS NOT NULL
+               OR birthday IS NOT NULL OR address IS NOT NULL;
+        END IF;
+      END $$;
+      DO $$ BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = '${schema}' AND table_name = 'contacts' AND column_name = 'lead_score'
+        ) THEN
+          ALTER TABLE "${schema}".contacts RENAME COLUMN lead_score TO score;
+        END IF;
+      END $$;
+      ALTER TABLE "${schema}".contacts
+        DROP COLUMN IF EXISTS job_title,
+        DROP COLUMN IF EXISTS linkedin_url,
+        DROP COLUMN IF EXISTS birthday,
+        DROP COLUMN IF EXISTS address,
+        DROP COLUMN IF EXISTS department,
+        DROP COLUMN IF EXISTS country,
+        DROP COLUMN IF EXISTS type,
+        DROP COLUMN IF EXISTS type_label,
+        DROP COLUMN IF EXISTS data_consent,
+        DROP COLUMN IF EXISTS consent_date,
+        DROP COLUMN IF EXISTS consent_source,
+        DROP COLUMN IF EXISTS opt_out_email,
+        DROP COLUMN IF EXISTS opt_out_sms,
+        DROP COLUMN IF EXISTS opt_out_whatsapp;
+      UPDATE "${schema}".contact_views
+        SET columns = REPLACE(columns::text, '"leadScore"', '"score"')::jsonb,
+            sort = REPLACE(sort::text, '"leadScore"', '"score"')::jsonb,
+            advanced_filters = REPLACE(advanced_filters::text, '"leadScore"', '"score"')::jsonb
+        WHERE columns::text LIKE '%leadScore%'
+           OR sort::text LIKE '%leadScore%'
+           OR advanced_filters::text LIKE '%leadScore%';
+      UPDATE "${schema}".contact_workspace_states
+        SET table_state = REPLACE(table_state::text, '"leadScore"', '"score"')::jsonb
+        WHERE table_state::text LIKE '%leadScore%';
+    `,
+  },
+  {
+    id: '0034_bulk_actions',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".bulk_actions (
+        id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        entity          VARCHAR(20) NOT NULL,
+        action          VARCHAR(30) NOT NULL,
+        params          JSONB NOT NULL DEFAULT '{}',
+        selection_mode  VARCHAR(10) NOT NULL,
+        selection_ids   UUID[] NOT NULL DEFAULT '{}',
+        selection_query JSONB,
+        status          VARCHAR(30) NOT NULL DEFAULT 'queued',
+        total           INTEGER NOT NULL DEFAULT 0,
+        processed       INTEGER NOT NULL DEFAULT 0,
+        succeeded       INTEGER NOT NULL DEFAULT 0,
+        failed          INTEGER NOT NULL DEFAULT 0,
+        errors          JSONB NOT NULL DEFAULT '[]',
+        result_file_url TEXT,
+        drip            JSONB,
+        job_id          VARCHAR(100),
+        created_by      UUID NOT NULL REFERENCES "${schema}".users(id),
+        started_at      TIMESTAMPTZ,
+        finished_at     TIMESTAMPTZ,
+        created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT bulk_actions_entity_valid CHECK (entity IN ('contacts', 'companies', 'deals')),
+        CONSTRAINT bulk_actions_selection_mode_valid CHECK (selection_mode IN ('ids', 'filter'))
+      );
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_bulk_actions_created"
+        ON "${schema}".bulk_actions (created_at DESC);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_bulk_actions_actor"
+        ON "${schema}".bulk_actions (created_by, created_at DESC);
+    `,
+  },
+  {
+    id: '0035_bulk_action_snapshots',
+    up: (schema) => `
+      ALTER TABLE "${schema}".bulk_actions
+        ADD COLUMN IF NOT EXISTS reverted_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS reverts_id UUID REFERENCES "${schema}".bulk_actions(id) ON DELETE SET NULL;
+      CREATE TABLE IF NOT EXISTS "${schema}".bulk_action_snapshots (
+        id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        bulk_action_id UUID NOT NULL REFERENCES "${schema}".bulk_actions(id) ON DELETE CASCADE,
+        entity_id      UUID NOT NULL,
+        before         JSONB NOT NULL,
+        created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_bulk_snapshots_action_entity"
+        ON "${schema}".bulk_action_snapshots (bulk_action_id, entity_id);
+    `,
+  },
+  {
+    id: '0036_tags_soft_delete',
+    up: (schema) => `
+      ALTER TABLE "${schema}".tags
+        ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS deleted_from_contact_ids UUID[] NOT NULL DEFAULT '{}';
+      DROP INDEX IF EXISTS "${schema}"."idx_${schema}_tags_unique";
+      DROP INDEX IF EXISTS "${schema}"."uq_${schema}_tags_name_entity";
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_tags_active_name"
+        ON "${schema}".tags (entity_type, LOWER(name)) WHERE deleted_at IS NULL;
+    `,
+  },
+  {
+    id: '0037_contacts_drop_score',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts DROP COLUMN IF EXISTS score;
+      UPDATE "${schema}".contact_views SET sort = NULL WHERE sort->>'field' = 'score';
+    `,
+  },
 ]

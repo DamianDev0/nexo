@@ -7,7 +7,6 @@ import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import {
   ContactRelativeCell,
-  ContactScoreCell,
   ContactStatusCell,
 } from '@/entities/contact/ui/cells/ContactValueCells'
 
@@ -32,28 +31,6 @@ describe('ContactStatusCell', () => {
     )
 
     expect(screen.getByText('Calificado')).toBeInTheDocument()
-  })
-})
-
-describe('ContactScoreCell', () => {
-  it('leaves a score of zero as an empty marker', () => {
-    render(<ContactScoreCell score={0} bandLabel="Puntaje bajo" />, { wrapper })
-
-    expect(screen.getByText('—')).toBeInTheDocument()
-  })
-
-  it('shows the score as a plain number with a semantic dot', () => {
-    render(<ContactScoreCell score={82} bandLabel="Puntaje alto" />, { wrapper })
-
-    expect(screen.getByText('82')).toBeInTheDocument()
-  })
-
-  it('explains the band in a tooltip on hover', async () => {
-    render(<ContactScoreCell score={99} bandLabel="Puntaje 99 — alto interés" />, { wrapper })
-
-    await userEvent.hover(screen.getByText('99'))
-
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('Puntaje 99 — alto interés')
   })
 })
 

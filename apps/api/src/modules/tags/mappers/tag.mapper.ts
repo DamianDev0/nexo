@@ -9,6 +9,7 @@ export function mapTagRow(r: TagRow): Tag {
     description: r.description ?? null,
     enabled: r.enabled ?? true,
     entityType: r.entity_type,
+    deletedAt: r.deleted_at ?? null,
     createdAt: r.created_at,
   }
 }

@@ -9,10 +9,7 @@ import { ColorSwatchPicker } from '@/shared/ui/molecules/color-swatch-picker'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { HEX_COLOR_PALETTE } from '../../../config/hex-palette.constants'
-import {
-  MAX_STAGE_PROBABILITY,
-  STAGE_NAME_MAX,
-} from '../../../config/pipelines.constants'
+import { MAX_STAGE_PROBABILITY, STAGE_NAME_MAX } from '../../../config/pipelines.constants'
 import { clampProbability } from '../../../lib/stage-edit'
 
 import type { StageDraft } from '../../../lib/stage-edit'

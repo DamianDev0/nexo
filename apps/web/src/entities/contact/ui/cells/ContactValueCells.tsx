@@ -16,9 +16,9 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/shadcn/dropdown-menu'
 
-import { CONTACT_SCORE_DOT, CONTACT_STALE_DAYS } from '../../config/contact-columns.constants'
 import { contactCreatedParts } from '../../lib/contact-display'
-import { contactScoreBand, daysSince } from '../../lib/contact-links'
+import { CONTACT_STALE_DAYS } from '../../config/contact-columns.constants'
+import { daysSince } from '../../lib/contact-links'
 
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
@@ -106,24 +106,6 @@ export function ContactRelativeCell({
       >
         {timeAgo(iso, locale)}
       </span>
-    </HintTooltip>
-  )
-}
-
-export function ContactScoreCell({
-  score,
-  bandLabel,
-}: Readonly<{ score: number; bandLabel: string }>) {
-  if (score <= 0) return <DataTable.CellText numeric>{null}</DataTable.CellText>
-
-  const band = contactScoreBand(score)
-
-  return (
-    <HintTooltip asChild hint={bandLabel}>
-      <Text variant="body" className="inline-flex items-center gap-1.5 tabular-nums">
-        <span className={cn('size-1.5 shrink-0 rounded-full', CONTACT_SCORE_DOT[band])} />
-        {score}
-      </Text>
     </HintTooltip>
   )
 }

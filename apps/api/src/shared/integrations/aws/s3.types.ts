@@ -21,6 +21,7 @@ export enum S3Category {
   USER_AVATAR = 'user_avatar',
   CONTACT_DOCUMENT = 'contact_document',
   DEAL_ATTACHMENT = 'deal_attachment',
+  BULK_EXPORT = 'bulk_export',
 }
 
 type CategoryConfig = {
@@ -88,6 +89,13 @@ export const S3_CATEGORY_CONFIG: Record<S3Category, CategoryConfig> = {
     ],
     allowedExtensions: ['.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx', '.xls', '.xlsx'],
     maxSizeBytes: 20 * 1024 * 1024, // 20 MB
+    public: false,
+  },
+  [S3Category.BULK_EXPORT]: {
+    pathPrefix: (slug) => `${slug}/exports`,
+    allowedMimeTypes: ['text/csv'],
+    allowedExtensions: ['.csv'],
+    maxSizeBytes: 100 * 1024 * 1024, // 100 MB
     public: false,
   },
 }

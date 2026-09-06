@@ -26,7 +26,7 @@ type ProbeFieldName = 'email' | 'phone'
 
 export function useContactForm(contact: ContactListItem | null, onDone: () => void) {
   const { t } = useTranslation()
-  const { statuses, sources, types, lifecycleStages } = useContactTaxonomy()
+  const { statuses, sources, lifecycleStages } = useContactTaxonomy()
   const terms = useEntityTerms('contact')
   const customFieldDefs = useContactCustomFields()
   const probeDuplicate = useProbeContactDuplicate()
@@ -34,7 +34,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
     () => contact?.customFields ?? {},
   )
   const [customErrors, setCustomErrors] = useState<Record<string, string>>({})
-  const schema = useMemo(() => buildContactSchema(t, terms.lowerSingular), [t, terms.lowerSingular])
+  const schema = useMemo(() => buildContactSchema(t), [t])
 
   const defaultStatus = statuses[0]?.key ?? ''
   const defaultStage = lifecycleStages[0]?.key ?? ''
@@ -138,7 +138,7 @@ export function useContactForm(contact: ContactListItem | null, onDone: () => vo
 
   return {
     form,
-    taxonomy: { statuses, sources, types, lifecycleStages },
+    taxonomy: { statuses, sources, lifecycleStages },
     customFields: {
       defs: customFieldDefs,
       values: customValues,

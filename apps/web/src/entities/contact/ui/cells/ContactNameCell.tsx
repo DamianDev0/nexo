@@ -1,7 +1,12 @@
 import { cn } from '@/shared/lib/cn'
 import { Avatar } from '@/shared/ui/atoms/avatar'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { NotePencilIcon, SidebarSimpleIcon, TagIcon } from '@/shared/ui/icons'
+import {
+  ArrowCounterClockwiseIcon,
+  NotePencilIcon,
+  SidebarSimpleIcon,
+  TagIcon,
+} from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 
@@ -111,6 +116,19 @@ function ActionStrip({ contact, labels, actions, tagsByName }: StripContext) {
       )}
       {actions.onPreview && hasLeadingActions && (
         <span aria-hidden className="mx-0.5 h-3.5 w-px shrink-0 bg-border" />
+      )}
+      {!contact.isActive && actions.onRestore && (
+        <HintTooltip asChild hint={labels.restore}>
+          <PillButton
+            variant="ghost"
+            size="xs"
+            aria-label={labels.restore}
+            onClick={() => actions.onRestore?.(contact)}
+            className={cn('w-8 px-0', CONTACT_STRIP_BUTTON)}
+          >
+            <ArrowCounterClockwiseIcon className="size-3.5" />
+          </PillButton>
+        </HintTooltip>
       )}
       {actions.onPreview && (
         <HintTooltip asChild hint={labels.preview}>

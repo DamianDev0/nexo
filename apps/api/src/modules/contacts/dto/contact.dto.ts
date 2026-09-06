@@ -3,7 +3,6 @@ import {
   IsEmail,
   IsEnum,
   IsIn,
-  IsInt,
   IsISO8601,
   IsNotEmpty,
   IsObject,
@@ -13,11 +12,10 @@ import {
   IsUUID,
   Length,
   Matches,
-  Max,
   MaxLength,
-  Min,
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
 import { PartialType, PickType } from '@nestjs/mapped-types'
 import { DUPLICATE_STRATEGIES } from '@/shared/imports/constants/import.constants'
 import type { DuplicateStrategy } from '@repo/shared-types'
@@ -68,37 +66,8 @@ export class CreateContactDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @Length(1, 150)
-  jobTitle?: string
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUrl()
-  @MaxLength(255)
-  linkedinUrl?: string
-
-  @ApiPropertyOptional({ description: 'Date of birth (ISO 8601)' })
-  @IsOptional()
-  @IsISO8601()
-  birthday?: string
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
   @Length(1, 100)
   city?: string
-
-  @ApiPropertyOptional({ description: 'Street address, canonicalized on the client' })
-  @IsOptional()
-  @IsString()
-  @Length(1, 255)
-  address?: string
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  @Length(1, 100)
-  department?: string
 
   @ApiPropertyOptional({ description: 'DANE 5-digit municipality code' })
   @IsOptional()
@@ -118,56 +87,11 @@ export class CreateContactDto {
   @Matches(TAXONOMY_KEY_PATTERN)
   source?: string
 
-  @ApiPropertyOptional({ description: 'Tenant taxonomy type key' })
-  @IsOptional()
-  @IsString()
-  @Length(1, 30)
-  type?: string
-
-  @ApiPropertyOptional({ description: 'Free-text label, persisted only when type is other' })
-  @IsOptional()
-  @IsString()
-  @Length(1, 50)
-  typeLabel?: string
-
   @ApiPropertyOptional({ description: 'Tenant taxonomy lifecycle stage key' })
   @IsOptional()
   @IsString()
   @Matches(TAXONOMY_KEY_PATTERN)
   lifecycleStage?: string
-
-  @ApiPropertyOptional({ minimum: 0, maximum: 100 })
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(100)
-  leadScore?: number
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsBoolean()
-  dataConsent?: boolean
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  @Length(1, 100)
-  consentSource?: string
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsBoolean()
-  optOutEmail?: boolean
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsBoolean()
-  optOutSms?: boolean
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsBoolean()
-  optOutWhatsapp?: boolean
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
@@ -280,6 +204,12 @@ export class ContactQueryDto extends TaggedPaginationQueryDto {
   @IsISO8601()
   lastContactedTo?: string
 
+  @ApiPropertyOptional({ description: 'List archived (inactive) contacts instead of active ones' })
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => value === true || value === 'true')
+  @IsBoolean()
+  archived?: boolean
+
   @ApiPropertyOptional({ enum: CONTACT_SORT_FIELDS })
   @IsOptional()
   @IsIn(CONTACT_SORT_FIELDS)
@@ -292,8 +222,8 @@ export class ContactQueryDto extends TaggedPaginationQueryDto {
 }
 
 export class ReassignTaxonomyDto {
-  @ApiProperty({ enum: ['status', 'source', 'type', 'lifecycle', 'tag'] })
-  @IsIn(['status', 'source', 'type', 'lifecycle', 'tag'])
+  @ApiProperty({ enum: ['status', 'source', 'lifecycle', 'tag'] })
+  @IsIn(['status', 'source', 'lifecycle', 'tag'])
   kind: TaxonomyReassignKind
 
   @ApiProperty()

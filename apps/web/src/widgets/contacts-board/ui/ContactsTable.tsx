@@ -5,12 +5,12 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useEntityTerms } from '@/entities/nomenclature'
-import { ContactsBulkActions } from '@/features/archive-contacts'
+import { BulkActionBar, BulkDialogs } from '@/features/bulk-actions'
 import { ContactsListHint } from '@/features/filter-contacts'
 import { SaveViewControls } from '@/features/manage-contact-views'
 import { ROUTES } from '@/shared/config/routes'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { CloudArrowUpIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
+import { CloudArrowUpIcon, PlusIcon, StackIcon, UsersThreeIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { FilterChips, FilterTrigger } from '@/shared/ui/organisms/filter-bar'
@@ -22,10 +22,17 @@ import type { ContactsBoard } from '../model/useContactsBoard'
 import type { ListMenu } from '../model/useListMenu'
 
 type ContactsTableProps = Readonly<
-  Pick<ContactsBoard, 'instance' | 'lists' | 'state' | 'actions'> & { listMenu: ListMenu }
+  Pick<ContactsBoard, 'instance' | 'lists' | 'state' | 'actions' | 'bulk'> & { listMenu: ListMenu }
 >
 
-export function ContactsTable({ instance, lists, state, actions, listMenu }: ContactsTableProps) {
+export function ContactsTable({
+  instance,
+  lists,
+  state,
+  actions,
+  bulk,
+  listMenu,
+}: ContactsTableProps) {
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -47,12 +54,20 @@ export function ContactsTable({ instance, lists, state, actions, listMenu }: Con
           activeView={state.activeView}
           onRevert={actions.onRevertFilters}
         />
-        <PillButton asChild variant="ghost" size="sm" className="gap-1.5 rounded-md">
-          <Link href={ROUTES.app.contacts.import}>
-            <CloudArrowUpIcon className="size-4" />
-            {t('contacts.import.cta')}
-          </Link>
-        </PillButton>
+        <span className="flex items-center gap-0.5">
+          <PillButton asChild variant="ghost" size="sm" className="gap-1.5 rounded-md">
+            <Link href={ROUTES.app.bulkActions}>
+              <StackIcon className="size-4" />
+              {t('bulkActions.title')}
+            </Link>
+          </PillButton>
+          <PillButton asChild variant="ghost" size="sm" className="gap-1.5 rounded-md">
+            <Link href={ROUTES.app.contacts.import}>
+              <CloudArrowUpIcon className="size-4" />
+              {t('contacts.import.cta')}
+            </Link>
+          </PillButton>
+        </span>
         <PillButton size="sm" className="gap-1.5 rounded-md" onClick={actions.onCreate}>
           <PlusIcon className="size-4" />
           {t('contacts.lists.new')}
@@ -73,13 +88,9 @@ export function ContactsTable({ instance, lists, state, actions, listMenu }: Con
         >
           <DataTable.Toolbar
             bulk={{
-              labels: state.bulkLabels,
-              actions: (
-                <ContactsBulkActions
-                  onArchive={actions.onArchiveSelected}
-                  disabled={state.isArchiving}
-                />
-              ),
+              labels: bulk.bar.labels,
+              onSelectAll: bulk.bar.onSelectAll,
+              actions: <BulkActionBar bar={bulk.bar} />,
             }}
           >
             <DataTable.Search
@@ -166,6 +177,7 @@ export function ContactsTable({ instance, lists, state, actions, listMenu }: Con
           )}
         </DataTable>
       </div>
+      <BulkDialogs dialogs={bulk.dialogs} />
     </div>
   )
 }

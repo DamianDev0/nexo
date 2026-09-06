@@ -1,7 +1,12 @@
 export { useContactsTable } from './model/useContactsTable'
 export { useContactCounts } from './query/useContactCounts'
 export { contactListQuery, contactListQueryFromParams } from './query/contacts-query'
-export { buildSmartLists, listIdToStatus, statusToListId } from './lib/contact-lists'
+export {
+  buildSmartLists,
+  isArchivedList,
+  listIdToStatus,
+  statusToListId,
+} from './lib/contact-lists'
 export { buildContactHints } from './lib/contact-hints'
 export { buildQuickFilterDefs } from './lib/quick-filters'
 export { ContactsListHint } from './ui/ContactsListHint'

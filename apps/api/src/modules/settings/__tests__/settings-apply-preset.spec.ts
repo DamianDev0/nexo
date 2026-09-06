@@ -64,7 +64,14 @@ describe('SettingsService.applyPreset', () => {
     )
     expect(mocks.tenantConfig.updateCustomFields).toHaveBeenCalledWith(
       TENANT_ID,
-      preset.customFields,
+      expect.objectContaining({
+        companies: preset.customFields.companies,
+        deals: preset.customFields.deals,
+        contacts: expect.arrayContaining([
+          ...preset.customFields.contacts,
+          expect.objectContaining({ key: 'role', isSystem: true }),
+        ]),
+      }),
       SLUG,
     )
     expect(mocks.presetRepo.insertTagsIfEmpty).toHaveBeenCalledWith(SCHEMA, preset.tags)
@@ -77,7 +84,7 @@ describe('SettingsService.applyPreset', () => {
   it('never overwrites a workspace that is already configured', async () => {
     const mocks = buildMocks({
       nomenclature: { contact: { singular: 'Paciente', plural: 'Pacientes' } },
-      contactTaxonomy: { statuses: [], sources: [], types: [], lifecycleStages: [] },
+      contactTaxonomy: { statuses: [], sources: [], lifecycleStages: [] },
       customFields: {
         contacts: [
           {

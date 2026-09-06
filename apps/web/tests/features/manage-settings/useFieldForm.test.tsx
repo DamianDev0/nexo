@@ -7,7 +7,6 @@ import type { FieldFormValues } from '@/features/manage-settings/lib/custom-fiel
 
 import { useFieldForm } from '@/features/manage-settings/model/useFieldForm'
 
-
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }))

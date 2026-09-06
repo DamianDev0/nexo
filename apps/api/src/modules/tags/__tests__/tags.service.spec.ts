@@ -15,6 +15,7 @@ function makeTagRow(overrides: Record<string, unknown> = {}) {
     color: '#6B7280',
     entity_type: 'contact',
     enabled: true,
+    deleted_at: null,
     created_at: '2024-01-01T00:00:00Z',
     ...overrides,
   }
@@ -61,12 +62,12 @@ describe('TagsService', () => {
 
       const countSql: string = qr.query.mock.calls[0][0] as string
       const countParams: unknown[] = qr.query.mock.calls[0][1] as unknown[]
-      expect(countSql).toContain('WHERE entity_type = $1')
+      expect(countSql).toContain('WHERE deleted_at IS NULL AND entity_type = $1')
       expect(countParams).toEqual(['deal'])
 
       const pageSql: string = qr.query.mock.calls[1][0] as string
       const pageParams: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(pageSql).toContain('WHERE entity_type = $1')
+      expect(pageSql).toContain('WHERE deleted_at IS NULL AND entity_type = $1')
       expect(pageSql).toContain('LIMIT $2 OFFSET $3')
       expect(pageParams).toEqual(['deal', 25, 0])
     })
@@ -118,7 +119,7 @@ describe('TagsService', () => {
     })
 
     it('throws BadRequestException when a tag with the same name already exists for the entity type', async () => {
-      qr.query.mockResolvedValueOnce([{ id: 'tag-existing' }])
+      qr.query.mockResolvedValueOnce([{ id: 'tag-existing', deleted_at: null }])
 
       await expect(service.create(SCHEMA, { name: 'VIP', entityType: 'contact' })).rejects.toThrow(
         BadRequestException,
@@ -212,55 +213,85 @@ describe('TagsService', () => {
   })
 
   describe('remove', () => {
-    it('deletes the tag and removes it from contacts.tags via array_remove', async () => {
+    it('soft-deletes the tag, remembers who had it and takes it off contacts.tags', async () => {
       qr.query.mockResolvedValueOnce([[{ name: 'VIP' }], 1]).mockResolvedValueOnce([])
 
       await service.remove(SCHEMA, 'tag-1')
 
       const deleteQuery: string = qr.query.mock.calls[0][0] as string
-      expect(deleteQuery).toContain('DELETE FROM tags')
-      expect(deleteQuery).toContain('RETURNING name')
+      expect(deleteQuery).toContain('SET deleted_at = NOW()')
+      expect(deleteQuery).toContain('deleted_from_contact_ids')
+      expect(deleteQuery).toContain('deleted_at IS NULL')
+      expect(deleteQuery).not.toContain('DELETE FROM tags')
 
       const cleanupQuery: string = qr.query.mock.calls[1][0] as string
       const cleanupParams: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(cleanupQuery).toContain('UPDATE contacts')
       expect(cleanupQuery).toContain('array_remove(tags, $1)')
       expect(cleanupParams).toEqual(['VIP'])
-      expect(db.query).toHaveBeenCalledWith(SCHEMA, expect.any(Function))
     })
 
-    it('deletes the tag when the driver returns plain rows and still cleans up contacts.tags', async () => {
-      qr.query.mockResolvedValueOnce([{ name: 'Hot' }]).mockResolvedValueOnce([])
-
-      await service.remove(SCHEMA, 'tag-1')
-
-      const cleanupParams: unknown[] = qr.query.mock.calls[1][1] as unknown[]
-      expect(cleanupParams).toEqual(['Hot'])
-    })
-
-    it('throws NotFoundException when deleting a nonexistent tag and the driver returns [[], 0]', async () => {
-      qr.query.mockResolvedValueOnce([[], 0])
-
-      await expect(service.remove(SCHEMA, 'missing')).rejects.toThrow(NotFoundException)
-      expect(qr.query).toHaveBeenCalledTimes(1)
-    })
-
-    it('throws NotFoundException when deleting a nonexistent tag and the driver returns plain empty rows', async () => {
+    it('throws NotFoundException and skips the cleanup when nothing was deleted', async () => {
       qr.query.mockResolvedValueOnce([])
 
       await expect(service.remove(SCHEMA, 'missing')).rejects.toThrow(NotFoundException)
       expect(qr.query).toHaveBeenCalledTimes(1)
     })
+  })
 
-    it('does not run the array_remove cleanup query when the tag does not exist', async () => {
+  describe('restore', () => {
+    it('revives the tag and re-attaches it to the contacts that had it', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ name: 'VIP', deleted_from_contact_ids: ['c-1', 'c-2'] }])
+        .mockResolvedValueOnce([makeTagRow({ deleted_at: null })])
+        .mockResolvedValueOnce([])
+
+      const tag = await service.restore(SCHEMA, 'tag-1')
+
+      expect(tag.deletedAt).toBeNull()
+      const reviveQuery: string = qr.query.mock.calls[1][0] as string
+      expect(reviveQuery).toContain('SET deleted_at = NULL')
+      const [reattachQuery, reattachParams] = qr.query.mock.calls[2] as [string, unknown[]]
+      expect(reattachQuery).toContain('array_append(tags, $1)')
+      expect(reattachParams).toEqual(['VIP', ['c-1', 'c-2']])
+    })
+
+    it('does not touch contacts when the tag had none', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ name: 'VIP', deleted_from_contact_ids: [] }])
+        .mockResolvedValueOnce([makeTagRow()])
+
+      await service.restore(SCHEMA, 'tag-1')
+
+      expect(qr.query).toHaveBeenCalledTimes(2)
+    })
+
+    it('throws NotFoundException for tags that are not in the trash', async () => {
       qr.query.mockResolvedValueOnce([])
 
-      await expect(service.remove(SCHEMA, 'missing')).rejects.toThrow(NotFoundException)
+      await expect(service.restore(SCHEMA, 'tag-1')).rejects.toThrow(NotFoundException)
+    })
+  })
 
-      const cleanupCalled = qr.query.mock.calls.some((call) =>
-        String(call[0]).includes('array_remove'),
+  describe('create', () => {
+    it('revives a trashed tag with the same name instead of failing on the unique index', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ id: 'tag-old', deleted_at: '2026-09-01T00:00:00Z' }])
+        .mockResolvedValueOnce([makeTagRow({ id: 'tag-old' })])
+
+      const tag = await service.create(SCHEMA, { name: 'VIP', entityType: 'contact' })
+
+      expect(tag.id).toBe('tag-old')
+      const reviveQuery: string = qr.query.mock.calls[1][0] as string
+      expect(reviveQuery).toContain('SET deleted_at = NULL')
+      expect(reviveQuery).not.toContain('INSERT')
+    })
+
+    it('rejects a duplicate that is still active', async () => {
+      qr.query.mockResolvedValueOnce([{ id: 'tag-1', deleted_at: null }])
+
+      await expect(service.create(SCHEMA, { name: 'VIP', entityType: 'contact' })).rejects.toThrow(
+        BadRequestException,
       )
-      expect(cleanupCalled).toBe(false)
     })
   })
 

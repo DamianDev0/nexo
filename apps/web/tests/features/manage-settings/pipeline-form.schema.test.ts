@@ -5,7 +5,6 @@ import type { TFunction } from 'i18next'
 import { PIPELINE_NAME_MAX } from '@/features/manage-settings/config/pipelines.constants'
 import { buildPipelineFormSchema } from '@/features/manage-settings/lib/pipeline-form.schema'
 
-
 const t = vi.fn((key: string) => key) as unknown as TFunction
 
 describe('buildPipelineFormSchema', () => {

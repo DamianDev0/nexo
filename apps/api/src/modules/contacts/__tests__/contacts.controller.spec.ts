@@ -20,28 +20,13 @@ const mockContact: Contact = {
   whatsapp: null,
   documentType: null,
   documentNumber: null,
-  jobTitle: null,
-  linkedinUrl: null,
-  birthday: null,
-  address: null,
+  avatarUrl: null,
   city: 'Bogotá',
-  department: null,
   municipioCode: null,
-  country: 'Colombia',
   status: 'new',
   statusChangedAt: null,
-  avatarUrl: null,
   lifecycleStage: LifecycleStage.LEAD,
   source: 'manual',
-  type: null,
-  typeLabel: null,
-  leadScore: 0,
-  dataConsent: false,
-  consentDate: null,
-  consentSource: null,
-  optOutEmail: false,
-  optOutSms: false,
-  optOutWhatsapp: false,
   lastContactedAt: null,
   tags: [],
   companyId: null,
@@ -54,7 +39,7 @@ const mockContact: Contact = {
 }
 
 const { customFields: _cf, ...contactBase } = mockContact
-const mockContactListItem = { ...contactBase, noteCount: 0 }
+const mockContactListItem = { ...contactBase, noteCount: 0, optedOutChannels: [] }
 const mockPaginated: PaginatedContacts = {
   data: [mockContactListItem],
   total: 1,
@@ -196,12 +181,12 @@ describe('ContactsController', () => {
 
   describe('counts', () => {
     it('delegates to service with schema', async () => {
-      service.counts.mockResolvedValue({ total: 5, byStatus: { new: 5 } })
+      service.counts.mockResolvedValue({ total: 5, archived: 0, byStatus: { new: 5 } })
 
       const result = await controller.counts(mockCtx)
 
       expect(service.counts).toHaveBeenCalledWith(mockCtx.schemaName)
-      expect(result).toEqual({ total: 5, byStatus: { new: 5 } })
+      expect(result).toEqual({ total: 5, archived: 0, byStatus: { new: 5 } })
     })
   })
 

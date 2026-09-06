@@ -62,6 +62,9 @@ export const DOMAIN_EVENTS = {
   WORKFLOW_FAILED: 'workflow.failed',
   STOCK_LOW: 'stock.low',
   IMPORT_COMPLETED: 'import.completed',
+  BULK_ACTION_STARTED: 'bulk_action.started',
+  BULK_ACTION_COMPLETED: 'bulk_action.completed',
+  BULK_ACTION_CANCELLED: 'bulk_action.cancelled',
   WHATSAPP_NEW_MESSAGE: 'whatsapp.new_message',
 } as const
 

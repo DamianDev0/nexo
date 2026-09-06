@@ -1,7 +1,10 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useSaveShortcut, useSaveShortcutLabel } from '@/features/manage-settings/model/useSaveShortcut'
+import {
+  useSaveShortcut,
+  useSaveShortcutLabel,
+} from '@/features/manage-settings/model/useSaveShortcut'
 
 function pressSaveKey(init: KeyboardEventInit = {}) {
   const event = new KeyboardEvent('keydown', { key: 's', metaKey: true, ...init })

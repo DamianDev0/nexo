@@ -14,6 +14,14 @@ describe('contactListQuery', () => {
     expect(query.q).toBe('maria')
   })
 
+  it('turns the archived list into the archived flag instead of a status', () => {
+    const query = contactListQuery('', 'archived')
+
+    expect(query.archived).toBe(true)
+    expect(query.status).toBeUndefined()
+    expect(contactListQuery('', 'new').archived).toBeUndefined()
+  })
+
   it('sets q to undefined for an empty search', () => {
     const query = contactListQuery('   ', null)
 
@@ -35,7 +43,10 @@ describe('contactListQuery', () => {
   })
 
   it('maps quick filters to is_any_of advanced conditions', () => {
-    const query = contactListQuery('', null, { lifecycleStage: ['lead', 'mql'], source: ['manual'] })
+    const query = contactListQuery('', null, {
+      lifecycleStage: ['lead', 'mql'],
+      source: ['manual'],
+    })
 
     expect(query.advanced).toEqual([
       { field: 'source', operator: 'is_any_of', value: ['manual'] },

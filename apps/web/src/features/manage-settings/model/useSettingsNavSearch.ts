@@ -23,7 +23,10 @@ export function useSettingsNavSearch() {
     [moduleLabel, t],
   )
 
-  const groups = useMemo(() => filterSettingsGroups(SETTINGS_GROUPS, query, labels), [query, labels])
+  const groups = useMemo(
+    () => filterSettingsGroups(SETTINGS_GROUPS, query, labels),
+    [query, labels],
+  )
 
   return { query, setQuery, groups }
 }

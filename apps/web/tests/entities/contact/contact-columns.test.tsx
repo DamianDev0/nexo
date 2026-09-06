@@ -15,7 +15,6 @@ const CONTEXT = {
   taxonomy: {
     statusByKey: new Map(),
     sourceByKey: new Map(),
-    typeByKey: new Map(),
     lifecycleByKey: new Map(),
   },
 }

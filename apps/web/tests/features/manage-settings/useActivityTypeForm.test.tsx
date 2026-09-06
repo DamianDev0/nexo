@@ -9,7 +9,6 @@ import { DEFAULT_ACTIVITY_ICON } from '@/features/manage-settings/config/activit
 import { HEX_COLOR_PALETTE } from '@/features/manage-settings/config/hex-palette.constants'
 import { useActivityTypeForm } from '@/features/manage-settings/model/useActivityTypeForm'
 
-
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }))

@@ -18,7 +18,6 @@ const CONTEXT: ContactColumnContext = {
   taxonomy: {
     statusByKey: new Map([['new', { key: 'new', label: 'Nuevo', color: '#3B82F6' }]]),
     sourceByKey: new Map([['manual', { key: 'manual', label: 'Manual', color: '#64748B' }]]),
-    typeByKey: new Map(),
     lifecycleByKey: new Map([['lead', { key: 'lead', label: 'Lead', color: '#60A5FA' }]]),
   },
 }
@@ -41,12 +40,6 @@ describe('contactCellRenderer', () => {
     expect(screen.getByText('unmapped')).toBeInTheDocument()
   })
 
-  it('prefers the free-form type label over the taxonomy lookup', () => {
-    renderCell('type', { type: 'client', typeLabel: 'Distribuidor' })
-
-    expect(screen.getByText('Distribuidor')).toBeInTheDocument()
-  })
-
   it('renders the created date with its Bogota time', () => {
     renderCell('createdAt', { createdAt: '2026-08-14T15:00:00.000Z' })
 
@@ -61,9 +54,15 @@ describe('contactCellRenderer', () => {
   })
 
   it('reads unmapped columns straight off the contact', () => {
-    renderCell('jobTitle', { jobTitle: 'Gerente' })
+    renderCell('municipioCode', { municipioCode: '05001' })
 
-    expect(screen.getByText('Gerente')).toBeInTheDocument()
+    expect(screen.getByText('05001')).toBeInTheDocument()
+  })
+
+  it('flags channels the contact revoked through consents', () => {
+    renderCell('email', { email: 'ana@empresa.co', optedOutChannels: ['email'] })
+
+    expect(screen.getByLabelText('contacts.optOut.email')).toBeInTheDocument()
   })
 })
 
@@ -81,17 +80,5 @@ describe('refined cells', () => {
     renderCell('lastContactedAt', { lastContactedAt: when })
 
     expect(screen.getByText('hace 2 horas')).toBeInTheDocument()
-  })
-
-  it('leaves a lead score of zero as an empty marker instead of a loud badge', () => {
-    renderCell('leadScore', { leadScore: 0 })
-
-    expect(screen.getByText('—')).toBeInTheDocument()
-  })
-
-  it('shows a real score as a badge', () => {
-    renderCell('leadScore', { leadScore: 82 })
-
-    expect(screen.getByText('82')).toBeInTheDocument()
   })
 })

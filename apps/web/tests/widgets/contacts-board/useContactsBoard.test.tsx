@@ -67,9 +67,10 @@ describe('useContactsBoard', () => {
 
     const { result } = renderHook(() => useContactsBoard(), { wrapper })
 
-    await waitFor(() => expect(result.current.lists.items).toHaveLength(3))
-    const [all, first] = result.current.lists.items
+    await waitFor(() => expect(result.current.lists.items).toHaveLength(4))
+    const [all, archived, first] = result.current.lists.items
     expect(all).toMatchObject({ id: 'all', pinned: true, count: 2 })
+    expect(archived).toMatchObject({ id: 'archived', count: 0 })
     expect(first).toMatchObject({ id: 'new', label: 'Nuevo', count: 1 })
     expect(result.current.lists.activeId).toBe('all')
     expect(result.current.state.isEmpty).toBe(false)
@@ -105,6 +106,7 @@ describe('useContactsBoard', () => {
     await waitFor(() =>
       expect(result.current.lists.items.map((item) => item.id)).toEqual([
         'all',
+        'archived',
         'qualified',
         'new',
       ]),
@@ -127,6 +129,7 @@ describe('useContactsBoard', () => {
     await waitFor(() =>
       expect(result.current.lists.items.map((item) => item.id)).toEqual([
         'all',
+        'archived',
         'qualified',
         'new',
       ]),
@@ -136,6 +139,7 @@ describe('useContactsBoard', () => {
     await waitFor(() =>
       expect(result.current.lists.items.map((item) => item.id)).toEqual([
         'all',
+        'archived',
         'new',
         'qualified',
       ]),
@@ -160,14 +164,21 @@ describe('useContactsBoard', () => {
     await waitFor(() => expect(result.current.lists.activeId).toBe('all'))
   })
 
-  it('archives every selected row and clears the selection', async () => {
-    const deletedIds: string[] = []
+  it('queues a bulk archive for the selected rows and clears the selection', async () => {
+    let received: Record<string, unknown> | null = null
     server.use(...boardHandlers())
     server.use(
-      http.delete(`${API}/contacts/:id`, ({ params }) => {
-        deletedIds.push(String(params.id))
-        return HttpResponse.json({ data: null })
+      http.post(`${API}/bulk-actions`, async ({ request }) => {
+        received = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json({
+          data: { id: 'ba-1', status: 'queued', total: 2, processed: 0, succeeded: 0, failed: 0 },
+        })
       }),
+      http.get(`${API}/bulk-actions/ba-1`, () =>
+        HttpResponse.json({
+          data: { id: 'ba-1', status: 'running', total: 2, processed: 0, succeeded: 0, failed: 0 },
+        }),
+      ),
     )
 
     const { result } = renderHook(() => useContactsBoard(), { wrapper })
@@ -178,19 +189,23 @@ describe('useContactsBoard', () => {
     })
     await waitFor(() => expect(result.current.instance.selection.count).toBe(2))
 
-    act(() => result.current.actions.onArchiveSelected())
+    act(() => result.current.bulk.dialogs.archive())
 
-    await waitFor(() => expect(deletedIds).toHaveLength(2))
-    expect(deletedIds).toEqual(CONTACTS_FIXTURE.map((contact) => contact.id))
+    await waitFor(() => expect(received).not.toBeNull())
+    expect(received).toMatchObject({
+      entity: 'contacts',
+      action: 'archive',
+      selection: { mode: 'ids', ids: CONTACTS_FIXTURE.map((contact) => contact.id) },
+    })
     await waitFor(() => expect(result.current.instance.selection.count).toBe(0))
   })
 
-  it('ignores the archive action when nothing is selected', async () => {
-    const deletedIds: string[] = []
+  it('ignores bulk actions when nothing is selected', async () => {
+    const posted = vi.fn()
     server.use(...boardHandlers())
     server.use(
-      http.delete(`${API}/contacts/:id`, ({ params }) => {
-        deletedIds.push(String(params.id))
+      http.post(`${API}/bulk-actions`, () => {
+        posted()
         return HttpResponse.json({ data: null })
       }),
     )
@@ -198,9 +213,9 @@ describe('useContactsBoard', () => {
     const { result } = renderHook(() => useContactsBoard(), { wrapper })
     await waitFor(() => expect(result.current.state.isPending).toBe(false))
 
-    act(() => result.current.actions.onArchiveSelected())
+    act(() => result.current.bulk.dialogs.archive())
 
-    expect(deletedIds).toEqual([])
+    expect(posted).not.toHaveBeenCalled()
   })
 
   it('opens the create sheet without a contact and closes it again', async () => {

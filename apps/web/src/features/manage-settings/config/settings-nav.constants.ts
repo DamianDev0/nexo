@@ -1,5 +1,6 @@
 import { ROUTES } from '@/shared/config/routes'
 import {
+  ArrowCounterClockwiseIcon,
   AddressBookIcon,
   BellIcon,
   BuildingsIcon,
@@ -75,10 +76,10 @@ export const SETTINGS_GROUPS: ReadonlyArray<SettingsGroup> = [
           { key: 'status', href: SETTINGS.contacts.status },
           { key: 'lifecycle', href: SETTINGS.contacts.lifecycle },
           { key: 'sources', href: SETTINGS.contacts.sources },
-          { key: 'types', href: SETTINGS.contacts.types },
           { key: 'tags', href: SETTINGS.contacts.tags },
         ],
       },
+      { key: 'trash', href: SETTINGS.trash, icon: ArrowCounterClockwiseIcon, available: true },
     ],
   },
 ]

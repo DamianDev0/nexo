@@ -16,7 +16,7 @@ const STALE_MS = 5 * 60 * 1000
 function toChoices(
   t: TFunction,
   options: ReadonlyArray<TaxonomyOption> = [],
-  namespace: 'status' | 'source' | 'types' | 'lifecycleStage',
+  namespace: 'status' | 'source' | 'lifecycleStage',
 ): TaxonomyChoice[] {
   return options
     .filter((option) => option.enabled)
@@ -45,16 +45,13 @@ export function useContactTaxonomy() {
   return useMemo(() => {
     const statuses = toChoices(t, data?.statuses, 'status')
     const sources = toChoices(t, data?.sources, 'source')
-    const types = toChoices(t, data?.types, 'types')
     const lifecycleStages = toChoices(t, data?.lifecycleStages, 'lifecycleStage')
     return {
       statuses,
       sources,
-      types,
       lifecycleStages,
       statusByKey: byKey(statuses),
       sourceByKey: byKey(sources),
-      typeByKey: byKey(types),
       lifecycleByKey: byKey(lifecycleStages),
       isPending,
     }

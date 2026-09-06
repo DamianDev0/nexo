@@ -35,6 +35,7 @@ export type ContactNameLabels = {
   readonly preview: string
   readonly addNote: string
   readonly editTags: string
+  readonly restore: string
   readonly tags: TagsCellLabels
   readonly notes: NotesCellLabels
 }
@@ -56,6 +57,7 @@ export type ContactNameActions = {
   readonly onPreview?: (contact: ContactListItem) => void
   readonly onAddNote?: (contact: ContactListItem) => void
   readonly onEditTags?: (contact: ContactListItem) => void
+  readonly onRestore?: (contact: ContactListItem) => void
 }
 
 export type ContactRowActions = ContactNameActions & {
@@ -69,7 +71,6 @@ export type ContactRowActions = ContactNameActions & {
 export type ContactTaxonomyMaps = {
   readonly statusByKey: ReadonlyMap<string, TaxonomyChoice>
   readonly sourceByKey: ReadonlyMap<string, TaxonomyChoice>
-  readonly typeByKey: ReadonlyMap<string, TaxonomyChoice>
   readonly lifecycleByKey: ReadonlyMap<string, TaxonomyChoice>
 }
 

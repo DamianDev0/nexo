@@ -1,4 +1,4 @@
-import type { ActivityTypeDef } from '@repo/shared-types'
+import type { ActivityTypeDef, IndustrySector } from '@repo/shared-types'
 import type {
   TenantTheme,
   TenantThemeColors,
@@ -26,5 +26,6 @@ export interface TenantFullConfig {
   fieldPermissions?: FieldPermissionsConfig
   activityTypes?: ActivityTypeDef[]
   contactTaxonomy?: ContactTaxonomy
+  industry?: { sector?: IndustrySector }
   [key: string]: unknown
 }
