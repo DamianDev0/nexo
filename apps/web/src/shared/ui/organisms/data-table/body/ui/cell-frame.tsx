@@ -121,7 +121,7 @@ export function DataTableCellFrame({
         side="top"
         align="end"
         sideOffset={2}
-        className="rounded-lg p-0.5"
+        className="z-30 rounded-lg p-0.5"
         onMouseEnter={() => schedule(true, 0)}
         onMouseLeave={() => schedule(false, DOCK_CLOSE_GRACE_MS)}
       >

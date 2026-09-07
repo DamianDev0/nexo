@@ -11,3 +11,7 @@ export const CONTACT_NAME_TEXT = 'text-sm font-medium tracking-tight text-foregr
 
 export const CONTACT_STRIP_BUTTON =
   'relative size-5 rounded-sm text-muted-foreground hover:text-foreground'
+
+export const CONTACT_REQUIRED_FIELDS = ['email', 'phone', 'documentNumber'] as const
+
+export const CONTACT_ADDRESS_KEY = 'address'

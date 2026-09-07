@@ -138,3 +138,47 @@ describe('useOptimisticContactListPatch', () => {
     )
   })
 })
+
+describe('useOptimisticContactListPatch — overlapping mutations', () => {
+  it('only reverts its own fields when an earlier mutation fails after a later one applied', async () => {
+    const client = seedClient()
+    function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
+      return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    }
+    let rejectFirst: (error: Error) => void = () => undefined
+    const first = renderHook(
+      () =>
+        useOptimisticContactListPatch<NameChange>({
+          mutationFn: () =>
+            new Promise((_resolve, rejectPromise) => {
+              rejectFirst = rejectPromise
+            }),
+          patch: (contact, change) => ({ ...contact, firstName: change.firstName }),
+          match: (contact, change) => contact.id === change.id,
+          successTitle: () => 'first',
+        }),
+      { wrapper: Wrapper },
+    )
+    const second = renderHook(
+      () =>
+        useOptimisticContactListPatch<{ id: string; lastName: string }>({
+          mutationFn: () => Promise.resolve(null),
+          patch: (contact, change) => ({ ...contact, lastName: change.lastName }),
+          match: (contact, change) => contact.id === change.id,
+          successTitle: () => 'second',
+        }),
+      { wrapper: Wrapper },
+    )
+
+    act(() => first.result.current({ id: 'c1', firstName: 'Zoe' }))
+    await waitFor(() => expect(names(client)).toEqual(['Zoe', 'Luis']))
+    act(() => second.result.current({ id: 'c1', lastName: 'Gómez' }))
+    act(() => rejectFirst(new Error('boom')))
+
+    await waitFor(() => expect(sileoError).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(sileoSuccess).toHaveBeenCalledWith({ title: 'second' }))
+    const c1 = client.getQueryData<PaginatedContacts>(listKey)?.data[0]
+    expect(c1?.firstName).toBe('Ana')
+    expect(c1?.lastName).toBe('Gómez')
+  })
+})

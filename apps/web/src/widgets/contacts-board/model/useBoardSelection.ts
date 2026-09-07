@@ -42,7 +42,8 @@ export function useBoardSelection({
     if (previousScope.current === scopeKey) return
     previousScope.current = scopeKey
     clearSelection()
-  }, [scopeKey, clearSelection])
+    closePreview()
+  }, [scopeKey, clearSelection, closePreview])
 
   return { openFromPreview, selectedIds, selectedTags, clearSelection }
 }

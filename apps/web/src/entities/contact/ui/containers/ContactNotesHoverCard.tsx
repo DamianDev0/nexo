@@ -65,7 +65,7 @@ export function ContactNotesHoverCard({
       }}
     >
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
-      <HoverCardContent align="start" className="w-64 p-2">
+      <HoverCardContent align="start" className="z-30 w-64 p-2">
         <Text as="p" variant="hint" className="px-1.5 pb-1 font-medium">
           {labels.title}
         </Text>

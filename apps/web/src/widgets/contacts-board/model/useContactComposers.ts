@@ -2,10 +2,10 @@
 
 import { useCallback, useMemo, useState } from 'react'
 
-import type { ContactComposeChannel } from '@/entities/contact'
+import type { ContactComposeChannel, ContactLogKind } from '@/entities/contact'
 import type { ContactListItem } from '@repo/shared-types'
 
-export type ComposerKind = 'note' | 'tags' | ContactComposeChannel
+export type ComposerKind = 'note' | 'tags' | ContactComposeChannel | ContactLogKind
 
 export type ActiveComposer = {
   readonly kind: ComposerKind
@@ -29,10 +29,14 @@ export function useContactComposers() {
       setActive({ kind: channel, contact }),
     [],
   )
+  const openActivity = useCallback(
+    (kind: ContactLogKind, contact: ContactListItem) => setActive({ kind, contact }),
+    [],
+  )
 
   return useMemo(
-    () => ({ active, close, openNote, openTags, openMessage }),
-    [active, close, openNote, openTags, openMessage],
+    () => ({ active, close, openNote, openTags, openMessage, openActivity }),
+    [active, close, openNote, openTags, openMessage, openActivity],
   )
 }
 

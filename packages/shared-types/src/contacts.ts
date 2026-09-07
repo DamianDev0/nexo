@@ -51,7 +51,7 @@ export type ContactInput = {
   lifecycleStage?: string
   tags?: string[]
   companyId?: string
-  assignedToId?: string
+  assignedToId?: string | null
   avatarUrl?: string
   customFields?: Record<string, unknown>
 }
@@ -64,7 +64,7 @@ export type ContactListQuery = {
   lifecycleStage?: string
   tags?: string[]
   companyId?: string
-  assignedToId?: string
+  assignedToId?: string | null
   unassigned?: boolean
   city?: string
   createdFrom?: string

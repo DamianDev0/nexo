@@ -1,35 +1,14 @@
-import { isValidCOPhone, phoneDigits } from '@repo/shared-utils'
 import { z } from 'zod'
+
+import { contactCoreFieldsSchema } from '@/entities/contact'
 
 import type { TFunction } from 'i18next'
 
-function optionalPhone(t: TFunction) {
-  return z
-    .string()
-    .trim()
-    .transform(phoneDigits)
-    .refine((value) => value === '' || isValidCOPhone(value), t('contacts.errors.phoneInvalid'))
-}
-
 export function buildContactSchema(t: TFunction) {
-  return z.object({
-    firstName: z.string().trim().min(1, t('contacts.errors.firstNameRequired')),
-    lastName: z.string().trim(),
-    email: z
-      .string()
-      .trim()
-      .email(t('contacts.errors.emailInvalid'))
-      .or(z.literal(''))
-      .transform((value) => value || ''),
-    phone: optionalPhone(t),
-    whatsapp: optionalPhone(t),
+  return contactCoreFieldsSchema(t).extend({
     whatsappSameAsPhone: z.boolean(),
-    address: z.string().trim(),
-    city: z.string().trim(),
-    municipioCode: z.string().trim(),
     avatarUrl: z.string().trim(),
     status: z.string().min(1),
-    source: z.string(),
     lifecycleStage: z.string(),
   })
 }

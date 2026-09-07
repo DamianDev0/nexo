@@ -1,3 +1,5 @@
+import { CONTACT_ADDRESS_KEY } from '../config/contact-columns.constants'
+
 import {
   contactDocumentLabel,
   contactMailHref,
@@ -48,7 +50,11 @@ export function buildContactPreviewRows(
     },
     { key: 'role', label: t('contacts.form.role'), value: customText(contact, 'role') },
     { key: 'city', label: t('contacts.form.city'), value: contact.city },
-    { key: 'address', label: t('contacts.form.address'), value: customText(contact, 'address') },
+    {
+      key: 'address',
+      label: t('contacts.form.address'),
+      value: customText(contact, CONTACT_ADDRESS_KEY),
+    },
   ]
 }
 

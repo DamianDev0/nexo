@@ -4,6 +4,7 @@ export type CreateActivityInput = {
   readonly activityType: string
   readonly title?: string
   readonly description?: string
+  readonly dueDate?: string
   readonly contactId?: string
   readonly companyId?: string
   readonly dealId?: string

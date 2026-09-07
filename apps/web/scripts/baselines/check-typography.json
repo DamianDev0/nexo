@@ -1,5 +1,4 @@
 [
-  "src/entities/contact/ui/cells/ContactNameCell.tsx :: <span className=\"absolute -right-0.5 -top-0.5 flex size-3 items-center justify-c",
   "src/features/create-contact/ui/CustomFieldsSection.tsx :: {def.required && <span className=\"text-destructive\"> *</span>}",
   "src/features/import-contacts/ui/FieldSelector.tsx :: {field.required && <span className=\"text-destructive\"> *</span>}",
   "src/features/manage-settings/ui/sections/fields/FieldTypePicker.tsx :: <span className=\"text-xs leading-tight\">{t(`settings.fields.types.${fieldType}`)",

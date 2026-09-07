@@ -3,8 +3,9 @@
 import dynamic from 'next/dynamic'
 
 import { useMountedOnce } from '@/shared/lib/hooks/useMountedOnce'
+import { Composer } from '@/shared/ui/organisms/composer'
 
-import { resolveMessageChannel } from '../../lib/message-channel'
+import { resolveLogKind, resolveMessageChannel } from '../../lib/message-channel'
 import { useComposerPreload } from '../../model/useComposerPreload'
 import { useContactsBoard } from '../../model/useContactsBoard'
 import { useListMenu } from '../../model/useListMenu'
@@ -15,8 +16,13 @@ const ContactFormSheet = dynamic(
   { loading: () => null, ssr: false },
 )
 
-const ContactPreviewSheet = dynamic(
-  () => import('@/entities/contact').then((m) => m.ContactPreviewSheet),
+const ContactRecordDrawer = dynamic(
+  () => import('@/features/preview-contact').then((m) => m.ContactRecordDrawer),
+  { loading: () => null, ssr: false },
+)
+
+const ActivityComposer = dynamic(
+  () => import('@/features/log-contact-activity').then((m) => m.ActivityComposer),
   { loading: () => null, ssr: false },
 )
 
@@ -50,6 +56,7 @@ export function ContactsBoard() {
   const previewMounted = useMountedOnce(preview.open)
   const { active, close } = composers
   const channel = resolveMessageChannel(active)
+  const logKind = resolveLogKind(active)
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -62,29 +69,43 @@ export function ContactsBoard() {
           onOpenChange={sheet.onOpenChange}
         />
       )}
-      {previewMounted && (
-        <ContactPreviewSheet
-          contact={preview.contact}
+      {previewMounted && preview.contact && (
+        <ContactRecordDrawer
+          record={{
+            contact: preview.contact,
+            siblings: preview.siblings,
+            onSelect: preview.onSelect,
+          }}
           open={preview.open}
           onOpenChange={preview.onOpenChange}
-          onEdit={preview.onEdit}
+          actions={preview.actions}
           taxonomy={preview.taxonomy}
         />
       )}
-      {active?.kind === 'note' && (
-        <NoteComposer key={active.contact.id} contact={active.contact} onClose={close} />
-      )}
-      {active?.kind === 'tags' && (
-        <TagComposer key={active.contact.id} contact={active.contact} onClose={close} />
-      )}
-      {active && channel && (
-        <MessageComposer
-          key={`${channel}:${active.contact.id}`}
-          channel={channel}
-          contact={active.contact}
-          onClose={close}
-        />
-      )}
+      <Composer.Placement value={preview.open ? 'aside' : 'corner'}>
+        {active?.kind === 'note' && (
+          <NoteComposer key={active.contact.id} contact={active.contact} onClose={close} />
+        )}
+        {active?.kind === 'tags' && (
+          <TagComposer key={active.contact.id} contact={active.contact} onClose={close} />
+        )}
+        {active && logKind && (
+          <ActivityComposer
+            key={`${logKind}:${active.contact.id}`}
+            kind={logKind}
+            contact={active.contact}
+            onClose={close}
+          />
+        )}
+        {active && channel && (
+          <MessageComposer
+            key={`${channel}:${active.contact.id}`}
+            channel={channel}
+            contact={active.contact}
+            onClose={close}
+          />
+        )}
+      </Composer.Placement>
     </div>
   )
 }

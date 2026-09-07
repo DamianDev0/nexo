@@ -9,17 +9,28 @@ import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { AsyncSelect } from '@/shared/ui/molecules/async-select'
 
-import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { AsyncSelectSource } from '@/shared/ui/molecules/async-select'
-import type { Control } from 'react-hook-form'
+import type { Control, FieldValues, Path } from 'react-hook-form'
 
-type TaxonomySelectFieldProps = {
-  readonly control: Control<ContactFormValues>
-  readonly name: 'status' | 'source' | 'lifecycleStage'
-  readonly label: string
+export type TaxonomyFieldName<T extends FieldValues> = Extract<
+  Path<T>,
+  'status' | 'source' | 'lifecycleStage'
+>
+
+export type TaxonomySelectView = {
   readonly placeholder?: string
+  readonly compact?: boolean
+  readonly disabled?: boolean
+  readonly onChange?: (value: string) => void
+}
+
+type TaxonomySelectFieldProps<T extends FieldValues> = {
+  readonly control: Control<T>
+  readonly name: TaxonomyFieldName<T>
+  readonly label: string
   readonly choices: ReadonlyArray<TaxonomyChoice>
+  readonly view?: TaxonomySelectView
 }
 
 function renderChoice(choice: TaxonomyChoice) {
@@ -31,13 +42,13 @@ function renderChoice(choice: TaxonomyChoice) {
   )
 }
 
-export function TaxonomySelectField({
+export function TaxonomySelectField<T extends FieldValues>({
   control,
   name,
   label,
-  placeholder,
   choices,
-}: Readonly<TaxonomySelectFieldProps>) {
+  view,
+}: Readonly<TaxonomySelectFieldProps<T>>) {
   const { t } = useTranslation()
 
   const source = useMemo<AsyncSelectSource<TaxonomyChoice>>(
@@ -59,14 +70,18 @@ export function TaxonomySelectField({
         return (
           <div>
             <FieldLabel>{label}</FieldLabel>
-            <div className="mt-1.5">
+            <div className={view?.compact ? 'mt-1' : 'mt-1.5'}>
               <AsyncSelect
-                value={field.value}
-                onChange={(value) => field.onChange(value)}
+                value={String(field.value ?? '')}
+                disabled={view?.disabled}
+                onChange={(value) => {
+                  field.onChange(value)
+                  view?.onChange?.(value)
+                }}
                 source={source}
                 view={{
                   display: selected ? renderChoice(selected) : undefined,
-                  placeholder: placeholder ?? '',
+                  placeholder: view?.placeholder ?? '',
                   searchPlaceholder: t('common.search'),
                   empty: t('common.noResults'),
                 }}

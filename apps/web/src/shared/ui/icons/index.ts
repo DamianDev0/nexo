@@ -131,6 +131,7 @@ export {
   UserX as UserXIcon,
   Users as UsersThreeIcon,
   CircleAlert as WarningCircleIcon,
+  TriangleAlert as WarningIcon,
   Wrench as WrenchIcon,
   X as XIcon,
 } from 'lucide-react'

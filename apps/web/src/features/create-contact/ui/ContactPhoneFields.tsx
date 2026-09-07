@@ -3,9 +3,8 @@
 import { Controller, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { ContactPhoneField } from '@/entities/contact'
 import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
-
-import { ContactPhoneField } from './ContactPhoneField'
 
 import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { Control } from 'react-hook-form'
@@ -30,7 +29,7 @@ export function ContactPhoneFields({
           control={control}
           name="whatsapp"
           label={t('contacts.form.whatsapp')}
-          disabled={sameAsPhone}
+          view={{ disabled: sameAsPhone }}
         />
       </div>
 

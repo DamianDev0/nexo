@@ -8,9 +8,14 @@ import { sileo } from 'sileo'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import type { ContactListItem, PaginatedContacts } from '@repo/shared-types'
-import type { QueryKey } from '@tanstack/react-query'
 
-type ListSnapshot = Array<[QueryKey, PaginatedContacts | undefined]>
+type ContactKey = keyof ContactListItem
+
+type Reversal = {
+  readonly id: string
+  readonly previous: ContactListItem
+  readonly keys: ReadonlyArray<ContactKey>
+}
 
 type OptimisticContactListPatchOptions<TChange> = {
   mutationFn: (change: TChange) => Promise<unknown>
@@ -20,6 +25,17 @@ type OptimisticContactListPatchOptions<TChange> = {
 }
 
 const contactLists = QUERY_KEYS.contacts.lists
+const CONTACT_LIST_SCOPE = { id: 'contact-list-patch' }
+
+function changedKeys(previous: ContactListItem, next: ContactListItem): ReadonlyArray<ContactKey> {
+  return (Object.keys(next) as ContactKey[]).filter((key) => next[key] !== previous[key])
+}
+
+function revertOwnKeys(contact: ContactListItem, reversal: Reversal): ContactListItem {
+  const restored = { ...contact }
+  for (const key of reversal.keys) Object.assign(restored, { [key]: reversal.previous[key] })
+  return restored
+}
 
 export function useOptimisticContactListPatch<TChange>({
   mutationFn,
@@ -31,24 +47,43 @@ export function useOptimisticContactListPatch<TChange>({
 
   const { mutate } = useMutation({
     mutationFn,
-    onMutate: async (change: TChange): Promise<{ snapshots: ListSnapshot }> => {
+    scope: CONTACT_LIST_SCOPE,
+    onMutate: async (change: TChange): Promise<{ reversals: Reversal[] }> => {
       await client.cancelQueries({ queryKey: contactLists })
-      const snapshots = client.getQueriesData<PaginatedContacts>({ queryKey: contactLists })
+      const reversals: Reversal[] = []
       client.setQueriesData<PaginatedContacts>({ queryKey: contactLists }, (page) =>
         page
           ? {
               ...page,
-              data: page.data.map((contact) =>
-                match(contact, change) ? patch(contact, change) : contact,
-              ),
+              data: page.data.map((contact) => {
+                if (!match(contact, change)) return contact
+                const next = patch(contact, change)
+                reversals.push({
+                  id: contact.id,
+                  previous: contact,
+                  keys: changedKeys(contact, next),
+                })
+                return next
+              }),
             }
           : page,
       )
-      return { snapshots }
+      return { reversals }
     },
     onSuccess: () => sileo.success({ title: successTitle() }),
     onError: (_error, _change, context) => {
-      context?.snapshots.forEach(([key, data]) => client.setQueryData(key, data))
+      const byId = new Map(context?.reversals.map((reversal) => [reversal.id, reversal]))
+      client.setQueriesData<PaginatedContacts>({ queryKey: contactLists }, (page) =>
+        page
+          ? {
+              ...page,
+              data: page.data.map((contact) => {
+                const reversal = byId.get(contact.id)
+                return reversal ? revertOwnKeys(contact, reversal) : contact
+              }),
+            }
+          : page,
+      )
       sileo.error({ title: t('common.saveFailed') })
     },
     onSettled: () => void client.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all }),

@@ -20,6 +20,7 @@ export function useBoardEditors() {
     onAddNote: composers.openNote,
     onEditTags: composers.openTags,
     onCompose: composers.openMessage,
+    onLogActivity: composers.openActivity,
   })
 
   return { sheet, preview, composers, rowActions }

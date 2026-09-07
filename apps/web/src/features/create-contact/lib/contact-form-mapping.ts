@@ -1,4 +1,4 @@
-import { contactAvatarUrl } from '@/entities/contact'
+import { CONTACT_ADDRESS_KEY, contactAvatarUrl } from '@/entities/contact'
 
 import { resolveWhatsapp, type ContactFormValues } from './contact-form.schema'
 
@@ -7,8 +7,6 @@ import type { ContactInput, ContactListItem, FieldDef } from '@repo/shared-types
 export function stripNullValues(record: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(record).filter(([, value]) => value !== null))
 }
-
-export const ADDRESS_FIELD_KEY = 'address'
 
 export function pickCustomFieldValues(
   values: Record<string, unknown>,
@@ -23,7 +21,7 @@ function withAddress(
   customFields: Record<string, unknown>,
 ): Record<string, unknown> | undefined {
   const merged = values.address
-    ? { ...customFields, [ADDRESS_FIELD_KEY]: values.address }
+    ? { ...customFields, [CONTACT_ADDRESS_KEY]: values.address }
     : customFields
   return Object.keys(merged).length > 0 ? merged : undefined
 }
@@ -57,8 +55,8 @@ export function toFormValues(contact: ContactListItem): ContactFormValues {
     whatsapp: contact.whatsapp ?? '',
     whatsappSameAsPhone: Boolean(contact.phone) && contact.phone === contact.whatsapp,
     address:
-      typeof contact.customFields?.[ADDRESS_FIELD_KEY] === 'string'
-        ? contact.customFields[ADDRESS_FIELD_KEY]
+      typeof contact.customFields?.[CONTACT_ADDRESS_KEY] === 'string'
+        ? contact.customFields[CONTACT_ADDRESS_KEY]
         : '',
     city: contact.city ?? '',
     municipioCode: contact.municipioCode ?? '',

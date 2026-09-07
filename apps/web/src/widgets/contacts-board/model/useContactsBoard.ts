@@ -25,6 +25,7 @@ import { orderSmartLists } from '../lib/order-smart-lists'
 import { selectionScopeKey } from '../lib/selection-scope'
 
 import { useBoardEditors } from './useBoardEditors'
+import { useBoardPreview } from './useBoardPreview'
 import { useBoardSelection } from './useBoardSelection'
 import { useBoardViews } from './useBoardViews'
 import { useSkeletonHintSync } from './useSkeletonHintSync'
@@ -79,6 +80,13 @@ export function useContactsBoard() {
     scopeKey: selectionScopeKey(table.query),
     closePreview: () => preview.setOpen(false),
     openEdit: sheet.openEdit,
+  })
+  const previewRecord = useBoardPreview({
+    editor: preview,
+    rowActions,
+    openFromPreview,
+    siblings: table.rows,
+    taxonomy,
   })
   const { query: tableQuery } = table
   const bulkFilter = useCallback(() => filterSelection(tableQuery), [tableQuery])
@@ -184,13 +192,7 @@ export function useContactsBoard() {
     composers,
     bulk,
     sheet: { contact: sheet.editing, open: sheet.open, onOpenChange: sheet.setOpen },
-    preview: {
-      contact: preview.editing,
-      open: preview.open,
-      onOpenChange: preview.setOpen,
-      onEdit: openFromPreview,
-      taxonomy,
-    },
+    preview: previewRecord,
   }
 }
 

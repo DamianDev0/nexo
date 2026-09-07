@@ -3,17 +3,18 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { CONTACT_AVATARS } from '@/entities/contact'
-import { AddressField, MunicipalityCombobox } from '@/entities/geo'
+import {
+  CONTACT_AVATARS,
+  ContactAddressField,
+  ContactCityField,
+  TaxonomySelectField,
+  useAddressAutofill,
+} from '@/entities/contact'
 import { useEntityTerms } from '@/entities/nomenclature'
-import { FieldLabel } from '@/shared/ui/atoms/field-label'
 import { AvatarPicker } from '@/shared/ui/kokonutui/avatar-picker'
 import { ControlledField } from '@/shared/ui/molecules/controlled-field'
 
-import { useAddressAutofill } from '../model/useAddressAutofill'
-
 import { ContactPhoneFields } from './ContactPhoneFields'
-import { TaxonomySelectField } from './TaxonomySelectField'
 
 import type { ContactFormValues } from '../lib/contact-form.schema'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
@@ -39,7 +40,10 @@ export function ContactFormFields({
   const { t } = useTranslation()
   const terms = useEntityTerms('contact')
   const { statuses, sources, lifecycleStages } = taxonomy
-  const handlePlaceSelect = useAddressAutofill(setValue)
+  const handlePlaceSelect = useAddressAutofill((municipality) => {
+    setValue('city', municipality.name, { shouldDirty: true })
+    setValue('municipioCode', municipality.code, { shouldDirty: true })
+  })
 
   return (
     <div className="flex flex-col gap-3.5">
@@ -86,43 +90,19 @@ export function ContactFormFields({
         actions={{ onBlur: () => onProbeField?.('email') }}
       />
       <ContactPhoneFields control={control} onPhoneBlur={() => onProbeField?.('phone')} />
-      <Controller
+      <ContactAddressField
         control={control}
         name="address"
-        render={({ field }) => (
-          <div>
-            <FieldLabel>{t('contacts.form.address')}</FieldLabel>
-            <div className="mt-1.5">
-              <AddressField
-                value={field.value}
-                onChange={field.onChange}
-                onPlaceSelect={(place) => handlePlaceSelect(place.secondaryText)}
-                placeholder={t('contacts.form.addressPlaceholder')}
-              />
-            </div>
-          </div>
-        )}
+        onPlaceSelect={(place) => handlePlaceSelect(place.secondaryText)}
       />
 
       <div className="grid grid-cols-2 gap-3.5">
-        <Controller
+        <ContactCityField
           control={control}
           name="city"
-          render={({ field }) => (
-            <div>
-              <FieldLabel>{t('contacts.form.city')}</FieldLabel>
-              <div className="mt-1.5">
-                <MunicipalityCombobox
-                  value={field.value}
-                  placeholder={t('contacts.form.cityPlaceholder')}
-                  onSelect={(municipality) => {
-                    field.onChange(municipality.name)
-                    setValue('municipioCode', municipality.code, { shouldDirty: true })
-                  }}
-                />
-              </div>
-            </div>
-          )}
+          onSelect={(municipality) =>
+            setValue('municipioCode', municipality.code, { shouldDirty: true })
+          }
         />
         <TaxonomySelectField
           control={control}
@@ -136,8 +116,10 @@ export function ContactFormFields({
           control={control}
           name="source"
           label={t('contacts.form.source')}
-          placeholder={t('contacts.form.sourcePlaceholder', { entity: terms.lowerSingular })}
           choices={sources}
+          view={{
+            placeholder: t('contacts.form.sourcePlaceholder', { entity: terms.lowerSingular }),
+          }}
         />
         <TaxonomySelectField
           control={control}

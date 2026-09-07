@@ -2,22 +2,23 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/shared/lib'
 
-const badgeSoftVariants = cva(
-  'inline-flex h-7 items-center gap-1.75 rounded-full px-3 text-[12.5px] font-black',
-  {
-    variants: {
-      tone: {
-        neutral: 'bg-muted text-body',
-        info: 'bg-info-surface text-info-text',
-        warning: 'bg-warning-surface text-warning-text',
-        positive: 'bg-positive-surface text-positive-text',
-        negative: 'bg-negative-surface text-negative-text',
-        outline: 'border border-border-strong font-medium text-body',
-      },
+const badgeSoftVariants = cva('inline-flex items-center rounded-full font-black', {
+  variants: {
+    size: {
+      md: 'h-7 gap-1.75 px-3 text-[12.5px]',
+      sm: 'h-6 gap-1.5 px-2.5 text-[11px]',
     },
-    defaultVariants: { tone: 'neutral' },
+    tone: {
+      neutral: 'bg-muted text-body',
+      info: 'bg-info-surface text-info-text',
+      warning: 'bg-warning-surface text-warning-text',
+      positive: 'bg-positive-surface text-positive-text',
+      negative: 'bg-negative-surface text-negative-text',
+      outline: 'border border-border-strong font-medium text-body',
+    },
   },
-)
+  defaultVariants: { tone: 'neutral', size: 'md' },
+})
 
 const dotVariants = cva('size-1.5 rounded-full', {
   variants: {
@@ -39,13 +40,13 @@ interface BadgeSoftProps extends VariantProps<typeof badgeSoftVariants> {
   readonly color?: string
 }
 
-export function BadgeSoft({ tone, color, children, className }: Readonly<BadgeSoftProps>) {
+export function BadgeSoft({ tone, size, color, children, className }: Readonly<BadgeSoftProps>) {
   const resolvedTone = color ? 'neutral' : tone
 
   return (
     <span
       data-slot="badge-soft"
-      className={cn(badgeSoftVariants({ tone: resolvedTone }), className)}
+      className={cn(badgeSoftVariants({ tone: resolvedTone, size }), className)}
       style={
         color
           ? {

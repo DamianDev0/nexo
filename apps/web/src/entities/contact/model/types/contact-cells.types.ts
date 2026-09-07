@@ -1,5 +1,6 @@
+import type { ContactRequiredField } from '../../lib/contact-completeness'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
-import type { ContactListItem, Tag } from '@repo/shared-types'
+import type { ContactInput, ContactListItem, Tag } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
 export type TagsCellLabels = {
@@ -36,11 +37,35 @@ export type ContactNameLabels = {
   readonly addNote: string
   readonly editTags: string
   readonly restore: string
+  readonly missing: (fields: ReadonlyArray<ContactRequiredField>) => string | null
   readonly tags: TagsCellLabels
   readonly notes: NotesCellLabels
 }
 
 export type ContactComposeChannel = 'email' | 'sms' | 'whatsapp'
+
+export type ContactLogKind = 'task' | 'meeting'
+
+export type ContactFieldsPatch = Partial<
+  Pick<
+    ContactInput,
+    | 'firstName'
+    | 'lastName'
+    | 'email'
+    | 'phone'
+    | 'whatsapp'
+    | 'documentNumber'
+    | 'city'
+    | 'municipioCode'
+    | 'source'
+  >
+>
+
+export type ContactOwnerChange = {
+  readonly id: string
+  readonly assignedToId: string | null
+  readonly assignedToName: string | null
+}
 
 export type ContactCellLabels = {
   readonly name: ContactNameLabels
@@ -64,6 +89,9 @@ export type ContactRowActions = ContactNameActions & {
   readonly onCopy?: (value: string) => void
   readonly onCall?: (number: string) => void
   readonly onCompose?: (channel: ContactComposeChannel, contact: ContactListItem) => void
+  readonly onLogActivity?: (kind: ContactLogKind, contact: ContactListItem) => void
+  readonly onAssign?: (change: ContactOwnerChange) => void
+  readonly onFieldsChange?: (contactId: string, patch: ContactFieldsPatch) => void
   readonly onStatusChange?: (contactId: string, status: string) => void
   readonly onCustomFieldsChange?: (contactId: string, customFields: Record<string, unknown>) => void
 }

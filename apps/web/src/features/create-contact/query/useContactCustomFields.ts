@@ -4,10 +4,9 @@ import { RENDERABLE_FIELD_TYPES } from '@repo/shared-types'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
+import { CONTACT_ADDRESS_KEY } from '@/entities/contact'
 import settingsService from '@/shared/api/services/settings.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
-
-import { ADDRESS_FIELD_KEY } from '../lib/contact-form-mapping'
 
 import type { FieldDef } from '@repo/shared-types'
 
@@ -25,7 +24,7 @@ export function useContactCustomFields(): ReadonlyArray<FieldDef> {
       (data ?? [])
         .filter(
           (field) =>
-            field.key !== ADDRESS_FIELD_KEY &&
+            field.key !== CONTACT_ADDRESS_KEY &&
             field.isActive !== false &&
             field.showInForm !== false &&
             RENDERABLE_FIELD_TYPES.includes(field.type),

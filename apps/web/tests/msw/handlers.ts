@@ -22,7 +22,7 @@ import type {
   PaginatedContacts,
 } from '@repo/shared-types'
 
-function buildContact(overrides: Partial<ContactListItem>): ContactListItem {
+export function buildContact(overrides: Partial<ContactListItem> = {}): ContactListItem {
   return {
     id: 'contact-1',
     firstName: 'Maria',

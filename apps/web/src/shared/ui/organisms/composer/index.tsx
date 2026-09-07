@@ -7,10 +7,12 @@ import { cn } from '@/shared/lib'
 import { smoothSpring, useReducedTransition } from '@/shared/lib/animations'
 
 import { ComposerAttachment, ComposerAttachments } from './attachments'
+import { COMPOSER_PLACEMENT } from './constants'
 import { ComposerContext } from './context'
 import { ComposerControls, ComposerHeader, ComposerTitle, ComposerStandardHeader } from './header'
 import { ComposerInput, ComposerTextarea } from './inputs'
 import { useComposerWindow } from './model/use-composer-window'
+import { ComposerPlacementProvider, useComposerPlacement } from './placement'
 import {
   ComposerBody,
   ComposerField,
@@ -32,6 +34,7 @@ function ComposerRoot({ label, children, onClose, className }: Readonly<Composer
   const composerWindow = useComposerWindow()
   const value = useMemo(() => ({ ...composerWindow, onClose }), [composerWindow, onClose])
   const layoutTransition = useReducedTransition(smoothSpring)
+  const placement = useComposerPlacement()
   return (
     <ComposerContext.Provider value={value}>
       <div
@@ -59,7 +62,8 @@ function ComposerRoot({ label, children, onClose, className }: Readonly<Composer
         exit={{ opacity: 0, scale: 0.96 }}
         transition={{ layout: layoutTransition }}
         className={cn(
-          'fixed right-40 bottom-6 z-50 flex max-h-[calc(100dvh-3rem)] w-150 max-w-[calc(100dvw-11.5rem)] flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-xl',
+          'fixed z-50 flex max-h-[calc(100dvh-3rem)] w-150 flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-xl',
+          COMPOSER_PLACEMENT[placement],
           'group/composer',
           'data-minimized:w-80',
           'data-maximized:inset-0 data-maximized:m-auto data-maximized:h-[min(80dvh,46rem)] data-maximized:w-[min(56rem,calc(100dvw-3rem))] data-maximized:max-w-none',
@@ -73,6 +77,7 @@ function ComposerRoot({ label, children, onClose, className }: Readonly<Composer
 }
 
 export const Composer = Object.assign(ComposerRoot, {
+  Placement: ComposerPlacementProvider,
   StandardHeader: ComposerStandardHeader,
   Actions: ComposerActions,
   Header: ComposerHeader,
@@ -91,3 +96,4 @@ export const Composer = Object.assign(ComposerRoot, {
 export { useComposer } from './context'
 export { buildComposerControlLabels } from './lib/labels'
 export type { ComposerControlLabels } from './lib/labels'
+export type { ComposerPlacement } from './constants'

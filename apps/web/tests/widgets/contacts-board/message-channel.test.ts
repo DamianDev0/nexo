@@ -28,3 +28,15 @@ describe('resolveMessageChannel', () => {
     expect(resolveMessageChannel(composer('email'))).toBe('email')
   })
 })
+
+describe('resolveLogKind', () => {
+  it('returns the activity kind for task and meeting composers only', async () => {
+    const { resolveLogKind } = await import('@/widgets/contacts-board/lib/message-channel')
+    const contact = { id: 'c1' } as never
+    expect(resolveLogKind({ kind: 'task', contact })).toBe('task')
+    expect(resolveLogKind({ kind: 'meeting', contact })).toBe('meeting')
+    expect(resolveLogKind({ kind: 'note', contact })).toBeNull()
+    expect(resolveLogKind({ kind: 'email', contact })).toBeNull()
+    expect(resolveLogKind(null)).toBeNull()
+  })
+})

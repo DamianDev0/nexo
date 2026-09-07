@@ -8,6 +8,8 @@ function warmComposerChunks(): void {
   void import('@/features/add-contact-note')
   void import('@/features/tag-contact')
   void import('@/features/compose-message')
+  void import('@/features/log-contact-activity')
+  void import('@/features/preview-contact')
 }
 
 export function useComposerPreload(): void {

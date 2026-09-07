@@ -1,5 +1,7 @@
 import { CONTACT_STALE_DAYS } from '../config/contact-columns.constants'
 
+import { missingFieldsHint } from './contact-completeness'
+
 import type { ContactCellLabels, TagsCellLabels } from '../model/types/contact-cells.types'
 import type { TFunction } from 'i18next'
 
@@ -17,6 +19,7 @@ export function buildContactCellLabels(t: TFunction): ContactCellLabels {
       addNote: t('contacts.rowActions.addNote'),
       editTags: t('contacts.rowActions.editTags'),
       restore: t('contacts.rowActions.restore'),
+      missing: (fields) => missingFieldsHint(t, fields),
       tags,
       notes: { title: t('contacts.notesPopover.title') },
     },

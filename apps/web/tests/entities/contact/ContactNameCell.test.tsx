@@ -15,6 +15,8 @@ const LABELS = {
   addNote: 'Agregar nota',
   editTags: 'Editar etiquetas',
   restore: 'restore',
+  missing: (fields: ReadonlyArray<string>) =>
+    fields.length ? `Faltan: ${fields.join(', ')}` : null,
   tags: {
     title: 'Etiquetas',
     count: (total: number) => `${total} etiquetas`,
@@ -69,5 +71,18 @@ describe('ContactNameCell', () => {
     })
 
     expect(screen.queryByRole('button', { name: 'Etiquetas' })).not.toBeInTheDocument()
+  })
+})
+
+describe('ContactNameCell completeness', () => {
+  it('flags missing required fields next to the name', () => {
+    const contact = { ...CONTACT, email: null, documentNumber: null }
+    render(<ContactNameCell contact={contact} labels={LABELS} />, { wrapper })
+    expect(screen.getByRole('img', { name: 'Faltan: email, documentNumber' })).toBeInTheDocument()
+  })
+
+  it('shows no mark for a complete contact', () => {
+    render(<ContactNameCell contact={CONTACT} labels={LABELS} />, { wrapper })
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 })
