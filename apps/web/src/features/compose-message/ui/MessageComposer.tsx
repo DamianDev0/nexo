@@ -30,7 +30,7 @@ type MessageComposerProps = {
 
 export function MessageComposer({ channel, contact, onClose }: Readonly<MessageComposerProps>) {
   const { t } = useTranslation()
-  const composer = useMessageComposer(channel, contact)
+  const composer = useMessageComposer(channel, contact, onClose)
   const markup = useBodyMarkup(channel, composer.form)
   const email = useEmailEditor(composer.form)
   const isEmail = channel === 'email'
@@ -108,14 +108,17 @@ export function MessageComposer({ channel, contact, onClose }: Readonly<MessageC
               used: composer.bodyLength,
               max: composer.bodyMax,
             })}
+            {' · '}
+            {t('contacts.composers.message.segments', { count: composer.segments })}
           </Text>
         ) : null}
         <Composer.Actions
           cancel={{ label: t('common.cancel'), onClick: onClose }}
           action={{
             label: t('contacts.composers.message.send'),
-            disabled: !composer.sendAvailable,
-            hint: t('contacts.composers.message.comingSoon'),
+            disabled: !composer.sendAvailable || composer.isPending,
+            hint: composer.sendAvailable ? undefined : t('contacts.composers.message.comingSoon'),
+            onClick: composer.submit,
           }}
         />
       </Composer.Footer>

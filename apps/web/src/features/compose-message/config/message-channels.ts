@@ -1,11 +1,19 @@
+import { SMS_BODY_MAX } from '@repo/shared-utils'
+
 export const MESSAGE_CHANNELS = ['email', 'sms', 'whatsapp'] as const
 
 export type MessageChannel = (typeof MESSAGE_CHANNELS)[number]
 
 export const MESSAGE_BODY_MAX: Record<MessageChannel, number> = {
   email: 10000,
-  sms: 160,
+  sms: SMS_BODY_MAX,
   whatsapp: 4096,
+}
+
+export const CHANNEL_SEND_ENABLED: Record<MessageChannel, boolean> = {
+  email: false,
+  sms: true,
+  whatsapp: false,
 }
 
 export const CHANNEL_HAS_SUBJECT: Record<MessageChannel, boolean> = {

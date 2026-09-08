@@ -5,11 +5,13 @@ import { t } from 'i18next'
 import { useCallback, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { MESSAGE_BODY_MAX } from '../config/message-channels'
+import { CHANNEL_SEND_ENABLED, MESSAGE_BODY_MAX } from '../config/message-channels'
 import { buildMessageSchema, messageDefaults } from '../lib/message-form.schema'
+import { smsSegments } from '../lib/sms-segments'
+import { useSendMessage } from '../query/useSendMessage'
 
 import type { MessageChannel } from '../config/message-channels'
-import type { MessageFormValues } from '../lib/message-form.schema'
+import type { MessageFormValues, RecipientSource } from '../lib/message-form.schema'
 
 export type MessageAttachment = {
   readonly id: string
@@ -18,13 +20,11 @@ export type MessageAttachment = {
   readonly file: File
 }
 
-type RecipientSource = {
-  readonly email: string | null
-  readonly phone: string | null
-  readonly whatsapp: string | null
-}
-
-export function useMessageComposer(channel: MessageChannel, contact: RecipientSource) {
+export function useMessageComposer(
+  channel: MessageChannel,
+  contact: RecipientSource,
+  onDone: () => void,
+) {
   const schema = useMemo(() => buildMessageSchema(t, channel), [channel])
   const form = useForm<MessageFormValues>({
     resolver: zodResolver(schema),
@@ -61,7 +61,21 @@ export function useMessageComposer(channel: MessageChannel, contact: RecipientSo
     setAttachments((current) => current.filter((attachment) => attachment.id !== id))
   }, [])
 
-  const bodyLength = form.watch('body').length
+  const { mutate, isPending } = useSendMessage()
+  const sendAvailable = CHANNEL_SEND_ENABLED[channel]
+
+  const submit = form.handleSubmit((values) => {
+    mutate(
+      { channel, to: values.to, body: values.body, contactId: contact.id },
+      { onSuccess: onDone },
+    )
+  })
+
+  const body = form.watch('body')
+  const segments = useMemo(
+    () => (channel === 'sms' ? smsSegments(body).segments : 0),
+    [channel, body],
+  )
 
   return {
     form,
@@ -69,8 +83,11 @@ export function useMessageComposer(channel: MessageChannel, contact: RecipientSo
     addFiles,
     removeAttachment,
     extras: { ccVisible, bccVisible, showCc, showBcc, hideCc, hideBcc },
-    bodyLength,
+    bodyLength: body.length,
     bodyMax: MESSAGE_BODY_MAX[channel],
-    sendAvailable: false,
+    segments,
+    sendAvailable,
+    submit,
+    isPending,
   }
 }

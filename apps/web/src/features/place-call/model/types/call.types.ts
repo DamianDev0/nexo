@@ -1,8 +1,19 @@
 import type { ContactListItem } from '@repo/shared-types'
 
-export type CallStatus = 'idle' | 'connecting' | 'active' | 'ended'
+export type CallStatus = 'idle' | 'connecting' | 'ringing' | 'active' | 'ended' | 'failed'
 
 export type CallOutcome = 'completed' | 'canceled'
+
+export type TelephonyError =
+  | 'deviceNotReady'
+  | 'microphoneDenied'
+  | 'invalidNumber'
+  | 'callFailed'
+  | 'callRejected'
+  | 'busy'
+  | 'networkError'
+  | 'tokenExpired'
+  | 'providerError'
 
 export type CallLogEntry = {
   readonly id: string
@@ -29,13 +40,16 @@ export type AudioDeviceOption = {
 }
 
 export type TelephonyEvents = {
+  readonly onRinging: () => void
   readonly onConnected: () => void
   readonly onDisconnected: () => void
+  readonly onFailed: (error: TelephonyError) => void
 }
 
 export type TelephonyAdapter = {
   readonly connect: (number: string, events: TelephonyEvents) => Promise<void>
   readonly disconnect: () => Promise<void>
+  readonly dispose: () => void
   readonly setMuted: (muted: boolean) => void
   readonly setHeld: (held: boolean) => void
   readonly setRecording: (recording: boolean) => void

@@ -9,7 +9,12 @@ import {
 
 const t = ((key: string) => key) as never
 
-const CONTACT = { email: 'ana@nexo.test', phone: '3001234567', whatsapp: '3109876543' }
+const CONTACT = {
+  id: 'cnt-1',
+  email: 'ana@nexo.test',
+  phone: '3001234567',
+  whatsapp: '3109876543',
+}
 
 describe('buildMessageSchema', () => {
   it('validates email recipients on the email channel', () => {

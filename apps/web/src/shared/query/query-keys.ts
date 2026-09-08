@@ -25,6 +25,9 @@ export const QUERY_KEYS = {
   team: {
     members: ['team', 'members'] as const,
   },
+  telephony: {
+    voiceToken: ['telephony', 'voice-token'] as const,
+  },
   bulkActions: {
     all: ['bulk-actions'] as const,
     list: (query: BulkActionListQuery) => ['bulk-actions', 'list', query] as const,

@@ -55,7 +55,8 @@ export function buildMessageSchema(t: TFunction, channel: MessageChannel) {
 
 export type MessageFormValues = z.infer<ReturnType<typeof buildMessageSchema>>
 
-type RecipientSource = {
+export type RecipientSource = {
+  readonly id: string
   readonly email: string | null
   readonly phone: string | null
   readonly whatsapp: string | null

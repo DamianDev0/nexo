@@ -20,6 +20,7 @@ const ON_DEMAND_ONLY_KEYS = new Set([
   'bulkActions.list',
   'bulkActions.detail',
   'tags.trash',
+  'telephony.voiceToken',
 ])
 
 function read(patterns: string[]): string {

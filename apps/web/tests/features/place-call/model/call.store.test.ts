@@ -79,6 +79,37 @@ describe('useCallStore', () => {
     expect(useCallStore.getState().startedAt).toBe(Date.now())
   })
 
+  it('moves to ringing only from connecting', () => {
+    useCallStore.getState().callRinging()
+    expect(useCallStore.getState().status).toBe('idle')
+
+    useCallStore.getState().callConnecting()
+    useCallStore.getState().callRinging()
+    expect(useCallStore.getState().status).toBe('ringing')
+  })
+
+  it('records a failure with its error, logs it as canceled and auto-resets', () => {
+    useCallStore.getState().appendDigit('3')
+    useCallStore.getState().callConnecting()
+    useCallStore.getState().callFailed('networkError')
+
+    expect(useCallStore.getState()).toMatchObject({ status: 'failed', error: 'networkError' })
+    expect(useCallStore.getState().history[0]).toMatchObject({ number: '3', outcome: 'canceled' })
+
+    vi.advanceTimersByTime(DIALER_TIMINGS.resetMs)
+    expect(useCallStore.getState()).toMatchObject({ status: 'idle', error: null })
+  })
+
+  it('ignores failures once the call is already over', () => {
+    useCallStore.getState().callConnecting()
+    useCallStore.getState().callConnected()
+    useCallStore.getState().callEnded()
+    useCallStore.getState().callFailed('busy')
+
+    expect(useCallStore.getState().status).toBe('ended')
+    expect(useCallStore.getState().history).toHaveLength(1)
+  })
+
   it('auto-resets to idle after a call ends', () => {
     useCallStore.getState().appendDigit('3')
     useCallStore.getState().callConnecting()

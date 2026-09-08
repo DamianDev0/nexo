@@ -1,27 +1,52 @@
 import { act, cleanup, renderHook } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { TelephonyAdapter } from '@/features/place-call/model/types/call.types'
+import { queryWrapper } from '../../../query-wrapper'
+
+import type {
+  TelephonyAdapter,
+  TelephonyEvents,
+} from '@/features/place-call/model/types/call.types'
 
 import { DIALER_TIMINGS } from '@/features/place-call/config/dialer.config'
 import { useCallStore } from '@/features/place-call/model/call.store'
 import { useDialer } from '@/features/place-call/model/useDialer'
 
-const lastAdapter = vi.hoisted(() => ({ current: null as TelephonyAdapter | null }))
+const fake = vi.hoisted(() => ({
+  events: null as TelephonyEvents | null,
+  adapter: null as
+    | (TelephonyAdapter & {
+        disconnect: ReturnType<typeof vi.fn>
+        dispose: ReturnType<typeof vi.fn>
+      })
+    | null,
+}))
 
-vi.mock('@/features/place-call/model/telephony-adapter', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@/features/place-call/model/telephony-adapter')>()
-  return {
-    createStubTelephony: (connectDelayMs: number) => {
-      const adapter = actual.createStubTelephony(connectDelayMs)
-      vi.spyOn(adapter, 'disconnect')
-      lastAdapter.current = adapter
-      return adapter
-    },
-  }
-})
+vi.mock('@/features/place-call/model/twilio-telephony', () => ({
+  createTwilioTelephony: () => {
+    const adapter = {
+      connect: vi.fn((_number: string, events: TelephonyEvents) => {
+        fake.events = events
+        return Promise.resolve()
+      }),
+      disconnect: vi.fn(() => {
+        fake.events?.onDisconnected()
+        return Promise.resolve()
+      }),
+      dispose: vi.fn(),
+      setMuted: vi.fn(),
+      setHeld: vi.fn(),
+      setRecording: vi.fn(),
+      sendDigit: vi.fn(),
+    }
+    fake.adapter = adapter
+    return adapter
+  },
+}))
+
+function answer() {
+  act(() => fake.events?.onConnected())
+}
 
 describe('useDialer', () => {
   beforeEach(() => {
@@ -29,6 +54,7 @@ describe('useDialer', () => {
     useCallStore.setState({
       open: false,
       status: 'idle',
+      error: null,
       number: '',
       muted: false,
       held: false,
@@ -40,11 +66,12 @@ describe('useDialer', () => {
   afterEach(() => {
     cleanup()
     vi.useRealTimers()
-    lastAdapter.current = null
+    fake.events = null
+    fake.adapter = null
   })
 
   function dialedHook(number = '3001234567') {
-    const rendered = renderHook(() => useDialer())
+    const rendered = renderHook(() => useDialer(), { wrapper: queryWrapper })
     act(() => {
       rendered.result.current.setOpen(true)
       for (const digit of number) rendered.result.current.appendDigit(digit)
@@ -52,13 +79,16 @@ describe('useDialer', () => {
     return rendered
   }
 
-  it('moves through connecting into active when the call connects', async () => {
+  it('moves through connecting and ringing into active when the call is answered', async () => {
     const { result } = dialedHook()
 
     await act(async () => result.current.placeCall())
     expect(result.current.status).toBe('connecting')
 
-    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+    act(() => fake.events?.onRinging())
+    expect(result.current.status).toBe('ringing')
+
+    answer()
     expect(result.current.status).toBe('active')
   })
 
@@ -67,13 +97,14 @@ describe('useDialer', () => {
 
     await act(async () => result.current.placeCall())
     expect(result.current.status).toBe('idle')
+    expect(fake.adapter).toBeNull()
   })
 
   it('counts call seconds while active', async () => {
     const { result } = dialedHook()
 
     await act(async () => result.current.placeCall())
-    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+    answer()
     act(() => vi.advanceTimersByTime(3000))
 
     expect(result.current.seconds).toBe(3)
@@ -83,7 +114,7 @@ describe('useDialer', () => {
     const { result } = dialedHook()
 
     await act(async () => result.current.placeCall())
-    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+    answer()
     await act(async () => result.current.hangUp())
 
     expect(result.current.status).toBe('ended')
@@ -94,23 +125,39 @@ describe('useDialer', () => {
     expect(result.current.seconds).toBe(0)
   })
 
+  it('surfaces a normalized failure and auto-resets', async () => {
+    const { result } = dialedHook()
+
+    await act(async () => result.current.placeCall())
+    act(() => fake.events?.onFailed('busy'))
+
+    expect(result.current.status).toBe('failed')
+    expect(result.current.error).toBe('busy')
+
+    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.resetMs))
+    expect(result.current.status).toBe('idle')
+    expect(result.current.error).toBeNull()
+  })
+
   it('dials and places a call in one step from a raw number', async () => {
-    const { result } = renderHook(() => useDialer())
+    const { result } = renderHook(() => useDialer(), { wrapper: queryWrapper })
 
     await act(async () => result.current.callNumber('+57 300 123 4567'))
 
     expect(result.current.status).toBe('connecting')
     expect(result.current.number).toBe('+573001234567')
+    expect(fake.adapter?.connect).toHaveBeenCalledWith('+573001234567', expect.any(Object))
   })
 
   it('collects dtmf digits during a call and clears them on the next call', async () => {
     const { result } = dialedHook()
 
     await act(async () => result.current.placeCall())
-    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+    answer()
     act(() => result.current.sendDtmf('1'))
     act(() => result.current.sendDtmf('#'))
     expect(result.current.dtmf).toBe('1#')
+    expect(fake.adapter?.sendDigit).toHaveBeenCalledTimes(2)
 
     await act(async () => result.current.hangUp())
     act(() => vi.advanceTimersByTime(DIALER_TIMINGS.resetMs))
@@ -122,7 +169,7 @@ describe('useDialer', () => {
     const { result } = dialedHook()
 
     await act(async () => result.current.placeCall())
-    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+    answer()
 
     act(() => result.current.toggleRecord())
     expect(result.current.recording).toBe(true)
@@ -135,7 +182,7 @@ describe('useDialer', () => {
     const { result } = dialedHook()
 
     await act(async () => result.current.placeCall())
-    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+    answer()
 
     act(() => result.current.toggleHold())
     expect(result.current.held).toBe(true)
@@ -144,11 +191,13 @@ describe('useDialer', () => {
     expect(result.current.held).toBe(false)
   })
 
-  it('toggles mute state', () => {
+  it('toggles mute state through the adapter', async () => {
     const { result } = dialedHook()
 
+    await act(async () => result.current.placeCall())
     act(() => result.current.toggleMute())
     expect(result.current.muted).toBe(true)
+    expect(fake.adapter?.setMuted).toHaveBeenCalledWith(true)
 
     act(() => result.current.toggleMute())
     expect(result.current.muted).toBe(false)
@@ -171,17 +220,18 @@ describe('useDialer', () => {
     const rendered = dialedHook()
 
     await act(async () => rendered.result.current.placeCall())
-    act(() => vi.advanceTimersByTime(DIALER_TIMINGS.connectMs))
+    answer()
     expect(rendered.result.current.status).toBe('active')
 
     rendered.unmount()
 
-    expect(lastAdapter.current?.disconnect).toHaveBeenCalledTimes(1)
+    expect(fake.adapter?.disconnect).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => expect(fake.adapter?.dispose).toHaveBeenCalledTimes(1))
     expect(useCallStore.getState().status).toBe('ended')
   })
 
   it('ignores the keyboard while the dock is closed', () => {
-    const { result } = renderHook(() => useDialer())
+    const { result } = renderHook(() => useDialer(), { wrapper: queryWrapper })
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: '3' }))

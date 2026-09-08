@@ -1,8 +1,22 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { queryWrapper } from '../../../query-wrapper'
+
 import { useCallStore } from '@/features/place-call/model/call.store'
 import { useCallDock } from '@/features/place-call/model/useCallDock'
+
+vi.mock('@/features/place-call/model/twilio-telephony', () => ({
+  createTwilioTelephony: () => ({
+    connect: vi.fn(() => Promise.resolve()),
+    disconnect: vi.fn(() => Promise.resolve()),
+    dispose: vi.fn(),
+    setMuted: vi.fn(),
+    setHeld: vi.fn(),
+    setRecording: vi.fn(),
+    sendDigit: vi.fn(),
+  }),
+}))
 
 describe('useCallDock', () => {
   beforeEach(() => {
@@ -28,14 +42,14 @@ describe('useCallDock', () => {
   })
 
   it('starts on the phone screen with the dialpad tab', () => {
-    const { result } = renderHook(() => useCallDock())
+    const { result } = renderHook(() => useCallDock(), { wrapper: queryWrapper })
 
     expect(result.current.screen).toBe('phone')
     expect(result.current.phoneTab).toBe('dialpad')
   })
 
   it('callAndSwitch jumps back to the dialpad and dials with the caller name', async () => {
-    const { result } = renderHook(() => useCallDock())
+    const { result } = renderHook(() => useCallDock(), { wrapper: queryWrapper })
     await waitFor(() => expect(result.current.micGate.denied).toBe(false))
 
     act(() => result.current.setScreen('contacts'))
@@ -50,7 +64,7 @@ describe('useCallDock', () => {
   })
 
   it('reflects in-call and expanded state from the store', () => {
-    const { result } = renderHook(() => useCallDock())
+    const { result } = renderHook(() => useCallDock(), { wrapper: queryWrapper })
 
     act(() => useCallStore.getState().callConnecting())
     expect(result.current.inCall).toBe(true)

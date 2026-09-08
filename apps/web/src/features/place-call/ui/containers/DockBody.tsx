@@ -23,6 +23,7 @@ export function DockBody({ dock }: Readonly<{ dock: DockController }>) {
           number: formatDialNumber(dialer.number),
           name: dialer.callerName,
           status: dialer.status,
+          error: dialer.error,
           seconds: dialer.seconds,
           muted: dialer.muted,
           held: dialer.held,

@@ -1,9 +1,8 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { tenantRef } from '@/shared/api/tenant-ref'
-
 import { DIALER_LIMITS, DIALER_TIMINGS } from '../config/dialer.config'
+import { callLogEntry, tenantScopedStorage } from '../lib/call-history-storage'
 import { isDialChar, toDialString } from '../lib/format-dial-number'
 
 import type {
@@ -12,12 +11,14 @@ import type {
   CallLogEntry,
   CallStatus,
   PresenceKey,
+  TelephonyError,
 } from './types/call.types'
 
 type CallState = {
   open: boolean
   hidden: boolean
   status: CallStatus
+  error: TelephonyError | null
   number: string
   callerName: string | null
   muted: boolean
@@ -39,8 +40,10 @@ type CallState = {
   appendDigit: (digit: string) => void
   deleteDigit: () => void
   callConnecting: () => void
+  callRinging: () => void
   callConnected: () => void
   callEnded: () => void
+  callFailed: (error: TelephonyError) => void
   toggleMuted: () => void
   toggleHeld: () => void
   toggleRecording: () => void
@@ -49,57 +52,13 @@ type CallState = {
 
 let resetTimer: ReturnType<typeof setTimeout> | null = null
 
-const noopStorage = {
-  getItem: () => null,
-  setItem: () => undefined,
-  removeItem: () => undefined,
-}
-
-function historyStorage() {
-  try {
-    const storage = typeof window === 'undefined' ? null : window.localStorage
-    if (typeof storage?.setItem !== 'function') return noopStorage
-    storage.removeItem('nexo-call-log')
-    const scopedKey = (name: string) => {
-      const slug = tenantRef.get()
-      return slug === null ? null : `${name}:${slug}`
-    }
-    return {
-      getItem: (name: string) => {
-        const key = scopedKey(name)
-        return key === null ? null : storage.getItem(key)
-      },
-      setItem: (name: string, value: string) => {
-        const key = scopedKey(name)
-        if (key !== null) storage.setItem(key, value)
-      },
-      removeItem: (name: string) => {
-        const key = scopedKey(name)
-        if (key !== null) storage.removeItem(key)
-      },
-    }
-  } catch {
-    return noopStorage
-  }
-}
-
-function logEntry(number: string, name: string | null, startedAt: number | null): CallLogEntry {
-  return {
-    id: crypto.randomUUID(),
-    number,
-    name,
-    at: Date.now(),
-    durationSec: startedAt === null ? 0 : Math.round((Date.now() - startedAt) / 1000),
-    outcome: startedAt === null ? 'canceled' : 'completed',
-  }
-}
-
 export const useCallStore = create<CallState>()(
   persist(
     (set, get) => ({
       open: false,
       hidden: false,
       status: 'idle',
+      error: null,
       number: '',
       callerName: null,
       muted: false,
@@ -134,7 +93,9 @@ export const useCallStore = create<CallState>()(
         }),
       deleteDigit: () =>
         set((state) => (state.status === 'idle' ? { number: state.number.slice(0, -1) } : state)),
-      callConnecting: () => set({ status: 'connecting' }),
+      callConnecting: () => set({ status: 'connecting', error: null }),
+      callRinging: () =>
+        set((state) => (state.status === 'connecting' ? { status: 'ringing' } : state)),
       callConnected: () => set({ status: 'active', startedAt: Date.now() }),
       callEnded: () => {
         set((state) => ({
@@ -143,10 +104,28 @@ export const useCallStore = create<CallState>()(
           held: false,
           recording: false,
           history: [
-            logEntry(state.number, state.callerName, state.startedAt),
+            callLogEntry(state.number, state.callerName, state.startedAt),
             ...state.history,
           ].slice(0, DIALER_LIMITS.historyMax),
         }))
+        resetTimer = setTimeout(() => get().reset(), DIALER_TIMINGS.resetMs)
+      },
+      callFailed: (error) => {
+        set((state) =>
+          state.status === 'idle' || state.status === 'ended' || state.status === 'failed'
+            ? state
+            : {
+                status: 'failed',
+                error,
+                startedAt: null,
+                held: false,
+                recording: false,
+                history: [
+                  callLogEntry(state.number, state.callerName, null),
+                  ...state.history,
+                ].slice(0, DIALER_LIMITS.historyMax),
+              },
+        )
         resetTimer = setTimeout(() => get().reset(), DIALER_TIMINGS.resetMs)
       },
       toggleMuted: () => set((state) => ({ muted: !state.muted })),
@@ -170,6 +149,7 @@ export const useCallStore = create<CallState>()(
         resetTimer = null
         set({
           status: 'idle',
+          error: null,
           number: '',
           callerName: null,
           muted: false,
@@ -181,7 +161,7 @@ export const useCallStore = create<CallState>()(
     }),
     {
       name: 'nexo-call-log',
-      storage: createJSONStorage(historyStorage),
+      storage: createJSONStorage(tenantScopedStorage),
       partialize: (state) => ({
         history: state.history,
         hidden: state.hidden,

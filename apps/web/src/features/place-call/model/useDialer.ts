@@ -1,11 +1,15 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { DIALER_LIMITS, DIALER_TIMINGS } from '../config/dialer.config'
+import telephonyService from '@/shared/api/services/telephony.service'
+import { QUERY_KEYS } from '@/shared/query/query-keys'
+
+import { DIALER_LIMITS } from '../config/dialer.config'
 
 import { useCallStore } from './call.store'
-import { createStubTelephony } from './telephony-adapter'
+import { createTwilioTelephony } from './twilio-telephony'
 import { useCallClock } from './useCallClock'
 import { useDialHotkeys } from './useDialHotkeys'
 
@@ -13,30 +17,36 @@ import type { TelephonyAdapter } from './types/call.types'
 
 export function useDialer() {
   const store = useCallStore()
+  const queryClient = useQueryClient()
   const adapterRef = useRef<TelephonyAdapter | null>(null)
   const seconds = useCallClock(store.startedAt)
   const [keypadOpen, setKeypadOpen] = useState(false)
   const [dtmf, setDtmf] = useState('')
 
   const ensureAdapter = useCallback(() => {
-    adapterRef.current ??= createStubTelephony(DIALER_TIMINGS.connectMs)
+    adapterRef.current ??= createTwilioTelephony({
+      fetchToken: () =>
+        queryClient.fetchQuery({
+          queryKey: QUERY_KEYS.telephony.voiceToken,
+          queryFn: telephonyService.voiceToken,
+          staleTime: 0,
+        }),
+    })
     return adapterRef.current
-  }, [])
+  }, [queryClient])
 
   const placeCall = useCallback(async () => {
-    const { number, status, callConnecting, reset } = useCallStore.getState()
+    const { number, status, callConnecting } = useCallStore.getState()
     if (number === '' || status !== 'idle') return
     setKeypadOpen(false)
     setDtmf('')
     callConnecting()
-    try {
-      await ensureAdapter().connect(number, {
-        onConnected: () => useCallStore.getState().callConnected(),
-        onDisconnected: () => useCallStore.getState().callEnded(),
-      })
-    } catch {
-      reset()
-    }
+    await ensureAdapter().connect(number, {
+      onRinging: () => useCallStore.getState().callRinging(),
+      onConnected: () => useCallStore.getState().callConnected(),
+      onDisconnected: () => useCallStore.getState().callEnded(),
+      onFailed: (error) => useCallStore.getState().callFailed(error),
+    })
   }, [ensureAdapter])
 
   const callNumber = useCallback(
@@ -83,13 +93,17 @@ export function useDialer() {
 
   useEffect(() => {
     return () => {
-      void adapterRef.current?.disconnect()
+      const adapter = adapterRef.current
+      adapterRef.current = null
+      if (adapter === null) return
+      void adapter.disconnect().finally(() => adapter.dispose())
     }
   }, [])
 
   return {
     open: store.open,
     status: store.status,
+    error: store.error,
     number: store.number,
     callerName: store.callerName,
     muted: store.muted,

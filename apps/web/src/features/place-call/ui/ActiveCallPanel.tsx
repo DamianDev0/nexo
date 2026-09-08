@@ -22,13 +22,14 @@ import { statusLabel } from '../lib/call-status-label'
 
 import { CallControl, GhostControl } from './CallControls'
 
-import type { CallStatus } from '../model/types/call.types'
+import type { CallStatus, TelephonyError } from '../model/types/call.types'
 
 type ActiveCallPanelProps = {
   readonly call: {
     readonly number: string
     readonly name: string | null
     readonly status: CallStatus
+    readonly error: TelephonyError | null
     readonly seconds: number
     readonly muted: boolean
     readonly held: boolean
@@ -51,13 +52,14 @@ type ActiveCallPanelProps = {
 export function ActiveCallPanel({ call, actions, keypad }: Readonly<ActiveCallPanelProps>) {
   const { t } = useTranslation()
   const active = call.status === 'active'
+  const over = call.status === 'ended' || call.status === 'failed'
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex h-12 shrink-0 items-center justify-between bg-sidebar px-4">
         <Text className="flex items-center gap-2 text-[11px] font-black tracking-[0.14em] text-sidebar-foreground uppercase">
           <span aria-hidden className="size-2 rounded-full bg-primary" />
-          {statusLabel(call.status, call.held, t)}
+          {statusLabel(call, t)}
         </Text>
         <Text className="font-mono text-sm text-sidebar-foreground tabular-nums" aria-live="polite">
           {active ? formatCallDuration(call.seconds) : ''}
@@ -155,7 +157,7 @@ export function ActiveCallPanel({ call, actions, keypad }: Readonly<ActiveCallPa
           variant="destructive"
           size="md"
           aria-label={t('dialer.hangUp')}
-          disabled={call.status === 'ended'}
+          disabled={over}
           onClick={actions.onHangUp}
           className="size-13 rounded-full px-0"
         >

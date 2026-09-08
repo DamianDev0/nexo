@@ -6,6 +6,5 @@ export const DIALER_LIMITS = {
 } as const
 
 export const DIALER_TIMINGS = {
-  connectMs: 1800,
   resetMs: 2200,
 } as const
