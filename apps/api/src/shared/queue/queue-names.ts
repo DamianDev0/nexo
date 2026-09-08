@@ -1,6 +1,7 @@
 export const QUEUE_NAMES = {
   NOTIFICATIONS: 'notifications',
   MESSAGES: 'messages',
+  SMS: 'sms',
   INVOICES: 'invoices',
   IMPORTS: 'imports',
   BULK_ACTIONS: 'bulk-actions',

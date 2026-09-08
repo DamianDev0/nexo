@@ -9,6 +9,7 @@ import { AppModule } from '../../src/app.module'
 import { TransformInterceptor } from '../../src/shared/interceptors/transform.interceptor'
 import { TenantProvisioningService } from '../../src/modules/tenants/services/tenant-provisioning.service'
 import { CacheService } from '../../src/shared/cache/cache.service'
+import { TwilioMessagingService } from '../../src/shared/integrations/twilio/twilio-messaging.service'
 
 export const API_PREFIX = 'api/v1'
 
@@ -19,8 +20,16 @@ export interface TestApp {
   cache: CacheService
 }
 
+export const FAKE_SMS_SENDER = '+15550000000'
+
 export async function createTestApp(): Promise<TestApp> {
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile()
+  const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+    .overrideProvider(TwilioMessagingService)
+    .useValue({
+      senderNumber: FAKE_SMS_SENDER,
+      sendSms: () => Promise.resolve({ sid: `SM${Date.now()}`, status: 'queued', segments: 1 }),
+    })
+    .compile()
 
   const app = moduleRef.createNestApplication()
   app.use(cookieParser())

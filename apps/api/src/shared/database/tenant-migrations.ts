@@ -682,4 +682,76 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       ALTER TABLE "${schema}".notifications ADD COLUMN IF NOT EXISTS data JSONB;
     `,
   },
+  {
+    id: '0039_calls_table',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".calls (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        provider VARCHAR(20) NOT NULL,
+        provider_call_sid VARCHAR(64) NOT NULL,
+        direction VARCHAR(10) NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'initiated',
+        from_number VARCHAR(20) NOT NULL,
+        to_number VARCHAR(20) NOT NULL,
+        contact_id UUID REFERENCES "${schema}".contacts(id),
+        user_id UUID REFERENCES "${schema}".users(id),
+        started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        answered_at TIMESTAMPTZ,
+        ended_at TIMESTAMPTZ,
+        duration_seconds INTEGER NOT NULL DEFAULT 0,
+        last_sequence INTEGER,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE (provider, provider_call_sid)
+      );
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_calls_contact"
+        ON "${schema}".calls (contact_id, started_at DESC);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_calls_user"
+        ON "${schema}".calls (user_id, started_at DESC);
+    `,
+  },
+  {
+    id: '0040_messages_table',
+    up: (schema) => `
+      CREATE TABLE IF NOT EXISTS "${schema}".messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        channel VARCHAR(20) NOT NULL,
+        direction VARCHAR(10) NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'queued',
+        provider VARCHAR(20) NOT NULL,
+        provider_message_sid VARCHAR(64),
+        from_number VARCHAR(20) NOT NULL,
+        to_number VARCHAR(20) NOT NULL,
+        body TEXT NOT NULL,
+        segments INTEGER NOT NULL DEFAULT 1,
+        error_code VARCHAR(20),
+        contact_id UUID REFERENCES "${schema}".contacts(id),
+        user_id UUID REFERENCES "${schema}".users(id),
+        sent_at TIMESTAMPTZ,
+        delivered_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE (provider, provider_message_sid)
+      );
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_messages_contact"
+        ON "${schema}".messages (contact_id, created_at DESC);
+    `,
+  },
+  {
+    id: '0041_telephony_lookup_indexes',
+    up: (schema) => `
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_calls_sid"
+        ON "${schema}".calls (provider_call_sid);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_calls_started"
+        ON "${schema}".calls (started_at DESC);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_messages_sid"
+        ON "${schema}".messages (provider_message_sid);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_messages_created"
+        ON "${schema}".messages (created_at DESC);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_phone"
+        ON "${schema}".contacts (phone) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_whatsapp"
+        ON "${schema}".contacts (whatsapp) WHERE is_active = true;
+    `,
+  },
 ]

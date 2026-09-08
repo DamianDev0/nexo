@@ -62,4 +62,5 @@ export interface ActivityInsertValues {
   dealId: string | null
   assignedToId: string
   createdById: string
+  completed: boolean
 }

@@ -7,10 +7,7 @@ const MODULE_DEFAULTS: ReadonlyArray<Pick<SidebarModule, 'key' | 'label' | 'icon
   { key: 'settings', label: 'Settings', icon: 'cog', required: true },
 ]
 
-export function sidebarModule(
-  key: string,
-  overrides: Partial<SidebarModule> = {},
-): SidebarModule {
+export function sidebarModule(key: string, overrides: Partial<SidebarModule> = {}): SidebarModule {
   const seed = MODULE_DEFAULTS.find((m) => m.key === key) ?? {
     key,
     label: key,

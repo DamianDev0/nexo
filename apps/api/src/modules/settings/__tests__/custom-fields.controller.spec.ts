@@ -20,7 +20,9 @@ const mockCtx: TenantContext = {
 function buildServiceMock() {
   return {
     getCustomFields: jest.fn().mockResolvedValue({
-      contacts: [{ key: 'nit', label: 'NIT', type: 'text', required: false, unique: false, order: 1 }],
+      contacts: [
+        { key: 'nit', label: 'NIT', type: 'text', required: false, unique: false, order: 1 },
+      ],
       companies: [],
       deals: [],
     }),

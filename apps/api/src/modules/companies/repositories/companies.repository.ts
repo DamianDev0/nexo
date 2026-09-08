@@ -12,7 +12,11 @@ import type {
   CompanyFieldUpdate,
   CompanySummaryRows,
 } from '../interfaces/company-row.interfaces'
-import { COMPANY_COLUMNS, COMPANY_LIST_COLUMNS, COMPANY_SEARCH } from '../constants/company.constants'
+import {
+  COMPANY_COLUMNS,
+  COMPANY_LIST_COLUMNS,
+  COMPANY_SEARCH,
+} from '../constants/company.constants'
 import { searchClause } from '@/shared/database/search-sql'
 import { sqlRows } from '@/shared/database/sql.util'
 

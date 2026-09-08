@@ -43,6 +43,7 @@ export class ActivitiesService {
     schemaName: string,
     dto: CreateActivityDto,
     createdById: string,
+    completed = false,
   ): Promise<ActivityListItem> {
     const row = await this.repository.insert(schemaName, {
       activityType: dto.activityType,
@@ -56,6 +57,7 @@ export class ActivitiesService {
       dealId: dto.dealId ?? null,
       assignedToId: dto.assignedToId ?? createdById,
       createdById,
+      completed,
     })
 
     void this.audit.entityEvent(

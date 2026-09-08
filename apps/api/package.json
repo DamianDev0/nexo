@@ -18,6 +18,7 @@
     "clean:contact-tags": "ts-node -r tsconfig-paths/register scripts/clean-contact-tags.ts",
     "migrate": "ts-node -r tsconfig-paths/register scripts/migrate-all-tenants.ts",
     "migrate:dry": "ts-node -r tsconfig-paths/register scripts/migrate-all-tenants.ts --dry-run",
+    "twilio:webhooks": "ts-node -r tsconfig-paths/register scripts/twilio-sync-webhooks.ts",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/data-source.ts",
     "migration:generate": "pnpm run typeorm migration:generate",
     "migration:run": "pnpm run typeorm migration:run",
@@ -68,6 +69,7 @@
     "resend": "^6.9.3",
     "rxjs": "^7.8.2",
     "socket.io": "^4.8.3",
+    "twilio": "^6.1.0",
     "typeorm": "^0.3.28",
     "uuid": "^13.0.0"
   },

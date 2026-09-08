@@ -95,6 +95,33 @@ class EnvironmentVariables {
 
   @IsString()
   AWS_S3_BUCKET: string
+
+  @IsString()
+  @MinLength(1)
+  TWILIO_ACCOUNT_SID: string
+
+  @IsString()
+  @MinLength(1)
+  TWILIO_AUTH_TOKEN: string
+
+  @IsString()
+  @MinLength(1)
+  TWILIO_API_KEY_SID: string
+
+  @IsString()
+  @MinLength(1)
+  TWILIO_API_KEY_SECRET: string
+
+  @IsString()
+  @MinLength(1)
+  TWILIO_TWIML_APP_SID: string
+
+  @IsString()
+  @MinLength(1)
+  TWILIO_PHONE_NUMBER: string
+
+  @IsUrl({ require_tld: false })
+  TWILIO_WEBHOOK_BASE_URL: string
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {

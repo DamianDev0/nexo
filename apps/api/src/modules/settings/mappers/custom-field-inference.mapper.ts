@@ -1,9 +1,5 @@
 import { normalizeText } from '@repo/shared-utils'
-import type {
-  CustomFieldHeaderSuggestion,
-  CustomFieldType,
-  FieldDef,
-} from '@repo/shared-types'
+import type { CustomFieldHeaderSuggestion, CustomFieldType, FieldDef } from '@repo/shared-types'
 import type { ColumnAnalysis } from '@/shared/imports/interfaces/import.interfaces'
 
 const BOOLEAN_VALUES = new Set(['true', 'false', 'si', 'no', 'yes'])
@@ -19,7 +15,11 @@ function isPhoneLike(value: string): boolean {
   if (!PHONE_PATTERN.test(value)) return false
   const digits = value.replaceAll(/\D/g, '')
   if (digits.length < 7 || digits.length > 15) return false
-  return value.startsWith('+') || /[\s().-]/.test(value) || (digits.length === 10 && digits.startsWith('3'))
+  return (
+    value.startsWith('+') ||
+    /[\s().-]/.test(value) ||
+    (digits.length === 10 && digits.startsWith('3'))
+  )
 }
 
 export function inferFieldType(sampleValues: string[]): CustomFieldType {
@@ -67,7 +67,9 @@ export function buildHeaderSuggestions(
     const label = column.csvColumn.trim()
     const baseKey = suggestFieldKey(label, new Set())
     const existingFieldKey =
-      (existingKeys.has(baseKey) ? baseKey : null) ?? existingLabels.get(normalizeText(label)) ?? null
+      (existingKeys.has(baseKey) ? baseKey : null) ??
+      existingLabels.get(normalizeText(label)) ??
+      null
     const suggestedKey = suggestFieldKey(label, takenKeys)
     takenKeys.add(suggestedKey)
 

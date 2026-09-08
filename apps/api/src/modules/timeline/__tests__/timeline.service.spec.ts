@@ -100,7 +100,13 @@ describe('TimelineService', () => {
 
       await service.getContactTimeline(SCHEMA, ENTITY_ID, 3, 10)
 
-      expect(repository.findTimelinePage).toHaveBeenCalledWith(SCHEMA, 'contact_id', ENTITY_ID, 10, 20)
+      expect(repository.findTimelinePage).toHaveBeenCalledWith(
+        SCHEMA,
+        'contact_id',
+        ENTITY_ID,
+        10,
+        20,
+      )
     })
 
     it('uses offset 0 for page 1 regardless of limit', async () => {
@@ -108,7 +114,13 @@ describe('TimelineService', () => {
 
       await service.getContactTimeline(SCHEMA, ENTITY_ID, 1, 50)
 
-      expect(repository.findTimelinePage).toHaveBeenCalledWith(SCHEMA, 'contact_id', ENTITY_ID, 50, 0)
+      expect(repository.findTimelinePage).toHaveBeenCalledWith(
+        SCHEMA,
+        'contact_id',
+        ENTITY_ID,
+        50,
+        0,
+      )
     })
 
     it('propagates a NaN offset when given a non-numeric page, with no validation', async () => {
@@ -139,7 +151,12 @@ describe('TimelineService', () => {
     it('maps rows from mixed entity types into timeline entries preserving order', async () => {
       const rows = [
         makeRow({ id: 'deal-1', event_type: 'deal_won', entity_type: 'deal', entity_id: 'deal-1' }),
-        makeRow({ id: 'act-1', event_type: 'activity', entity_type: 'activity', entity_id: 'act-1' }),
+        makeRow({
+          id: 'act-1',
+          event_type: 'activity',
+          entity_type: 'activity',
+          entity_id: 'act-1',
+        }),
         makeRow({
           id: 'notif-1',
           event_type: 'invoice_paid',

@@ -44,11 +44,7 @@ describe('TimelineController', () => {
 
       const result = await controller.getContactTimeline('contact-1', mockCtx, undefined)
 
-      expect(service.getContactTimeline).toHaveBeenCalledWith(
-        mockCtx.schemaName,
-        'contact-1',
-        1,
-      )
+      expect(service.getContactTimeline).toHaveBeenCalledWith(mockCtx.schemaName, 'contact-1', 1)
       expect(result).toEqual(emptyTimeline)
     })
 

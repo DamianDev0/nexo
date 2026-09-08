@@ -36,3 +36,14 @@ export function formatCOPhoneIntl(value: string): string {
 export function coPhoneE164(value: string): string {
   return `+${COUNTRY_CODE}${phoneDigits(value)}`
 }
+
+const E164_PATTERN = /^\+[1-9]\d{6,14}$/
+
+export function isE164(value: string): boolean {
+  return E164_PATTERN.test(value)
+}
+
+export function toE164(value: string): string | null {
+  if (isE164(value)) return value
+  return isValidCOPhone(value) ? coPhoneE164(value) : null
+}

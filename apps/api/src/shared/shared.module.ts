@@ -10,8 +10,11 @@ import { Tenant } from '@/modules/tenants/entities/tenant.entity'
 import { Plan } from '@/modules/tenants/entities/plan.entity'
 import { ResendModule } from './integrations/resend/resend.module'
 import { S3Module } from './integrations/aws/s3.module'
+import { TwilioModule } from './integrations/twilio/twilio.module'
 import { CacheService } from './cache/cache.service'
 import { TenantDbService } from './database/tenant-db.service'
+import { ContactPhoneLookupRepository } from './database/repositories/contact-phone-lookup.repository'
+import { TenantSchemaRepository } from './database/repositories/tenant-schema.repository'
 import { TenantMigrationService } from './database/tenant-migration.service'
 import { PasswordService } from './security/password.service'
 import { EventBusService } from './events/event-bus.service'
@@ -36,12 +39,15 @@ import { DuplicateDetectionService } from './duplicate-detection/duplicate-detec
     TypeOrmModule.forFeature([Tenant, Plan]),
     ResendModule,
     S3Module,
+    TwilioModule,
     ImportsModule,
     QueueModule,
   ],
   providers: [
     CacheService,
     TenantDbService,
+    ContactPhoneLookupRepository,
+    TenantSchemaRepository,
     TenantMigrationService,
     PasswordService,
     EventBusService,
@@ -52,6 +58,8 @@ import { DuplicateDetectionService } from './duplicate-detection/duplicate-detec
   exports: [
     CacheService,
     TenantDbService,
+    ContactPhoneLookupRepository,
+    TenantSchemaRepository,
     TypeOrmModule,
     PasswordService,
     EventBusService,

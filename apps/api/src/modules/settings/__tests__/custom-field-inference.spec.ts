@@ -6,7 +6,9 @@ import {
 } from '../mappers/custom-field-inference.mapper'
 import type { ColumnAnalysis } from '@/shared/imports/interfaces/import.interfaces'
 
-function column(overrides: Partial<ColumnAnalysis> & Pick<ColumnAnalysis, 'csvColumn'>): ColumnAnalysis {
+function column(
+  overrides: Partial<ColumnAnalysis> & Pick<ColumnAnalysis, 'csvColumn'>,
+): ColumnAnalysis {
   return { suggestedField: null, sampleValues: [], fillRate: 100, ...overrides }
 }
 

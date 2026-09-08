@@ -72,8 +72,11 @@ export class ActivitiesRepository {
         `INSERT INTO activities (
            activity_type, title, description, due_date,
            duration_minutes, reminder_at,
-           contact_id, company_id, deal_id, assigned_to_id, created_by
-         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+           contact_id, company_id, deal_id, assigned_to_id, created_by,
+           status, completed_at
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,
+           CASE WHEN $12::boolean THEN 'completed' ELSE 'pending' END,
+           CASE WHEN $12::boolean THEN NOW() END)
          RETURNING id`,
         [
           values.activityType,
@@ -87,6 +90,7 @@ export class ActivitiesRepository {
           values.dealId,
           values.assignedToId,
           values.createdById,
+          values.completed,
         ],
       )
 

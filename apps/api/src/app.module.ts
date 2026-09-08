@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TenantThrottlerGuard } from '@/shared/security/tenant-throttler.guard'
@@ -8,6 +8,7 @@ import { appConfig } from '@/config/app.config'
 import { databaseConfig } from '@/config/database.config'
 import { redisConfig } from '@/config/redis.config'
 import { jwtConfig } from '@/config/jwt.config'
+import { twilioConfig } from '@/config/twilio.config'
 import { createLoggerOptions } from '@/config/logger.config'
 import { validateEnv } from '@/config/env.validation'
 
@@ -34,6 +35,10 @@ import { BulkActionsModule } from '@/modules/bulk-actions/bulk-actions.module'
 import { WebhooksModule } from '@/modules/webhooks/webhooks.module'
 import { ApiKeysModule } from '@/modules/api-keys/api-keys.module'
 import { AuditLogModule } from '@/modules/audit-log/audit-log.module'
+import { TelephonyModule } from '@/modules/telephony/telephony.module'
+import { MessagingModule } from '@/modules/messaging/messaging.module'
+import { MESSAGING_WEBHOOK_PATH } from '@/modules/messaging/constants/message.constants'
+import { VOICE_WEBHOOK_PATH } from '@/modules/telephony/constants/call.constants'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { TenantMatchGuard } from '@/modules/auth/guards/tenant-match.guard'
 import { RolesGuard } from '@/modules/auth/guards/roles.guard'
@@ -42,7 +47,7 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, redisConfig, jwtConfig],
+      load: [appConfig, databaseConfig, redisConfig, jwtConfig, twilioConfig],
       validate: validateEnv,
     }),
     LoggerModule.forRootAsync({
@@ -70,6 +75,8 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
     BulkActionsModule,
     WebhooksModule,
     ApiKeysModule,
+    TelephonyModule,
+    MessagingModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: TenantThrottlerGuard },
@@ -80,6 +87,12 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard'
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(TenantMiddleware).forRoutes('*path')
+    consumer
+      .apply(TenantMiddleware)
+      .exclude(
+        { path: `${VOICE_WEBHOOK_PATH}/{*path}`, method: RequestMethod.POST },
+        { path: `${MESSAGING_WEBHOOK_PATH}/{*path}`, method: RequestMethod.POST },
+      )
+      .forRoutes('*path')
   }
 }

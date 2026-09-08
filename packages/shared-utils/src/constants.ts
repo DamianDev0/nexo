@@ -170,3 +170,4 @@ export const DEFAULT_PIPELINE_STAGES = {
     { name: 'Perdido', probability: 0, order: 8 },
   ],
 } as const
+export const SMS_BODY_MAX = 480
