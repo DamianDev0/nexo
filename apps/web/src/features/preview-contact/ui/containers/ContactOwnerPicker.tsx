@@ -3,10 +3,8 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useTeamMembers } from '@/entities/team-member'
+import { buildOwnerOptions, useTeamMembers } from '@/entities/team-member'
 import { AssigneePicker } from '@/shared/ui/molecules/assignee-picker'
-
-import { buildOwnerOptions } from '../../lib/owner-options'
 
 import type { ContactOwnerChange } from '@/entities/contact'
 import type { ContactListItem } from '@repo/shared-types'

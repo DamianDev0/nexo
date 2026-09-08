@@ -3,10 +3,8 @@
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { buildContactColumns } from '@/entities/contact'
 import { useContactTaxonomy, useTaxonomyUsage } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
-import { useTagCatalog } from '@/entities/tag'
 import { filterSelection, useBulkActions } from '@/features/bulk-actions'
 import { useContactsLayout, useContactWorkspace } from '@/features/customize-contacts-table'
 import {
@@ -24,6 +22,7 @@ import { EMPTY_COLUMNS, EMPTY_TABLE_STATE, EMPTY_VIEWS } from '../config/board-e
 import { orderSmartLists } from '../lib/order-smart-lists'
 import { selectionScopeKey } from '../lib/selection-scope'
 
+import { useBoardColumns } from './useBoardColumns'
 import { useBoardEditors } from './useBoardEditors'
 import { useBoardPreview } from './useBoardPreview'
 import { useBoardSelection } from './useBoardSelection'
@@ -31,7 +30,7 @@ import { useBoardViews } from './useBoardViews'
 import { useSkeletonHintSync } from './useSkeletonHintSync'
 
 export function useContactsBoard() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const table = useContactsTable()
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
@@ -48,22 +47,13 @@ export function useContactsBoard() {
     { value: table.sort, onChange: handleSort },
   )
 
-  const tagsByName = useTagCatalog('contact')
-
-  const columns = useMemo(
-    () =>
-      buildContactColumns(catalog, {
-        t,
-        locale: i18n.language,
-        entity: terms.lowerSingular,
-        dense: layout.value.density === 'compact',
-        statuses: taxonomy.statuses,
-        actions: rowActions,
-        taxonomy,
-        tagsByName,
-      }),
-    [catalog, t, i18n.language, layout.value.density, taxonomy, rowActions, tagsByName, terms],
-  )
+  const columns = useBoardColumns({
+    catalog,
+    taxonomy,
+    rowActions,
+    entity: terms.lowerSingular,
+    dense: layout.value.density === 'compact',
+  })
 
   const instance = useDataTable({
     data: table.rows,

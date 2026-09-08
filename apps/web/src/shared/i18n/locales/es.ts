@@ -793,6 +793,12 @@ const es = {
     toolbar: {
       more: 'Más acciones',
     },
+    cells: {
+      pick: 'Elegir {{field}}',
+      edit: 'Editar {{field}}',
+      clear: 'Sin valor',
+      addTag: 'Agregar etiqueta',
+    },
     rowActions: {
       preview: 'Vista rápida',
       call: 'Llamar',

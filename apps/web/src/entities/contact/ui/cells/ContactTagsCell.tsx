@@ -2,6 +2,7 @@ import { cn } from '@/shared/lib/cn'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
+import { TagPlusIcon } from '@/shared/ui/icons'
 import { HintContent } from '@/shared/ui/molecules/hint-content'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/shared/ui/shadcn/hover-card'
@@ -73,6 +74,21 @@ type ContactTagsCellProps = {
   readonly tags: ReadonlyArray<string>
   readonly labels: TagsCellLabels
   readonly byName?: ReadonlyMap<string, Tag>
+  readonly onEdit?: () => void
+}
+
+function AddTagButton({ label, onEdit }: Readonly<{ label: string; onEdit: () => void }>) {
+  return (
+    <PillButton
+      variant="ghost"
+      size="xs"
+      aria-label={label}
+      onClick={onEdit}
+      className="size-5.5 shrink-0 rounded-md px-0 text-muted-foreground opacity-0 transition-opacity duration-120 group-hover/tags:opacity-100 focus-visible:opacity-100"
+    >
+      <TagPlusIcon className="size-3.5" />
+    </PillButton>
+  )
 }
 
 function TagChip({ name, meta }: Readonly<{ name: string; meta?: Tag }>) {
@@ -84,7 +100,7 @@ function TagChip({ name, meta }: Readonly<{ name: string; meta?: Tag }>) {
   )
 }
 
-export function ContactTagsCell({ tags, labels, byName }: Readonly<ContactTagsCellProps>) {
+function TagsSummary({ tags, labels, byName }: Readonly<Omit<ContactTagsCellProps, 'onEdit'>>) {
   const [only] = tags
   if (only === undefined) return <DataTable.CellText>{null}</DataTable.CellText>
 
@@ -116,5 +132,17 @@ export function ContactTagsCell({ tags, labels, byName }: Readonly<ContactTagsCe
         {labels.count(tags.length)}
       </PillButton>
     </ContactTagsHoverCard>
+  )
+}
+
+export function ContactTagsCell({ tags, labels, byName, onEdit }: Readonly<ContactTagsCellProps>) {
+  const summary = <TagsSummary tags={tags} labels={labels} byName={byName} />
+  if (!onEdit || !labels.add) return summary
+
+  return (
+    <span className="group/tags flex min-w-0 items-center gap-1">
+      {summary}
+      <AddTagButton label={labels.add} onEdit={onEdit} />
+    </span>
   )
 }

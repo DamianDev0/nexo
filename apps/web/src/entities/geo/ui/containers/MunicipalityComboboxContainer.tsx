@@ -17,6 +17,7 @@ interface MunicipalityComboboxProps {
   readonly value: string
   readonly onSelect: (municipality: { code: string; name: string; department: string }) => void
   readonly placeholder?: string
+  readonly triggerClassName?: string
 }
 
 function renderMunicipality(municipality: Municipality) {
@@ -34,6 +35,7 @@ export function MunicipalityComboboxContainer({
   value,
   onSelect,
   placeholder,
+  triggerClassName,
 }: Readonly<MunicipalityComboboxProps>) {
   const { t } = useTranslation()
   const fetcher = useMunicipalityFetcher()
@@ -62,6 +64,7 @@ export function MunicipalityComboboxContainer({
         empty: (term) =>
           term.trim().length < MIN_TERM_LENGTH ? t('geo.typeToSearch') : t('geo.noMatches'),
         error: t('geo.loadFailed'),
+        triggerClassName,
       }}
     />
   )

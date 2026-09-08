@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ContactListItem, PaginatedContacts } from '@repo/shared-types'
 import type { ReactNode } from 'react'
 
-import { useOptimisticContactListPatch } from '@/entities/contact'
+import { useOptimisticContactListPatch, usePendingContactPatches } from '@/entities/contact'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 vi.mock('i18next', () => ({ t: (key: string) => key }))
@@ -180,5 +180,19 @@ describe('useOptimisticContactListPatch — overlapping mutations', () => {
     const c1 = client.getQueryData<PaginatedContacts>(listKey)?.data[0]
     expect(c1?.firstName).toBe('Ana')
     expect(c1?.lastName).toBe('Gómez')
+  })
+
+  it('flags the patched contact as pending until the request settles', async () => {
+    let release: () => void = () => undefined
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const { result } = renderPatchHook(() => gate)
+
+    act(() => result.current({ id: 'c1', firstName: 'Anita' }))
+    await waitFor(() => expect(usePendingContactPatches.getState().ids.has('c1')).toBe(true))
+
+    release()
+    await waitFor(() => expect(usePendingContactPatches.getState().ids.has('c1')).toBe(false))
   })
 })

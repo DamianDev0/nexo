@@ -2,6 +2,7 @@ import { selectionColumn } from '@/shared/ui/organisms/data-table'
 
 import { CONTACT_COLUMN_ALIGN, CONTACT_GROW_COLUMN } from '../../config/contact-columns.constants'
 import { contactAccessor } from '../../lib/contact-accessor'
+import { ContactCellSaving } from '../cells/ContactCellSaving'
 
 import { contactCellRenderer, withContactCellLabels } from './cell-renderers'
 import { customFieldCellRenderer } from './custom-field-cells'
@@ -36,7 +37,14 @@ function dataColumn(def: ContactColumnDef, context: ContactRenderContext): Conta
       grow: def.key === CONTACT_GROW_COLUMN,
       lockable: true,
     },
-    cell: ({ row }) => render(row.original, context),
+    cell: ({ row }) => (
+      <ContactCellSaving
+        saving={context.pendingIds?.has(row.original.id) ?? false}
+        label={context.labels.saving}
+      >
+        {render(row.original, context)}
+      </ContactCellSaving>
+    ),
   }
 }
 

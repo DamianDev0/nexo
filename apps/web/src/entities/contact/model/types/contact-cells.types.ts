@@ -1,11 +1,29 @@
 import type { ContactRequiredField } from '../../lib/contact-completeness'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
+import type { AssigneeOption, AssigneePickerLabels } from '@/shared/ui/molecules/assignee-picker'
 import type { ContactInput, ContactListItem, Tag } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
 export type TagsCellLabels = {
   readonly title: string
   readonly count: (total: number) => string
+  readonly add?: string
+}
+
+export type ChoiceCellLabels = {
+  readonly pick: (field: string) => string
+  readonly clear: string
+}
+
+export type EditableCellLabels = {
+  readonly edit: (field: string) => string
+  readonly save: string
+  readonly cancel: string
+}
+
+export type CityCellLabels = {
+  readonly field: string
+  readonly placeholder: string
 }
 
 export type CommCellLabels = {
@@ -58,6 +76,7 @@ export type ContactFieldsPatch = Partial<
     | 'city'
     | 'municipioCode'
     | 'source'
+    | 'lifecycleStage'
   >
 >
 
@@ -75,6 +94,12 @@ export type ContactCellLabels = {
   readonly document: DocumentCellLabels
   readonly tags: TagsCellLabels
   readonly stale: string
+  readonly saving: string
+  readonly choice: ChoiceCellLabels
+  readonly editable: EditableCellLabels
+  readonly city: CityCellLabels
+  readonly owner: AssigneePickerLabels
+  readonly column: (key: string) => string
 }
 
 export type ContactNameActions = {
@@ -109,6 +134,10 @@ export type ContactColumnContext = {
   readonly entity?: string
   readonly dense?: boolean
   readonly statuses?: ReadonlyArray<TaxonomyChoice>
+  readonly sources?: ReadonlyArray<TaxonomyChoice>
+  readonly lifecycleStages?: ReadonlyArray<TaxonomyChoice>
+  readonly owners?: ReadonlyArray<AssigneeOption>
+  readonly pendingIds?: ReadonlySet<string>
   readonly actions?: ContactRowActions
   readonly tagsByName?: ReadonlyMap<string, Tag>
 }

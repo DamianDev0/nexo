@@ -1,25 +1,19 @@
 import { formatDateTimeCO, timeAgo } from '@repo/shared-utils'
 
 import { cn } from '@/shared/lib/cn'
-import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
-import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
-import { CaretDownIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import { DataTable } from '@/shared/ui/organisms/data-table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/shadcn/dropdown-menu'
 
 import { CONTACT_STALE_DAYS } from '../../config/contact-columns.constants'
 import { contactCreatedParts } from '../../lib/contact-display'
 import { daysSince } from '../../lib/contact-links'
 
+import { ContactChoiceCell } from './ContactChoiceCell'
+
+import type { ChoiceCellSelection } from './ContactChoiceCell'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactListItem } from '@repo/shared-types'
 
@@ -52,41 +46,49 @@ export function ContactStatusCell({
     </span>
   )
 
-  if (!onChange || options.length === 0) return label
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <PillButton
-          variant="ghost"
-          size="sm"
-          data-slot="status-picker"
-          className="h-auto w-full justify-between gap-1 rounded-md px-1 py-0.5 font-normal hover:bg-muted"
-        >
-          {label}
-          <CaretDownIcon className="size-3.5 shrink-0 text-faint" />
-        </PillButton>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48">
-        {options.map((option) => (
-          <DropdownMenuItem
-            key={option.key}
-            disabled={option.key === contact.status}
-            onSelect={() => onChange(contact.id, option.key)}
-          >
-            <ColorDot color={option.color} />
-            {option.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <ContactChoiceCell
+      label={choice?.label ?? contact.status}
+      selection={{
+        value: contact.status,
+        options,
+        onChange: onChange
+          ? (status) => {
+              if (status !== null) onChange(contact.id, status)
+            }
+          : undefined,
+      }}
+    >
+      {label}
+    </ContactChoiceCell>
   )
 }
 
-export function ContactStageCell({ label }: Readonly<{ label: string | null }>) {
-  if (!label) return <DataTable.CellText>{null}</DataTable.CellText>
+export function ContactTaxonomyCell({
+  value,
+  choice,
+  label,
+  selection,
+}: Readonly<{
+  value: string | null
+  choice: TaxonomyChoice | undefined
+  label: string
+  selection: Omit<ChoiceCellSelection, 'value'>
+}>) {
+  const display = choice ? (
+    <span className="flex min-w-0 items-center gap-1.5">
+      <ColorDot color={choice.color} />
+      <TruncateTip>{choice.label}</TruncateTip>
+    </span>
+  ) : (
+    <DataTable.CellText muted>{value}</DataTable.CellText>
+  )
 
-  return <BadgeSoft tone="outline">{label}</BadgeSoft>
+  return (
+    <ContactChoiceCell label={label} selection={{ ...selection, value }}>
+      {display}
+    </ContactChoiceCell>
+  )
 }
 
 export function ContactRelativeCell({

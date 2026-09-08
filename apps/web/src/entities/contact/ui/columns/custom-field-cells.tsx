@@ -11,10 +11,13 @@ import {
 import {
   customFieldDatePart,
   nextCustomFieldDate,
+  parseCustomValue,
   withCustomField,
 } from '../../lib/custom-field-edit'
 import { ContactBooleanFieldCell } from '../cells/ContactBooleanFieldCell'
+import { ContactChoiceCell } from '../cells/ContactChoiceCell'
 import { ContactDateFieldCell } from '../cells/ContactDateFieldCell'
+import { ContactTextFieldCell } from '../cells/ContactTextFieldCell'
 
 import type { ContactRenderContext } from '../../model/types/contact-cells.types'
 import type { ContactColumnDef, ContactListItem } from '@repo/shared-types'
@@ -63,21 +66,79 @@ function booleanRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRe
   }
 }
 
+function badgesOf(def: ContactColumnDef, value: unknown): ReactNode {
+  const badges = customFieldBadges(def, value)
+  if (badges.length === 0) return <DataTable.CellText>{null}</DataTable.CellText>
+  return (
+    <span className="flex items-center gap-1 overflow-hidden">
+      {badges.map((badge) => (
+        <BadgeSoft key={badge.label} color={badge.color}>
+          {badge.label}
+        </BadgeSoft>
+      ))}
+    </span>
+  )
+}
+
+function selectRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRenderer {
+  const options = (def.fieldOptions ?? []).map((option) => ({
+    key: option.value,
+    label: option.label,
+    color: option.color,
+  }))
+  return function renderCustomSelectField(contact, { actions, labels }) {
+    const raw = contact.customFields?.[fieldKey]
+    const onChange = actions?.onCustomFieldsChange
+    return (
+      <ContactChoiceCell
+        label={labels.choice.pick(customFieldLabel(def, fieldKey))}
+        selection={{
+          value: typeof raw === 'string' ? raw : null,
+          options,
+          clearLabel: labels.choice.clear,
+          onChange: onChange
+            ? (next) => onChange(contact.id, withCustomField(contact.customFields, fieldKey, next))
+            : undefined,
+        }}
+      >
+        {badgesOf(def, raw)}
+      </ContactChoiceCell>
+    )
+  }
+}
+
+function textRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRenderer {
+  const numeric = def.fieldType === 'number' || def.fieldType === 'currency'
+  return function renderCustomTextField(contact, { t, actions, labels }) {
+    const raw = contact.customFields?.[fieldKey]
+    const onChange = actions?.onCustomFieldsChange
+    return (
+      <ContactTextFieldCell
+        field={customFieldLabel(def, fieldKey)}
+        value={{
+          raw: raw === null || raw === undefined ? '' : String(raw),
+          display: customFieldDisplay(def, raw, t).text,
+          numeric,
+        }}
+        labels={labels.editable}
+        onSave={
+          onChange
+            ? (next) =>
+                onChange(
+                  contact.id,
+                  withCustomField(contact.customFields, fieldKey, parseCustomValue(next, numeric)),
+                )
+            : undefined
+        }
+      />
+    )
+  }
+}
+
 function displayRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRenderer {
   return function renderCustomField(contact, { t }) {
     const value = contact.customFields?.[fieldKey]
-    const badges = customFieldBadges(def, value)
-    if (badges.length > 0) {
-      return (
-        <span className="flex items-center gap-1 overflow-hidden">
-          {badges.map((badge) => (
-            <BadgeSoft key={badge.label} color={badge.color}>
-              {badge.label}
-            </BadgeSoft>
-          ))}
-        </span>
-      )
-    }
+    if (def.fieldType === 'multiselect') return badgesOf(def, value)
     const display = customFieldDisplay(def, value, t)
     return <DataTable.CellText numeric={display.numeric}>{display.text}</DataTable.CellText>
   }
@@ -91,6 +152,12 @@ export function customFieldCellRenderer(def: ContactColumnDef): ContactCellRende
       return dateRenderer(def, fieldKey)
     case 'boolean':
       return booleanRenderer(def, fieldKey)
+    case 'select':
+      return selectRenderer(def, fieldKey)
+    case 'text':
+    case 'number':
+    case 'currency':
+      return textRenderer(def, fieldKey)
     default:
       return displayRenderer(def, fieldKey)
   }

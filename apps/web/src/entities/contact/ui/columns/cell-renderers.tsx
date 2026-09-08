@@ -1,9 +1,8 @@
-import { TruncateTip } from '@/shared/ui/molecules/truncate-tip'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 
 import { commCellActions } from '../../lib/comm-actions'
 import { buildContactCellLabels } from '../../lib/contact-cell-labels'
-import { taxonomyLabel } from '../../lib/contact-taxonomy-label'
+import { ContactCityCell } from '../cells/ContactCityCell'
 import {
   ContactDocumentCell,
   ContactEmailCell,
@@ -11,12 +10,13 @@ import {
   ContactWhatsAppCell,
 } from '../cells/ContactCommCells'
 import { ContactNameCell } from '../cells/ContactNameCell'
+import { ContactOwnerCell } from '../cells/ContactOwnerCell'
 import { ContactTagsCell } from '../cells/ContactTagsCell'
 import {
   ContactCreatedCell,
   ContactRelativeCell,
-  ContactStageCell,
   ContactStatusCell,
+  ContactTaxonomyCell,
 } from '../cells/ContactValueCells'
 import { ContactNotesCell } from '../containers/ContactNotesHoverCard'
 
@@ -35,10 +35,6 @@ export function withContactCellLabels(context: ContactColumnContext): ContactRen
 
 function text(value: string | number | null): ReactNode {
   return <DataTable.CellText>{value}</DataTable.CellText>
-}
-
-function muted(value: string | null): ReactNode {
-  return <DataTable.CellText muted>{value}</DataTable.CellText>
 }
 
 const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
@@ -60,8 +56,13 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
       onChange={actions?.onStatusChange}
     />
   ),
-  tags: (contact, { tagsByName, labels }) => (
-    <ContactTagsCell tags={contact.tags} labels={labels.tags} byName={tagsByName} />
+  tags: (contact, { tagsByName, labels, actions }) => (
+    <ContactTagsCell
+      tags={contact.tags}
+      labels={labels.tags}
+      byName={tagsByName}
+      onEdit={actions?.onEditTags ? () => actions.onEditTags?.(contact) : undefined}
+    />
   ),
   notes: (contact, { actions, labels }) => (
     <ContactNotesCell contact={contact} labels={labels.name.notes} onAddNote={actions?.onAddNote} />
@@ -102,19 +103,59 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
       dense={dense}
     />
   ),
-  city: (contact) => muted(contact.city),
-  source: (contact, { taxonomy }) => muted(taxonomyLabel(taxonomy.sourceByKey, contact.source)),
-  assignedTo: (contact) =>
-    contact.assignedToName ? (
-      <TruncateTip className="text-body">{contact.assignedToName}</TruncateTip>
-    ) : (
-      muted(null)
-    ),
-  lifecycleStage: (contact, { taxonomy }) => (
-    <ContactStageCell
-      label={
-        taxonomyLabel(taxonomy.lifecycleByKey, contact.lifecycleStage) ?? contact.lifecycleStage
+  city: (contact, { actions, labels }) => (
+    <ContactCityCell
+      value={contact.city}
+      labels={labels.city}
+      onSelect={
+        actions?.onFieldsChange
+          ? ({ name, code }) =>
+              actions.onFieldsChange?.(contact.id, { city: name, municipioCode: code })
+          : undefined
       }
+    />
+  ),
+  source: (contact, { taxonomy, sources, actions, labels }) => (
+    <ContactTaxonomyCell
+      value={contact.source}
+      choice={taxonomy.sourceByKey.get(contact.source ?? '')}
+      label={labels.choice.pick(labels.column('source'))}
+      selection={{
+        options: sources ?? [],
+        clearLabel: labels.choice.clear,
+        onChange: actions?.onFieldsChange
+          ? (source) => actions.onFieldsChange?.(contact.id, { source: source ?? '' })
+          : undefined,
+      }}
+    />
+  ),
+  assignedTo: (contact, { owners, actions, labels }) => (
+    <ContactOwnerCell
+      value={contact.assignedToId}
+      name={contact.assignedToName ?? null}
+      options={owners}
+      labels={labels.owner}
+      onChange={
+        actions?.onAssign
+          ? (assignedToId, assignedToName) =>
+              actions.onAssign?.({ id: contact.id, assignedToId, assignedToName })
+          : undefined
+      }
+    />
+  ),
+  lifecycleStage: (contact, { taxonomy, lifecycleStages, actions, labels }) => (
+    <ContactTaxonomyCell
+      value={contact.lifecycleStage}
+      choice={taxonomy.lifecycleByKey.get(contact.lifecycleStage ?? '')}
+      label={labels.choice.pick(labels.column('lifecycleStage'))}
+      selection={{
+        options: lifecycleStages ?? [],
+        onChange: actions?.onFieldsChange
+          ? (stage) => {
+              if (stage !== null) actions.onFieldsChange?.(contact.id, { lifecycleStage: stage })
+            }
+          : undefined,
+      }}
     />
   ),
   lastContactedAt: (contact, { locale, labels }) => (

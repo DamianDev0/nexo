@@ -11,6 +11,7 @@ export function buildContactCellLabels(t: TFunction): ContactCellLabels {
   const tags: TagsCellLabels = {
     title: t('contacts.tagsPopover.title'),
     count: (total) => t('contacts.tagCount', { count: total }),
+    add: t('contacts.cells.addTag'),
   }
 
   return {
@@ -44,5 +45,23 @@ export function buildContactCellLabels(t: TFunction): ContactCellLabels {
     document: { copy, menu, invalid: t('contacts.document.invalid') },
     tags,
     stale: t('contacts.recency.stale', { days: CONTACT_STALE_DAYS }),
+    saving: t('common.saving'),
+    choice: {
+      pick: (field) => t('contacts.cells.pick', { field }),
+      clear: t('contacts.cells.clear'),
+    },
+    editable: {
+      edit: (field) => t('contacts.cells.edit', { field }),
+      save: t('common.save'),
+      cancel: t('common.cancel'),
+    },
+    city: { field: t('contacts.form.city'), placeholder: t('contacts.form.cityPlaceholder') },
+    owner: {
+      trigger: t('contacts.preview.owner.trigger'),
+      search: t('contacts.preview.owner.search'),
+      empty: t('contacts.preview.owner.empty'),
+      unassign: t('contacts.preview.owner.unassign'),
+    },
+    column: (key) => t(`contacts.columns.${key}`),
   }
 }

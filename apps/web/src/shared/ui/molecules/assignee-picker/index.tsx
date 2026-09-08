@@ -36,12 +36,42 @@ function OptionAvatar({ option, size }: Readonly<{ option: AssigneeOption; size:
   )
 }
 
+export type AssigneePickerView = {
+  readonly disabled?: boolean
+  readonly compact?: boolean
+}
+
 type AssigneePickerProps = {
   readonly value: string | null
   readonly onChange: (id: string | null) => void
   readonly options: ReadonlyArray<AssigneeOption>
   readonly labels: AssigneePickerLabels
-  readonly disabled?: boolean
+  readonly view?: AssigneePickerView
+}
+
+function CompactTrigger({
+  current,
+  open,
+  placeholder,
+}: Readonly<{ current: AssigneeOption | null; open: boolean; placeholder: string }>) {
+  return (
+    <>
+      {current ? (
+        <OptionAvatar option={current} size="sm" />
+      ) : (
+        <UserXIcon className="size-4 shrink-0 text-muted-foreground" />
+      )}
+      <Text variant={current ? 'body' : 'muted'} className="min-w-0 truncate">
+        {current?.name ?? placeholder}
+      </Text>
+      <CaretDownIcon
+        className={cn(
+          'ml-auto size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity duration-120 group-hover/assignee:opacity-100',
+          open && 'opacity-100',
+        )}
+      />
+    </>
+  )
 }
 
 export function AssigneePicker({
@@ -49,7 +79,7 @@ export function AssigneePicker({
   onChange,
   options,
   labels,
-  disabled,
+  view,
 }: Readonly<AssigneePickerProps>) {
   const state = useAsyncSelect<AssigneeOption>(
     { options, getValue: (option) => option.id, filterFn: matches },
@@ -66,30 +96,44 @@ export function AssigneePicker({
             role="combobox"
             aria-label={current ? `${labels.trigger}: ${current.name}` : labels.trigger}
             aria-expanded={state.open}
-            disabled={disabled}
+            disabled={view?.disabled}
             className={cn(
-              'flex h-10 items-center gap-1 rounded-full border border-transparent bg-muted py-1 pr-2 pl-1 outline-none transition-colors duration-120 hover:border-border-strong focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-50',
-              state.open && 'border-ring ring-2 ring-ring/30',
+              'outline-none transition-colors duration-120 focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-50',
+              view?.compact
+                ? 'group/assignee flex h-auto w-full min-w-0 items-center gap-1.5 rounded-md px-1 py-0.5 hover:bg-muted'
+                : 'flex h-10 items-center gap-1 rounded-full border border-transparent bg-muted py-1 pr-2 pl-1 hover:border-border-strong',
+              state.open && (view?.compact ? 'bg-muted' : 'border-ring ring-2 ring-ring/30'),
             )}
           >
-            {current ? (
-              <OptionAvatar option={current} size="sm" />
+            {view?.compact ? (
+              <CompactTrigger current={current} open={state.open} placeholder={labels.trigger} />
             ) : (
-              <span className="flex size-8 items-center justify-center text-muted-foreground">
-                <UserXIcon className="size-4" />
-              </span>
+              <>
+                {current ? (
+                  <OptionAvatar option={current} size="sm" />
+                ) : (
+                  <span className="flex size-8 items-center justify-center text-muted-foreground">
+                    <UserXIcon className="size-4" />
+                  </span>
+                )}
+                <CaretDownIcon
+                  className={cn(
+                    'size-3.5 text-muted-foreground transition-transform duration-150',
+                    state.open && 'rotate-180',
+                  )}
+                />
+              </>
             )}
-            <CaretDownIcon
-              className={cn(
-                'size-3.5 text-muted-foreground transition-transform duration-150',
-                state.open && 'rotate-180',
-              )}
-            />
           </button>
         </GroovyPopover.Trigger>
       </HintTooltip>
 
-      <GroovyPopover.Content align="end" autoFocusContent subtle className="w-72 p-0">
+      <GroovyPopover.Content
+        align={view?.compact ? 'start' : 'end'}
+        autoFocusContent
+        subtle
+        className="w-72 p-0"
+      >
         <SearchableCommand
           search={{ value: state.term, onChange: state.setTerm, placeholder: labels.search }}
           highlight={{ value: state.highlightedValue, onChange: state.setHighlighted }}

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { TeamMember } from '@repo/shared-types'
 
-import { buildOwnerOptions } from '@/features/preview-contact/lib/owner-options'
+import { buildOwnerOptions } from '@/entities/team-member/lib/owner-options'
 
 const t = ((key: string) => key) as never
 

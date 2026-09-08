@@ -24,3 +24,10 @@ export function withCustomField(
 ): Record<string, unknown> {
   return { ...fields, [key]: value }
 }
+
+export function parseCustomValue(raw: string, numeric: boolean): string | number | null {
+  if (raw === '') return null
+  if (!numeric) return raw
+  const parsed = Number(raw)
+  return Number.isFinite(parsed) ? parsed : null
+}

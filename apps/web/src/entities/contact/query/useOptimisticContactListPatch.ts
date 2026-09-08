@@ -7,6 +7,8 @@ import { sileo } from 'sileo'
 
 import { QUERY_KEYS } from '@/shared/query/query-keys'
 
+import { usePendingContactPatches } from '../model/contact-pending.store'
+
 import type { ContactListItem, PaginatedContacts } from '@repo/shared-types'
 
 type ContactKey = keyof ContactListItem
@@ -68,6 +70,7 @@ export function useOptimisticContactListPatch<TChange>({
             }
           : page,
       )
+      usePendingContactPatches.getState().begin(reversals.map((reversal) => reversal.id))
       return { reversals }
     },
     onSuccess: () => sileo.success({ title: successTitle() }),
@@ -86,7 +89,10 @@ export function useOptimisticContactListPatch<TChange>({
       )
       sileo.error({ title: t('common.saveFailed') })
     },
-    onSettled: () => void client.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all }),
+    onSettled: (_data, _error, _change, context) => {
+      usePendingContactPatches.getState().end(context?.reversals.map((r) => r.id) ?? [])
+      void client.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
+    },
   })
 
   return useCallback((change: TChange) => mutate(change), [mutate])

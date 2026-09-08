@@ -786,6 +786,12 @@ const en = {
     toolbar: {
       more: 'More actions',
     },
+    cells: {
+      pick: 'Pick {{field}}',
+      edit: 'Edit {{field}}',
+      clear: 'No value',
+      addTag: 'Add tag',
+    },
     rowActions: {
       preview: 'Quick view',
       call: 'Call',

@@ -44,6 +44,7 @@ export {
 } from './lib/contact-sort'
 export { useContactList, usePrefetchContactList } from './query/useContactList'
 export { useOptimisticContactListPatch } from './query/useOptimisticContactListPatch'
+export { usePendingContactPatches } from './model/contact-pending.store'
 export { contactDialNumber, contactPhoneLabel } from './lib/contact-links'
 export { readSkeletonHint, writeSkeletonHint, type ContactsSkeletonHint } from './lib/skeleton-hint'
 export { useRestoreContact } from './query/useRestoreContact'
