@@ -60,6 +60,7 @@ export function BulkChoiceDialog({
               renderOption: (option) => <BulkChoiceRow option={option} />,
             }}
             view={{
+              label: copy.placeholder,
               display: selected ? <BulkChoiceRow option={selected} compact /> : undefined,
               placeholder: copy.placeholder,
               searchPlaceholder: copy.searchPlaceholder,

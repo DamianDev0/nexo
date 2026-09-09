@@ -56,7 +56,7 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
     >
       <HintTooltip asChild hint={t(`${s}.dragToReorder`)}>
         <span
-          className="flex size-6 shrink-0 items-center justify-center text-muted-foreground/50 transition-colors group-hover:text-muted-foreground"
+          className="flex size-6 shrink-0 items-center justify-center text-faint transition-colors group-hover:text-muted-foreground"
           aria-label={t(`${s}.dragToReorder`)}
         >
           <DotsSixVerticalIcon className="size-4" />
@@ -82,7 +82,7 @@ export function ModuleRow({ module, actions, handle, ghost }: Readonly<ModuleRow
       </div>
 
       {module.required ? (
-        <LockIcon className="size-3.5 text-muted-foreground/50" />
+        <LockIcon className="size-3.5 text-faint" />
       ) : (
         <AnimatedToggle
           checked={module.enabled}

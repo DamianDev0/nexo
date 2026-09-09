@@ -41,6 +41,7 @@ export function AsyncSelect<T>({
           type="button"
           variant="outline"
           role="combobox"
+          aria-label={view.label}
           aria-expanded={state.open}
           disabled={disabled}
           className={cn(

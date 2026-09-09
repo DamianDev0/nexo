@@ -7,7 +7,7 @@ import type { RefObject } from 'react'
 export function useHorizontalScrollbar(target: RefObject<HTMLElement | null>) {
   const fallbackId = useId()
   const [metrics, setMetrics] = useState({ ratio: 1, offset: 0 })
-  const [controlsId, setControlsId] = useState(fallbackId)
+  const [controlsId, setControlsId] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     const el = target.current

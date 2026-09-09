@@ -86,6 +86,7 @@ export function ReassignOptionDialog({
                     renderOption: candidateOption,
                   }}
                   view={{
+                    label: t('settings.reassign.target'),
                     display: form.selected ? candidateOption(form.selected) : undefined,
                     placeholder: t('settings.reassign.target'),
                     searchPlaceholder: t('common.search'),

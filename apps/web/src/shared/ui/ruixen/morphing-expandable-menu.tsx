@@ -1,7 +1,5 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
 import {
   Search,
   Music2,
@@ -15,6 +13,8 @@ import {
   RotateCcw,
   Plus,
 } from 'lucide-react'
+import { motion, AnimatePresence } from 'motion/react'
+import { useState, useRef, useEffect } from 'react'
 
 type Mode = 'pill' | 'dock' | 'search' | 'player' | 'timer' | 'note'
 
@@ -184,14 +184,14 @@ export function MorphingExpandableMenu() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search..."
-                  className="flex-1 bg-transparent text-[13px] outline-none placeholder:text-muted-foreground/50"
+                  className="flex-1 bg-transparent text-[13px] outline-none placeholder:text-faint"
                 />
                 <button onClick={goBack} className="text-muted-foreground/60 hover:text-foreground">
                   <X className="size-3.5" />
                 </button>
               </div>
               <div className="scrollbar-hide mt-1 min-h-0 flex-1 overflow-y-auto">
-                <p className="mt-1.5 px-1 text-[10px] font-medium uppercase tracking-widest text-muted-foreground/50">
+                <p className="mt-1.5 px-1 text-[10px] font-medium uppercase tracking-widest text-faint">
                   Recent
                 </p>
                 <div className="mt-1 space-y-0.5">
@@ -233,7 +233,7 @@ export function MorphingExpandableMenu() {
                     </p>
                   </div>
                 </div>
-                <button onClick={goBack} className="text-muted-foreground/50 hover:text-foreground">
+                <button onClick={goBack} className="text-faint hover:text-foreground">
                   <X className="size-3.5" />
                 </button>
               </div>
@@ -247,7 +247,7 @@ export function MorphingExpandableMenu() {
                     transition={{ duration: 0.5, ease: 'easeOut' }}
                   />
                 </div>
-                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground/50">
+                <div className="mt-1 flex justify-between text-[10px] text-faint">
                   <span>1:24</span>
                   <span>4:03</span>
                 </div>
@@ -292,10 +292,10 @@ export function MorphingExpandableMenu() {
               transition={{ duration: 0.15 }}
             >
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-faint">
                   Focus
                 </p>
-                <button onClick={goBack} className="text-muted-foreground/50 hover:text-foreground">
+                <button onClick={goBack} className="text-faint hover:text-foreground">
                   <X className="size-3.5" />
                 </button>
               </div>
@@ -337,10 +337,10 @@ export function MorphingExpandableMenu() {
               transition={{ duration: 0.15 }}
             >
               <div className="mb-2 flex items-center justify-between">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-faint">
                   Quick Note
                 </p>
-                <button onClick={goBack} className="text-muted-foreground/50 hover:text-foreground">
+                <button onClick={goBack} className="text-faint hover:text-foreground">
                   <X className="size-3.5" />
                 </button>
               </div>

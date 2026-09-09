@@ -1,5 +1,7 @@
 'use client'
 
+import { useCallback } from 'react'
+
 import { cn } from '@/shared/lib'
 import { PagedTransition } from '@/shared/ui/molecules/paged-transition'
 import { Sheet, SheetContent, SheetTitle } from '@/shared/ui/shadcn/sheet'
@@ -9,6 +11,8 @@ import { RecordDrawerHeader } from './header'
 import { RecordDrawerHighlight } from './highlight'
 import { RecordDrawerIdentity } from './identity'
 import { isFloatingLayerTarget } from './lib/interact-outside'
+import { useEscapeToClose } from './model/use-escape-to-close'
+import { useRestoreFocus } from './model/use-restore-focus'
 import { RecordDrawerQuickActions } from './quick-actions'
 import { RecordDrawerSection, RecordDrawerSections } from './sections'
 
@@ -33,6 +37,12 @@ function RecordDrawerRoot({
   children,
   className,
 }: Readonly<RecordDrawerRootProps>) {
+  useRestoreFocus(open)
+  useEscapeToClose(
+    open,
+    useCallback(() => onOpenChange(false), [onOpenChange]),
+  )
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
       <SheetContent

@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { CONTACT_ADDRESS_KEY, contactCoreFieldsSchema } from '@/entities/contact'
+import {
+  clearedFieldsToNull,
+  CONTACT_ADDRESS_KEY,
+  contactCoreFieldsSchema,
+} from '@/entities/contact'
 
 import type { ContactFieldsPatch } from '@/entities/contact'
 import type { ContactListItem } from '@repo/shared-types'
@@ -37,8 +41,10 @@ export function buildDetailsPatch(
 ): ContactFieldsPatch | null {
   const current = contactDetailsDefaults(contact)
   if (values[field] === current[field]) return null
-  if (field === 'city') return { city: values.city, municipioCode: values.municipioCode }
-  return { [field]: values[field] }
+  if (field === 'city') {
+    return clearedFieldsToNull({ city: values.city, municipioCode: values.municipioCode })
+  }
+  return clearedFieldsToNull({ [field]: values[field] })
 }
 
 export function buildAddressCustomFields(

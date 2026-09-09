@@ -160,9 +160,7 @@ export function CarouselRow({ item, offset, swipeHint, onDismiss, onSelect }: Ca
         </div>
         <span className="truncate text-xs text-muted-foreground">{item.body}</span>
         {isFocused ? (
-          <span className="absolute bottom-1.5 right-3.5 text-[9px] text-muted-foreground/50">
-            {swipeHint}
-          </span>
+          <span className="absolute bottom-1.5 right-3.5 text-[9px] text-faint">{swipeHint}</span>
         ) : null}
       </div>
     </motion.div>

@@ -53,6 +53,7 @@ export function TypographySection({ data, actions }: Readonly<TypographySectionP
         <FieldLabel variant="section">{t(`${s}.font`, 'Font')}</FieldLabel>
         <Select value={data.fontFamily} onValueChange={actions.onFontFamilyChange}>
           <SelectTrigger
+            aria-label={t(`${s}.font`, 'Font')}
             className="mt-2 h-8 w-full text-sm"
             style={{ fontFamily: fontStack(data.fontFamily) }}
           >

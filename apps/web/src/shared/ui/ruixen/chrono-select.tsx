@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+
 import { cn } from '@/shared/lib/index'
 
 /**
@@ -74,7 +75,9 @@ function tick() {
     s.buffer = _buf
     s.connect(_ctx.destination)
     s.start()
-  } catch {}
+  } catch {
+    return
+  }
 }
 
 /* ── types ── */
@@ -125,7 +128,7 @@ export function ChronoSelect({
       setMonth(p.m)
       setYear(p.y)
     }
-  }, [value]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value])
 
   /* click-outside */
   useEffect(() => {

@@ -27,12 +27,14 @@ export function SettingsNavItem({ section, pathname, isActive }: Readonly<Settin
       <li>
         <HintTooltip asChild hint={t('settings.comingSoon')} side="right">
           <span
+            role="link"
+            aria-disabled="true"
             className={cn(
               'flex items-center gap-2.5 px-2.5 py-1.5 text-sm',
-              'cursor-not-allowed text-muted-foreground/50',
+              'cursor-not-allowed text-faint',
             )}
           >
-            <Icon className="size-4 shrink-0 text-muted-foreground/50" />
+            <Icon className="size-4 shrink-0 text-faint" />
             {label}
           </span>
         </HintTooltip>

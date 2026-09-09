@@ -6,6 +6,7 @@ export type AsyncSelectSource<T> = AsyncOptionSource<T> & {
 }
 
 export interface AsyncSelectView {
+  readonly label: string
   readonly display?: ReactNode
   readonly placeholder: string
   readonly searchPlaceholder: string

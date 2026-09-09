@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { Text } from '@/shared/ui/atoms/text'
+import { BrowserFrame } from '@/shared/ui/molecules/browser-frame'
 
 import { SIDEBAR_ICON_MAP } from '../../config/module-icons.constants'
 import { groupModules } from '../../lib/navigation'
@@ -28,18 +29,7 @@ export function SidebarPreview({ modules, highlightKey }: Readonly<SidebarPrevie
         <Text variant="hint">{t(`${s}.modulesActive`, { count: enabledModules.length })}</Text>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border shadow-sm">
-        <div className="flex h-8 items-center justify-between border-b border-border bg-muted/40 px-3">
-          <div className="flex gap-1.5">
-            <div className="size-2 rounded-full bg-red-400/90" />
-            <div className="size-2 rounded-full bg-amber-400/90" />
-            <div className="size-2 rounded-full bg-emerald-400/90" />
-          </div>
-          <Text variant="micro" className="font-medium tracking-wide text-muted-foreground/50">
-            app.nexo.com
-          </Text>
-        </div>
-
+      <BrowserFrame address="app.nexo.com">
         <div className="flex min-h-72 bg-background">
           <div className="flex w-44 shrink-0 flex-col gap-0.5 border-r border-border bg-muted/30 p-2.5">
             <div className="mb-3 flex items-center gap-2 px-2">
@@ -95,7 +85,7 @@ export function SidebarPreview({ modules, highlightKey }: Readonly<SidebarPrevie
             <div className="mt-1 flex-1 rounded-lg border border-border bg-card" />
           </div>
         </div>
-      </div>
+      </BrowserFrame>
     </div>
   )
 }

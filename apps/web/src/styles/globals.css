@@ -65,6 +65,8 @@
   --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted-foreground: var(--sidebar-muted-foreground);
+  --color-sidebar-faint: var(--sidebar-faint);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
@@ -141,6 +143,8 @@
   --chart-5: #5f665d;
   --sidebar: var(--brand-sidebar);
   --sidebar-foreground: var(--brand-sidebar-foreground);
+  --sidebar-muted-foreground: #5c6359;
+  --sidebar-faint: #5f665c;
   --sidebar-primary: #a5e96f;
   --sidebar-primary-foreground: #0e0f0c;
   --sidebar-accent: #e4f7d6;
@@ -209,6 +213,8 @@
   --chart-4: #ff6a63;
   --chart-5: #8e938c;
   --sidebar: #171915;
+  --sidebar-muted-foreground: #9aa197;
+  --sidebar-faint: #868d83;
   --sidebar-foreground: #f2f4f0;
   --sidebar-primary: #a5e96f;
   --sidebar-primary-foreground: #0e0f0c;

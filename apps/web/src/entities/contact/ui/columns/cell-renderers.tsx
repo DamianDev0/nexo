@@ -125,7 +125,7 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
         options: sources ?? [],
         clearLabel: labels.choice.clear,
         onChange: actions?.onFieldsChange
-          ? (source) => actions.onFieldsChange?.(contact.id, { source: source ?? '' })
+          ? (source) => actions.onFieldsChange?.(contact.id, { source })
           : undefined,
       }}
     />

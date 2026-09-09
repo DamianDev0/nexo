@@ -18,6 +18,7 @@ interface MunicipalityComboboxProps {
   readonly onSelect: (municipality: { code: string; name: string; department: string }) => void
   readonly placeholder?: string
   readonly triggerClassName?: string
+  readonly label?: string
 }
 
 function renderMunicipality(municipality: Municipality) {
@@ -36,6 +37,7 @@ export function MunicipalityComboboxContainer({
   onSelect,
   placeholder,
   triggerClassName,
+  label,
 }: Readonly<MunicipalityComboboxProps>) {
   const { t } = useTranslation()
   const fetcher = useMunicipalityFetcher()
@@ -58,6 +60,7 @@ export function MunicipalityComboboxContainer({
       }}
       source={source}
       view={{
+        label: label ?? t('contacts.form.city'),
         display: value || undefined,
         placeholder: placeholder ?? '',
         searchPlaceholder: t('common.search'),

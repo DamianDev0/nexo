@@ -16,6 +16,7 @@ import {
   Max,
   MaxLength,
   Min,
+  ValidateIf,
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform, Type } from 'class-transformer'
@@ -84,11 +85,12 @@ export class CreateContactDto {
   @Matches(TAXONOMY_KEY_PATTERN)
   status?: string
 
-  @ApiPropertyOptional({ description: 'Tenant taxonomy source key' })
+  @ApiPropertyOptional({ description: 'Tenant taxonomy source key, null clears it' })
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsString()
   @Matches(TAXONOMY_KEY_PATTERN)
-  source?: string
+  source?: string | null
 
   @ApiPropertyOptional({ description: 'Tenant taxonomy lifecycle stage key' })
   @IsOptional()

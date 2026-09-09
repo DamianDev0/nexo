@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { useRef, useState, useCallback } from 'react'
+
 import { cn } from '@/shared/lib/index'
 
 /**
@@ -170,7 +171,7 @@ export function CalendarCrest({
         onRangeChange?.(s, e)
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [rangeStart, rangeEnd, onRangeChange],
   )
 

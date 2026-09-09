@@ -21,6 +21,7 @@ export function ContactCityCell({ value, labels, onSelect }: Readonly<ContactCit
   return (
     <MunicipalityCombobox
       value={value ?? ''}
+      label={labels.field}
       placeholder={labels.placeholder}
       triggerClassName={TRIGGER}
       onSelect={onSelect}

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Text } from '@/shared/ui/atoms/text'
+import { BrowserFrame } from '@/shared/ui/molecules/browser-frame'
 
 import {
   DENSITY_MAP,
@@ -49,21 +50,10 @@ export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewPr
         <Text variant="hint">{t('onboarding.steps.appearance.updatesRealTime')}</Text>
       </div>
 
-      <div
-        className="overflow-hidden rounded-xl border border-border shadow-sm"
+      <BrowserFrame
+        address="app.nexo.com"
         style={{ fontFamily: `'${fontFace}', system-ui, sans-serif` }}
       >
-        <div className="flex h-8 items-center justify-between border-b border-border bg-muted/40 px-3">
-          <div className="flex gap-1.5">
-            <div className="size-2 rounded-full bg-red-400/90" />
-            <div className="size-2 rounded-full bg-amber-400/90" />
-            <div className="size-2 rounded-full bg-emerald-400/90" />
-          </div>
-          <Text variant="micro" className="font-medium tracking-wide text-muted-foreground/50">
-            app.nexo.com
-          </Text>
-        </div>
-
         <div className="flex min-h-96">
           <PreviewSidebar
             colors={colors}
@@ -80,7 +70,7 @@ export function AppearanceLivePreview({ data }: Readonly<AppearanceLivePreviewPr
             gap={d.gap}
           />
         </div>
-      </div>
+      </BrowserFrame>
     </div>
   )
 }

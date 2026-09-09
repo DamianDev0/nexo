@@ -3,8 +3,8 @@
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { buildBulkLabels } from '../lib/bulk-labels'
 import { buildActionRequest, bulkActionsFor, bulkScope } from '../lib/bulk-action-registry'
+import { buildBulkLabels } from '../lib/bulk-labels'
 
 import { useBulkDialog } from './useBulkDialog'
 import { useBulkFeedback } from './useBulkFeedback'

@@ -6,6 +6,7 @@ import {
   oklchToHex,
   parseHex,
   readableForeground,
+  readableNeutral,
   relativeLuminance,
   resolveThemeTokens,
   rotateHue,
@@ -127,7 +128,7 @@ describe('color', () => {
     it('passes seed colors through the light tokens', () => {
       const { light } = resolveThemeTokens(seeds)
       expect(light.primary).toBe(seeds.primary)
-      expect(light['primary-foreground']).toBe(seeds.primaryForeground)
+      expect(light['primary-foreground']).toBe(readableForeground(seeds.primary))
       expect(light.secondary).toBe(seeds.secondary)
       expect(light.accent).toBe(seeds.accent)
       expect(light.sidebar).toBe(seeds.sidebar)
@@ -148,5 +149,60 @@ describe('color', () => {
         expect(isHexColor(value)).toBe(true)
       }
     })
+  })
+})
+
+describe('readableNeutral', () => {
+  it('darkens a neutral until it clears AA on a light surface', () => {
+    const surface = '#f7f8f5'
+    const naive = tintedNeutral('#4a7c3f', 0.62, 0.018)
+    const fixed = readableNeutral('#4a7c3f', 0.62, 0.018, [surface])
+
+    expect(contrastRatio(naive, surface)).toBeLessThan(4.5)
+    expect(contrastRatio(fixed, surface)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it('lightens instead when the surface is dark', () => {
+    const surface = '#151a14'
+    const fixed = readableNeutral('#4a7c3f', 0.4, 0.02, [surface])
+
+    expect(contrastRatio(fixed, surface)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it('satisfies every surface it is given', () => {
+    const surfaces = ['#fafcfa', '#f1f6ee']
+    const fixed = readableNeutral('#4a7c3f', 0.62, 0.018, surfaces)
+
+    for (const surface of surfaces) {
+      expect(contrastRatio(fixed, surface)).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+})
+
+describe('generated theme accessibility', () => {
+  const seeds = {
+    primary: '#4a7c3f',
+    primaryForeground: '#FFFFFF',
+    secondary: '#2f4f2a',
+    accent: '#8fbf6a',
+    sidebar: '#f7f8f5',
+    sidebarForeground: '#1b1f19',
+  }
+
+  it('keeps body text readable on its own surface in both modes', () => {
+    const { light, dark } = resolveThemeTokens(seeds)
+
+    for (const tokens of [light, dark]) {
+      for (const name of ['muted-foreground', 'faint', 'body', 'foreground'] as const) {
+        expect(contrastRatio(tokens[name], tokens.background)).toBeGreaterThanOrEqual(4.5)
+      }
+      for (const name of [
+        'sidebar-muted-foreground',
+        'sidebar-faint',
+        'sidebar-foreground',
+      ] as const) {
+        expect(contrastRatio(tokens[name], tokens.sidebar)).toBeGreaterThanOrEqual(4.5)
+      }
+    }
   })
 })

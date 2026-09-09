@@ -48,16 +48,16 @@ export type ContactListItem = Omit<Contact, 'customFields'> & {
 
 export type ContactInput = {
   firstName: string
-  lastName?: string
-  email?: string
-  phone?: string
-  whatsapp?: string
+  lastName?: string | null
+  email?: string | null
+  phone?: string | null
+  whatsapp?: string | null
   documentType?: DocumentType
-  documentNumber?: string
-  city?: string
-  municipioCode?: string
+  documentNumber?: string | null
+  city?: string | null
+  municipioCode?: string | null
   status?: string
-  source?: string
+  source?: string | null
   lifecycleStage?: string
   tags?: string[]
   companyId?: string

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+
 import { cn } from '@/shared/lib/index'
 
 /* ── constants ── */

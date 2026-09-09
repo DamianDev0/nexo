@@ -328,7 +328,7 @@ export class ContactsService {
   }
 
   private assertTaxonomyKeys(dto: UpdateContactDto, taxonomy: ContactTaxonomy): void {
-    const checks: Array<[string | undefined, keyof ContactTaxonomy]> = [
+    const checks: Array<[string | null | undefined, keyof ContactTaxonomy]> = [
       [dto.status, 'statuses'],
       [dto.source, 'sources'],
       [dto.lifecycleStage, 'lifecycleStages'],
@@ -336,7 +336,7 @@ export class ContactsService {
 
     const invalid = checks
       .filter(([value, kind]) => {
-        if (value === undefined) return false
+        if (value === undefined || value === null) return false
         return !taxonomy[kind].some((option) => option.enabled && option.key === value)
       })
       .map(([value, kind]) => `${kind}: ${value}`)

@@ -72,8 +72,7 @@ function SmartListTabBase({
   const trigger = (
     <Button
       variant="ghost"
-      role="tab"
-      aria-selected={active}
+      aria-pressed={active}
       tabIndex={active ? 0 : -1}
       onClick={() => actions.onSelect(item.id)}
       onKeyDown={actions.onKeyDown}

@@ -73,6 +73,8 @@ export type ThemeTokens = {
   'chart-5': string
   sidebar: string
   'sidebar-foreground': string
+  'sidebar-muted-foreground': string
+  'sidebar-faint': string
   'sidebar-primary': string
   'sidebar-primary-foreground': string
   'sidebar-accent': string

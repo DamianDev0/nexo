@@ -12,7 +12,7 @@ export function FieldError({ message }: Readonly<FieldErrorProps>) {
       <AnimatePresence>
         {message && (
           <motion.span
-            className="block text-destructive/80"
+            className="block text-negative-text"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

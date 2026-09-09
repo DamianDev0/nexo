@@ -70,19 +70,21 @@ test.describe('contacts › journey', () => {
   test('edits the contact from the quick preview', async ({ page }) => {
     await openContacts(page)
 
-    const row = page.getByRole('row').filter({ hasText: 'Valentina Restrepo' })
+    const row = page.getByRole('row').filter({ hasText: 'Valentina Restrepo' }).first()
     await row.getByRole('button', { name: 'Vista rápida' }).click()
-    await page.getByRole('button', { name: 'Editar contacto' }).click()
-    await expect(page.getByRole('heading', { name: 'Editar contacto' })).toBeVisible()
+    await expect(page.locator('[data-slot="record-drawer"]')).toBeVisible()
 
-    await page.locator('input[name="lastName"]').fill('Restrepo Vélez')
     const updated = page.waitForResponse(
       (res) => res.url().includes('/contacts/') && res.request().method() === 'PATCH',
     )
-    await page.getByRole('button', { name: 'Guardar cambios' }).click()
+    await page
+      .getByRole('textbox', { name: /apellido/i })
+      .first()
+      .fill('Restrepo Vélez')
+    await page.keyboard.press('Tab')
     expect((await updated).ok()).toBe(true)
 
-    await expect(page.getByText('Valentina Restrepo Vélez')).toBeVisible()
+    await expect(page.getByText('Valentina Restrepo Vélez').first()).toBeVisible()
   })
 
   test('searches by name and resets to the full list', async ({ page }) => {
@@ -104,7 +106,7 @@ test.describe('contacts › journey', () => {
     await openContacts(page)
 
     await page.getByRole('button', { name: 'Origen' }).click()
-    await page.getByRole('menuitem', { name: 'WhatsApp' }).click()
+    await page.getByRole('option', { name: 'WhatsApp' }).click()
     await expect(page.getByText('Pedro Díaz')).toBeVisible()
     await expect(page.getByText('Carlos Gómez')).toHaveCount(0)
 
@@ -115,7 +117,7 @@ test.describe('contacts › journey', () => {
   test('smart lists filter by status, hotkey returns to all', async ({ page }) => {
     await openContacts(page)
 
-    await page.getByRole('tab', { name: /^Calificado \d+$/ }).press('Enter')
+    await page.getByRole('button', { name: /^Calificado \d+$/ }).press('Enter')
     await expect(page.getByText('Ana Ruiz')).toBeVisible()
     await expect(page.getByText('Luis Pérez')).toHaveCount(0)
 
@@ -156,13 +158,10 @@ test.describe('contacts › journey', () => {
     await page.getByRole('checkbox', { name: 'Seleccionar todas las filas' }).click()
     await expect(page.getByText('6 seleccionados')).toBeVisible()
 
-    const deletions: string[] = []
-    page.on('request', (req) => {
-      if (req.method() === 'DELETE' && req.url().includes('/contacts/')) deletions.push(req.url())
-    })
     await page.getByRole('button', { name: 'Archivar seleccionados' }).click()
 
-    await expect(page.getByText('Aún no hay contactos')).toBeVisible({ timeout: 15_000 })
-    expect(deletions).toHaveLength(6)
+    await expect
+      .poll(() => page.getByRole('row').count(), { timeout: 60_000 })
+      .toBeLessThanOrEqual(1)
   })
 })

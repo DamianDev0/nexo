@@ -127,6 +127,38 @@ export function tintedNeutral(brand: string, lightness: number, chroma = 0.01): 
   return oklchToHex({ l: lightness, c: chroma, h: base.h })
 }
 
+const AA_CONTRAST = 4.5
+const CONTRAST_STEP = 0.01
+const MIN_LIGHTNESS = 0.08
+const MAX_LIGHTNESS = 0.99
+
+export function readableNeutral(
+  brand: string,
+  lightness: number,
+  chroma: number,
+  backgrounds: ReadonlyArray<string>,
+  target = AA_CONTRAST,
+): string {
+  const worstContrast = (hex: string) =>
+    backgrounds.reduce((min, background) => Math.min(min, contrastRatio(hex, background)), Infinity)
+  const lightest = backgrounds.reduce(
+    (max, background) => Math.max(max, relativeLuminance(background)),
+    0,
+  )
+  const step = lightest > 0.35 ? -CONTRAST_STEP : CONTRAST_STEP
+
+  let current = lightness
+  let candidate = tintedNeutral(brand, current, chroma)
+
+  while (worstContrast(candidate) < target) {
+    current += step
+    if (current <= MIN_LIGHTNESS || current >= MAX_LIGHTNESS) break
+    candidate = tintedNeutral(brand, current, chroma)
+  }
+
+  return candidate
+}
+
 export function rotateHue(hex: string, degrees: number): string {
   const base = hexToOklch(hex)
   if (!base) return hex
@@ -173,6 +205,9 @@ function buildLight(seeds: ThemeColors): ThemeTokens {
   const p = seeds.primary
   const fg = tintedNeutral(p, 0.18, 0.012)
   const surface = tintedNeutral(p, 0.99, 0.004)
+  const muted = tintedNeutral(p, 0.968, 0.012)
+  const readable = (lightness: number, chroma: number) =>
+    readableNeutral(p, lightness, chroma, [surface, muted])
   const border = tintedNeutral(p, 0.922, 0.012)
   const scale = derivePrimaryScale(p)
   const [c1, c2, c3, c4, c5] = deriveCharts(p, seeds.accent, seeds.secondary)
@@ -192,8 +227,8 @@ function buildLight(seeds: ThemeColors): ThemeTokens {
     'primary-deep': scale.deep,
     secondary: seeds.secondary,
     'secondary-foreground': readableForeground(seeds.secondary),
-    muted: tintedNeutral(p, 0.968, 0.012),
-    'muted-foreground': tintedNeutral(p, 0.55, 0.022),
+    muted,
+    'muted-foreground': readable(0.55, 0.022),
     accent: seeds.accent,
     'accent-foreground': readableForeground(seeds.accent),
     destructive: DESTRUCTIVE,
@@ -210,12 +245,14 @@ function buildLight(seeds: ThemeColors): ThemeTokens {
     'sidebar-foreground': seeds.sidebarForeground,
     'sidebar-primary': p,
     'sidebar-primary-foreground': readableForeground(p),
+    'sidebar-muted-foreground': readableNeutral(p, 0.55, 0.022, [seeds.sidebar]),
+    'sidebar-faint': readableNeutral(p, 0.62, 0.018, [seeds.sidebar]),
     'sidebar-accent': blendLightness(seeds.sidebar, seeds.sidebarForeground, 0.12),
     'sidebar-accent-foreground': seeds.sidebarForeground,
     'sidebar-border': blendLightness(seeds.sidebar, seeds.sidebarForeground, 0.18),
     'sidebar-ring': p,
-    body: tintedNeutral(p, 0.35, 0.016),
-    faint: tintedNeutral(p, 0.62, 0.018),
+    body: readable(0.35, 0.016),
+    faint: readable(0.62, 0.018),
     'disabled-fg': tintedNeutral(p, 0.72, 0.012),
     'border-strong': tintedNeutral(p, 0.72, 0.016),
     'row-divider': tintedNeutral(p, 0.965, 0.008),
@@ -233,8 +270,11 @@ function buildDark(seeds: ThemeColors): ThemeTokens {
   const p = seeds.primary
   const fg = tintedNeutral(p, 0.97, 0.004)
   const surface = tintedNeutral(p, 0.21, 0.012)
+  const mutedSurface = tintedNeutral(p, 0.27, 0.014)
   const border = tintedNeutral(p, 0.3, 0.014)
   const sidebar = blendLightness(seeds.sidebar, '#000000', 0.15)
+  const readable = (lightness: number, chroma: number) =>
+    readableNeutral(p, lightness, chroma, [surface, mutedSurface])
   const scale = derivePrimaryScale(p)
   const [c1, c2, c3, c4, c5] = deriveCharts(p, seeds.accent, seeds.secondary)
 
@@ -253,8 +293,8 @@ function buildDark(seeds: ThemeColors): ThemeTokens {
     'primary-deep': scale.deep,
     secondary: tintedNeutral(p, 0.27, 0.012),
     'secondary-foreground': fg,
-    muted: tintedNeutral(p, 0.27, 0.014),
-    'muted-foreground': tintedNeutral(p, 0.72, 0.02),
+    muted: mutedSurface,
+    'muted-foreground': readable(0.72, 0.02),
     accent: tintedNeutral(p, 0.27, 0.012),
     'accent-foreground': fg,
     destructive: DESTRUCTIVE,
@@ -271,12 +311,14 @@ function buildDark(seeds: ThemeColors): ThemeTokens {
     'sidebar-foreground': seeds.sidebarForeground,
     'sidebar-primary': p,
     'sidebar-primary-foreground': readableForeground(p),
+    'sidebar-muted-foreground': readableNeutral(p, 0.55, 0.022, [sidebar]),
+    'sidebar-faint': readableNeutral(p, 0.62, 0.018, [sidebar]),
     'sidebar-accent': blendLightness(sidebar, seeds.sidebarForeground, 0.14),
     'sidebar-accent-foreground': seeds.sidebarForeground,
     'sidebar-border': blendLightness(sidebar, seeds.sidebarForeground, 0.2),
     'sidebar-ring': p,
-    body: tintedNeutral(p, 0.86, 0.012),
-    faint: tintedNeutral(p, 0.62, 0.016),
+    body: readable(0.86, 0.012),
+    faint: readable(0.62, 0.016),
     'disabled-fg': tintedNeutral(p, 0.45, 0.01),
     'border-strong': tintedNeutral(p, 0.42, 0.016),
     'row-divider': tintedNeutral(p, 0.24, 0.01),

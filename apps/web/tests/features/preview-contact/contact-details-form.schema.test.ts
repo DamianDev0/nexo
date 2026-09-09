@@ -72,3 +72,26 @@ describe('buildAddressCustomFields', () => {
     expect(buildAddressCustomFields(contact, 'Cl 1')).toBeNull()
   })
 })
+
+describe('clearing a field from the drawer', () => {
+  it('sends null instead of an empty string so the API accepts the clear', () => {
+    const contact = buildContact({ lastName: 'Jiménez', city: 'Cali', municipioCode: '76001' })
+    const values = { ...contactDetailsDefaults(contact), lastName: '' }
+
+    expect(buildDetailsPatch('lastName', values, contact)).toEqual({ lastName: null })
+  })
+
+  it('clears the municipality code alongside the city', () => {
+    const contact = buildContact({ city: 'Cali', municipioCode: '76001' })
+    const values = { ...contactDetailsDefaults(contact), city: '', municipioCode: '' }
+
+    expect(buildDetailsPatch('city', values, contact)).toEqual({ city: null, municipioCode: null })
+  })
+
+  it('still returns null when nothing actually changed', () => {
+    const contact = buildContact({ lastName: 'Jiménez' })
+    const values = contactDetailsDefaults(contact)
+
+    expect(buildDetailsPatch('lastName', values, contact)).toBeNull()
+  })
+})

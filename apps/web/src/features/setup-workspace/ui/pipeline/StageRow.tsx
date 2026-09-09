@@ -50,7 +50,7 @@ export function StageRow({ stage, actions, handle, ghost }: Readonly<StageRowPro
         <PillButton
           variant="ghost"
           size="xs"
-          className="size-6 px-0 shrink-0 cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
+          className="size-6 px-0 shrink-0 cursor-grab touch-none text-faint hover:text-muted-foreground active:cursor-grabbing"
           aria-label={t(`${s}.dragToReorder`)}
           {...handle?.attributes}
           {...handle?.listeners}

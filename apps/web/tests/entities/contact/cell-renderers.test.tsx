@@ -109,7 +109,7 @@ describe('refined cells', () => {
     expect(onFieldsChange).toHaveBeenCalledWith(contact.id, { lifecycleStage: 'customer' })
   })
 
-  it('clears the source to an empty string', async () => {
+  it('clears the source with an explicit null the API accepts', async () => {
     const onFieldsChange = vi.fn()
     const contact = renderCell(
       'source',
@@ -118,7 +118,7 @@ describe('refined cells', () => {
     )
     await userEvent.click(screen.getByRole('button', { name: /contacts.cells.pick/ }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'contacts.cells.clear' }))
-    expect(onFieldsChange).toHaveBeenCalledWith(contact.id, { source: '' })
+    expect(onFieldsChange).toHaveBeenCalledWith(contact.id, { source: null })
   })
 
   it('assigns an owner inline with the resolved name', async () => {

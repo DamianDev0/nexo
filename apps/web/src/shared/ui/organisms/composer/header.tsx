@@ -25,9 +25,7 @@ function HeaderLeading({ minimized }: Readonly<{ minimized: boolean }>) {
       />
     )
   }
-  return (
-    <DotsSixVerticalIcon aria-hidden className="ml-1 size-4 shrink-0 text-muted-foreground/50" />
-  )
+  return <DotsSixVerticalIcon aria-hidden className="ml-1 size-4 shrink-0 text-faint" />
 }
 
 type ComposerHeaderProps = ComponentProps<'div'> & { readonly dragLabel?: string }

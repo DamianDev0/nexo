@@ -43,6 +43,7 @@ export {
   type ContactSort,
 } from './lib/contact-sort'
 export { useContactList, usePrefetchContactList } from './query/useContactList'
+export { clearedFieldsToNull } from './lib/contact-patch'
 export { useOptimisticContactListPatch } from './query/useOptimisticContactListPatch'
 export { usePendingContactPatches } from './model/contact-pending.store'
 export { contactDialNumber, contactPhoneLabel } from './lib/contact-links'

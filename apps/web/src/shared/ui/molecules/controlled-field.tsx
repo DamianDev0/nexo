@@ -58,9 +58,7 @@ export function ControlledField<T extends FieldValues>({
             }}
           />
           {hintFormat && (
-            <span className="mt-1 block text-xs text-muted-foreground/50">
-              {hintFormat(field.value ?? '')}
-            </span>
+            <span className="mt-1 block text-xs text-faint">{hintFormat(field.value ?? '')}</span>
           )}
           <FieldError message={fieldState.error?.message} />
         </div>

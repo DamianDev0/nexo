@@ -49,7 +49,7 @@ function ReadonlyField({ label, value, icon: Icon }: Readonly<ReadonlyFieldProps
         <Text variant="body" className="flex-1 truncate text-foreground/80">
           {value}
         </Text>
-        <LockIcon className="size-3 shrink-0 text-muted-foreground/50" />
+        <LockIcon className="size-3 shrink-0 text-faint" />
       </div>
     </div>
   )

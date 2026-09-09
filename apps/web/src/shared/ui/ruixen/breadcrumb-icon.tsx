@@ -69,25 +69,22 @@ export function BreadcrumbIcon({
   const Link = linkComponent ?? 'a'
 
   return (
-    <nav aria-label="Breadcrumb" className={className}>
+    <nav aria-label="Breadcrumb" className={cn('relative', className)}>
+      <div
+        className="pointer-events-none absolute inset-y-0 rounded-md bg-foreground/[0.06]"
+        style={{
+          left: pill.left,
+          width: pill.width,
+          opacity: hoveredIndex !== null ? 1 : 0,
+          transition:
+            hoveredIndex !== null && hasPositioned.current ? PILL_TRANSITION : 'opacity 0.2s ease',
+        }}
+      />
       <ol
         ref={containerRef}
         className="relative flex flex-wrap items-center gap-0.5"
         onMouseLeave={() => setHoveredIndex(null)}
       >
-        <div
-          className="pointer-events-none absolute inset-y-0 rounded-md bg-foreground/[0.06]"
-          style={{
-            left: pill.left,
-            width: pill.width,
-            opacity: hoveredIndex !== null ? 1 : 0,
-            transition:
-              hoveredIndex !== null && hasPositioned.current
-                ? PILL_TRANSITION
-                : 'opacity 0.2s ease',
-          }}
-        />
-
         {itemsWithIcons.map((item, index) => {
           const isLast = index === items.length - 1
           const isLink = !!item.href && !isLast

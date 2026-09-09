@@ -80,6 +80,7 @@ export function TaxonomySelectField<T extends FieldValues>({
                 }}
                 source={source}
                 view={{
+                  label,
                   display: selected ? renderChoice(selected) : undefined,
                   placeholder: view?.placeholder ?? '',
                   searchPlaceholder: t('common.search'),

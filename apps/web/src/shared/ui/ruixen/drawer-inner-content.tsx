@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { useRef, type ReactNode } from 'react'
 
 /**
  * Drawer Inner Content — gesture-driven bottom sheet.

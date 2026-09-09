@@ -87,7 +87,7 @@ export function DataTableSmartLists({
             <SortableContext items={reorder.movableIds} strategy={horizontalListSortingStrategy}>
               <LayoutGroup id={instanceId}>
                 <span
-                  role="tablist"
+                  role="toolbar"
                   aria-orientation="horizontal"
                   data-slot="smart-list-track"
                   className="flex w-max items-center"

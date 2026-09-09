@@ -41,3 +41,46 @@ export async function loginAs(page: Page, workspace: Workspace): Promise<void> {
   })
   expect(done.ok(), await done.text()).toBe(true)
 }
+
+export async function seedContact(
+  page: Page,
+  workspace: Workspace,
+  contact: Record<string, unknown>,
+): Promise<{ id: string }> {
+  const state = await page.context().storageState()
+  const cookie = state.cookies.map((c) => `${c.name}=${c.value}`).join('; ')
+  const response = await page.request.post(`${API}/contacts`, {
+    headers: { 'x-tenant-slug': workspace.slug, cookie },
+    data: contact,
+  })
+  expect(response.status(), await response.text()).toBe(201)
+  return (await response.json()).data as { id: string }
+}
+
+export async function seedActivity(
+  page: Page,
+  workspace: Workspace,
+  activity: Record<string, unknown>,
+): Promise<void> {
+  const state = await page.context().storageState()
+  const cookie = state.cookies.map((c) => `${c.name}=${c.value}`).join('; ')
+  const response = await page.request.post(`${API}/activities`, {
+    headers: { 'x-tenant-slug': workspace.slug, cookie },
+    data: activity,
+  })
+  expect(response.status(), await response.text()).toBe(201)
+}
+
+export async function readContact(
+  page: Page,
+  workspace: Workspace,
+  id: string,
+): Promise<Record<string, unknown>> {
+  const state = await page.context().storageState()
+  const cookie = state.cookies.map((c) => `${c.name}=${c.value}`).join('; ')
+  const response = await page.request.get(`${API}/contacts/${id}`, {
+    headers: { 'x-tenant-slug': workspace.slug, cookie },
+  })
+  expect(response.ok(), await response.text()).toBe(true)
+  return (await response.json()).data as Record<string, unknown>
+}
