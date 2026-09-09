@@ -14,4 +14,3 @@ export type FilterFieldDef = {
   readonly type: FilterFieldType
   readonly options?: ReadonlyArray<FilterFieldOption>
 }
-

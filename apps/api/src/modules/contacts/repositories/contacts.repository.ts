@@ -305,7 +305,7 @@ export class ContactsRepository {
     return rows.map((row) => row.name)
   }
 
-  async findActivities(qr: QueryRunner, contactId: string): Promise<ActivityRow[]> {
+  async findActivities(qr: QueryRunner, contactId: string, limit: number): Promise<ActivityRow[]> {
     const rows = await sqlRows<ActivityRow[]>(
       qr,
       `SELECT id, activity_type, title, description, due_date, completed_at,
@@ -313,8 +313,8 @@ export class ContactsRepository {
        FROM activities
        WHERE contact_id = $1 AND is_active = true
        ORDER BY created_at DESC
-       LIMIT 50`,
-      [contactId],
+       LIMIT $2`,
+      [contactId, limit],
     )
     return rows
   }

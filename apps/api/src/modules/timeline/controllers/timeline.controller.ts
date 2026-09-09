@@ -7,11 +7,11 @@ import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { TimelineService } from '../services/timeline.service'
 
 @ApiTags('Timeline')
-@Controller()
+@Controller('timeline')
 export class TimelineController {
   constructor(private readonly timelineService: TimelineService) {}
 
-  @Get('contacts/:id/timeline')
+  @Get('contacts/:id')
   @ApiEndpoint({
     summary: 'Unified timeline for a contact (activities, deals, notes)',
     roles: [UserRole.VIEWER],
@@ -25,7 +25,7 @@ export class TimelineController {
     return this.timelineService.getContactTimeline(ctx.schemaName, id, page ? Number(page) : 1)
   }
 
-  @Get('deals/:id/timeline')
+  @Get('deals/:id')
   @ApiEndpoint({
     summary: 'Unified timeline for a deal (activities, stage changes, notes)',
     roles: [UserRole.VIEWER],
@@ -39,7 +39,7 @@ export class TimelineController {
     return this.timelineService.getDealTimeline(ctx.schemaName, id, page ? Number(page) : 1)
   }
 
-  @Get('companies/:id/timeline')
+  @Get('companies/:id')
   @ApiEndpoint({
     summary: 'Unified timeline for a company (activities, deals, notes)',
     roles: [UserRole.VIEWER],

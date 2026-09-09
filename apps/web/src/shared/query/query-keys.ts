@@ -20,7 +20,10 @@ export const QUERY_KEYS = {
     detail: (id: string) => ['contacts', 'detail', id] as const,
     duplicateProbe: (params: ContactDuplicateProbeQuery) =>
       ['contacts', 'duplicate-probe', params] as const,
-    timeline: (id: string) => ['contacts', 'timeline', id] as const,
+    timeline: (id: string, limit?: number) =>
+      limit === undefined
+        ? (['contacts', 'timeline', id] as const)
+        : (['contacts', 'timeline', id, limit] as const),
   },
   team: {
     members: ['team', 'members'] as const,

@@ -221,9 +221,9 @@ describe('ContactsController', () => {
       const timeline = { activities: [], deals: [] }
       service.getTimeline.mockResolvedValue(timeline)
 
-      const result = await controller.getTimeline('c-1', mockCtx)
+      const result = await controller.getTimeline('c-1', mockCtx, {})
 
-      expect(service.getTimeline).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1')
+      expect(service.getTimeline).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1', undefined)
       expect(result.activities).toHaveLength(0)
     })
   })

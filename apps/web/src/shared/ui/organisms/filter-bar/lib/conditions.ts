@@ -40,9 +40,7 @@ export function parseConditions(raw: string | null | undefined): FilterCondition
       .filter((entry): entry is FilterCondition => {
         if (typeof entry !== 'object' || entry === null) return false
         const { field, operator } = entry as Partial<FilterCondition>
-        return (
-          typeof field === 'string' && FILTER_OPERATORS.includes(operator as FilterOperator)
-        )
+        return typeof field === 'string' && FILTER_OPERATORS.includes(operator as FilterOperator)
       })
       .slice(0, FILTER_MAX_CONDITIONS)
   } catch {

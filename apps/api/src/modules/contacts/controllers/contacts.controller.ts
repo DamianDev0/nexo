@@ -46,6 +46,7 @@ import {
   ProbeContactDuplicatesDto,
   ReassignTaxonomyDto,
   ExecuteContactImportDto,
+  ContactTimelineQueryDto,
 } from '../dto/contact.dto'
 
 @ApiTags('Contacts')
@@ -273,7 +274,8 @@ export class ContactsController {
   getTimeline(
     @Param('id', ParseUUIDPipe) id: string,
     @TenantCtx() ctx: TenantContext,
+    @Query() query: ContactTimelineQueryDto,
   ): Promise<ContactTimeline> {
-    return this.contactsService.getTimeline(ctx.schemaName, id)
+    return this.contactsService.getTimeline(ctx.schemaName, id, query.limit)
   }
 }

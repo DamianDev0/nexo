@@ -18,7 +18,7 @@ export type {
 } from './model/types/contact-cells.types'
 export { revalidateContacts } from './api/revalidate-contacts'
 export { buildContactPreviewRows, customText } from './lib/contact-preview'
-export { useContactTimeline } from './query/useContactTimeline'
+export { useContactTimeline, type ContactTimelineFeed } from './query/useContactTimeline'
 export {
   contactCoreFieldsSchema,
   optionalEmailSchema,

@@ -90,3 +90,14 @@ export function timeAgo(date: Date | string, locale: string): string {
 
   return format.format(0, 'minute')
 }
+
+const BOGOTA_DAY = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/Bogota',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
+export function toBogotaDayKey(date: Date | string): string {
+  return BOGOTA_DAY.format(typeof date === 'string' ? new Date(date) : date)
+}

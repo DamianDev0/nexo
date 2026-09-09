@@ -19,12 +19,5 @@ export function FilterTrigger({ fields, value, onChange, iconOnly }: Readonly<Fi
     onChange([...value, { field: field.key, operator: defaultOperator(field.type) }])
   }
 
-  return (
-    <AddFilter
-      fields={fields}
-      onPick={add}
-      showLabel={!iconOnly}
-      count={value.length}
-    />
-  )
+  return <AddFilter fields={fields} onPick={add} showLabel={!iconOnly} count={value.length} />
 }

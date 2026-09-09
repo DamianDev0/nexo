@@ -35,6 +35,7 @@ import type {
   UpdateContactDto,
   ProbeContactDuplicatesDto,
 } from '../dto/contact.dto'
+import { CONTACT_TIMELINE_DEFAULT } from '../dto/contact.dto'
 import type {
   ContactColumnChange,
   CreateContactData,
@@ -306,12 +307,16 @@ export class ContactsService {
     return restored
   }
 
-  async getTimeline(schemaName: string, contactId: string): Promise<ContactTimeline> {
+  async getTimeline(
+    schemaName: string,
+    contactId: string,
+    limit = CONTACT_TIMELINE_DEFAULT,
+  ): Promise<ContactTimeline> {
     return this.db.query(schemaName, async (qr): Promise<ContactTimeline> => {
       await this.assertContactExists(qr, contactId)
 
       const [activityRows, dealRows] = await Promise.all([
-        this.repository.findActivities(qr, contactId),
+        this.repository.findActivities(qr, contactId, limit),
         this.repository.findDeals(qr, contactId),
       ])
 

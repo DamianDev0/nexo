@@ -1084,6 +1084,21 @@ const es = {
         other: 'Actividad',
       },
       due: 'Vence {{when}}',
+      timeline: {
+        filters: {
+          all: 'Todo',
+          calls: 'Llamadas',
+          messages: 'Mensajes',
+          notes: 'Notas',
+          tasks: 'Tareas',
+        },
+        today: 'Hoy',
+        yesterday: 'Ayer',
+        loadMore: 'Cargar más',
+        retry: 'Reintentar',
+        noneForFilter: 'Nada en este filtro',
+        error: 'No pudimos cargar la actividad',
+      },
       tasks: {
         complete: 'Marcar como completada',
         reopen: 'Reabrir',

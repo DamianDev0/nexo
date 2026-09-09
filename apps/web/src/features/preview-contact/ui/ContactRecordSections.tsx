@@ -10,9 +10,11 @@ import { RecordDrawer } from '@/shared/ui/organisms/record-drawer'
 import { groupContactActivities } from '../lib/activity-groups'
 
 import { ActivityList } from './ActivityList'
+import { ActivityTimeline } from './ActivityTimeline'
 import { ContactDetailsForm } from './ContactDetailsForm'
 
 import type { ContactRecord } from '../model/useContactRecord'
+import type { ContactTimelineFeed } from '@/entities/contact'
 import type { ContactActivity, ContactListItem, Tag } from '@repo/shared-types'
 
 const STORAGE_KEY = 'record-drawer:contact'
@@ -22,8 +24,7 @@ type ContactRecordSectionsProps = {
   readonly contact: ContactListItem
   readonly record: ContactRecord
   readonly activities: {
-    readonly items: ReadonlyArray<ContactActivity>
-    readonly isLoading: boolean
+    readonly feed: ContactTimelineFeed
     readonly onToggle?: (activity: ContactActivity) => void
   }
   readonly tagsByName: ReadonlyMap<string, Tag>
@@ -36,7 +37,8 @@ export function ContactRecordSections({
   tagsByName,
 }: Readonly<ContactRecordSectionsProps>) {
   const { t } = useTranslation()
-  const groups = groupContactActivities(activities.items)
+  const { feed, onToggle } = activities
+  const groups = groupContactActivities(feed.activities)
   const optedOut = contact.optedOutChannels
 
   const listOrEmpty = (
@@ -44,10 +46,10 @@ export function ContactRecordSections({
     emptyKey: string,
     action: ContactRecord['add'][keyof ContactRecord['add']],
   ) =>
-    items.length === 0 && !activities.isLoading ? (
+    items.length === 0 && !feed.isLoading ? (
       <RecordDrawer.Empty label={t(emptyKey)} action={action} />
     ) : (
-      <ActivityList items={items} isLoading={activities.isLoading} onToggle={activities.onToggle} />
+      <ActivityList items={items} isLoading={feed.isLoading} onToggle={onToggle} />
     )
 
   return (
@@ -65,13 +67,13 @@ export function ContactRecordSections({
       </RecordDrawer.Section>
 
       <RecordDrawer.Section id="activity" title={t('contacts.preview.sections.activity')}>
-        {listOrEmpty(groups.all, 'contacts.preview.empty.activity', record.add.note)}
+        <ActivityTimeline feed={feed} onToggle={onToggle} emptyAction={record.add.note} />
       </RecordDrawer.Section>
 
       <RecordDrawer.Section
         id="notes"
         title={t('contacts.preview.sections.notes')}
-        meta={{ count: activities.isLoading ? contact.noteCount : groups.notes.length }}
+        meta={{ count: feed.isLoading ? contact.noteCount : groups.notes.length }}
         action={record.add.note}
       >
         {listOrEmpty(groups.notes, 'contacts.preview.empty.notes', record.add.note)}

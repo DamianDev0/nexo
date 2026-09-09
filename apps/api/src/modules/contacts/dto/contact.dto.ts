@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsEnum,
   IsIn,
+  IsInt,
   IsISO8601,
   IsNotEmpty,
   IsObject,
@@ -12,10 +13,12 @@ import {
   IsUUID,
   Length,
   Matches,
+  Max,
   MaxLength,
+  Min,
 } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import { PartialType, PickType } from '@nestjs/mapped-types'
 import { DUPLICATE_STRATEGIES } from '@/shared/imports/constants/import.constants'
 import type { DuplicateStrategy } from '@repo/shared-types'
@@ -248,4 +251,16 @@ export class ExecuteContactImportDto {
   @IsOptional()
   @IsIn(DUPLICATE_STRATEGIES)
   duplicateStrategy?: DuplicateStrategy
+}
+
+export const CONTACT_TIMELINE_MAX = 200
+export const CONTACT_TIMELINE_DEFAULT = 50
+
+export class ContactTimelineQueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(CONTACT_TIMELINE_MAX)
+  limit?: number
 }

@@ -115,8 +115,12 @@ const contactsService = {
 
   restore: (id: string) => request<Contact>({ method: 'post', url: `/contacts/${id}/restore` }),
 
-  timeline: (id: string) =>
-    request<ContactTimeline>({ method: 'get', url: `/contacts/${id}/timeline` }),
+  timeline: (id: string, limit?: number) =>
+    request<ContactTimeline>({
+      method: 'get',
+      url: `/contacts/${id}/timeline`,
+      params: limit === undefined ? undefined : { limit },
+    }),
 }
 
 export default contactsService

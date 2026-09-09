@@ -1077,6 +1077,21 @@ const en = {
         other: 'Activity',
       },
       due: 'Due {{when}}',
+      timeline: {
+        filters: {
+          all: 'All',
+          calls: 'Calls',
+          messages: 'Messages',
+          notes: 'Notes',
+          tasks: 'Tasks',
+        },
+        today: 'Today',
+        yesterday: 'Yesterday',
+        loadMore: 'Load more',
+        retry: 'Retry',
+        noneForFilter: 'Nothing in this filter',
+        error: "We couldn't load the activity",
+      },
       tasks: {
         complete: 'Mark as completed',
         reopen: 'Reopen',
