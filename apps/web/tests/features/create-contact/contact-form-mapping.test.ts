@@ -77,6 +77,7 @@ describe('toFormValues', () => {
       updatedAt: '2026-01-01',
       noteCount: 0,
       optedOutChannels: [],
+      nextActivity: null,
       customFields: { address: 'Carrera 7 #1-1' },
     } satisfies ContactListItem
 

@@ -1,3 +1,4 @@
+import type { ActivityDueFilter } from '@repo/shared-types'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateActivityDto } from '../dto/activity.dto'
 
@@ -8,6 +9,7 @@ export const UPDATABLE_FIELDS: FieldMap<UpdateActivityDto> = [
   ['dueDate', 'due_date'],
   ['durationMinutes', 'duration_minutes'],
   ['reminderAt', 'reminder_at'],
+  ['priority', 'priority'],
   ['contactId', 'contact_id'],
   ['companyId', 'company_id'],
   ['dealId', 'deal_id'],
@@ -16,7 +18,7 @@ export const UPDATABLE_FIELDS: FieldMap<UpdateActivityDto> = [
 
 export const ACTIVITY_LIST_COLUMNS = `
   a.id, a.activity_type, a.title, a.description, a.due_date,
-  a.completed_at, a.status, a.duration_minutes, a.reminder_at,
+  a.completed_at, a.status, a.priority, a.duration_minutes, a.reminder_at,
   a.is_active, a.contact_id, a.company_id, a.deal_id,
   a.assigned_to_id, a.created_by, a.created_at, a.updated_at,
   COALESCE(c.first_name || ' ' || c.last_name, c.first_name) AS contact_name,
@@ -39,6 +41,12 @@ export const CALENDAR_COLUMNS = `
   d.title AS deal_title,
   a.assigned_to_id
 `
+
+export const DUE_FILTER_SQL: Readonly<Record<ActivityDueFilter, string>> = {
+  overdue: `a.status = 'pending' AND a.due_date < NOW()`,
+  today: `a.status = 'pending' AND (a.due_date AT TIME ZONE 'America/Bogota')::date = (NOW() AT TIME ZONE 'America/Bogota')::date`,
+  upcoming: `a.status = 'pending' AND a.due_date >= NOW()`,
+}
 
 export const CALENDAR_FROM = `
   FROM activities a

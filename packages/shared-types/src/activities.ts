@@ -1,5 +1,13 @@
 export type ActivityStatus = 'pending' | 'completed' | 'cancelled'
 
+export const ACTIVITY_PRIORITIES = ['low', 'normal', 'high'] as const
+
+export type ActivityPriority = (typeof ACTIVITY_PRIORITIES)[number]
+
+export const ACTIVITY_DUE_FILTERS = ['overdue', 'today', 'upcoming'] as const
+
+export type ActivityDueFilter = (typeof ACTIVITY_DUE_FILTERS)[number]
+
 export type Activity = {
   id: string
   activityType: string
@@ -8,6 +16,7 @@ export type Activity = {
   dueDate: string | null
   completedAt: string | null
   status: ActivityStatus
+  priority: ActivityPriority
   durationMinutes: number | null
   reminderAt: string | null
   isActive: boolean

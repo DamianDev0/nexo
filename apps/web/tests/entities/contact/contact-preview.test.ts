@@ -33,6 +33,7 @@ const BASE: ContactListItem = {
   updatedAt: '2026-08-01T00:00:00.000Z',
   noteCount: 0,
   optedOutChannels: [],
+  nextActivity: null,
   customFields: { role: 'Directora Comercial', address: 'Calle 100 #7-21' },
 }
 

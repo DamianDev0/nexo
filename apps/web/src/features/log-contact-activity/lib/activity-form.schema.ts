@@ -1,3 +1,4 @@
+import { ACTIVITY_PRIORITIES } from '@repo/shared-types'
 import { z } from 'zod'
 
 import {
@@ -27,6 +28,7 @@ export function buildActivitySchema(t: TFunction) {
       ),
     dueDate: z.string().regex(ISO_DATE, t('contacts.composers.activity.dueDateRequired')),
     time: z.string().regex(CLOCK_TIME, t('contacts.composers.activity.timeInvalid')),
+    priority: z.enum(ACTIVITY_PRIORITIES),
     description: z
       .string()
       .trim()
@@ -44,7 +46,13 @@ export function bogotaToday(now: Date = new Date()): string {
 }
 
 export function activityDefaults(now?: Date): ActivityFormValues {
-  return { title: '', dueDate: bogotaToday(now), time: ACTIVITY_DEFAULT_TIME, description: '' }
+  return {
+    title: '',
+    dueDate: bogotaToday(now),
+    time: ACTIVITY_DEFAULT_TIME,
+    priority: 'normal',
+    description: '',
+  }
 }
 
 export function toBogotaIso(date: string, time: string): string {
@@ -62,5 +70,6 @@ export function buildActivityPayload(
     title: values.title,
     description: values.description.length > 0 ? values.description : undefined,
     dueDate: toBogotaIso(values.dueDate, values.time),
+    priority: kind === 'task' ? values.priority : undefined,
   }
 }

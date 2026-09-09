@@ -309,9 +309,9 @@ export class ContactsRepository {
     const rows = await sqlRows<ActivityRow[]>(
       qr,
       `SELECT id, activity_type, title, description, due_date, completed_at,
-              assigned_to_id, created_by, created_at
+              status, priority, assigned_to_id, created_by, created_at
        FROM activities
-       WHERE contact_id = $1
+       WHERE contact_id = $1 AND is_active = true
        ORDER BY created_at DESC
        LIMIT 50`,
       [contactId],

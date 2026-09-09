@@ -6,6 +6,7 @@ import { useRestoreContact } from '@/entities/contact'
 import { useAssignContactOwner } from '@/features/assign-contact-owner'
 import { useChangeContactStatus } from '@/features/change-contact-status'
 import { useEditContactCustomFields, useEditContactFields } from '@/features/edit-contact-field'
+import { useToggleContactActivity } from '@/features/log-contact-activity'
 import { useDialNumber } from '@/features/place-call'
 import { copyToClipboard } from '@/shared/lib/copy-to-clipboard'
 
@@ -28,6 +29,7 @@ export function useContactRowActions(handlers: RowActionHandlers): ContactRowAct
   const dialNumber = useDialNumber()
   const restore = useRestoreContact()
   const assignOwner = useAssignContactOwner()
+  const toggleActivity = useToggleContactActivity()
   const { onOpen, onPreview, onAddNote, onEditTags, onCompose, onLogActivity } = handlers
 
   return useMemo(
@@ -45,6 +47,7 @@ export function useContactRowActions(handlers: RowActionHandlers): ContactRowAct
       onCopy: (value: string) => void copyToClipboard(value),
       onStatusChange: changeStatus,
       onCustomFieldsChange: editCustomFields,
+      onToggleActivity: toggleActivity,
     }),
     [
       onOpen,
@@ -59,6 +62,7 @@ export function useContactRowActions(handlers: RowActionHandlers): ContactRowAct
       editFields,
       changeStatus,
       editCustomFields,
+      toggleActivity,
     ],
   )
 }

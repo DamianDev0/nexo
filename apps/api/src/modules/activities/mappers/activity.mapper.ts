@@ -1,6 +1,7 @@
 import type {
   Activity,
   ActivityListItem,
+  ActivityPriority,
   ActivityStatus,
   CalendarActivity,
 } from '@repo/shared-types'
@@ -19,6 +20,7 @@ export function mapActivity(r: ActivityRow): Activity {
     dueDate: r.due_date,
     completedAt: r.completed_at,
     status: r.status as ActivityStatus,
+    priority: r.priority as ActivityPriority,
     durationMinutes: r.duration_minutes,
     reminderAt: r.reminder_at,
     isActive: r.is_active,

@@ -110,6 +110,15 @@ export const CONTACT_COLUMN_CATALOG: readonly ContactColumnDef[] = [
     minWidth: 120,
   },
   {
+    key: 'nextActivity',
+    labelKey: 'contacts.columns.nextActivity',
+    hintKey: 'contacts.columnHints.nextActivity',
+    sortField: 'nextActivity',
+    defaultVisible: true,
+    defaultWidth: 170,
+    minWidth: 130,
+  },
+  {
     key: 'notes',
     labelKey: 'contacts.columns.notes',
     hintKey: 'contacts.columnHints.notes',

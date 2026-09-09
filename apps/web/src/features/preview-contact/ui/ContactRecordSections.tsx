@@ -24,6 +24,7 @@ type ContactRecordSectionsProps = {
   readonly activities: {
     readonly items: ReadonlyArray<ContactActivity>
     readonly isLoading: boolean
+    readonly onToggle?: (activity: ContactActivity) => void
   }
   readonly tagsByName: ReadonlyMap<string, Tag>
 }
@@ -46,7 +47,7 @@ export function ContactRecordSections({
     items.length === 0 && !activities.isLoading ? (
       <RecordDrawer.Empty label={t(emptyKey)} action={action} />
     ) : (
-      <ActivityList items={items} isLoading={activities.isLoading} />
+      <ActivityList items={items} isLoading={activities.isLoading} onToggle={activities.onToggle} />
     )
 
   return (

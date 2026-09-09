@@ -537,6 +537,7 @@ const es = {
       lifecycleStage: 'Etapa',
       source: 'Fuente',
       lastContactedAt: 'Último contacto',
+      nextActivity: 'Próxima actividad',
       notes: 'Notas',
       createdAt: 'Creado',
       assignedTo: 'Responsable',
@@ -554,6 +555,7 @@ const es = {
       phone: 'Teléfono principal; si no hay, se muestra el WhatsApp.',
       city: 'Municipio registrado en la dirección del {{entity}}.',
       lastContactedAt: 'Fecha de la última interacción registrada.',
+      nextActivity: 'Tarea o reunión pendiente más cercana.',
       notes: 'Cantidad de notas del contacto; pasa el cursor para leerlas.',
       createdAt: 'Fecha en que el {{entity}} entró al CRM.',
     },
@@ -824,6 +826,7 @@ const es = {
         time: 'Hora',
         description: 'Detalle',
         descriptionPlaceholder: 'Agrega contexto (opcional)…',
+        priority: 'Prioridad',
         save: {
           task: 'Crear tarea',
           meeting: 'Agendar',
@@ -1081,6 +1084,19 @@ const es = {
         other: 'Actividad',
       },
       due: 'Vence {{when}}',
+      tasks: {
+        complete: 'Marcar como completada',
+        reopen: 'Reabrir',
+        completed: 'Tarea completada',
+        reopened: 'Tarea reabierta',
+        overdue: 'Vencida el {{when}}',
+        overdueShort: 'Vencida',
+      },
+      priority: {
+        low: 'Baja',
+        normal: 'Normal',
+        high: 'Alta',
+      },
       completed: 'Completada',
     },
     toasts: {

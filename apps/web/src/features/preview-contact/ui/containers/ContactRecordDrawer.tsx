@@ -71,7 +71,11 @@ export function ContactRecordDrawer({
         <ContactRecordSections
           contact={contact}
           record={record}
-          activities={{ items: timeline.activities, isLoading: timeline.isLoading }}
+          activities={{
+            items: timeline.activities,
+            isLoading: timeline.isLoading,
+            onToggle: actions.onToggleActivity,
+          }}
           tagsByName={tagsByName}
         />
       </RecordDrawer.Body>

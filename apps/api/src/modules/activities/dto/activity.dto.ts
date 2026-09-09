@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import {
   IsDateString,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -11,6 +12,8 @@ import {
   MaxLength,
   Min,
 } from 'class-validator'
+import { ACTIVITY_DUE_FILTERS, ACTIVITY_PRIORITIES } from '@repo/shared-types'
+import type { ActivityDueFilter, ActivityPriority } from '@repo/shared-types'
 import { MAX_PAGE_SIZE } from '@repo/shared-utils'
 
 export const ACTIVITY_DESCRIPTION_MAX = 5000
@@ -47,6 +50,10 @@ export class CreateActivityDto {
   reminderAt?: string
 
   @IsOptional()
+  @IsIn(ACTIVITY_PRIORITIES)
+  priority?: ActivityPriority
+
+  @IsOptional()
   @IsUUID()
   contactId?: string
 
@@ -73,6 +80,10 @@ export class ActivityQueryDto {
   @IsOptional()
   @IsString()
   status?: string
+
+  @IsOptional()
+  @IsIn(ACTIVITY_DUE_FILTERS)
+  due?: ActivityDueFilter
 
   @IsOptional()
   @IsUUID()

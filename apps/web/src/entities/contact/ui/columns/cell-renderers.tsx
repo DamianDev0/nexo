@@ -10,6 +10,7 @@ import {
   ContactWhatsAppCell,
 } from '../cells/ContactCommCells'
 import { ContactNameCell } from '../cells/ContactNameCell'
+import { ContactNextActivityCell } from '../cells/ContactNextActivityCell'
 import { ContactOwnerCell } from '../cells/ContactOwnerCell'
 import { ContactTagsCell } from '../cells/ContactTagsCell'
 import {
@@ -156,6 +157,13 @@ const RENDERERS: Readonly<Record<string, ContactCellRenderer>> = {
             }
           : undefined,
       }}
+    />
+  ),
+  nextActivity: (contact, { locale, labels }) => (
+    <ContactNextActivityCell
+      activity={contact.nextActivity}
+      locale={locale}
+      labels={labels.nextActivity}
     />
   ),
   lastContactedAt: (contact, { locale, labels }) => (

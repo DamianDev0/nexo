@@ -754,4 +754,14 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".contacts (whatsapp) WHERE is_active = true;
     `,
   },
+  {
+    id: '0042_activities_priority_next',
+    up: (schema) => `
+      ALTER TABLE "${schema}".activities
+        ADD COLUMN IF NOT EXISTS priority VARCHAR(10) NOT NULL DEFAULT 'normal';
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_activities_next"
+        ON "${schema}".activities (contact_id, due_date)
+        WHERE is_active = true AND status = 'pending' AND due_date IS NOT NULL;
+    `,
+  },
 ]

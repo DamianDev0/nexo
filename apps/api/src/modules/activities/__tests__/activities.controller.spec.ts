@@ -16,6 +16,7 @@ const mockActivity: ActivityListItem = {
   dueDate: '2026-04-01T10:00:00Z',
   completedAt: null,
   status: 'pending',
+  priority: 'normal',
   durationMinutes: 30,
   reminderAt: null,
   isActive: true,

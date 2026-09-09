@@ -9,7 +9,7 @@ import {
   WhatsappLogoIcon,
 } from '@/shared/ui/icons'
 
-import type { ActivityKindKey } from './activity-groups'
+import type { ActivityKindKey } from '../lib/activity-kind'
 import type { ReactNode } from 'react'
 
 const ACTIVITY_ICONS: Record<ActivityKindKey, ReactNode> = {

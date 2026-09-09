@@ -326,6 +326,7 @@ export function getTenantSchemaSQL(schema: string): string {
       due_date TIMESTAMPTZ,
       completed_at TIMESTAMPTZ,
       status VARCHAR(20) DEFAULT 'pending',
+      priority VARCHAR(10) NOT NULL DEFAULT 'normal',
       duration_minutes INTEGER,
       reminder_at TIMESTAMPTZ,
       is_active BOOLEAN DEFAULT true,
@@ -737,6 +738,8 @@ export function getTenantIndicesSQL(schema: string): string {
       WHERE is_active = true;
     CREATE INDEX idx_${schema}_activities_contact ON "${schema}".activities (contact_id)
       WHERE is_active = true;
+    CREATE INDEX idx_${schema}_activities_next ON "${schema}".activities (contact_id, due_date)
+      WHERE is_active = true AND status = 'pending' AND due_date IS NOT NULL;
     CREATE INDEX idx_${schema}_activities_deal ON "${schema}".activities (deal_id)
       WHERE is_active = true;
     CREATE INDEX idx_${schema}_activities_calendar ON "${schema}".activities (due_date, assigned_to_id)

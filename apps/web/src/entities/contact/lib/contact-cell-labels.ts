@@ -56,6 +56,10 @@ export function buildContactCellLabels(t: TFunction): ContactCellLabels {
       cancel: t('common.cancel'),
     },
     city: { field: t('contacts.form.city'), placeholder: t('contacts.form.cityPlaceholder') },
+    nextActivity: {
+      overdue: t('contacts.preview.tasks.overdueShort'),
+      kind: (kind) => t(`contacts.preview.activityKinds.${kind}`),
+    },
     owner: {
       trigger: t('contacts.preview.owner.trigger'),
       search: t('contacts.preview.owner.search'),

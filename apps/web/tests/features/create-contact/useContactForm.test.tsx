@@ -36,6 +36,7 @@ const EXISTING_CONTACT: ContactListItem = {
   updatedAt: new Date().toISOString(),
   noteCount: 0,
   optedOutChannels: [],
+  nextActivity: null,
   customFields: { address: 'Calle 100 #7-21' },
 }
 

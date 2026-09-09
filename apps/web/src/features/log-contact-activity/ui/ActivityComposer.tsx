@@ -1,5 +1,6 @@
 'use client'
 
+import { ACTIVITY_PRIORITIES } from '@repo/shared-types'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -7,6 +8,13 @@ import { contactFullName } from '@/entities/contact'
 import { DatePicker } from '@/shared/ui/molecules/date-picker'
 import { FieldError } from '@/shared/ui/molecules/field-error'
 import { buildComposerControlLabels, Composer } from '@/shared/ui/organisms/composer'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/shadcn/select'
 
 import { useActivityComposer } from '../model/useActivityComposer'
 
@@ -64,6 +72,31 @@ export function ActivityComposer({ kind, contact, onClose }: Readonly<ActivityCo
           )}
         />
       </Composer.Field>
+      {kind === 'task' ? (
+        <Composer.Field label={t('contacts.composers.activity.priority')}>
+          <Controller
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger
+                  aria-label={t('contacts.composers.activity.priority')}
+                  className="h-8 w-40 border-none bg-transparent px-0 shadow-none"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ACTIVITY_PRIORITIES.map((priority) => (
+                    <SelectItem key={priority} value={priority}>
+                      {t(`contacts.preview.priority.${priority}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </Composer.Field>
+      ) : null}
       <Composer.Body>
         <Composer.Textarea
           placeholder={t('contacts.composers.activity.descriptionPlaceholder')}

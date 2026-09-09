@@ -56,6 +56,7 @@ export const SORTABLE_COLUMNS: Record<string, string> = {
   city: 'city',
   status: 'status',
   lastContactedAt: 'last_contacted_at',
+  nextActivity: 'next_activity_due',
 }
 
 export const CONTACT_LIST_COLUMNS = `
@@ -64,7 +65,17 @@ export const CONTACT_LIST_COLUMNS = `
    WHERE a.contact_id = contacts.id AND a.activity_type = 'note') AS note_count,
   ARRAY(SELECT dc.channel FROM data_consents dc
         WHERE dc.contact_id = contacts.id AND dc.granted = false) AS opted_out_channels,
-  (SELECT u.full_name FROM users u WHERE u.id = contacts.assigned_to_id) AS assigned_to_name
+  (SELECT u.full_name FROM users u WHERE u.id = contacts.assigned_to_id) AS assigned_to_name,
+  (SELECT MIN(a.due_date) FROM activities a
+   WHERE a.contact_id = contacts.id AND a.is_active = true
+     AND a.status = 'pending' AND a.due_date IS NOT NULL) AS next_activity_due,
+  (SELECT jsonb_build_object(
+      'id', a.id, 'activityType', a.activity_type, 'title', a.title,
+      'dueDate', a.due_date, 'priority', a.priority)
+   FROM activities a
+   WHERE a.contact_id = contacts.id AND a.is_active = true
+     AND a.status = 'pending' AND a.due_date IS NOT NULL
+   ORDER BY a.due_date ASC LIMIT 1) AS next_activity
 `
 
 export type TaxonomyColumn = 'status' | 'source' | 'lifecycle'

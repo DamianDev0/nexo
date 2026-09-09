@@ -1,4 +1,11 @@
-import type { Contact, ContactActivity, ContactDeal, ContactListItem } from '@repo/shared-types'
+import type {
+  ActivityPriority,
+  ActivityStatus,
+  Contact,
+  ContactActivity,
+  ContactDeal,
+  ContactListItem,
+} from '@repo/shared-types'
 import type { ActivityRow, ContactRow, DealRow } from '../interfaces/contact-row.interfaces'
 
 export function mapContact(r: ContactRow): Contact {
@@ -36,6 +43,7 @@ export function mapContactListItem(r: ContactRow): ContactListItem {
     assignedToName: r.assigned_to_name ?? null,
     noteCount: r.note_count ?? 0,
     optedOutChannels: r.opted_out_channels ?? [],
+    nextActivity: r.next_activity ?? null,
   }
 }
 
@@ -47,6 +55,8 @@ export function mapContactActivity(a: ActivityRow): ContactActivity {
     description: a.description,
     dueDate: a.due_date,
     completedAt: a.completed_at,
+    status: a.status as ActivityStatus,
+    priority: a.priority as ActivityPriority,
     assignedToId: a.assigned_to_id,
     createdById: a.created_by,
     createdAt: a.created_at,

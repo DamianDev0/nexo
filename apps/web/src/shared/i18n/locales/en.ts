@@ -534,6 +534,7 @@ const en = {
       lifecycleStage: 'Lifecycle',
       source: 'Source',
       lastContactedAt: 'Last contacted',
+      nextActivity: 'Next activity',
       notes: 'Notes',
       createdAt: 'Created',
       assignedTo: 'Owner',
@@ -551,6 +552,7 @@ const en = {
       phone: 'Primary phone; falls back to WhatsApp when empty.',
       city: 'Municipality recorded in the {{entity}} address.',
       lastContactedAt: 'Date of the last logged interaction.',
+      nextActivity: 'Closest pending task or meeting.',
       notes: 'How many notes the contact has; hover to read them.',
       createdAt: 'Date the {{entity}} entered the CRM.',
     },
@@ -817,6 +819,7 @@ const en = {
         time: 'Time',
         description: 'Details',
         descriptionPlaceholder: 'Add context (optional)…',
+        priority: 'Priority',
         save: {
           task: 'Create task',
           meeting: 'Schedule',
@@ -1074,6 +1077,19 @@ const en = {
         other: 'Activity',
       },
       due: 'Due {{when}}',
+      tasks: {
+        complete: 'Mark as completed',
+        reopen: 'Reopen',
+        completed: 'Task completed',
+        reopened: 'Task reopened',
+        overdue: 'Overdue since {{when}}',
+        overdueShort: 'Overdue',
+      },
+      priority: {
+        low: 'Low',
+        normal: 'Normal',
+        high: 'High',
+      },
       completed: 'Completed',
     },
     toasts: {

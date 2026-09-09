@@ -1,3 +1,5 @@
+import type { ActivityDueFilter } from '@repo/shared-types'
+
 export interface ActivityRow {
   id: string
   activity_type: string
@@ -6,6 +8,7 @@ export interface ActivityRow {
   due_date: string | null
   completed_at: string | null
   status: string
+  priority: string
   duration_minutes: number | null
   reminder_at: string | null
   is_active: boolean
@@ -39,6 +42,7 @@ export interface CalendarRow {
 export interface ActivityListFilters {
   activityType?: string
   status?: string
+  due?: ActivityDueFilter
   contactId?: string
   companyId?: string
   dealId?: string
@@ -57,6 +61,7 @@ export interface ActivityInsertValues {
   dueDate: string | null
   durationMinutes: number | null
   reminderAt: string | null
+  priority: string
   contactId: string | null
   companyId: string | null
   dealId: string | null

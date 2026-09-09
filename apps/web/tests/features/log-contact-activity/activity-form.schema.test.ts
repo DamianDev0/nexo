@@ -20,8 +20,13 @@ describe('buildActivitySchema', () => {
     title: 'Enviar cotización',
     dueDate: '2026-09-10',
     time: '14:30',
+    priority: 'normal',
     description: '',
   }
+
+  it('rejects an unknown priority', () => {
+    expect(schema.safeParse({ ...valid, priority: 'urgent' }).success).toBe(false)
+  })
 
   it('accepts a complete activity and trims the title', () => {
     const result = schema.safeParse({ ...valid, title: '  Llamar  ' })
@@ -58,6 +63,7 @@ describe('activityDefaults', () => {
       title: '',
       dueDate: '2026-09-06',
       time: ACTIVITY_DEFAULT_TIME,
+      priority: 'normal',
       description: '',
     })
   })
@@ -75,6 +81,7 @@ describe('buildActivityPayload', () => {
       title: 'Visita',
       dueDate: '2026-09-10',
       time: '09:00',
+      priority: 'normal',
       description: 'Llevar muestras',
     })
     expect(payload).toEqual({
@@ -86,13 +93,26 @@ describe('buildActivityPayload', () => {
     })
   })
 
-  it('omits an empty description', () => {
+  it('omits an empty description and carries the task priority', () => {
     const payload = buildActivityPayload('task', 'c1', {
       title: 'Cotizar',
       dueDate: '2026-09-10',
       time: '09:00',
+      priority: 'high',
       description: '',
     })
     expect(payload.description).toBeUndefined()
+    expect(payload.priority).toBe('high')
+  })
+
+  it('does not send a priority for meetings', () => {
+    const payload = buildActivityPayload('meeting', 'c1', {
+      title: 'Visita',
+      dueDate: '2026-09-10',
+      time: '09:00',
+      priority: 'high',
+      description: '',
+    })
+    expect(payload.priority).toBeUndefined()
   })
 })

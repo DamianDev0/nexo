@@ -1,4 +1,9 @@
-import type { ConsentChannel, ContactSortField, FilterCondition } from '@repo/shared-types'
+import type {
+  ConsentChannel,
+  ContactNextActivity,
+  ContactSortField,
+  FilterCondition,
+} from '@repo/shared-types'
 
 export interface ContactRow {
   id: string
@@ -28,6 +33,7 @@ export interface ContactRow {
   note_count?: number
   opted_out_channels?: ConsentChannel[]
   assigned_to_name?: string | null
+  next_activity?: ContactNextActivity | null
 }
 
 export interface ActivityRow {
@@ -37,6 +43,8 @@ export interface ActivityRow {
   description: string | null
   due_date: string | null
   completed_at: string | null
+  status: string
+  priority: string
   assigned_to_id: string | null
   created_by: string | null
   created_at: string

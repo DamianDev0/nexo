@@ -44,6 +44,7 @@ const mockContactListItem = {
   assignedToName: null,
   noteCount: 0,
   optedOutChannels: [],
+  nextActivity: null,
 }
 const mockPaginated: PaginatedContacts = {
   data: [mockContactListItem],

@@ -49,6 +49,7 @@ export function buildContact(overrides: Partial<ContactListItem> = {}): ContactL
     updatedAt: new Date().toISOString(),
     noteCount: 0,
     optedOutChannels: [],
+    nextActivity: null,
     ...overrides,
   }
 }

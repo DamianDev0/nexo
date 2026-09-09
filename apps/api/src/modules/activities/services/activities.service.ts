@@ -52,6 +52,7 @@ export class ActivitiesService {
       dueDate: dto.dueDate ?? null,
       durationMinutes: dto.durationMinutes ?? null,
       reminderAt: dto.reminderAt ?? null,
+      priority: dto.priority ?? 'normal',
       contactId: dto.contactId ?? null,
       companyId: dto.companyId ?? null,
       dealId: dto.dealId ?? null,

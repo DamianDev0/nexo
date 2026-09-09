@@ -13,6 +13,7 @@ import {
   ACTIVITY_LIST_FROM,
   CALENDAR_COLUMNS,
   CALENDAR_FROM,
+  DUE_FILTER_SQL,
 } from '../constants/activity.constants'
 import { sqlRows } from '@/shared/database/sql.util'
 
@@ -73,10 +74,11 @@ export class ActivitiesRepository {
            activity_type, title, description, due_date,
            duration_minutes, reminder_at,
            contact_id, company_id, deal_id, assigned_to_id, created_by,
-           status, completed_at
+           status, completed_at, priority
          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,
            CASE WHEN $12::boolean THEN 'completed' ELSE 'pending' END,
-           CASE WHEN $12::boolean THEN NOW() END)
+           CASE WHEN $12::boolean THEN NOW() END,
+           $13)
          RETURNING id`,
         [
           values.activityType,
@@ -91,6 +93,7 @@ export class ActivitiesRepository {
           values.assignedToId,
           values.createdById,
           values.completed,
+          values.priority,
         ],
       )
 
@@ -252,6 +255,8 @@ export class ActivitiesRepository {
       params.push(filters.status)
       conditions.push(`a.status = $${params.length}`)
     }
+
+    if (filters.due) conditions.push(DUE_FILTER_SQL[filters.due])
 
     if (filters.contactId) {
       params.push(filters.contactId)

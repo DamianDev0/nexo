@@ -1,7 +1,7 @@
 import type { ContactRequiredField } from '../../lib/contact-completeness'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { AssigneeOption, AssigneePickerLabels } from '@/shared/ui/molecules/assignee-picker'
-import type { ContactInput, ContactListItem, Tag } from '@repo/shared-types'
+import type { ContactActivity, ContactInput, ContactListItem, Tag } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
 export type TagsCellLabels = {
@@ -24,6 +24,11 @@ export type EditableCellLabels = {
 export type CityCellLabels = {
   readonly field: string
   readonly placeholder: string
+}
+
+export type NextActivityCellLabels = {
+  readonly overdue: string
+  readonly kind: (kind: string) => string
 }
 
 export type CommCellLabels = {
@@ -98,6 +103,7 @@ export type ContactCellLabels = {
   readonly choice: ChoiceCellLabels
   readonly editable: EditableCellLabels
   readonly city: CityCellLabels
+  readonly nextActivity: NextActivityCellLabels
   readonly owner: AssigneePickerLabels
   readonly column: (key: string) => string
 }
@@ -115,6 +121,7 @@ export type ContactRowActions = ContactNameActions & {
   readonly onCall?: (number: string) => void
   readonly onCompose?: (channel: ContactComposeChannel, contact: ContactListItem) => void
   readonly onLogActivity?: (kind: ContactLogKind, contact: ContactListItem) => void
+  readonly onToggleActivity?: (activity: ContactActivity) => void
   readonly onAssign?: (change: ContactOwnerChange) => void
   readonly onFieldsChange?: (contactId: string, patch: ContactFieldsPatch) => void
   readonly onStatusChange?: (contactId: string, status: string) => void

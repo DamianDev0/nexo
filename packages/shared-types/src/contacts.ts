@@ -1,3 +1,4 @@
+import type { ActivityPriority, ActivityStatus } from './activities'
 import type { ConsentChannel } from './consents'
 import type { DocumentType } from './enums'
 import type { FilterCondition } from './filters'
@@ -29,11 +30,20 @@ export type Contact = {
   updatedAt: string
 }
 
+export type ContactNextActivity = {
+  id: string
+  activityType: string
+  title: string | null
+  dueDate: string
+  priority: ActivityPriority
+}
+
 export type ContactListItem = Omit<Contact, 'customFields'> & {
   customFields?: Record<string, unknown>
   assignedToName?: string | null
   noteCount: number
   optedOutChannels: ConsentChannel[]
+  nextActivity: ContactNextActivity | null
 }
 
 export type ContactInput = {
@@ -87,6 +97,7 @@ export const CONTACT_SORT_FIELDS = [
   'city',
   'status',
   'lastContactedAt',
+  'nextActivity',
 ] as const
 
 export type ContactSortField = (typeof CONTACT_SORT_FIELDS)[number]
@@ -110,6 +121,8 @@ export type ContactActivity = {
   description: string | null
   dueDate: string | null
   completedAt: string | null
+  status: ActivityStatus
+  priority: ActivityPriority
   assignedToId: string | null
   createdById: string | null
   createdAt: string
