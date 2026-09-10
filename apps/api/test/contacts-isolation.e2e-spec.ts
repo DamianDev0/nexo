@@ -88,6 +88,21 @@ describe('Contacts Core Tenant Isolation (E2E, real HTTP)', () => {
       .expect(404)
   })
 
+  it('answers the detail route with the same shape the list rows carry', async () => {
+    const detail = await asTenant(
+      request(server()).get(`/${API_PREFIX}/contacts/${contactA}`),
+      tenantA,
+    ).expect(200)
+
+    expect(detail.body.data).toMatchObject({
+      id: contactA,
+      noteCount: expect.any(Number),
+      optedOutChannels: expect.any(Array),
+    })
+    expect(detail.body.data).toHaveProperty('nextActivity')
+    expect(detail.body.data).toHaveProperty('assignedToName')
+  })
+
   it("does not report tenant A's email as a duplicate for tenant B", async () => {
     const probe = await asTenant(
       request(server()).get(`/${API_PREFIX}/contacts/duplicates/probe?email=${EMAIL_A}`),

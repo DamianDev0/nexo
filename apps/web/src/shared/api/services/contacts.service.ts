@@ -7,6 +7,7 @@ import type {
   ContactDuplicateProbeQuery,
   ContactDuplicateProbeResult,
   ContactInput,
+  ContactListItem,
   ContactListQuery,
   ContactTableState,
   ContactTaxonomyUsage,
@@ -93,7 +94,7 @@ const contactsService = {
       params,
     }),
 
-  getById: (id: string) => request<Contact>({ method: 'get', url: `/contacts/${id}` }),
+  getById: (id: string) => request<ContactListItem>({ method: 'get', url: `/contacts/${id}` }),
 
   create: (data: ContactInput, force?: boolean) =>
     request<Contact>({

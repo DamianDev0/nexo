@@ -175,6 +175,15 @@ export class ContactsRepository {
     })
   }
 
+  async findDetailById(qr: QueryRunner, contactId: string): Promise<ContactRow | null> {
+    const rows = await sqlRows<ContactRow[]>(
+      qr,
+      `SELECT ${CONTACT_LIST_COLUMNS} FROM contacts WHERE id = $1 AND is_active = true`,
+      [contactId],
+    )
+    return rows[0] ?? null
+  }
+
   async findActiveById(qr: QueryRunner, contactId: string): Promise<ContactRow | null> {
     const rows = await sqlRows<ContactRow[]>(
       qr,

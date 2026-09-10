@@ -1017,6 +1017,32 @@ const en = {
     recency: {
       stale: 'No contact in over {{days}} days',
     },
+    detail: {
+      back: 'Back to contacts',
+      closePanel: 'Close panel',
+      summary: 'Summary',
+      tabs: {
+        details: 'Details',
+        engagement: 'Engagement',
+      },
+      engagement: {
+        lifecycle: 'Lifecycle stage',
+        owner: 'Owner',
+        unassigned: 'Unassigned',
+        createdAt: 'Created',
+        lastContacted: 'Last contacted',
+        never: 'Never',
+      },
+      notFound: {
+        title: 'We could not find this contact',
+        description: 'It may have been archived or deleted.',
+        action: 'Back to contacts',
+      },
+      error: {
+        title: 'We could not load the contact',
+        action: 'Retry',
+      },
+    },
     preview: {
       lastContacted: 'Last contacted {{when}}',
       createdAt: 'Created {{when}}',

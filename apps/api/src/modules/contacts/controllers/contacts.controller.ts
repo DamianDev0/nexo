@@ -21,6 +21,7 @@ import type {
   TenantContext,
   AuthenticatedUser,
   Contact,
+  ContactListItem,
   ContactCounts,
   ContactDuplicateProbeResult,
   ContactTaxonomyUsage,
@@ -223,7 +224,7 @@ export class ContactsController {
   findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @TenantCtx() ctx: TenantContext,
-  ): Promise<Contact> {
+  ): Promise<ContactListItem> {
     return this.contactsService.findOne(ctx.schemaName, id)
   }
 

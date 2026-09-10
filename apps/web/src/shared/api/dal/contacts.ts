@@ -5,6 +5,7 @@ import { apiFetch } from '../client'
 
 import type {
   ContactCounts,
+  ContactListItem,
   ContactListQuery,
   ContactTaxonomyUsage,
   ContactWorkspace,
@@ -39,6 +40,9 @@ export const listContacts = (query: ContactListQuery) =>
   apiFetch<PaginatedContacts>(`/contacts${toSearchParams(query)}`, {
     tags: [CACHE_TAGS.contacts],
   })
+
+export const getContact = (id: string) =>
+  apiFetch<ContactListItem>(`/contacts/${id}`, { tags: [CACHE_TAGS.contacts] })
 
 export const getContactCounts = () =>
   apiFetch<ContactCounts>('/contacts/counts', { tags: [CACHE_TAGS.contacts] })

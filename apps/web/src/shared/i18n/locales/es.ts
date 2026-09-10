@@ -1024,6 +1024,32 @@ const es = {
     recency: {
       stale: 'Sin contacto hace más de {{days}} días',
     },
+    detail: {
+      back: 'Volver a contactos',
+      closePanel: 'Cerrar panel',
+      summary: 'Resumen',
+      tabs: {
+        details: 'Detalles',
+        engagement: 'Interacción',
+      },
+      engagement: {
+        lifecycle: 'Ciclo de vida',
+        owner: 'Responsable',
+        unassigned: 'Sin responsable',
+        createdAt: 'Creado',
+        lastContacted: 'Último contacto',
+        never: 'Nunca',
+      },
+      notFound: {
+        title: 'No encontramos este contacto',
+        description: 'Puede que lo hayan archivado o eliminado.',
+        action: 'Volver a contactos',
+      },
+      error: {
+        title: 'No pudimos cargar el contacto',
+        action: 'Reintentar',
+      },
+    },
     preview: {
       lastContacted: 'Último contacto {{when}}',
       createdAt: 'Creado {{when}}',

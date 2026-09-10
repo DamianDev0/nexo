@@ -24,6 +24,7 @@ import type {
   Contact,
   ContactCounts,
   ContactDuplicateProbeResult,
+  ContactListItem,
   ContactTaxonomy,
   ContactTaxonomyUsage,
   TaxonomyReassignKind,
@@ -140,9 +141,11 @@ export class ContactsService {
     })
   }
 
-  async findOne(schemaName: string, contactId: string): Promise<Contact> {
-    return this.db.query(schemaName, async (qr): Promise<Contact> => {
-      return this.fetchContactOrFail(qr, contactId)
+  async findOne(schemaName: string, contactId: string): Promise<ContactListItem> {
+    return this.db.query(schemaName, async (qr): Promise<ContactListItem> => {
+      const row = await this.repository.findDetailById(qr, contactId)
+      if (!row) throw new NotFoundException(`Contact ${contactId} not found`)
+      return mapContactListItem(row)
     })
   }
 
