@@ -810,6 +810,9 @@ const es = {
       addNote: 'Agregar nota',
       editTags: 'Editar etiquetas',
       restore: 'Restaurar',
+      open: 'Abrir y editar',
+      task: 'Crear tarea',
+      meeting: 'Agendar reunión',
     },
     composers: {
       activity: {
@@ -1138,6 +1141,27 @@ const es = {
       createAnyway: 'Crear de todas formas',
       saveAnyway: 'Guardar de todas formas',
       dismiss: 'Descartar',
+    },
+  },
+  shortcuts: {
+    title: 'Atajos de teclado',
+    description: 'Pulsa ? en cualquier momento para volver a esta lista.',
+    groups: {
+      global: 'General',
+      records: 'Registros',
+      editing: 'Edición de texto',
+    },
+    actions: {
+      commandMenu: 'Abrir el buscador de acciones',
+      globalSearch: 'Buscar en la tabla',
+      escape: 'Cerrar o cancelar',
+      newRecord: 'Crear un registro',
+      nextItem: 'Siguiente registro',
+      previousItem: 'Registro anterior',
+      save: 'Guardar',
+      bold: 'Negrita',
+      italic: 'Cursiva',
+      underline: 'Subrayado',
     },
   },
   settings: {

@@ -803,6 +803,9 @@ const en = {
       addNote: 'Add note',
       editTags: 'Edit tags',
       restore: 'Restore',
+      open: 'Open and edit',
+      task: 'Create task',
+      meeting: 'Schedule meeting',
     },
     composers: {
       activity: {
@@ -1131,6 +1134,27 @@ const en = {
       createAnyway: 'Create anyway',
       saveAnyway: 'Save anyway',
       dismiss: 'Dismiss',
+    },
+  },
+  shortcuts: {
+    title: 'Keyboard shortcuts',
+    description: 'Press ? at any time to bring this list back.',
+    groups: {
+      global: 'General',
+      records: 'Records',
+      editing: 'Text editing',
+    },
+    actions: {
+      commandMenu: 'Open the action finder',
+      globalSearch: 'Search the table',
+      escape: 'Close or cancel',
+      newRecord: 'Create a record',
+      nextItem: 'Next record',
+      previousItem: 'Previous record',
+      save: 'Save',
+      bold: 'Bold',
+      italic: 'Italic',
+      underline: 'Underline',
     },
   },
   settings: {

@@ -3,18 +3,21 @@ import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import {
   ArrowCounterClockwiseIcon,
+  DotsThreeIcon,
   NotePencilIcon,
   SidebarSimpleIcon,
   TagIcon,
 } from '@/shared/ui/icons'
+import { ActionMenu } from '@/shared/ui/molecules/action-menu'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
 import { CONTACT_STRIP_BUTTON } from '../../config/contact-columns.constants'
+import { buildRowMenuItems } from '../../lib/row-menu-items'
 import { ContactNotesHoverCard } from '../containers/ContactNotesHoverCard'
 
 import { ContactTagsHoverCard } from './ContactTagsCell'
 
-import type { ContactNameActions, ContactNameLabels } from '../../model/types/contact-cells.types'
+import type { ContactNameLabels, ContactRowActions } from '../../model/types/contact-cells.types'
 import type { ContactListItem, Tag } from '@repo/shared-types'
 
 function CountBadge({ count }: Readonly<{ count: number }>) {
@@ -33,7 +36,7 @@ function CountBadge({ count }: Readonly<{ count: number }>) {
 type StripContext = Readonly<{
   contact: ContactListItem
   labels: ContactNameLabels
-  actions: ContactNameActions
+  actions: ContactRowActions
   tagsByName?: ReadonlyMap<string, Tag>
 }>
 
@@ -91,6 +94,24 @@ function NotesStripAction({ contact, labels, actions }: Omit<StripContext, 'tags
   )
 }
 
+function RowMenu({ contact, labels, actions }: Omit<StripContext, 'tagsByName'>) {
+  const items = buildRowMenuItems(contact, labels, actions)
+  if (items.length === 0) return null
+
+  return (
+    <ActionMenu items={items} align="start">
+      <PillButton
+        variant="ghost"
+        size="xs"
+        aria-label={labels.rowMenu}
+        className={cn('w-8 px-0', CONTACT_STRIP_BUTTON)}
+      >
+        <DotsThreeIcon className="size-3.5" />
+      </PillButton>
+    </ActionMenu>
+  )
+}
+
 export function ContactActionStrip({ contact, labels, actions, tagsByName }: StripContext) {
   const hasLeadingActions =
     contact.tags.length > 0 || Boolean(actions.onEditTags) || Boolean(actions.onAddNote)
@@ -122,6 +143,7 @@ export function ContactActionStrip({ contact, labels, actions, tagsByName }: Str
           </PillButton>
         </HintTooltip>
       )}
+      <RowMenu contact={contact} labels={labels} actions={actions} />
       {actions.onPreview && (
         <HintTooltip asChild hint={labels.preview}>
           <PillButton

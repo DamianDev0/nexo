@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { SHORTCUTS } from '@/shared/config/shortcuts'
+import { useHotkey } from '@/shared/lib/hooks/useHotkey'
+
 import type { RefObject } from 'react'
 
 export interface ExpandableSearch {
@@ -29,6 +32,13 @@ export function useExpandableSearch(
     else setOpen(true)
   }, [open, close])
 
+  const reveal = useCallback(() => {
+    setOpen(true)
+    inputRef.current?.focus()
+  }, [])
+
+  useHotkey(SHORTCUTS.globalSearch, reveal)
+
   useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
@@ -40,7 +50,9 @@ export function useExpandableSearch(
       if (value === '' && !containerRef.current?.contains(event.target as Node)) setOpen(false)
     }
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') close()
+      if (event.key !== 'Escape') return
+      if (document.activeElement !== inputRef.current) return
+      close()
     }
 
     document.addEventListener('pointerdown', onPointerDown)

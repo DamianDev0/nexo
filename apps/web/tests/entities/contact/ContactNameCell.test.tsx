@@ -22,6 +22,15 @@ const LABELS = {
     count: (total: number) => `${total} etiquetas`,
   },
   notes: { title: 'Notas' },
+  rowMenu: 'Acciones',
+  menu: {
+    open: 'Abrir y editar',
+    call: 'Llamar',
+    sms: 'Enviar SMS',
+    email: 'Escribir email',
+    task: 'Crear tarea',
+    meeting: 'Agendar reunión',
+  },
 }
 
 describe('ContactNameCell', () => {

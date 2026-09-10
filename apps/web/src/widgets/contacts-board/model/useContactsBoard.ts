@@ -24,6 +24,7 @@ import { selectionScopeKey } from '../lib/selection-scope'
 
 import { useBoardColumns } from './useBoardColumns'
 import { useBoardEditors } from './useBoardEditors'
+import { useBoardHotkeys } from './useBoardHotkeys'
 import { useBoardPreview } from './useBoardPreview'
 import { useBoardSelection } from './useBoardSelection'
 import { useBoardViews } from './useBoardViews'
@@ -38,6 +39,8 @@ export function useContactsBoard() {
   const { sheet, preview, composers, rowActions } = useBoardEditors()
   const workspace = useContactWorkspace()
   const usage = useTaxonomyUsage()
+
+  useBoardHotkeys({ onCreate: sheet.openCreate, enabled: !sheet.open && !preview.open })
 
   const catalog = workspace.data?.columns ?? EMPTY_COLUMNS
   const { handleSort } = table

@@ -10,7 +10,7 @@ import { contactAvatarUrl, contactFullName } from '../../lib/contact-display'
 
 import { ContactActionStrip } from './ContactActionStrip'
 
-import type { ContactNameActions, ContactNameLabels } from '../../model/types/contact-cells.types'
+import type { ContactRowActions, ContactNameLabels } from '../../model/types/contact-cells.types'
 import type { ContactListItem, Tag } from '@repo/shared-types'
 import type { ReactNode } from 'react'
 
@@ -18,7 +18,7 @@ type ContactNameCellProps = {
   readonly contact: ContactListItem
   readonly dense?: boolean
   readonly labels?: ContactNameLabels
-  readonly actions?: ContactNameActions
+  readonly actions?: ContactRowActions
   readonly tagsByName?: ReadonlyMap<string, Tag>
 }
 

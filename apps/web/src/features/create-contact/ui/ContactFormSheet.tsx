@@ -23,6 +23,15 @@ import { CustomFieldsSection } from './CustomFieldsSection'
 
 import type { ContactListItem } from '@repo/shared-types'
 
+function focusFirstField(event: Event) {
+  const panel = event.currentTarget
+  if (!(panel instanceof HTMLElement)) return
+  const field = panel.querySelector<HTMLInputElement>('input:not([type="hidden"]):not(:disabled)')
+  if (!field) return
+  event.preventDefault()
+  field.focus()
+}
+
 type ContactFormSheetProps = {
   readonly contact: ContactListItem | null
   readonly open: boolean
@@ -34,7 +43,11 @@ export function ContactFormSheet({ contact, open, onOpenChange }: Readonly<Conta
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent showCloseButton={false} className="w-full gap-0 overflow-visible sm:max-w-md">
+      <SheetContent
+        showCloseButton={false}
+        onOpenAutoFocus={focusFirstField}
+        className="w-full gap-0 overflow-visible sm:max-w-md"
+      >
         <EdgeCollapseButton
           edge="left"
           label={t('contacts.form.hidePanel')}

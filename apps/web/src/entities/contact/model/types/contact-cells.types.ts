@@ -55,11 +55,22 @@ export type NotesCellLabels = {
   readonly title: string
 }
 
+export type RowMenuLabels = {
+  readonly open: string
+  readonly call: string
+  readonly sms: string
+  readonly email: string
+  readonly task: string
+  readonly meeting: string
+}
+
 export type ContactNameLabels = {
   readonly preview: string
   readonly addNote: string
   readonly editTags: string
   readonly restore: string
+  readonly rowMenu: string
+  readonly menu: RowMenuLabels
   readonly missing: (fields: ReadonlyArray<ContactRequiredField>) => string | null
   readonly tags: TagsCellLabels
   readonly notes: NotesCellLabels
