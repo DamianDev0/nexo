@@ -23,6 +23,7 @@ export type QuickAction = {
   readonly icon: ReactNode
   readonly onClick?: () => void
   readonly disabled?: boolean
+  readonly reason?: string
   readonly menu?: ReadonlyArray<ActionMenuItem>
 }
 

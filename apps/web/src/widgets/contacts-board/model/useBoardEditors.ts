@@ -3,11 +3,11 @@
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 
+import { useContactComposers } from '@/features/compose-contact-actions'
 import { useCreateFromUrl } from '@/features/create-contact'
 import { ROUTES } from '@/shared/config/routes'
 import { useEntityEditor } from '@/shared/lib/hooks/useEntityEditor'
 
-import { useContactComposers } from './useContactComposers'
 import { useContactRowActions } from './useContactRowActions'
 
 import type { ContactListItem } from '@repo/shared-types'

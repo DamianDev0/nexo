@@ -27,6 +27,10 @@ export function contactPrimaryNumber(contact: ContactListItem): string | null {
   return contact.phone ?? contact.whatsapp
 }
 
+function missingReason(t: TFunction, fieldKey: string): string {
+  return t('contacts.completeness.field', { field: t(fieldKey).toLocaleLowerCase() })
+}
+
 export function buildContactQuickActions(
   t: TFunction,
   contact: ContactListItem,
@@ -39,6 +43,7 @@ export function buildContactQuickActions(
       label: t('contacts.preview.quickActions.call'),
       icon: <PhoneIcon />,
       disabled: number === null || !actions.onCall,
+      reason: number === null ? missingReason(t, 'contacts.form.phone') : undefined,
       onClick: () => {
         if (number !== null) actions.onCall?.(contactDialNumber(number))
       },
@@ -47,14 +52,16 @@ export function buildContactQuickActions(
       id: 'whatsapp',
       label: t('contacts.preview.quickActions.whatsapp'),
       icon: <WhatsappLogoIcon />,
-      disabled: !actions.onCompose,
+      disabled: number === null || !actions.onCompose,
+      reason: number === null ? missingReason(t, 'contacts.form.whatsapp') : undefined,
       onClick: () => actions.onCompose?.('whatsapp', contact),
     },
     {
       id: 'email',
       label: t('contacts.preview.quickActions.email'),
       icon: <EnvelopeSimpleIcon />,
-      disabled: !actions.onCompose,
+      disabled: !contact.email || !actions.onCompose,
+      reason: contact.email ? undefined : missingReason(t, 'contacts.form.email'),
       onClick: () => actions.onCompose?.('email', contact),
     },
     {
@@ -87,21 +94,26 @@ export function buildContactQuickActions(
     },
   ]
 
-  const menu: ActionMenuItem[] = [
-    ...items.map(({ id, label, icon, onClick }) => ({ id, label, icon, onClick })),
+  const extras: ReadonlyArray<QuickAction> = [
     {
       id: 'sms',
       label: t('contacts.preview.quickActions.sms'),
       icon: <ChatTextIcon />,
+      disabled: !contact.phone || !actions.onCompose,
       onClick: () => actions.onCompose?.('sms', contact),
     },
     {
       id: 'edit',
       label: t('contacts.preview.quickActions.edit', { entity: '' }).trim(),
       icon: <PencilSimpleIcon />,
+      disabled: !actions.onOpen,
       onClick: () => actions.onOpen?.(contact),
     },
-  ].filter((item) => !items.find((action) => action.id === item.id)?.disabled)
+  ]
+
+  const menu: ActionMenuItem[] = [...items, ...extras]
+    .filter((action) => !action.disabled)
+    .map(({ id, label, icon, onClick }) => ({ id, label, icon, onClick }))
 
   return {
     items,

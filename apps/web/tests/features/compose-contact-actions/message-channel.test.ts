@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { CONTACTS_FIXTURE } from '../../msw/handlers'
 
-import type { ActiveComposer } from '@/widgets/contacts-board/model/useContactComposers'
+import type { ActiveComposer } from '@/features/compose-contact-actions/model/useContactComposers'
 
-import { resolveMessageChannel } from '@/widgets/contacts-board/lib/message-channel'
+import { resolveMessageChannel } from '@/features/compose-contact-actions/lib/message-channel'
 
 const contact = CONTACTS_FIXTURE[0]!
 
@@ -31,7 +31,9 @@ describe('resolveMessageChannel', () => {
 
 describe('resolveLogKind', () => {
   it('returns the activity kind for task and meeting composers only', async () => {
-    const { resolveLogKind } = await import('@/widgets/contacts-board/lib/message-channel')
+    const { resolveLogKind } = await import(
+      '@/features/compose-contact-actions/lib/message-channel'
+    )
     const contact = { id: 'c1' } as never
     expect(resolveLogKind({ kind: 'task', contact })).toBe('task')
     expect(resolveLogKind({ kind: 'meeting', contact })).toBe('meeting')

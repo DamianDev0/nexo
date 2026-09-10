@@ -24,16 +24,19 @@ function QuickActionButton({
   tone,
 }: Readonly<{ action: QuickAction; tone: keyof typeof TONE }>) {
   const tap = useReducedTransition(snappySpring)
+  const blocked = Boolean(action.disabled)
+  const explained = blocked && Boolean(action.reason)
   const button = (
     <motion.button
       type="button"
       aria-label={action.label}
-      disabled={action.disabled}
-      onClick={action.menu ? undefined : action.onClick}
-      whileHover={action.disabled ? undefined : { y: -1 }}
-      whileTap={action.disabled ? undefined : { scale: 0.94 }}
+      aria-disabled={blocked || undefined}
+      disabled={blocked && !explained}
+      onClick={blocked || action.menu ? undefined : action.onClick}
+      whileHover={blocked ? undefined : { y: -1 }}
+      whileTap={blocked ? undefined : { scale: 0.94 }}
       transition={tap}
-      className={cn(BUTTON, TONE[tone])}
+      className={cn(BUTTON, TONE[tone], explained && 'cursor-not-allowed opacity-40')}
     >
       {action.icon}
     </motion.button>
@@ -47,7 +50,7 @@ function QuickActionButton({
     )
   }
   return (
-    <HintTooltip asChild hint={action.label}>
+    <HintTooltip asChild hint={action.reason ?? action.label}>
       {button}
     </HintTooltip>
   )

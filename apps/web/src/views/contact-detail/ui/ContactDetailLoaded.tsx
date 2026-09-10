@@ -1,5 +1,6 @@
 'use client'
 
+import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { useContactRecord } from '@/features/preview-contact'
 import { RecordLayout } from '@/shared/ui/organisms/record-layout'
 import { useBreadcrumbTail } from '@/widgets/app-shell'
@@ -17,7 +18,7 @@ type ContactDetailLoadedProps = {
 }
 
 export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailLoadedProps>) {
-  const { taxonomy, actions, activities, tagsByName, rail, defaultPanel, tabs } = detail
+  const { taxonomy, actions, activities, tagsByName, composers, rail, defaultPanel, tabs } = detail
   const record = useContactRecord({ contact, taxonomy, actions })
   useBreadcrumbTail(record.name)
 
@@ -32,6 +33,7 @@ export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailL
       <ContactDetailMain contact={contact} record={record} tabs={tabs} activities={activities} />
       <ContactDetailPanels activities={activities} />
       <RecordLayout.Rail items={rail} />
+      <ContactComposerHost composers={composers} />
     </RecordLayout>
   )
 }
