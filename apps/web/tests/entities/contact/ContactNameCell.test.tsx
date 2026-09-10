@@ -24,6 +24,7 @@ const LABELS = {
   notes: { title: 'Notas' },
   rowMenu: 'Acciones',
   menu: {
+    viewRecord: 'Ver registro',
     open: 'Abrir y editar',
     call: 'Llamar',
     sms: 'Enviar SMS',

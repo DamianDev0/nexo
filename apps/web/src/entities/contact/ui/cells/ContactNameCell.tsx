@@ -32,11 +32,12 @@ export function ContactNameCell({
   const name = contactFullName(contact)
   const missingHint = labels?.missing(missingContactFields(contact)) ?? null
 
-  const nameText: ReactNode = actions?.onOpen ? (
+  const openRecord = actions?.onViewRecord ?? actions?.onOpen
+  const nameText: ReactNode = openRecord ? (
     <PillButton
       variant="ghost"
       size="sm"
-      onClick={() => actions.onOpen?.(contact)}
+      onClick={() => openRecord(contact)}
       className={cn(
         'h-auto min-w-0 justify-start rounded-sm p-0 hover:bg-transparent hover:underline',
         CONTACT_NAME_TEXT,

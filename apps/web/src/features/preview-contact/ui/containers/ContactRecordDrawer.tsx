@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 
 import { useContactTimeline } from '@/entities/contact'
 import { useTagCatalog } from '@/entities/tag'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { ArrowRightIcon } from '@/shared/ui/icons'
 import {
   buildRecordDrawerLabels,
   RecordDrawer,
@@ -75,6 +77,14 @@ export function ContactRecordDrawer({
           tagsByName={tagsByName}
         />
       </RecordDrawer.Body>
+      {actions.onViewRecord ? (
+        <RecordDrawer.Footer>
+          <PillButton size="sm" className="w-full" onClick={() => actions.onViewRecord?.(contact)}>
+            {t('contacts.rowActions.viewRecord')}
+            <ArrowRightIcon className="size-4" />
+          </PillButton>
+        </RecordDrawer.Footer>
+      ) : null}
     </RecordDrawer>
   )
 }

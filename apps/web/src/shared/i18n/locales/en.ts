@@ -795,6 +795,7 @@ const en = {
       addTag: 'Add tag',
     },
     rowActions: {
+      viewRecord: 'View record',
       preview: 'Quick view',
       call: 'Call',
       whatsapp: 'Open WhatsApp',

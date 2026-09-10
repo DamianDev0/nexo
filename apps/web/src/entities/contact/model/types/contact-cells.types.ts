@@ -56,6 +56,7 @@ export type NotesCellLabels = {
 }
 
 export type RowMenuLabels = {
+  readonly viewRecord: string
   readonly open: string
   readonly call: string
   readonly sms: string
@@ -120,6 +121,7 @@ export type ContactCellLabels = {
 }
 
 export type ContactNameActions = {
+  readonly onViewRecord?: (contact: ContactListItem) => void
   readonly onOpen?: (contact: ContactListItem) => void
   readonly onPreview?: (contact: ContactListItem) => void
   readonly onAddNote?: (contact: ContactListItem) => void

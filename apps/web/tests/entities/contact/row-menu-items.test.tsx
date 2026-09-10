@@ -19,6 +19,7 @@ const LABELS = {
   tags: { title: 'Etiquetas', count: (total: number) => `${total}` },
   notes: { title: 'Notas' },
   menu: {
+    viewRecord: 'Ver registro',
     open: 'Abrir y editar',
     call: 'Llamar',
     sms: 'Enviar SMS',
@@ -41,13 +42,22 @@ describe('buildRowMenuItems', () => {
 
   it('lists every action the row can actually perform', () => {
     const actions: ContactRowActions = {
+      onViewRecord: vi.fn(),
       onOpen: vi.fn(),
       onCall: vi.fn(),
       onCompose: vi.fn(),
       onLogActivity: vi.fn(),
     }
 
-    expect(idsFor(actions)).toEqual(['open', 'call', 'sms', 'email', 'task', 'meeting'])
+    expect(idsFor(actions)).toEqual([
+      'viewRecord',
+      'open',
+      'call',
+      'sms',
+      'email',
+      'task',
+      'meeting',
+    ])
   })
 
   it('drops channels the contact cannot be reached on', () => {

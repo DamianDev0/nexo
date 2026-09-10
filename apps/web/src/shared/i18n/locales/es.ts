@@ -802,6 +802,7 @@ const es = {
       addTag: 'Agregar etiqueta',
     },
     rowActions: {
+      viewRecord: 'Ver registro',
       preview: 'Vista rápida',
       call: 'Llamar',
       whatsapp: 'Abrir WhatsApp',

@@ -1,6 +1,7 @@
 import {
   CalendarBlankIcon,
   ChatTextIcon,
+  ArrowRightIcon,
   CheckSquareIcon,
   EnvelopeSimpleIcon,
   PencilSimpleIcon,
@@ -22,6 +23,14 @@ export function buildRowMenuItems(
   const phone = contact.phone ?? contact.whatsapp
   const items: ActionMenuItem[] = []
 
+  if (actions.onViewRecord) {
+    items.push({
+      id: 'viewRecord',
+      label: menu.viewRecord,
+      icon: <ArrowRightIcon />,
+      onClick: () => actions.onViewRecord?.(contact),
+    })
+  }
   if (actions.onOpen) {
     items.push({
       id: 'open',
