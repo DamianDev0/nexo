@@ -4,41 +4,42 @@ import { CONTACTS_FIXTURE } from '../../msw/handlers'
 
 import type { TFunction } from 'i18next'
 
-import { buildEngagementRows } from '@/views/contact-detail/lib/build-engagement-rows'
+import { buildAttributionRows } from '@/views/contact-detail/lib/build-attribution-rows'
 
 const t = ((key: string) => key) as TFunction
 const CONTACT = CONTACTS_FIXTURE[0]!
 
 function rowsFor(overrides = {}) {
-  const rows = buildEngagementRows(t, { ...CONTACT, ...overrides }, 'es')
+  const rows = buildAttributionRows(t, { ...CONTACT, ...overrides }, 'es')
   return new Map(rows.map((row) => [row.key, row.value]))
 }
 
-describe('buildEngagementRows', () => {
-  it('reports every engagement field the tab shows', () => {
-    expect([...rowsFor().keys()]).toEqual(['lifecycle', 'owner', 'lastContacted', 'createdAt'])
+describe('buildAttributionRows', () => {
+  it('reports where the contact came from and who owns it', () => {
+    expect([...rowsFor().keys()]).toEqual(['source', 'owner', 'lastContacted', 'createdAt'])
   })
 
   it('names the owner when the contact has one', () => {
     expect(rowsFor({ assignedToName: 'Ana Guerrero' }).get('owner')).toBe('Ana Guerrero')
   })
 
-  it('says unassigned when nobody owns the contact', () => {
-    expect(rowsFor({ assignedToName: null }).get('owner')).toBe(
-      'contacts.detail.engagement.unassigned',
-    )
+  it('falls back to a placeholder for an unowned, unsourced contact', () => {
+    const rows = rowsFor({ assignedToName: null, source: null })
+
+    expect(rows.get('owner')).toBe('contacts.detail.attribution.unassigned')
+    expect(rows.get('source')).toBe('contacts.detail.attribution.noSource')
   })
 
   it('says never when the contact was never contacted', () => {
     expect(rowsFor({ lastContactedAt: null }).get('lastContacted')).toBe(
-      'contacts.detail.engagement.never',
+      'contacts.detail.attribution.never',
     )
   })
 
   it('renders a relative time once the contact has been reached', () => {
     const value = rowsFor({ lastContactedAt: new Date().toISOString() }).get('lastContacted')
 
-    expect(value).not.toBe('contacts.detail.engagement.never')
+    expect(value).not.toBe('contacts.detail.attribution.never')
     expect(value).toBeTruthy()
   })
 })

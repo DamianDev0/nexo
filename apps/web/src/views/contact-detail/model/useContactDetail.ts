@@ -33,15 +33,13 @@ export function useContactDetail(contactId: string) {
       buildDetailRailItems(
         t,
         {
-          activity: feed.activities.length,
           notes: groups.notes.length,
           tasks: groups.tasks.length,
           meetings: groups.meetings.length,
-          tags: contact?.tags.length ?? 0,
         },
         DETAIL_PANELS,
       ),
-    [t, feed.activities.length, groups, contact],
+    [t, groups],
   )
 
   return {

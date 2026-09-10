@@ -1027,18 +1027,23 @@ const es = {
     detail: {
       back: 'Volver a contactos',
       closePanel: 'Cerrar panel',
-      summary: 'Resumen',
       tabs: {
         details: 'Detalles',
-        engagement: 'Interacción',
+        activity: 'Actividad',
       },
-      engagement: {
-        lifecycle: 'Ciclo de vida',
+      sections: {
+        tags: 'Etiquetas',
+        attribution: 'Atribución',
+        doNotContact: 'No contactar',
+      },
+      attribution: {
+        source: 'Origen',
         owner: 'Responsable',
         unassigned: 'Sin responsable',
         createdAt: 'Creado',
         lastContacted: 'Último contacto',
         never: 'Nunca',
+        noSource: 'Sin origen',
       },
       notFound: {
         title: 'No encontramos este contacto',

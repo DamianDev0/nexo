@@ -1020,18 +1020,23 @@ const en = {
     detail: {
       back: 'Back to contacts',
       closePanel: 'Close panel',
-      summary: 'Summary',
       tabs: {
         details: 'Details',
-        engagement: 'Engagement',
+        activity: 'Activity',
       },
-      engagement: {
-        lifecycle: 'Lifecycle stage',
+      sections: {
+        tags: 'Tags',
+        attribution: 'Attribution',
+        doNotContact: 'Do not contact',
+      },
+      attribution: {
+        source: 'Source',
         owner: 'Owner',
         unassigned: 'Unassigned',
         createdAt: 'Created',
         lastContacted: 'Last contacted',
         never: 'Never',
+        noSource: 'No source',
       },
       notFound: {
         title: 'We could not find this contact',

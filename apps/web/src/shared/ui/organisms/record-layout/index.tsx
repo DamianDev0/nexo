@@ -12,7 +12,7 @@ import { RecordLayoutRail } from './rail'
 import type { CSSProperties, ReactNode } from 'react'
 
 const SIZES = {
-  '--record-aside-width': '360px',
+  '--record-aside-width': '400px',
   '--record-panel-width': '380px',
   '--record-rail-width': '56px',
 } as CSSProperties

@@ -4,32 +4,32 @@ import type { FieldRow } from '@/shared/ui/organisms/record-drawer'
 import type { ContactListItem } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
-export function buildEngagementRows(
+export function buildAttributionRows(
   t: TFunction,
   contact: ContactListItem,
   locale: string,
 ): ReadonlyArray<FieldRow> {
   return [
     {
-      key: 'lifecycle',
-      label: t('contacts.detail.engagement.lifecycle'),
-      value: contact.lifecycleStage,
+      key: 'source',
+      label: t('contacts.detail.attribution.source'),
+      value: contact.source ?? t('contacts.detail.attribution.noSource'),
     },
     {
       key: 'owner',
-      label: t('contacts.detail.engagement.owner'),
-      value: contact.assignedToName ?? t('contacts.detail.engagement.unassigned'),
+      label: t('contacts.detail.attribution.owner'),
+      value: contact.assignedToName ?? t('contacts.detail.attribution.unassigned'),
     },
     {
       key: 'lastContacted',
-      label: t('contacts.detail.engagement.lastContacted'),
+      label: t('contacts.detail.attribution.lastContacted'),
       value: contact.lastContactedAt
         ? timeAgo(contact.lastContactedAt, locale)
-        : t('contacts.detail.engagement.never'),
+        : t('contacts.detail.attribution.never'),
     },
     {
       key: 'createdAt',
-      label: t('contacts.detail.engagement.createdAt'),
+      label: t('contacts.detail.attribution.createdAt'),
       value: timeAgo(contact.createdAt, locale),
     },
   ]

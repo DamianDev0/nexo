@@ -69,7 +69,7 @@ export function RecordDrawerQuickActions({
       role="toolbar"
       aria-label={label}
       data-slot="record-drawer-quick-actions"
-      className="flex items-center gap-2 px-4 py-3"
+      className="flex items-center gap-1.5 px-4 py-3"
     >
       {items.map((action) => (
         <QuickActionButton key={action.id} action={action} tone="default" />
