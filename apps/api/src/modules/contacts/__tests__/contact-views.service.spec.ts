@@ -98,8 +98,10 @@ describe('ContactViewsService', () => {
   })
 
   it('writes one position per id on reorder scoped to the owner', async () => {
-    qr.query.mockResolvedValue([])
     const ids = ['a67c2f4e-4444-4f2c-b6d8-e4a67c056f04', 'a67c2f4e-5555-4f2c-b6d8-e4a67c056f05']
+    qr.query.mockImplementation((_sql: string, params: unknown[]) =>
+      Promise.resolve([{ id: params[0] }]),
+    )
 
     await service.reorder(SCHEMA, OWNER, { ids })
 
@@ -107,6 +109,14 @@ describe('ContactViewsService', () => {
     const [sql, params] = qr.query.mock.calls[1] as [string, unknown[]]
     expect(sql).toContain('owner_id = $2')
     expect(params).toEqual([ids[1], OWNER, 1])
+  })
+
+  it('rejects a reorder that names a view the user does not own', async () => {
+    qr.query.mockResolvedValue([])
+
+    await expect(
+      service.reorder(SCHEMA, OWNER, { ids: ['a67c2f4e-6666-4f2c-b6d8-e4a67c056f06'] }),
+    ).rejects.toThrow(NotFoundException)
   })
 
   it('throws when deleting a view the user does not own', async () => {

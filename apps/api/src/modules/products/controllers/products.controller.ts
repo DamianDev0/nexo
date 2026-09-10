@@ -163,8 +163,11 @@ export class ProductsController {
   })
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  analyzeImport(@UploadedFile() file: Express.Multer.File): Promise<AnalyzeResult> {
-    return this.importExportService.analyzeImport(file)
+  analyzeImport(
+    @UploadedFile() file: Express.Multer.File,
+    @TenantCtx() ctx: TenantContext,
+  ): Promise<AnalyzeResult> {
+    return this.importExportService.analyzeImport(ctx.schemaName, file)
   }
 
   @Post('import/execute')

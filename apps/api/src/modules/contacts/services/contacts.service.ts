@@ -204,7 +204,7 @@ export class ContactsService {
       await this.duplicates.assertNoDuplicates(qr, dto, { force, excludeId: contactId })
 
       const sanitized =
-        dto.tags === undefined ? dto : { ...dto, tags: await this.resolveTags(qr, dto.tags) }
+        dto.tags === undefined ? dto : { ...dto, tags: await this.resolveTags(qr, dto.tags ?? []) }
       const changes = this.buildUpdateChanges(sanitized)
       if (!changes.length) return this.fetchContactOrFail(qr, contactId)
 
@@ -328,15 +328,16 @@ export class ContactsService {
   }
 
   private assertTaxonomyKeys(dto: UpdateContactDto, taxonomy: ContactTaxonomy): void {
-    const checks: Array<[string | null | undefined, keyof ContactTaxonomy]> = [
-      [dto.status, 'statuses'],
-      [dto.source, 'sources'],
-      [dto.lifecycleStage, 'lifecycleStages'],
+    const checks: Array<[string | null | undefined, keyof ContactTaxonomy, boolean]> = [
+      [dto.status, 'statuses', false],
+      [dto.source, 'sources', true],
+      [dto.lifecycleStage, 'lifecycleStages', false],
     ]
 
     const invalid = checks
-      .filter(([value, kind]) => {
-        if (value === undefined || value === null) return false
+      .filter(([value, kind, clearable]) => {
+        if (value === undefined) return false
+        if (value === null) return !clearable
         return !taxonomy[kind].some((option) => option.enabled && option.key === value)
       })
       .map(([value, kind]) => `${kind}: ${value}`)

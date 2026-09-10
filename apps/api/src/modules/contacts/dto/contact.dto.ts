@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsEmail,
   IsEnum,
@@ -26,6 +27,7 @@ import type { DuplicateStrategy } from '@repo/shared-types'
 import { DocumentType, CONTACT_SORT_FIELDS, TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
 import type { ContactSortField, TaxonomyReassignKind } from '@repo/shared-types'
 import { TaggedPaginationQueryDto } from '@/shared/dto/tagged-pagination-query.dto'
+import { IsOptionalNotNull } from '@/shared/decorators/is-optional-not-null.decorator'
 
 export class CreateContactDto {
   @ApiProperty()
@@ -80,7 +82,7 @@ export class CreateContactDto {
   municipioCode?: string
 
   @ApiPropertyOptional({ description: 'Tenant taxonomy status key' })
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsString()
   @Matches(TAXONOMY_KEY_PATTERN)
   status?: string
@@ -93,13 +95,14 @@ export class CreateContactDto {
   source?: string | null
 
   @ApiPropertyOptional({ description: 'Tenant taxonomy lifecycle stage key' })
-  @IsOptional()
+  @IsOptionalNotNull()
   @IsString()
   @Matches(TAXONOMY_KEY_PATTERN)
   lifecycleStage?: string
 
   @ApiPropertyOptional({ type: [String] })
-  @IsOptional()
+  @IsOptionalNotNull()
+  @IsArray()
   @IsString({ each: true })
   tags?: string[]
 

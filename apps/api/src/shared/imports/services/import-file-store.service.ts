@@ -19,22 +19,26 @@ export class ImportFileStoreService implements OnModuleDestroy {
     this.store.clear()
   }
 
-  storeFile(buffer: Buffer, fileName: string): string {
+  storeFile(buffer: Buffer, fileName: string, scope: string): string {
     const fileId = randomUUID()
-    this.store.set(fileId, { buffer, fileName, expiresAt: Date.now() + FILE_TTL_MS })
+    this.store.set(fileId, { buffer, fileName, scope, expiresAt: Date.now() + FILE_TTL_MS })
     return fileId
   }
 
-  getFile(fileId: string): StoredFile {
+  getFile(fileId: string, scope: string): StoredFile {
     const stored = this.store.get(fileId)
     if (!stored || stored.expiresAt < Date.now()) {
       this.store.delete(fileId)
       throw new BadRequestException('The uploaded file has expired. Please upload again.')
     }
+    if (stored.scope !== scope) {
+      throw new BadRequestException('The uploaded file has expired. Please upload again.')
+    }
     return stored
   }
 
-  removeFile(fileId: string): void {
+  removeFile(fileId: string, scope: string): void {
+    if (this.store.get(fileId)?.scope !== scope) return
     this.store.delete(fileId)
   }
 

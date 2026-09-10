@@ -146,17 +146,19 @@ export class ContactViewsRepository {
     return rows[0]!
   }
 
-  async reorderOwned(schemaName: string, userId: string, ids: string[]): Promise<void> {
-    await this.db.transactional(schemaName, async (qr) => {
-      await Promise.all(
+  async reorderOwned(schemaName: string, userId: string, ids: string[]): Promise<number> {
+    return this.db.transactional(schemaName, async (qr): Promise<number> => {
+      const updated = await Promise.all(
         ids.map((id, index) =>
-          qr.query(
-            `UPDATE contact_views SET position = $3, updated_at = NOW()
-             WHERE id = $1 AND owner_id = $2`,
+          sqlRows<Array<{ id: string }>>(
+            qr,
+            `UPDATE contact_views SET position = $3::int, updated_at = NOW()
+             WHERE id = $1 AND owner_id = $2 RETURNING id`,
             [id, userId, index],
           ),
         ),
       )
+      return updated.filter((rows) => rows.length > 0).length
     })
   }
 

@@ -38,13 +38,16 @@ export class ProductImportExportService {
     return this.csvExport.toBuffer(rows, CSV_COLUMNS)
   }
 
-  async analyzeImport(file: {
-    buffer: Buffer
-    originalname: string
-    mimetype: string
-    size: number
-  }): Promise<AnalyzeResult> {
-    return this.importService.analyze(file, productImportMapper)
+  async analyzeImport(
+    schemaName: string,
+    file: {
+      buffer: Buffer
+      originalname: string
+      mimetype: string
+      size: number
+    },
+  ): Promise<AnalyzeResult> {
+    return this.importService.analyze(file, productImportMapper, schemaName)
   }
 
   async executeImport(
@@ -58,6 +61,7 @@ export class ProductImportExportService {
       fileId,
       mapping,
       productImportMapper,
+      schemaName,
     )
 
     let skipped = 0

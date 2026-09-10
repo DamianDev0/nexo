@@ -104,7 +104,10 @@ export class ContactViewsService {
   }
 
   async reorder(schemaName: string, userId: string, dto: ReorderContactViewsDto): Promise<void> {
-    await this.repository.reorderOwned(schemaName, userId, dto.ids)
+    const reordered = await this.repository.reorderOwned(schemaName, userId, dto.ids)
+    if (reordered !== dto.ids.length) {
+      throw new NotFoundException('One or more contact views were not found')
+    }
   }
 
   async remove(schemaName: string, userId: string, viewId: string): Promise<void> {

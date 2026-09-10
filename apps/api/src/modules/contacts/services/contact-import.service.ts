@@ -30,16 +30,26 @@ export class ContactImportService {
     private readonly importService: ImportService,
   ) {}
 
-  async analyze(file: UploadedImportFile, customFields: FieldDef[] = []): Promise<AnalyzeResult> {
-    return this.importService.analyze(file, contactImportMapperFor(customFields))
+  async analyze(
+    schemaName: string,
+    file: UploadedImportFile,
+    customFields: FieldDef[] = [],
+  ): Promise<AnalyzeResult> {
+    return this.importService.analyze(file, contactImportMapperFor(customFields), schemaName)
   }
 
   async preview(
+    schemaName: string,
     fileId: string,
     mapping: Mapping,
     customFields: FieldDef[] = [],
   ): Promise<ValidationPreview> {
-    return this.importService.preview(fileId, mapping, contactImportMapperFor(customFields))
+    return this.importService.preview(
+      fileId,
+      mapping,
+      contactImportMapperFor(customFields),
+      schemaName,
+    )
   }
 
   async validate(
@@ -49,7 +59,7 @@ export class ContactImportService {
     taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
     customFields: FieldDef[] = [],
   ): Promise<ValidationReport> {
-    const rows = await this.readRows(fileId, mapping, customFields)
+    const rows = await this.readRows(schemaName, fileId, mapping, customFields)
 
     return this.db.query(schemaName, async (qr): Promise<ValidationReport> => {
       const catalog = await this.repository.findEnabledTagNames(qr)
@@ -80,7 +90,7 @@ export class ContactImportService {
     taxonomy: ContactTaxonomy = DEFAULT_CONTACT_TAXONOMY,
     customFields: FieldDef[] = [],
   ): Promise<ImportResult> {
-    const rows = await this.readRows(fileId, mapping, customFields)
+    const rows = await this.readRows(schemaName, fileId, mapping, customFields)
 
     try {
       return await this.db.transactional(schemaName, async (qr): Promise<ImportResult> => {
@@ -104,11 +114,12 @@ export class ContactImportService {
         }
       })
     } finally {
-      this.importService.release(fileId)
+      this.importService.release(fileId, schemaName)
     }
   }
 
   private async readRows(
+    schemaName: string,
     fileId: string,
     mapping: Mapping,
     customFields: FieldDef[],
@@ -117,6 +128,7 @@ export class ContactImportService {
       fileId,
       mapping,
       contactImportMapperFor(customFields),
+      schemaName,
     )
     return rows
   }

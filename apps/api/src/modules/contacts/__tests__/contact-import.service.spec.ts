@@ -63,7 +63,7 @@ describe('ContactImportService', () => {
     const result = await execute([row({ firstName: 'Ana', email: 'ana@empresa.co' })])
 
     expect(result).toEqual({ imported: 1, updated: 0, skipped: 0, errors: [] })
-    expect(importService.release).toHaveBeenCalledWith(FILE_ID)
+    expect(importService.release).toHaveBeenCalledWith(FILE_ID, SCHEMA)
   })
 
   it('releases the uploaded file even when the import blows up', async () => {
@@ -74,7 +74,7 @@ describe('ContactImportService', () => {
     repository.findEnabledTagNames.mockRejectedValue(new Error('db down'))
 
     await expect(service.execute(SCHEMA, FILE_ID, {}, 'skip', USER)).rejects.toThrow('db down')
-    expect(importService.release).toHaveBeenCalledWith(FILE_ID)
+    expect(importService.release).toHaveBeenCalledWith(FILE_ID, SCHEMA)
   })
 
   it('keeps the file after validating so the user can still import it', async () => {

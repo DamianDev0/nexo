@@ -34,5 +34,6 @@ export interface UploadedImportFile {
 export interface StoredFile {
   buffer: Buffer
   fileName: string
+  scope: string
   expiresAt: number
 }

@@ -70,7 +70,11 @@ export class ContactsController {
     @UploadedFile() file: Express.Multer.File,
     @TenantCtx() ctx: TenantContext,
   ): Promise<AnalyzeResult> {
-    return this.importService.analyze(file, await this.contactCustomFields(ctx.tenantId))
+    return this.importService.analyze(
+      ctx.schemaName,
+      file,
+      await this.contactCustomFields(ctx.tenantId),
+    )
   }
 
   @Post('import/preview')
@@ -83,6 +87,7 @@ export class ContactsController {
     @TenantCtx() ctx: TenantContext,
   ): Promise<ValidationPreview> {
     return this.importService.preview(
+      ctx.schemaName,
       dto.fileId,
       dto.mapping ?? {},
       await this.contactCustomFields(ctx.tenantId),
