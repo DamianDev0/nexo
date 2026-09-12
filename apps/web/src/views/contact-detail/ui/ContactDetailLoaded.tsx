@@ -18,7 +18,8 @@ type ContactDetailLoadedProps = {
 }
 
 export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailLoadedProps>) {
-  const { taxonomy, actions, activities, tagsByName, composers, rail, panelRoute, tabs } = detail
+  const { taxonomy, actions, activities, deals, tagsByName, composers, rail, panelRoute, tabs } =
+    detail
   const record = useContactRecord({ contact, taxonomy, actions })
   useBreadcrumbTail(record.name)
 
@@ -31,7 +32,7 @@ export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailL
         onAssign={actions.onAssign}
       />
       <ContactDetailMain contact={contact} record={record} tabs={tabs} activities={activities} />
-      <ContactDetailPanels activities={activities} add={record.add} />
+      <ContactDetailPanels activities={activities} add={record.add} deals={deals} />
       <RecordLayout.Rail items={rail} />
       <ContactComposerHost composers={composers} />
     </RecordLayout>

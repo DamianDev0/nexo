@@ -1,4 +1,4 @@
-export const DETAIL_PANELS = ['notes', 'tasks', 'meetings'] as const
+export const DETAIL_PANELS = ['notes', 'tasks', 'meetings', 'deals'] as const
 
 export type DetailPanelId = (typeof DETAIL_PANELS)[number]
 

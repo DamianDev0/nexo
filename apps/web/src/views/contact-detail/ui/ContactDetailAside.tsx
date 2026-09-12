@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 
+import { ContactCompanySection } from '@/features/link-contact-company'
 import { ContactConsentsSection } from '@/features/manage-contact-consents'
 import { ContactOwnerPicker, ContactRecordHeader } from '@/features/preview-contact'
 import { ROUTES } from '@/shared/config/routes'
@@ -70,6 +71,10 @@ export function ContactDetailAside({
               <Text variant="muted">{t('contacts.preview.empty.tags')}</Text>
             ) : null}
           </span>
+        </RecordDrawer.Section>
+
+        <RecordDrawer.Section id="company" title={t('contacts.detail.sections.company')}>
+          <ContactCompanySection contactId={contact.id} companyId={contact.companyId} />
         </RecordDrawer.Section>
 
         <RecordDrawer.Section id="attribution" title={t('contacts.detail.sections.attribution')}>

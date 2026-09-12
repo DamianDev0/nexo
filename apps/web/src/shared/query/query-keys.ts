@@ -26,6 +26,15 @@ export const QUERY_KEYS = {
         ? (['contacts', 'timeline', id] as const)
         : (['contacts', 'timeline', id, limit] as const),
   },
+  companies: {
+    all: ['companies'] as const,
+    search: (term: string) => ['companies', 'search', term] as const,
+    summary: (id: string) => ['companies', 'summary', id] as const,
+  },
+  deals: {
+    all: ['deals'] as const,
+    byContact: (contactId: string) => ['deals', 'by-contact', contactId] as const,
+  },
   team: {
     members: ['team', 'members'] as const,
   },

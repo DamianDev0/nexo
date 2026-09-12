@@ -7,7 +7,7 @@ import { buildDetailRailItems } from '@/views/contact-detail/lib/build-rail-item
 
 const t = ((key: string) => key) as TFunction
 
-const COUNTS = { notes: 2, tasks: 0, meetings: 1 }
+const COUNTS = { notes: 2, tasks: 0, meetings: 1, deals: 3 }
 
 describe('buildDetailRailItems', () => {
   it('builds one item per panel, in the order the rail declares', () => {
@@ -28,6 +28,7 @@ describe('buildDetailRailItems', () => {
 
     expect(byId.get('notes')).toBe(2)
     expect(byId.get('meetings')).toBe(1)
+    expect(byId.get('deals')).toBe(3)
   })
 
   it('hides the badge on an empty panel instead of showing a zero', () => {

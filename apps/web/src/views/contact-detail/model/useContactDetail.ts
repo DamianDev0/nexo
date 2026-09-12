@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useContact, useContactTimeline } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
+import { openDealCount, useContactDeals } from '@/entities/deal'
 import { useTagCatalog } from '@/entities/tag'
 import { useContactComposers } from '@/features/compose-contact-actions'
 import { groupContactActivities } from '@/features/preview-contact'
@@ -27,6 +28,7 @@ export function useContactDetail(contactId: string) {
   const composers = useContactComposers()
   const actions = useContactDetailActions(composers)
   const feed = useContactTimeline(contactId, true)
+  const deals = useContactDeals(contactId)
   const tagsByName = useTagCatalog('contact')
   const { contact } = query
 
@@ -40,10 +42,11 @@ export function useContactDetail(contactId: string) {
           notes: groups.notes.length,
           tasks: groups.tasks.length,
           meetings: groups.meetings.length,
+          deals: openDealCount(deals.deals),
         },
         DETAIL_PANELS,
       ),
-    [t, groups],
+    [t, groups, deals.deals],
   )
 
   return {
@@ -54,6 +57,7 @@ export function useContactDetail(contactId: string) {
     taxonomy,
     actions,
     activities: { feed, groups, onToggle: actions.onToggleActivity },
+    deals,
     tagsByName,
     composers,
     rail,

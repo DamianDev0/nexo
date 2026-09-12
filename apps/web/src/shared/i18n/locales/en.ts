@@ -425,6 +425,25 @@ const en = {
       emailBody: 'Activities get logged automatically on every contact.',
     },
   },
+  deals: {
+    status: {
+      open: 'Open',
+      on_hold: 'On hold',
+      won: 'Won',
+      lost: 'Lost',
+    },
+    noStage: 'No stage',
+    closes: 'Closes {{when}}',
+    openCount_one: '{{count}} open deal',
+    openCount_other: '{{count}} open deals',
+  },
+  companies: {
+    stats: {
+      contacts: 'Contacts',
+      openDeals: 'Deals',
+      pipeline: 'In pipeline',
+    },
+  },
   timePicker: {
     hours: 'Hours',
     minutes: 'Minutes',
@@ -1057,6 +1076,18 @@ const en = {
       blocked: '{{channel}} blocked by the contact',
       revokedHint: 'No reason on record',
     },
+    company: {
+      empty: 'No company linked',
+      link: 'Link a company',
+      search: 'Search by name or NIT…',
+      noResults: 'No company matches',
+      unlink: 'Unlink company',
+      linked: 'Company linked',
+      unlinked: 'Company unlinked',
+      error: "We couldn't load the company",
+      colleagues_one: '{{count}} more contact here',
+      colleagues_other: '{{count}} more contacts here',
+    },
     detail: {
       back: 'Back to contacts',
       closePanel: 'Close panel',
@@ -1066,6 +1097,7 @@ const en = {
       },
       sections: {
         tags: 'Tags',
+        company: 'Company',
         attribution: 'Attribution',
         doNotContact: 'Do not contact',
       },
@@ -1122,12 +1154,14 @@ const en = {
         notes: 'Notes',
         tasks: 'Tasks',
         meetings: 'Meetings',
+        deals: 'Deals',
         tags: 'Tags',
         doNotContact: 'Do not contact',
       },
       empty: {
         activity: 'No activity yet',
         notes: 'No notes yet',
+        deals: 'No deals with this contact',
         tasks: 'No pending tasks',
         meetings: 'No meetings scheduled',
         tags: 'No tags',

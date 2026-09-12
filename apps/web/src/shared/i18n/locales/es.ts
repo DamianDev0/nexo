@@ -428,6 +428,25 @@ const es = {
       emailBody: 'Las actividades se registran automáticamente en cada contacto.',
     },
   },
+  deals: {
+    status: {
+      open: 'Abierto',
+      on_hold: 'En pausa',
+      won: 'Ganado',
+      lost: 'Perdido',
+    },
+    noStage: 'Sin etapa',
+    closes: 'Cierra {{when}}',
+    openCount_one: '{{count}} negocio abierto',
+    openCount_other: '{{count}} negocios abiertos',
+  },
+  companies: {
+    stats: {
+      contacts: 'Contactos',
+      openDeals: 'Negocios',
+      pipeline: 'En pipeline',
+    },
+  },
   timePicker: {
     hours: 'Horas',
     minutes: 'Minutos',
@@ -1064,6 +1083,18 @@ const es = {
       blocked: '{{channel}} bloqueado por el contacto',
       revokedHint: 'Sin motivo registrado',
     },
+    company: {
+      empty: 'Sin empresa vinculada',
+      link: 'Vincular empresa',
+      search: 'Buscar por nombre o NIT…',
+      noResults: 'Ninguna empresa coincide',
+      unlink: 'Desvincular empresa',
+      linked: 'Empresa vinculada',
+      unlinked: 'Empresa desvinculada',
+      error: 'No pudimos cargar la empresa',
+      colleagues_one: '{{count}} contacto más aquí',
+      colleagues_other: '{{count}} contactos más aquí',
+    },
     detail: {
       back: 'Volver a contactos',
       closePanel: 'Cerrar panel',
@@ -1073,6 +1104,7 @@ const es = {
       },
       sections: {
         tags: 'Etiquetas',
+        company: 'Empresa',
         attribution: 'Atribución',
         doNotContact: 'No contactar',
       },
@@ -1129,12 +1161,14 @@ const es = {
         notes: 'Notas',
         tasks: 'Tareas',
         meetings: 'Reuniones',
+        deals: 'Negocios',
         tags: 'Etiquetas',
         doNotContact: 'No contactar',
       },
       empty: {
         activity: 'Sin actividad registrada',
         notes: 'Sin notas todavía',
+        deals: 'Sin negocios con este contacto',
         tasks: 'Sin tareas pendientes',
         meetings: 'Sin reuniones agendadas',
         tags: 'Sin etiquetas',
