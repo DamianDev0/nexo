@@ -14,6 +14,7 @@ function activity(overrides: Partial<ContactActivity>): ContactActivity {
     completedAt: null,
     status: 'pending',
     priority: 'normal',
+    durationMinutes: null,
     assignedToId: null,
     createdById: null,
     createdAt: '2026-09-01T00:00:00.000Z',

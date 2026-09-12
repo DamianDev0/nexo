@@ -71,9 +71,24 @@ test('docks a different panel from the rail', async ({ page }) => {
 
   await rail.getByRole('button', { name: /tareas|tasks/i }).click()
   await expect(panel.getByText('Enviar propuesta')).toBeVisible()
+  await expect(page).toHaveURL(/[?&]panel=tasks/)
 
   await panel.getByRole('button', { name: /cerrar panel|close panel/i }).click()
   await expect(page.locator('[data-slot="record-layout-panel"]')).toHaveCount(0)
+  await expect(page).toHaveURL(/[?&]panel=none/)
+})
+
+test('reopens the panel the link was shared with', async ({ page }) => {
+  await page.goto(`/contacts/${contactId}?panel=meetings`)
+  await page.evaluate(() => document.querySelector('nextjs-portal')?.remove())
+
+  const panel = page.locator('[data-slot="record-layout-panel"]')
+  await expect(panel.getByRole('button', { name: /cerrar panel|close panel/i })).toBeVisible()
+  await expect(
+    page.locator('[data-slot="record-layout-rail"]').getByRole('button', {
+      name: /reuniones|meetings/i,
+    }),
+  ).toHaveAttribute('aria-pressed', 'true')
 })
 
 test('switches the workspace tab without leaving the record', async ({ page }) => {

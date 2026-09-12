@@ -1,4 +1,4 @@
-import { contactDialNumber } from '@/entities/contact'
+import { contactDialNumber, isChannelBlocked } from '@/entities/contact'
 import {
   CalendarBlankIcon,
   ChatTextIcon,
@@ -15,7 +15,7 @@ import {
 import type { ContactRowActions } from '@/entities/contact'
 import type { ActionMenuItem } from '@/shared/ui/molecules/action-menu'
 import type { QuickAction } from '@/shared/ui/organisms/record-drawer'
-import type { ContactListItem } from '@repo/shared-types'
+import type { ConsentChannel, ContactListItem } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
 export type ContactQuickActions = {
@@ -31,6 +31,12 @@ function missingReason(t: TFunction, fieldKey: string): string {
   return t('contacts.completeness.field', { field: t(fieldKey).toLocaleLowerCase() })
 }
 
+function blockedReason(t: TFunction, channel: ConsentChannel): string {
+  return t('contacts.consents.blocked', {
+    channel: t(`contacts.preview.optedOut.${channel}`),
+  })
+}
+
 export function buildContactQuickActions(
   t: TFunction,
   contact: ContactListItem,
@@ -42,8 +48,12 @@ export function buildContactQuickActions(
       id: 'call',
       label: t('contacts.preview.quickActions.call'),
       icon: <PhoneIcon />,
-      disabled: number === null || !actions.onCall,
-      reason: number === null ? missingReason(t, 'contacts.form.phone') : undefined,
+      disabled: number === null || isChannelBlocked(contact, 'call') || !actions.onCall,
+      reason: isChannelBlocked(contact, 'call')
+        ? blockedReason(t, 'call')
+        : number === null
+          ? missingReason(t, 'contacts.form.phone')
+          : undefined,
       onClick: () => {
         if (number !== null) actions.onCall?.(contactDialNumber(number))
       },
@@ -52,16 +62,24 @@ export function buildContactQuickActions(
       id: 'whatsapp',
       label: t('contacts.preview.quickActions.whatsapp'),
       icon: <WhatsappLogoIcon />,
-      disabled: number === null || !actions.onCompose,
-      reason: number === null ? missingReason(t, 'contacts.form.whatsapp') : undefined,
+      disabled: number === null || isChannelBlocked(contact, 'whatsapp') || !actions.onCompose,
+      reason: isChannelBlocked(contact, 'whatsapp')
+        ? blockedReason(t, 'whatsapp')
+        : number === null
+          ? missingReason(t, 'contacts.form.whatsapp')
+          : undefined,
       onClick: () => actions.onCompose?.('whatsapp', contact),
     },
     {
       id: 'email',
       label: t('contacts.preview.quickActions.email'),
       icon: <EnvelopeSimpleIcon />,
-      disabled: !contact.email || !actions.onCompose,
-      reason: contact.email ? undefined : missingReason(t, 'contacts.form.email'),
+      disabled: !contact.email || isChannelBlocked(contact, 'email') || !actions.onCompose,
+      reason: isChannelBlocked(contact, 'email')
+        ? blockedReason(t, 'email')
+        : contact.email
+          ? undefined
+          : missingReason(t, 'contacts.form.email'),
       onClick: () => actions.onCompose?.('email', contact),
     },
     {
@@ -99,7 +117,7 @@ export function buildContactQuickActions(
       id: 'sms',
       label: t('contacts.preview.quickActions.sms'),
       icon: <ChatTextIcon />,
-      disabled: !contact.phone || !actions.onCompose,
+      disabled: !contact.phone || isChannelBlocked(contact, 'sms') || !actions.onCompose,
       onClick: () => actions.onCompose?.('sms', contact),
     },
     {

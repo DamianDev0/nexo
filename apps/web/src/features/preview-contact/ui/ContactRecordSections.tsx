@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { ContactConsentsSection } from '@/features/manage-contact-consents'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { Chip } from '@/shared/ui/atoms/chip'
 import { Text } from '@/shared/ui/atoms/text'
@@ -130,17 +131,7 @@ export function ContactRecordSections({
             ) : undefined,
         }}
       >
-        {optedOut.length === 0 ? (
-          <Text variant="muted">{t('contacts.preview.empty.doNotContact')}</Text>
-        ) : (
-          <span className="flex flex-wrap gap-1.5">
-            {optedOut.map((channel) => (
-              <BadgeSoft key={channel} tone="negative">
-                {t(`contacts.preview.optedOut.${channel}`)}
-              </BadgeSoft>
-            ))}
-          </span>
-        )}
+        <ContactConsentsSection contactId={contact.id} />
       </RecordDrawer.Section>
     </RecordDrawer.Sections>
   )

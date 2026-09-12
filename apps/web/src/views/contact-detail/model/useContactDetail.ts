@@ -9,10 +9,11 @@ import { useTagCatalog } from '@/entities/tag'
 import { useContactComposers } from '@/features/compose-contact-actions'
 import { groupContactActivities } from '@/features/preview-contact'
 
-import { DETAIL_PANELS, DEFAULT_DETAIL_PANEL } from '../config/detail-panels.constants'
+import { DETAIL_PANELS } from '../config/detail-panels.constants'
 import { buildDetailRailItems } from '../lib/build-rail-items'
 
 import { useContactDetailActions } from './useContactDetailActions'
+import { usePanelRoute } from './usePanelRoute'
 
 import type { DetailTabId } from '../config/detail-panels.constants'
 
@@ -20,6 +21,7 @@ export function useContactDetail(contactId: string) {
   const { t } = useTranslation()
   const [tab, setTab] = useState<DetailTabId>('details')
 
+  const panelRoute = usePanelRoute()
   const query = useContact(contactId)
   const taxonomy = useContactTaxonomy()
   const composers = useContactComposers()
@@ -55,7 +57,7 @@ export function useContactDetail(contactId: string) {
     tagsByName,
     composers,
     rail,
-    defaultPanel: DEFAULT_DETAIL_PANEL,
+    panelRoute,
     tabs: { active: tab, select: setTab },
   }
 }

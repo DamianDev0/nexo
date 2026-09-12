@@ -23,11 +23,11 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 const onAction = fn()
 
 const RAIL = [
-  { id: 'notes', label: 'Notas', icon: <NotePencilIcon className="size-4" />, count: 2 },
-  { id: 'tasks', label: 'Tareas', icon: <CheckSquareIcon className="size-4" />, count: 2 },
-  { id: 'agenda', label: 'Agenda', icon: <CalendarBlankIcon className="size-4" />, count: 4 },
-  { id: 'files', label: 'Archivos', icon: <PaperclipIcon className="size-4" />, count: 2 },
-  { id: 'history', label: 'Historial', icon: <ClockIcon className="size-4" />, attention: true },
+  { id: 'notes', label: 'Notas', icon: <NotePencilIcon />, count: 2 },
+  { id: 'tasks', label: 'Tareas', icon: <CheckSquareIcon />, count: 2 },
+  { id: 'agenda', label: 'Agenda', icon: <CalendarBlankIcon />, count: 4 },
+  { id: 'files', label: 'Archivos', icon: <PaperclipIcon />, count: 2 },
+  { id: 'history', label: 'Historial', icon: <ClockIcon />, attention: true },
 ]
 
 const WORKSPACES = [

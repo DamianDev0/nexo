@@ -7,9 +7,9 @@ import type { TFunction } from 'i18next'
 export type DetailPanelCounts = Readonly<Record<DetailPanelId, number | undefined>>
 
 const ICONS: Readonly<Record<DetailPanelId, React.ReactNode>> = {
-  notes: <NotePencilIcon className="size-4" />,
-  tasks: <CheckSquareIcon className="size-4" />,
-  meetings: <CalendarBlankIcon className="size-4" />,
+  notes: <NotePencilIcon />,
+  tasks: <CheckSquareIcon />,
+  meetings: <CalendarBlankIcon />,
 }
 
 const LABEL_KEYS: Readonly<Record<DetailPanelId, string>> = {

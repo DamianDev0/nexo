@@ -31,12 +31,14 @@ export function RecordLayoutTabs({ children, end, className }: Readonly<RecordLa
     <div
       data-slot="record-layout-tabs"
       className={cn(
-        'flex shrink-0 items-center gap-3 border-b border-border px-4 py-2.5',
+        'flex h-[var(--record-header-height)] shrink-0 border-b border-border px-6',
         className,
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center">{children}</div>
-      {end ? <div className="flex shrink-0 items-center gap-1.5">{end}</div> : null}
+      <div className="mx-auto flex w-full max-w-[var(--record-main-width)] items-center gap-3">
+        <div className="flex min-w-0 flex-1 items-center">{children}</div>
+        {end ? <div className="flex shrink-0 items-center gap-1.5">{end}</div> : null}
+      </div>
     </div>
   )
 }
@@ -52,7 +54,14 @@ export function RecordLayoutContent({ children, className }: Readonly<RecordLayo
       data-slot="record-layout-content"
       className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable]"
     >
-      <div className={cn('flex flex-col gap-4 px-4 py-4', className)}>{children}</div>
+      <div
+        className={cn(
+          'mx-auto flex w-full max-w-[var(--record-main-width)] flex-col gap-5 px-6 py-6',
+          className,
+        )}
+      >
+        {children}
+      </div>
     </div>
   )
 }

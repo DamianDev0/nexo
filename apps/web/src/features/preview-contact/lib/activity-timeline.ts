@@ -1,17 +1,12 @@
 import { toBogotaDayKey } from '@repo/shared-utils'
 
-import { activityKindKey } from '@/entities/activity'
-
-import type { ActivityKindKey } from '@/entities/activity'
 import type { ContactActivity } from '@repo/shared-types'
 
 export const ACTIVITY_TIMELINE_FILTERS = ['all', 'calls', 'messages', 'notes', 'tasks'] as const
 
 export type ActivityTimelineFilter = (typeof ACTIVITY_TIMELINE_FILTERS)[number]
 
-const FILTER_KINDS: Readonly<
-  Record<ActivityTimelineFilter, ReadonlyArray<ActivityKindKey> | null>
-> = {
+const FILTER_KINDS: Readonly<Record<ActivityTimelineFilter, ReadonlyArray<string> | null>> = {
   all: null,
   calls: ['call'],
   messages: ['email', 'sms', 'whatsapp'],
@@ -30,7 +25,7 @@ export function filterActivities(
 ): ReadonlyArray<ContactActivity> {
   const kinds = FILTER_KINDS[filter]
   if (kinds === null) return activities
-  return activities.filter((activity) => kinds.includes(activityKindKey(activity.activityType)))
+  return activities.filter((activity) => kinds.includes(activity.activityType.toLowerCase()))
 }
 
 export function groupActivitiesByDay(

@@ -32,6 +32,30 @@ describe('useRecordLayout', () => {
     expect(result.current.activePanel).toBeNull()
   })
 
+  it('follows the panel the owner controls', () => {
+    const { result, rerender } = renderHook(
+      ({ panel }: { panel: string | null }) => useRecordLayout({ panel }),
+      { initialProps: { panel: 'files' as string | null } },
+    )
+
+    expect(result.current.activePanel).toBe('files')
+
+    act(() => result.current.togglePanel('notes'))
+    expect(result.current.activePanel).toBe('files')
+
+    rerender({ panel: 'notes' })
+    expect(result.current.activePanel).toBe('notes')
+  })
+
+  it('asks the owner to close a controlled panel', () => {
+    const onPanelChange = vi.fn()
+    const { result } = renderHook(() => useRecordLayout({ panel: 'files', onPanelChange }))
+
+    act(() => result.current.togglePanel('files'))
+
+    expect(onPanelChange).toHaveBeenCalledWith(null)
+  })
+
   it('reports every change to the caller', () => {
     const onPanelChange = vi.fn()
     const { result } = renderHook(() => useRecordLayout({ onPanelChange }))

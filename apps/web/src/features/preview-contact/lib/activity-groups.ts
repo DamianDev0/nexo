@@ -1,5 +1,3 @@
-import { activityKindKey } from '@/entities/activity'
-
 import type { ContactActivity } from '@repo/shared-types'
 
 export type ActivityGroups = {
@@ -10,7 +8,7 @@ export type ActivityGroups = {
 }
 
 function ofKind(activities: ReadonlyArray<ContactActivity>, kind: string) {
-  return activities.filter((activity) => activityKindKey(activity.activityType) === kind)
+  return activities.filter((activity) => activity.activityType.toLowerCase() === kind)
 }
 
 export function groupContactActivities(activities: ReadonlyArray<ContactActivity>): ActivityGroups {

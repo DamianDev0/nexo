@@ -4,8 +4,9 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import { cn } from '@/shared/lib'
 import { collapseHorizontal, smoothEase, useReducedTransition } from '@/shared/lib/animations'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
-import { PlusIcon, XIcon } from '@/shared/ui/icons'
+import { CaretDoubleRightIcon, PlusIcon } from '@/shared/ui/icons'
 import { HeaderIconButton } from '@/shared/ui/molecules/header-icon-button'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 
@@ -51,20 +52,27 @@ export function RecordLayoutPanel({
               'overflow-hidden',
             )}
           >
-            <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border pr-2 pl-4">
-              <Text variant="strong" className="min-w-0 flex-1 truncate">
+            <div className="flex h-[var(--record-header-height)] shrink-0 items-center gap-1 border-b border-border pr-2 pl-4">
+              <Text variant="bold" className="min-w-0 flex-1 truncate text-[15px]">
                 {title}
               </Text>
               {action ? (
-                <HintTooltip asChild hint={action.label}>
-                  <HeaderIconButton aria-label={action.label} onClick={action.onClick}>
-                    <PlusIcon />
-                  </HeaderIconButton>
-                </HintTooltip>
+                <>
+                  <PillButton
+                    variant="ghost"
+                    size="xs"
+                    onClick={action.onClick}
+                    className="gap-1.5 px-2.5 font-semibold"
+                  >
+                    <PlusIcon className="size-4" />
+                    {action.label}
+                  </PillButton>
+                  <span aria-hidden className="mx-1 h-5 w-px bg-border" />
+                </>
               ) : null}
-              <HintTooltip asChild hint={closeLabel}>
+              <HintTooltip asChild side="left" hint={closeLabel}>
                 <HeaderIconButton aria-label={closeLabel} onClick={closePanel}>
-                  <XIcon />
+                  <CaretDoubleRightIcon />
                 </HeaderIconButton>
               </HintTooltip>
             </div>

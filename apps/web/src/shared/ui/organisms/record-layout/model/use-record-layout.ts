@@ -3,19 +3,26 @@
 import { useCallback, useMemo, useState } from 'react'
 
 type RecordLayoutOptions = {
+  readonly panel?: string | null
   readonly defaultPanel?: string | null
   readonly onPanelChange?: (panelId: string | null) => void
 }
 
-export function useRecordLayout({ defaultPanel = null, onPanelChange }: RecordLayoutOptions = {}) {
-  const [activePanel, setActivePanel] = useState<string | null>(defaultPanel)
+export function useRecordLayout({
+  panel,
+  defaultPanel = null,
+  onPanelChange,
+}: RecordLayoutOptions = {}) {
+  const [uncontrolled, setUncontrolled] = useState<string | null>(defaultPanel)
+  const controlled = panel !== undefined
+  const activePanel = controlled ? panel : uncontrolled
 
   const openPanel = useCallback(
     (panelId: string | null) => {
-      setActivePanel(panelId)
+      if (!controlled) setUncontrolled(panelId)
       onPanelChange?.(panelId)
     },
-    [onPanelChange],
+    [controlled, onPanelChange],
   )
 
   const togglePanel = useCallback(

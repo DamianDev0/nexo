@@ -13,12 +13,15 @@ import type { CSSProperties, ReactNode } from 'react'
 
 const SIZES = {
   '--record-aside-width': '400px',
-  '--record-panel-width': '380px',
+  '--record-panel-width': '400px',
   '--record-rail-width': '56px',
+  '--record-main-width': '44rem',
+  '--record-header-height': '52px',
 } as CSSProperties
 
 type RecordLayoutRootProps = {
   readonly children: ReactNode
+  readonly panel?: string | null
   readonly defaultPanel?: string | null
   readonly onPanelChange?: (panelId: string | null) => void
   readonly className?: string
@@ -26,11 +29,12 @@ type RecordLayoutRootProps = {
 
 function RecordLayoutRoot({
   children,
+  panel,
   defaultPanel,
   onPanelChange,
   className,
 }: Readonly<RecordLayoutRootProps>) {
-  const layout = useRecordLayout({ defaultPanel, onPanelChange })
+  const layout = useRecordLayout({ panel, defaultPanel, onPanelChange })
 
   return (
     <RecordLayoutContext.Provider value={layout}>
@@ -53,7 +57,7 @@ function RecordLayoutHeader({
     <div
       data-slot="record-layout-header"
       className={cn(
-        'flex h-12 shrink-0 items-center gap-2 border-b border-border pr-2 pl-4',
+        'flex h-[var(--record-header-height)] shrink-0 items-center gap-2 border-b border-border pr-2 pl-4',
         className,
       )}
     >

@@ -39,10 +39,10 @@ export function ContactDetailMain({
           value={tabs.active}
           onValueChange={tabs.select}
           options={options}
-          className="w-full max-w-sm"
+          className="w-full max-w-xs"
         />
       </RecordLayout.Tabs>
-      <RecordLayout.Content className="mx-auto w-full max-w-2xl">
+      <RecordLayout.Content>
         {tabs.active === 'details' ? (
           <ContactDetailsForm
             key={contact.id}

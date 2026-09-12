@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 
+import { ContactConsentsSection } from '@/features/manage-contact-consents'
 import { ContactOwnerPicker, ContactRecordHeader } from '@/features/preview-contact'
 import { ROUTES } from '@/shared/config/routes'
 import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
@@ -37,7 +38,7 @@ export function ContactDetailAside({
 
   return (
     <RecordLayout.Aside>
-      <div className="px-3 pt-3">
+      <div className="px-2 pt-3">
         <PillButton asChild variant="ghost" size="xs" className="px-2 font-medium">
           <Link href={ROUTES.app.contacts.list}>
             <CaretLeftIcon className="size-4" />
@@ -87,17 +88,7 @@ export function ContactDetailAside({
               ) : undefined,
           }}
         >
-          {optedOut.length === 0 ? (
-            <Text variant="muted">{t('contacts.preview.empty.doNotContact')}</Text>
-          ) : (
-            <span className="flex flex-wrap gap-1.5">
-              {optedOut.map((channel) => (
-                <BadgeSoft key={channel} tone="negative">
-                  {t(`contacts.preview.optedOut.${channel}`)}
-                </BadgeSoft>
-              ))}
-            </span>
-          )}
+          <ContactConsentsSection contactId={contact.id} />
         </RecordDrawer.Section>
       </RecordDrawer.Sections>
     </RecordLayout.Aside>

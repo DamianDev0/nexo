@@ -18,6 +18,7 @@ function activity(id: string, activityType: string, createdAt: string): ContactA
     completedAt: null,
     status: 'pending',
     priority: 'normal',
+    durationMinutes: null,
     assignedToId: null,
     createdById: null,
     createdAt,
