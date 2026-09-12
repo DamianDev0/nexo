@@ -17,6 +17,7 @@ const ON_DEMAND_ONLY_KEYS = new Set([
   'geo.colombiaMap',
   'contacts.duplicateProbe',
   'contacts.timeline',
+  'contacts.consents',
   'bulkActions.list',
   'bulkActions.detail',
   'tags.trash',

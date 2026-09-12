@@ -8,6 +8,7 @@ import {
   PhoneIcon,
 } from '@/shared/ui/icons'
 
+import { isChannelBlocked } from './contact-consent-block'
 import { contactDialNumber } from './contact-links'
 
 import type { ContactNameLabels, ContactRowActions } from '../model/types/contact-cells.types'
@@ -39,7 +40,7 @@ export function buildRowMenuItems(
       onClick: () => actions.onOpen?.(contact),
     })
   }
-  if (actions.onCall && phone) {
+  if (actions.onCall && phone && !isChannelBlocked(contact, 'call')) {
     items.push({
       id: 'call',
       label: menu.call,
@@ -47,7 +48,7 @@ export function buildRowMenuItems(
       onClick: () => actions.onCall?.(contactDialNumber(phone)),
     })
   }
-  if (actions.onCompose && contact.phone) {
+  if (actions.onCompose && contact.phone && !isChannelBlocked(contact, 'sms')) {
     items.push({
       id: 'sms',
       label: menu.sms,
@@ -55,7 +56,7 @@ export function buildRowMenuItems(
       onClick: () => actions.onCompose?.('sms', contact),
     })
   }
-  if (actions.onCompose && contact.email) {
+  if (actions.onCompose && contact.email && !isChannelBlocked(contact, 'email')) {
     items.push({
       id: 'email',
       label: menu.email,

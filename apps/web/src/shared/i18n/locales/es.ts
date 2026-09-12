@@ -428,6 +428,11 @@ const es = {
       emailBody: 'Las actividades se registran automáticamente en cada contacto.',
     },
   },
+  timePicker: {
+    hours: 'Horas',
+    minutes: 'Minutos',
+    meridiem: 'AM o PM',
+  },
   composer: {
     controls: {
       minimize: 'Minimizar',
@@ -816,6 +821,31 @@ const es = {
       meeting: 'Agendar reunión',
     },
     composers: {
+      meeting: {
+        title: 'Agendar reunión con {{name}}',
+        titleLabel: 'Asunto',
+        titlePlaceholder: 'Visita técnica',
+        titleRequired: 'Escribe un asunto',
+        titleTooLong: 'Máximo {{max}} caracteres',
+        dateRequired: 'Elige una fecha',
+        timeInvalid: 'Hora inválida',
+        startTime: 'Inicio',
+        endTime: 'Fin',
+        duration: 'Duración {{duration}}',
+        reminder: 'Recordatorio',
+        reminderChoice: {
+          0: 'Sin recordatorio',
+          10: '10 minutos antes',
+          30: '30 minutos antes',
+          60: '1 hora antes',
+          1440: '1 día antes',
+        },
+        assignee: 'Responsable',
+        descriptionPlaceholder: 'Agenda, punto de encuentro, notas…',
+        descriptionTooLong: 'La descripción es muy larga',
+        save: 'Agendar',
+        saved: 'Reunión agendada',
+      },
       activity: {
         title: {
           task: 'Tarea para {{name}}',
@@ -835,6 +865,7 @@ const es = {
           task: 'Crear tarea',
           meeting: 'Agendar',
         },
+        savedFallback: 'Actividad registrada',
         saved: {
           task: 'Tarea creada',
           meeting: 'Reunión agendada',
@@ -1025,6 +1056,14 @@ const es = {
     recency: {
       stale: 'Sin contacto hace más de {{days}} días',
     },
+    consents: {
+      hint: 'Apaga un canal para dejar de contactar por ahí.',
+      toggle: 'Permitir {{channel}}',
+      granted: 'Canal habilitado',
+      revoked: 'Canal bloqueado',
+      blocked: '{{channel}} bloqueado por el contacto',
+      revokedHint: 'Sin motivo registrado',
+    },
     detail: {
       back: 'Volver a contactos',
       closePanel: 'Cerrar panel',
@@ -1119,6 +1158,10 @@ const es = {
         other: 'Actividad',
       },
       due: 'Vence {{when}}',
+      card: {
+        expand: 'Ver más',
+        collapse: 'Ver menos',
+      },
       timeline: {
         filters: {
           all: 'Todo',

@@ -30,13 +30,13 @@ describe('resolveMessageChannel', () => {
 })
 
 describe('resolveLogKind', () => {
-  it('returns the activity kind for task and meeting composers only', async () => {
+  it('returns the activity kind for the task composer only', async () => {
     const { resolveLogKind } = await import(
       '@/features/compose-contact-actions/lib/message-channel'
     )
     const contact = { id: 'c1' } as never
     expect(resolveLogKind({ kind: 'task', contact })).toBe('task')
-    expect(resolveLogKind({ kind: 'meeting', contact })).toBe('meeting')
+    expect(resolveLogKind({ kind: 'meeting', contact })).toBeNull()
     expect(resolveLogKind({ kind: 'note', contact })).toBeNull()
     expect(resolveLogKind({ kind: 'email', contact })).toBeNull()
     expect(resolveLogKind(null)).toBeNull()

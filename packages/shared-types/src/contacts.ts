@@ -123,6 +123,7 @@ export type ContactActivity = {
   completedAt: string | null
   status: ActivityStatus
   priority: ActivityPriority
+  durationMinutes: number | null
   assignedToId: string | null
   createdById: string | null
   createdAt: string

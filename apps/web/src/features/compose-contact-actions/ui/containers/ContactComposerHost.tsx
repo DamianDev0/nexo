@@ -30,6 +30,11 @@ const MessageComposer = dynamic(
   { loading: () => null, ssr: false },
 )
 
+const MeetingComposer = dynamic(
+  () => import('@/features/schedule-meeting').then((m) => m.MeetingComposer),
+  { loading: () => null, ssr: false },
+)
+
 type ContactComposerHostProps = {
   readonly composers: ContactComposers
   readonly placement?: ComposerPlacement
@@ -51,6 +56,9 @@ export function ContactComposerHost({
       )}
       {active?.kind === 'tags' && (
         <TagComposer key={active.contact.id} contact={active.contact} onClose={close} />
+      )}
+      {active?.kind === 'meeting' && (
+        <MeetingComposer key={active.contact.id} contact={active.contact} onClose={close} />
       )}
       {active && logKind && (
         <ActivityComposer

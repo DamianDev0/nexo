@@ -1,6 +1,11 @@
 import { formatDateCO, timeAgo } from '@repo/shared-utils'
 
-import { activityIcon, activityKindKey, isActivityOverdue } from '@/entities/activity'
+import {
+  activityIconByName,
+  isActivityOverdue,
+  resolveActivityType,
+  useActivityCatalog,
+} from '@/entities/activity'
 import { cn } from '@/shared/lib/cn'
 import { Text } from '@/shared/ui/atoms/text'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
@@ -20,12 +25,13 @@ export function ContactNextActivityCell({
   locale,
   labels,
 }: Readonly<ContactNextActivityCellProps>) {
+  const catalog = useActivityCatalog()
   if (activity === null) return <DataTable.CellText muted>{null}</DataTable.CellText>
 
-  const kind = activityKindKey(activity.activityType)
+  const type = resolveActivityType(activity.activityType, catalog)
   const overdue = isActivityOverdue({ dueDate: activity.dueDate, status: 'pending' })
   const when = overdue ? labels.overdue : timeAgo(activity.dueDate, locale)
-  const hint = `${labels.kind(kind)} · ${formatDateCO(activity.dueDate)}`
+  const hint = `${type.label} · ${formatDateCO(activity.dueDate)}`
 
   return (
     <HintTooltip asChild hint={activity.title ? `${activity.title} · ${hint}` : hint}>
@@ -38,10 +44,10 @@ export function ContactNextActivityCell({
             activity.priority === 'high' && !overdue && 'text-negative-text',
           )}
         >
-          {activityIcon(kind)}
+          {activityIconByName(type.icon)}
         </span>
         <span className="flex min-w-0 flex-col">
-          <Text className="truncate text-sm">{activity.title ?? labels.kind(kind)}</Text>
+          <Text className="truncate text-sm">{activity.title ?? type.label}</Text>
           <Text
             variant="faint"
             className={cn('truncate', overdue && 'font-medium text-warning-deep')}

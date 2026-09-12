@@ -3,6 +3,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { DatePicker } from '@/shared/ui/molecules/date-picker'
+import { buildTimePickerLabels, TimePicker } from '@/shared/ui/molecules/time-picker'
 import {
   Select,
   SelectContent,
@@ -108,12 +109,11 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
           placeholder={def.placeholder ?? t('contacts.form.pickDate')}
           aria-label={def.label}
         />
-        <Input
-          type="time"
+        <TimePicker
           value={timePart}
+          onChange={(next) => onChange(joinDateTime(datePart, next))}
+          labels={buildTimePickerLabels(t, t('contacts.form.pickTime'))}
           disabled={!datePart}
-          onChange={(event) => onChange(joinDateTime(datePart, event.target.value))}
-          aria-label={t('contacts.form.pickTime')}
           className="w-28"
         />
       </div>

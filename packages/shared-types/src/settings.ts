@@ -337,6 +337,14 @@ export const DEFAULT_ACTIVITY_TYPES: ActivityTypeDef[] = [
     trackDuration: false,
     isSystem: true,
   },
+  {
+    key: 'sms',
+    label: 'SMS',
+    icon: 'message-circle',
+    color: '#0EA5E9',
+    trackDuration: false,
+    isSystem: true,
+  },
 ]
 
 export type OnboardingStatus = {

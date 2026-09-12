@@ -57,6 +57,7 @@ export function mapContactActivity(a: ActivityRow): ContactActivity {
     completedAt: a.completed_at,
     status: a.status as ActivityStatus,
     priority: a.priority as ActivityPriority,
+    durationMinutes: a.duration_minutes ?? null,
     assignedToId: a.assigned_to_id,
     createdById: a.created_by,
     createdAt: a.created_at,

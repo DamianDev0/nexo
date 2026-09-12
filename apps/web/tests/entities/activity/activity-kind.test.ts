@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  ACTIVITY_KIND_KEYS,
-  activityIcon,
+  ACTIVITY_ICON_NAMES,
+  activityIconByName,
   activityKindKey,
   activityPreview,
   isActivityCompleted,
@@ -30,9 +30,9 @@ describe('isActivityCompleted', () => {
   })
 })
 
-describe('activityIcon', () => {
+describe('activityIconByName', () => {
   it('has an icon for every kind and a fallback for other', () => {
-    for (const kind of ACTIVITY_KIND_KEYS) expect(activityIcon(kind)).toBeTruthy()
-    expect(activityIcon('other')).toBeTruthy()
+    for (const name of ACTIVITY_ICON_NAMES) expect(activityIconByName(name)).toBeTruthy()
+    expect(activityIconByName('a-name-nobody-registered')).toBeTruthy()
   })
 })

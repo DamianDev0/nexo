@@ -4,7 +4,7 @@ import type { ActiveComposer } from '../model/useContactComposers'
 import type { ContactLogKind } from '@/entities/contact'
 import type { MessageChannel } from '@/features/compose-message'
 
-const LOG_KINDS: ReadonlyArray<ContactLogKind> = ['task', 'meeting']
+const LOG_KINDS: ReadonlyArray<ContactLogKind> = ['task']
 
 export function resolveMessageChannel(active: ActiveComposer | null): MessageChannel | null {
   if (!active) return null

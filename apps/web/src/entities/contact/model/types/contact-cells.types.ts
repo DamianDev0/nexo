@@ -28,7 +28,6 @@ export type CityCellLabels = {
 
 export type NextActivityCellLabels = {
   readonly overdue: string
-  readonly kind: (kind: string) => string
 }
 
 export type CommCellLabels = {

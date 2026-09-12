@@ -45,14 +45,3 @@ test('opens the record from the row action menu', async ({ page }) => {
 
   await expect(page).toHaveURL(detailUrl())
 })
-
-test('escalates from the quick view drawer to the record', async ({ page }) => {
-  const row = page.locator('[data-slot="table-body"]').first().getByRole('row').first()
-  await row.getByRole('button', { name: /vista rápida|quick view/i }).click()
-
-  const footer = page.locator('[data-slot="record-drawer-footer"]')
-  await expect(footer).toBeVisible()
-  await footer.getByRole('button', { name: /ver registro|view record/i }).click()
-
-  await expect(page).toHaveURL(detailUrl())
-})

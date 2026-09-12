@@ -45,6 +45,7 @@ export interface ActivityRow {
   completed_at: string | null
   status: string
   priority: string
+  duration_minutes: number | null
   assigned_to_id: string | null
   created_by: string | null
   created_at: string

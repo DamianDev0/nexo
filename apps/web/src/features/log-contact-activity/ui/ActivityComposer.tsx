@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { contactFullName } from '@/entities/contact'
 import { DatePicker } from '@/shared/ui/molecules/date-picker'
 import { FieldError } from '@/shared/ui/molecules/field-error'
+import { buildTimePickerLabels, TimePicker } from '@/shared/ui/molecules/time-picker'
 import { buildComposerControlLabels, Composer } from '@/shared/ui/organisms/composer'
 import {
   Select,
@@ -51,11 +52,17 @@ export function ActivityComposer({ kind, contact, onClose }: Readonly<ActivityCo
         label={t('contacts.composers.activity.dueDate')}
         error={errors.dueDate?.message ?? errors.time?.message}
         end={
-          <Composer.Input
-            type="time"
-            aria-label={t('contacts.composers.activity.time')}
-            className="w-24"
-            {...form.register('time')}
+          <Controller
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <TimePicker
+                value={field.value}
+                onChange={field.onChange}
+                labels={buildTimePickerLabels(t, t('contacts.composers.activity.time'))}
+                className="w-28"
+              />
+            )}
           />
         }
       >

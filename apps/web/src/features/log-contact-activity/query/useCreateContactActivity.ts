@@ -16,7 +16,9 @@ export function useCreateContactActivity() {
     mutationFn: (payload: CreateActivityInput) => activitiesService.create(payload),
     onSuccess: (_data, payload) => {
       sileo.success({
-        title: t(`contacts.composers.activity.saved.${payload.activityType}`),
+        title: t(`contacts.composers.activity.saved.${payload.activityType}`, {
+          defaultValue: t('contacts.composers.activity.savedFallback'),
+        }),
         description: payload.title,
       })
       if (payload.contactId) {

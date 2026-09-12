@@ -1,28 +1,8 @@
-import {
-  CalendarBlankIcon,
-  ChatTextIcon,
-  CheckSquareIcon,
-  ClockIcon,
-  EnvelopeSimpleIcon,
-  NotePencilIcon,
-  PhoneIcon,
-  WhatsappLogoIcon,
-} from '@/shared/ui/icons'
+import { ACTIVITY_ICON_MAP, FALLBACK_ACTIVITY_ICON } from '../config/activity-icons.constants'
 
-import type { ActivityKindKey } from '../lib/activity-kind'
 import type { ReactNode } from 'react'
 
-const ACTIVITY_ICONS: Record<ActivityKindKey, ReactNode> = {
-  call: <PhoneIcon />,
-  meeting: <CalendarBlankIcon />,
-  email: <EnvelopeSimpleIcon />,
-  task: <CheckSquareIcon />,
-  note: <NotePencilIcon />,
-  whatsapp: <WhatsappLogoIcon />,
-  sms: <ChatTextIcon />,
-  other: <ClockIcon />,
-}
-
-export function activityIcon(kind: ActivityKindKey): ReactNode {
-  return ACTIVITY_ICONS[kind]
+export function activityIconByName(icon: string): ReactNode {
+  const Icon = ACTIVITY_ICON_MAP[icon] ?? FALLBACK_ACTIVITY_ICON
+  return <Icon />
 }

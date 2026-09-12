@@ -3,6 +3,8 @@ import { request } from '@/shared/api/request'
 import type {
   AnalyzeResult,
   Contact,
+  ContactConsent,
+  ContactConsentInput,
   ContactCounts,
   ContactDuplicateProbeQuery,
   ContactDuplicateProbeResult,
@@ -115,6 +117,12 @@ const contactsService = {
   archive: (id: string) => request<void>({ method: 'delete', url: `/contacts/${id}` }),
 
   restore: (id: string) => request<Contact>({ method: 'post', url: `/contacts/${id}/restore` }),
+
+  consents: (id: string) =>
+    request<ContactConsent[]>({ method: 'get', url: `/contacts/${id}/consents` }),
+
+  saveConsent: (id: string, data: ContactConsentInput) =>
+    request<ContactConsent>({ method: 'put', url: `/contacts/${id}/consents`, data }),
 
   timeline: (id: string, limit?: number) =>
     request<ContactTimeline>({

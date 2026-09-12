@@ -425,6 +425,11 @@ const en = {
       emailBody: 'Activities get logged automatically on every contact.',
     },
   },
+  timePicker: {
+    hours: 'Hours',
+    minutes: 'Minutes',
+    meridiem: 'AM or PM',
+  },
   composer: {
     controls: {
       minimize: 'Minimize',
@@ -809,6 +814,31 @@ const en = {
       meeting: 'Schedule meeting',
     },
     composers: {
+      meeting: {
+        title: 'Schedule a meeting with {{name}}',
+        titleLabel: 'Subject',
+        titlePlaceholder: 'Site walkthrough',
+        titleRequired: 'Write a subject',
+        titleTooLong: 'At most {{max}} characters',
+        dateRequired: 'Pick a date',
+        timeInvalid: 'Invalid time',
+        startTime: 'Starts',
+        endTime: 'Ends',
+        duration: 'Runs {{duration}}',
+        reminder: 'Reminder',
+        reminderChoice: {
+          0: 'No reminder',
+          10: '10 minutes before',
+          30: '30 minutes before',
+          60: '1 hour before',
+          1440: '1 day before',
+        },
+        assignee: 'Owner',
+        descriptionPlaceholder: 'Agenda, meeting point, notes…',
+        descriptionTooLong: 'The description is too long',
+        save: 'Schedule',
+        saved: 'Meeting scheduled',
+      },
       activity: {
         title: {
           task: 'Task for {{name}}',
@@ -828,6 +858,7 @@ const en = {
           task: 'Create task',
           meeting: 'Schedule',
         },
+        savedFallback: 'Activity logged',
         saved: {
           task: 'Task created',
           meeting: 'Meeting scheduled',
@@ -1018,6 +1049,14 @@ const en = {
     recency: {
       stale: 'No contact in over {{days}} days',
     },
+    consents: {
+      hint: 'Turn a channel off to stop reaching out through it.',
+      toggle: 'Allow {{channel}}',
+      granted: 'Channel allowed',
+      revoked: 'Channel blocked',
+      blocked: '{{channel}} blocked by the contact',
+      revokedHint: 'No reason on record',
+    },
     detail: {
       back: 'Back to contacts',
       closePanel: 'Close panel',
@@ -1112,6 +1151,10 @@ const en = {
         other: 'Activity',
       },
       due: 'Due {{when}}',
+      card: {
+        expand: 'Show more',
+        collapse: 'Show less',
+      },
       timeline: {
         filters: {
           all: 'All',

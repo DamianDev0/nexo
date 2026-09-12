@@ -18,6 +18,7 @@ export const QUERY_KEYS = {
     lists: CONTACTS_LIST,
     list: (query: ContactListQuery) => [...CONTACTS_LIST, query] as const,
     detail: (id: string) => ['contacts', 'detail', id] as const,
+    consents: (id: string) => ['contacts', 'consents', id] as const,
     duplicateProbe: (params: ContactDuplicateProbeQuery) =>
       ['contacts', 'duplicate-probe', params] as const,
     timeline: (id: string, limit?: number) =>

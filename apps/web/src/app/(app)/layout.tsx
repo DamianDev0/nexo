@@ -1,5 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
+import { ActivityCatalogProvider } from '@/entities/activity'
 import { CallDock } from '@/features/place-call'
 import { ShortcutsDialog } from '@/features/show-shortcuts'
 import { LanguageSwitcher } from '@/features/switch-language'
@@ -33,38 +34,40 @@ export default async function AppLayout({ children }: Readonly<{ children: React
     <HydrationBoundary state={dehydrate(queryClient)}>
       <TenantThemeLoader />
       <AppMotionProvider>
-        <SidebarProvider
-          className="h-svh overflow-hidden"
-          style={{ '--sidebar-width': '13.5rem' } as React.CSSProperties}
-        >
-          <AppSidebar />
-          <SidebarInset className="min-w-0">
-            <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
-              <SidebarTrigger className="-ml-1 md:hidden" />
-              <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
-              <HeaderBreadcrumb />
-              <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
-              <HeaderSearch />
-              <div className="flex-1" />
-              <div className="flex items-center gap-0.5">
-                <HeaderQuickCreate />
-                <HeaderPhone />
-                <HeaderSettingsLink />
-                <HeaderNotifications />
-                <LanguageSwitcher />
-                <ThemeToggle />
+        <ActivityCatalogProvider>
+          <SidebarProvider
+            className="h-svh overflow-hidden"
+            style={{ '--sidebar-width': '13.5rem' } as React.CSSProperties}
+          >
+            <AppSidebar />
+            <SidebarInset className="min-w-0">
+              <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+                <SidebarTrigger className="-ml-1 md:hidden" />
+                <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
+                <HeaderBreadcrumb />
+                <Separator orientation="vertical" className="mx-5 hidden self-stretch md:block" />
+                <HeaderSearch />
+                <div className="flex-1" />
+                <div className="flex items-center gap-0.5">
+                  <HeaderQuickCreate />
+                  <HeaderPhone />
+                  <HeaderSettingsLink />
+                  <HeaderNotifications />
+                  <LanguageSwitcher />
+                  <ThemeToggle />
+                </div>
+              </header>
+              <div
+                id={APP_SCROLL_ID}
+                className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto [scrollbar-gutter:stable] has-[[data-fill-viewport]]:overflow-hidden has-[[data-fill-viewport]]:[scrollbar-gutter:auto] [&>*]:shrink-0"
+              >
+                {children}
               </div>
-            </header>
-            <div
-              id={APP_SCROLL_ID}
-              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto [scrollbar-gutter:stable] has-[[data-fill-viewport]]:overflow-hidden has-[[data-fill-viewport]]:[scrollbar-gutter:auto] [&>*]:shrink-0"
-            >
-              {children}
-            </div>
-          </SidebarInset>
-          <CallDock />
-          <ShortcutsDialog />
-        </SidebarProvider>
+            </SidebarInset>
+            <CallDock />
+            <ShortcutsDialog />
+          </SidebarProvider>
+        </ActivityCatalogProvider>
       </AppMotionProvider>
     </HydrationBoundary>
   )

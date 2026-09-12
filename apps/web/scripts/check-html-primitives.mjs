@@ -1,6 +1,7 @@
 import { loadBaseline, readLines, relPath, report, walkSource } from './lib.mjs'
 
 const PRIMITIVE = /<(button|input|select|table|textarea)\b/
+const NATIVE_PICKER = /type=(?:"|'|\{')(time|date|datetime-local)(?:"|'|'\})/
 const VENDOR_BUTTON = /from\s+'@\/shared\/ui\/shadcn\/button'/
 const ALLOWED = [/src\/components\//, /src\/shared\/ui\//]
 
@@ -13,6 +14,14 @@ for (const file of walkSource()) {
       violations.push({
         key: `${relPath(file)} :: ${line.trim().slice(0, 80)}`,
         detail: 'shadcn Button outside shared/ui — use PillButton (ui-standardization Fase 5)',
+      })
+      continue
+    }
+    const picker = NATIVE_PICKER.exec(line)
+    if (picker) {
+      violations.push({
+        key: `${relPath(file)} :: ${line.trim().slice(0, 80)}`,
+        detail: `native ${picker[1]} input — use DatePicker/TimePicker`,
       })
       continue
     }
