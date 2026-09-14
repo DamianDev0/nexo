@@ -54,9 +54,14 @@ test('opens the record with every region composed', async ({ page }) => {
   await expect(page.getByText('Hannah Weiss').first()).toBeVisible()
 
   const sections = page.locator('[data-slot="record-drawer-sections"]')
-  await expect(sections.getByRole('button', { name: /etiquetas|tags/i })).toBeVisible()
-  await expect(sections.getByRole('button', { name: /atribución|attribution/i })).toBeVisible()
-  await expect(sections.getByRole('button', { name: /no contactar|do not contact/i })).toBeVisible()
+  await expect(sections.getByRole('button', { name: /etiquetas|tags/i }).first()).toBeVisible()
+  await expect(sections.getByRole('button', { name: /empresa|company/i }).first()).toBeVisible()
+  await expect(
+    sections.getByRole('button', { name: /atribución|attribution/i }).first(),
+  ).toBeVisible()
+  await expect(
+    sections.getByRole('button', { name: /no contactar|do not contact/i }).first(),
+  ).toBeVisible()
 })
 
 test('docks a different panel from the rail', async ({ page }) => {
