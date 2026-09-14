@@ -77,6 +77,9 @@ const contactsService = {
 
   deleteView: (id: string) => request<void>({ method: 'delete', url: `/contacts/views/${id}` }),
 
+  reorderViews: (ids: ReadonlyArray<string>) =>
+    request<void>({ method: 'patch', url: '/contacts/views/reorder', data: { ids } }),
+
   duplicateView: (id: string) =>
     request<ContactView>({ method: 'post', url: `/contacts/views/${id}/duplicate` }),
 

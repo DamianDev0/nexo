@@ -4,7 +4,12 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { useAuth } from '@/entities/session'
 import { listIdToStatus, type useContactsTable } from '@/features/filter-contacts'
-import { defaultView, useContactViewsSection } from '@/features/manage-contact-views'
+import {
+  defaultView,
+  ownedViewOrder,
+  useContactViewsAdmin,
+  useContactViewsSection,
+} from '@/features/manage-contact-views'
 
 import { EMPTY_TABLE_STATE, EMPTY_VIEWS } from '../config/board-empty.constants'
 
@@ -17,6 +22,7 @@ type BoardViewsArgs = {
   readonly items: ReadonlyArray<SmartListItem>
   readonly fallbackActiveId: string
   readonly applyTableState: (patch: ContactTableState) => void
+  readonly setListOrder: (ids: ReadonlyArray<string>) => void
 }
 
 export function useBoardViews({
@@ -25,8 +31,10 @@ export function useBoardViews({
   items,
   fallbackActiveId,
   applyTableState,
+  setListOrder,
 }: BoardViewsArgs) {
   const { data: me } = useAuth()
+  const viewsAdmin = useContactViewsAdmin()
   const viewerId = me?.id ?? null
 
   const viewSnapshot = useMemo(
@@ -77,6 +85,16 @@ export function useBoardViews({
     if (view) selectList(`view:${view.id}`)
   }, [views, viewerId, isFiltered, selectList])
 
+  const { reorder } = viewsAdmin
+  const reorderLists = useCallback(
+    (listOrder: ReadonlyArray<string>) => {
+      setListOrder(listOrder)
+      const owned = ownedViewOrder(listOrder, views, viewerId)
+      if (owned.length > 0) reorder(owned)
+    },
+    [setListOrder, views, viewerId, reorder],
+  )
+
   const revertFilters = useCallback(() => {
     const last = lastViewListIdRef.current
     if (last && section.selectView(last)) return
@@ -93,6 +111,7 @@ export function useBoardViews({
     activeView: section.activeView,
     viewerId,
     selectList,
+    reorderLists,
     revertFilters,
   }
 }

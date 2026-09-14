@@ -36,7 +36,7 @@ export function useContactsBoard() {
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
   const terms = useEntityTerms('contact')
-  const { sheet, preview, composers, rowActions } = useBoardEditors()
+  const { sheet, preview, composers, archive, rowActions } = useBoardEditors()
   const workspace = useContactWorkspace()
   const usage = useTaxonomyUsage()
 
@@ -132,6 +132,7 @@ export function useContactsBoard() {
     items,
     fallbackActiveId: activeListId,
     applyTableState: applyState,
+    setListOrder,
   })
 
   return {
@@ -171,7 +172,7 @@ export function useContactsBoard() {
     },
     actions: {
       onSelectList: boardViews.selectList,
-      onReorderLists: setListOrder,
+      onReorderLists: boardViews.reorderLists,
       onAdvancedChange: table.handleAdvanced,
       onSearch: table.handleSearch,
       onPageChange: table.handlePage,
@@ -183,6 +184,7 @@ export function useContactsBoard() {
       onRevertFilters: boardViews.revertFilters,
     },
     composers,
+    archive,
     bulk,
     sheet: { contact: sheet.editing, open: sheet.open, onOpenChange: sheet.setOpen },
     preview: previewRecord,

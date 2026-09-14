@@ -44,6 +44,12 @@ export function useContactViewsAdmin() {
     onError,
   })
 
+  const reorder = useMutation({
+    mutationFn: (ids: ReadonlyArray<string>) => contactsService.reorderViews(ids),
+    onSuccess: refresh,
+    onError,
+  })
+
   const remove = useMutation({
     mutationFn: (id: string) => contactsService.deleteView(id),
     onSuccess: async () => {
@@ -57,6 +63,7 @@ export function useContactViewsAdmin() {
     create: create.mutate,
     update: update.mutate,
     duplicate: duplicate.mutate,
+    reorder: reorder.mutate,
     remove: remove.mutate,
     isPending: create.isPending || update.isPending || duplicate.isPending || remove.isPending,
   }
