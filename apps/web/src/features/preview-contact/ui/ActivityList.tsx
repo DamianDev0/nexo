@@ -87,7 +87,7 @@ export function ActivityList({ items, isLoading, onToggle }: Readonly<ActivityLi
   }
 
   return (
-    <RecordCard.List className="-my-1 divide-y divide-border/60">
+    <RecordCard.List divided className="-my-1">
       {items.map((activity) => (
         <ActivityRow key={activity.id} activity={activity} onToggle={onToggle} />
       ))}

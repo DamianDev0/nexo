@@ -21,10 +21,8 @@ export function CompanyContactList({ contacts }: Readonly<CompanyContactListProp
 
   return (
     <div className="flex flex-col gap-2 border-t border-border pt-3">
-      <Text variant="caption" className="uppercase">
-        {t('contacts.company.colleagues', { count: contacts.length })}
-      </Text>
-      <RecordCard.List className="gap-0 divide-y divide-border/60">
+      <Text variant="kicker">{t('contacts.company.colleagues', { count: contacts.length })}</Text>
+      <RecordCard.List divided>
         {contacts.map((contact) => (
           <RecordCard.Row key={contact.id}>
             <Link

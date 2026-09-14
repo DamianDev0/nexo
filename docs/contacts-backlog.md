@@ -4,6 +4,19 @@
 > Zoho, Attio/Folk and the LATAM WhatsApp-first crowd (Kommo, Leadsales).
 > Written 2026-09-12 against the code in `apps/api/src/modules/contacts` and
 > `apps/web/src/{entities/contact,features/*,views/contact*}`.
+> Status updated 2026-09-14.
+
+## Status
+
+- **Shipped:** #2 company on the record and #3 deals on the record (commit
+  `52fdd23`) — company block in the aside, deals as a fourth rail panel.
+- **Split out as its own epic, not part of this backlog:** #6 message templates
+  in the composers. A first cut lives on the branch
+  `feature/E0X-message-templates` (commit `69d8b01`) and is deliberately out of
+  `develop` until the epic is planned — templates need their own settings UI,
+  variable catalog, approval state for WhatsApp and send history, which is far
+  more than a picker in the composer.
+- **Next:** #1 merge duplicates.
 
 ## What Contacts already does (do not re-plan)
 
@@ -36,7 +49,7 @@ records, so a dirty import has no exit.
   auditable · cross-tenant merge attempt returns 404 · undo documented (restore
   the loser) or explicitly out of scope.
 
-### 2. Company on the record — **S** (backend ready)
+### 2. Company on the record — **S** (backend ready) — SHIPPED `52fdd23`
 
 `companyId` exists and `GET /companies/:id/summary` already returns stats,
 contacts and active deals; `POST /companies/:id/contacts/:contactId` assigns.
@@ -47,7 +60,7 @@ None of it is on screen.
 - Acceptance: assign and detach update both records without a reload · a contact
   without a company shows a create/link affordance, never an empty slot.
 
-### 3. Deals on the record — **S/M** (backend ready)
+### 3. Deals on the record — **S/M** (backend ready) — SHIPPED `52fdd23`
 
 The timeline already carries deals but the record never says "this person has
 $X open in stage Y".
@@ -78,10 +91,13 @@ and every competitor ships this.
 - Acceptance: files are tenant-scoped at the storage path, never only at the
   query · virus/type/size policy written down · attachments show in the timeline.
 
-### 6. Message templates in the composers — **S** (backend ready)
+### 6. Message templates in the composers — **S** (backend ready) — OWN EPIC
 
 `message-templates` is built (list by channel, Handlebars preview, send,
-duplicate) and has **zero imports in the web app**.
+duplicate) and has **zero imports in the web app**. Scoped out of this backlog:
+the picker is the small end of an epic that also owes a template manager in
+settings, a documented variable catalog, WhatsApp template approval state and
+send history. Parked on `feature/E0X-message-templates`.
 
 - Frontend: template picker in the WhatsApp/email composer, variable preview
   against the current contact, "save this message as a template".
@@ -175,9 +191,15 @@ with the evidence it used.
 
 ---
 
-## If only three things ship next
+## What ships next
 
-1. **Message templates in the composers** — backend is done, it is frontend work.
-2. **Company + deals on the record** — the page reads empty next to HubSpot and
-   both endpoints already exist.
-3. **Merge duplicates** — without it the importer is a trap we built ourselves.
+1. **Merge duplicates** — without it the importer is a trap we built ourselves,
+   and it is the last Tier 1 item that needs backend work before the record page
+   can be called finished.
+2. **Multi-value email and phone** — the field shape blocks both the importer and
+   the quick actions, so it should land before anything builds on top of it.
+3. **"No next step" as a first-class state** — cheapest item on the list and the
+   one that changes daily behaviour the most.
+
+Message templates come back as their own epic, not as a picker bolted onto the
+composer.

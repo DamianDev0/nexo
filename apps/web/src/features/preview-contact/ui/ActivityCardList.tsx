@@ -9,7 +9,7 @@ import { BadgeSoft } from '@/shared/ui/atoms/badge-soft'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { CaretDownIcon, CaretRightIcon, ClockIcon } from '@/shared/ui/icons'
 import { RecordCard } from '@/shared/ui/molecules/record-card'
-import { Skeleton } from '@/shared/ui/shadcn/skeleton'
+import { SkeletonList } from '@/shared/ui/molecules/skeleton-list'
 
 import { activityDue, isExpandableText } from '../lib/activity-card'
 
@@ -83,15 +83,7 @@ type ActivityCardListProps = {
 }
 
 export function ActivityCardList({ items, isLoading, onToggle }: Readonly<ActivityCardListProps>) {
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <Skeleton className="h-24 w-full rounded-xl" />
-      </div>
-    )
-  }
+  if (isLoading) return <SkeletonList rows={3} className="gap-2" rowClassName="h-24 rounded-xl" />
 
   return (
     <RecordCard.List>

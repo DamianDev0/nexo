@@ -8,10 +8,15 @@ import { useHydrated } from '@/shared/lib/hooks/useHydrated'
 import { RecordDrawer } from '@/shared/ui/organisms/record-drawer'
 import { RecordLayout } from '@/shared/ui/organisms/record-layout'
 
+import { DETAIL_PANELS } from '../config/detail-panels.constants'
+
+import type { DetailPanelId } from '../config/detail-panels.constants'
 import type { ContactTimelineFeed } from '@/entities/contact'
 import type { ContactDealsFeed } from '@/entities/deal'
 import type { ActivityGroups, ContactRecord } from '@/features/preview-contact'
+import type { PanelAction } from '@/shared/ui/organisms/record-layout'
 import type { ContactActivity } from '@repo/shared-types'
+import type { ReactNode } from 'react'
 
 type ContactDetailPanelsProps = {
   readonly activities: {
@@ -23,26 +28,13 @@ type ContactDetailPanelsProps = {
   readonly deals: ContactDealsFeed
 }
 
-const PANELS = [
-  {
-    id: 'notes',
-    addKey: 'note',
-    titleKey: 'contacts.preview.sections.notes',
-    emptyKey: 'contacts.preview.empty.notes',
-  },
-  {
-    id: 'tasks',
-    addKey: 'task',
-    titleKey: 'contacts.preview.sections.tasks',
-    emptyKey: 'contacts.preview.empty.tasks',
-  },
-  {
-    id: 'meetings',
-    addKey: 'meeting',
-    titleKey: 'contacts.preview.sections.meetings',
-    emptyKey: 'contacts.preview.empty.meetings',
-  },
-] as const
+type PanelDef = {
+  readonly title: string
+  readonly empty: string
+  readonly isEmpty: boolean
+  readonly content: ReactNode
+  readonly action?: PanelAction
+}
 
 export function ContactDetailPanels({
   activities,
@@ -55,43 +47,46 @@ export function ContactDetailPanels({
 
   if (!hydrated) return null
 
+  const activityPanel = (kind: 'notes' | 'tasks' | 'meetings', action?: PanelAction): PanelDef => ({
+    title: t(`contacts.preview.sections.${kind}`),
+    empty: t(`contacts.preview.empty.${kind}`),
+    isEmpty: groups[kind].length === 0 && !feed.isLoading,
+    content: (
+      <ActivityCardList items={groups[kind]} isLoading={feed.isLoading} onToggle={onToggle} />
+    ),
+    action,
+  })
+
+  const panels: Readonly<Record<DetailPanelId, PanelDef>> = {
+    notes: activityPanel('notes', add.note),
+    tasks: activityPanel('tasks', add.task),
+    meetings: activityPanel('meetings', add.meeting),
+    deals: {
+      title: t('contacts.preview.sections.deals'),
+      empty: t('contacts.preview.empty.deals'),
+      isEmpty: deals.deals.length === 0 && !deals.isLoading,
+      content: <DealCardList deals={deals.deals} isLoading={deals.isLoading} />,
+    },
+  }
+
   return (
     <>
-      {PANELS.map(({ id, addKey, titleKey, emptyKey }) => {
-        const items = groups[id]
-        const action = add[addKey]
+      {DETAIL_PANELS.map((id) => {
+        const panel = panels[id]
         return (
           <RecordLayout.Panel
             key={id}
             id={id}
-            title={t(titleKey)}
-            action={action}
+            title={panel.title}
+            action={panel.action}
             closeLabel={t('contacts.detail.closePanel')}
           >
             <div className="flex flex-col gap-2 px-3 py-3">
-              {items.length === 0 && !feed.isLoading ? (
-                <RecordDrawer.Empty label={t(emptyKey)} />
-              ) : (
-                <ActivityCardList items={items} isLoading={feed.isLoading} onToggle={onToggle} />
-              )}
+              {panel.isEmpty ? <RecordDrawer.Empty label={panel.empty} /> : panel.content}
             </div>
           </RecordLayout.Panel>
         )
       })}
-
-      <RecordLayout.Panel
-        id="deals"
-        title={t('contacts.preview.sections.deals')}
-        closeLabel={t('contacts.detail.closePanel')}
-      >
-        <div className="flex flex-col gap-2 px-3 py-3">
-          {deals.deals.length === 0 && !deals.isLoading ? (
-            <RecordDrawer.Empty label={t('contacts.preview.empty.deals')} />
-          ) : (
-            <DealCardList deals={deals.deals} isLoading={deals.isLoading} />
-          )}
-        </div>
-      </RecordLayout.Panel>
     </>
   )
 }

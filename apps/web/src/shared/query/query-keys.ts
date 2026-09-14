@@ -32,7 +32,6 @@ export const QUERY_KEYS = {
     summary: (id: string) => ['companies', 'summary', id] as const,
   },
   deals: {
-    all: ['deals'] as const,
     byContact: (contactId: string) => ['deals', 'by-contact', contactId] as const,
   },
   team: {

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Amount } from '@/shared/ui/atoms/amount'
 import { Text } from '@/shared/ui/atoms/text'
 import { RecordCard } from '@/shared/ui/molecules/record-card'
-import { Skeleton } from '@/shared/ui/shadcn/skeleton'
+import { SkeletonList } from '@/shared/ui/molecules/skeleton-list'
 
 import { openDealCount, openDealsValue } from '../lib/deal-display'
 
@@ -21,21 +21,12 @@ type DealCardListProps = {
 export function DealCardList({ deals, isLoading }: Readonly<DealCardListProps>) {
   const { t } = useTranslation()
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-20 w-full rounded-xl" />
-        <Skeleton className="h-20 w-full rounded-xl" />
-      </div>
-    )
-  }
+  if (isLoading) return <SkeletonList rows={2} className="gap-2" rowClassName="h-20 rounded-xl" />
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3 px-1">
-        <Text variant="caption" className="uppercase">
-          {t('deals.openCount', { count: openDealCount(deals) })}
-        </Text>
+        <Text variant="kicker">{t('deals.openCount', { count: openDealCount(deals) })}</Text>
         <Amount cents={openDealsValue(deals)} className="font-bold" />
       </div>
       <RecordCard.List>

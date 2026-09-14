@@ -18,6 +18,7 @@ const ON_DEMAND_ONLY_KEYS = new Set([
   'contacts.duplicateProbe',
   'contacts.timeline',
   'contacts.consents',
+  'companies.search',
   'companies.summary',
   'deals.byContact',
   'bulkActions.list',

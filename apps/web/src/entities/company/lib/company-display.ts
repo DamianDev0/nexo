@@ -1,3 +1,5 @@
+import { formatNIT } from '@repo/shared-utils'
+
 import type { CompanyListItem } from '@repo/shared-types'
 
 type CompanyLike = Pick<CompanyListItem, 'name' | 'nit' | 'nitDv' | 'nitFormatted' | 'city'>
@@ -7,14 +9,11 @@ export function companyNitLabel(
 ): string | null {
   if (company.nitFormatted) return company.nitFormatted
   if (!company.nit) return null
-  return company.nitDv ? `${company.nit}-${company.nitDv}` : company.nit
+  return company.nitDv ? formatNIT(company.nit, company.nitDv) : company.nit
 }
 
 export function companyMetaLine(company: CompanyLike): string | null {
-  const parts = [companyNitLabel(company), company.city].filter((part): part is string =>
-    Boolean(part),
-  )
-  return parts.length > 0 ? parts.join(' · ') : null
+  return [companyNitLabel(company), company.city].filter(Boolean).join(' · ') || null
 }
 
 export function companySearchLabel(company: CompanyLike): string {

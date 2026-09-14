@@ -20,8 +20,8 @@ describe('companyNitLabel', () => {
     expect(companyNitLabel({ ...ACME, nitFormatted: '900.123.456-7' })).toBe('900.123.456-7')
   })
 
-  it('joins the NIT with its check digit when there is no formatted one', () => {
-    expect(companyNitLabel(ACME)).toBe('900123456-7')
+  it('formats the NIT the DIAN way when the backend sent none', () => {
+    expect(companyNitLabel(ACME)).toBe('900.123.456-7')
   })
 
   it('falls back to the bare NIT and then to nothing', () => {
@@ -32,18 +32,18 @@ describe('companyNitLabel', () => {
 
 describe('companyMetaLine', () => {
   it('reads NIT and city as one line', () => {
-    expect(companyMetaLine(ACME)).toBe('900123456-7 · Bogotá')
+    expect(companyMetaLine(ACME)).toBe('900.123.456-7 · Bogotá')
   })
 
   it('drops what the company does not have', () => {
-    expect(companyMetaLine({ ...ACME, city: null })).toBe('900123456-7')
+    expect(companyMetaLine({ ...ACME, city: null })).toBe('900.123.456-7')
     expect(companyMetaLine({ ...ACME, nit: null, nitDv: null, city: null })).toBeNull()
   })
 })
 
 describe('companySearchLabel', () => {
   it('names the company and its NIT so two "Acme" rows can be told apart', () => {
-    expect(companySearchLabel(ACME)).toBe('Acme SAS — 900123456-7')
+    expect(companySearchLabel(ACME)).toBe('Acme SAS — 900.123.456-7')
     expect(companySearchLabel({ ...ACME, nit: null, nitDv: null })).toBe('Acme SAS')
   })
 })

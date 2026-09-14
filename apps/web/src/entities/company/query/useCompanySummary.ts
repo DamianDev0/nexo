@@ -21,5 +21,3 @@ export function useCompanySummary(companyId: string | null) {
     isError,
   }
 }
-
-export type ContactCompanyQuery = ReturnType<typeof useCompanySummary>

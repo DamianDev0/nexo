@@ -2,7 +2,7 @@ import { DealStatus } from '@repo/shared-types'
 
 import type { DealListItem } from '@repo/shared-types'
 
-type DealLike = Pick<DealListItem, 'valueCents' | 'status' | 'expectedCloseDate'>
+type DealLike = Pick<DealListItem, 'valueCents' | 'status'>
 
 const STATUS_ORDER: Readonly<Record<DealStatus, number>> = {
   [DealStatus.OPEN]: 0,

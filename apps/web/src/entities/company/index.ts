@@ -1,8 +1,4 @@
 export { CompanyCard } from './ui/CompanyCard'
-export {
-  companyMetaLine,
-  companyNitLabel,
-  companySearchLabel,
-  otherCompanyContacts,
-} from './lib/company-display'
-export { useCompanySummary, type ContactCompanyQuery } from './query/useCompanySummary'
+export { companySearchLabel, otherCompanyContacts } from './lib/company-display'
+export { useCompanySummary } from './query/useCompanySummary'
+export { useCompanyFetcher } from './query/useCompanyFetcher'

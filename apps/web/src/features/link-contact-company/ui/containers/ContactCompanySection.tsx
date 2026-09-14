@@ -3,9 +3,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { CompanyCard, otherCompanyContacts, useCompanySummary } from '@/entities/company'
-import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { LinkBreakIcon } from '@/shared/ui/icons'
+import { HeaderIconButton } from '@/shared/ui/molecules/header-icon-button'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 
@@ -30,9 +30,7 @@ export function ContactCompanySection({
 
   if (isLoading) return <Skeleton className="h-28 w-full rounded-xl" />
 
-  if (companyId !== null && isError) {
-    return <Text variant="muted">{t('contacts.company.error')}</Text>
-  }
+  if (isError) return <Text variant="muted">{t('contacts.company.error')}</Text>
 
   if (!company) {
     return (
@@ -46,16 +44,13 @@ export function ContactCompanySection({
         company={company}
         action={
           <HintTooltip asChild hint={t('contacts.company.unlink')}>
-            <PillButton
-              variant="ghost"
-              size="xs"
+            <HeaderIconButton
               aria-label={t('contacts.company.unlink')}
               disabled={isPending}
               onClick={() => unlink(company.id)}
-              className="size-8 shrink-0 p-0 [&_svg]:size-4"
             >
               <LinkBreakIcon />
-            </PillButton>
+            </HeaderIconButton>
           </HintTooltip>
         }
       />
