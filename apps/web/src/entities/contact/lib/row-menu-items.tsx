@@ -1,4 +1,5 @@
 import {
+  ArchiveIcon,
   CalendarBlankIcon,
   ChatTextIcon,
   ArrowRightIcon,
@@ -79,6 +80,16 @@ export function buildRowMenuItems(
         onClick: () => actions.onLogActivity?.('meeting', contact),
       },
     )
+  }
+
+  if (actions.onArchive && contact.isActive) {
+    items.push({
+      id: 'archive',
+      label: menu.archive,
+      icon: <ArchiveIcon />,
+      tone: 'danger',
+      onClick: () => actions.onArchive?.(contact),
+    })
   }
 
   return items

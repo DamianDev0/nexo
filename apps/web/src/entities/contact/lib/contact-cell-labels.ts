@@ -23,6 +23,7 @@ export function buildContactCellLabels(t: TFunction): ContactCellLabels {
       rowMenu: menu,
       menu: {
         viewRecord: t('contacts.rowActions.viewRecord'),
+        archive: t('contacts.archive.action'),
         open: t('contacts.rowActions.open'),
         call: t('contacts.rowActions.call'),
         sms: t('contacts.rowActions.sms'),

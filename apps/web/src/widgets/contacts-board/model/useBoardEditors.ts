@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 
+import { useArchiveContactDialog } from '@/features/archive-contact'
 import { useContactComposers } from '@/features/compose-contact-actions'
 import { useCreateFromUrl } from '@/features/create-contact'
 import { ROUTES } from '@/shared/config/routes'
@@ -16,6 +17,7 @@ export function useBoardEditors() {
   const sheet = useEntityEditor<ContactListItem>()
   const preview = useEntityEditor<ContactListItem>()
   const composers = useContactComposers()
+  const archive = useArchiveContactDialog()
   const router = useRouter()
   useCreateFromUrl(sheet.openCreate)
 
@@ -25,6 +27,7 @@ export function useBoardEditors() {
   )
 
   const rowActions = useContactRowActions({
+    onArchive: archive.ask,
     onViewRecord: viewRecord,
     onOpen: sheet.openEdit,
     onPreview: preview.openEdit,
@@ -34,5 +37,5 @@ export function useBoardEditors() {
     onLogActivity: composers.openActivity,
   })
 
-  return { sheet, preview, composers, rowActions, viewRecord }
+  return { sheet, preview, composers, archive, rowActions, viewRecord }
 }

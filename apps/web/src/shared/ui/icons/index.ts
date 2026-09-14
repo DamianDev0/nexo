@@ -6,6 +6,8 @@ export { WhatsappLogoIcon } from './whatsapp'
 
 export {
   BookUser as AddressBookIcon,
+  Archive as ArchiveIcon,
+  Merge as ArrowsMergeIcon,
   Redo2 as ArrowClockwiseIcon,
   RotateCcw as ArrowCounterClockwiseIcon,
   Undo2 as ArrowUUpLeftIcon,

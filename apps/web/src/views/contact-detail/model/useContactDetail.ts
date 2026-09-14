@@ -1,14 +1,17 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useContact, useContactTimeline } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { openDealCount, useContactDeals } from '@/entities/deal'
 import { useTagCatalog } from '@/entities/tag'
+import { useArchiveContactDialog } from '@/features/archive-contact'
 import { useContactComposers } from '@/features/compose-contact-actions'
 import { groupContactActivities } from '@/features/preview-contact'
+import { ROUTES } from '@/shared/config/routes'
 
 import { DETAIL_PANELS } from '../config/detail-panels.constants'
 import { buildDetailRailItems } from '../lib/build-rail-items'
@@ -23,10 +26,13 @@ export function useContactDetail(contactId: string) {
   const [tab, setTab] = useState<DetailTabId>('details')
 
   const panelRoute = usePanelRoute()
-  const query = useContact(contactId)
   const taxonomy = useContactTaxonomy()
   const composers = useContactComposers()
-  const actions = useContactDetailActions(composers)
+  const router = useRouter()
+  const backToList = useCallback(() => router.push(ROUTES.app.contacts.list), [router])
+  const archive = useArchiveContactDialog(backToList)
+  const query = useContact(contactId)
+  const actions = useContactDetailActions(composers, archive)
   const feed = useContactTimeline(contactId, true)
   const deals = useContactDeals(contactId)
   const tagsByName = useTagCatalog('contact')
@@ -61,6 +67,7 @@ export function useContactDetail(contactId: string) {
     tagsByName,
     composers,
     rail,
+    archive,
     panelRoute,
     tabs: { active: tab, select: setTab },
   }

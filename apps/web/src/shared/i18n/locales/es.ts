@@ -1083,6 +1083,54 @@ const es = {
       blocked: '{{channel}} bloqueado por el contacto',
       revokedHint: 'Sin motivo registrado',
     },
+    merge: {
+      action: 'Fusionar duplicado',
+      title: 'Fusionar contactos',
+      description:
+        '{{name}} sobrevive a la fusión. Elegí el contacto repetido y qué dato gana en cada campo.',
+      pickLoser: 'Elegir el contacto repetido',
+      searchPlaceholder: 'Buscar por nombre, email o documento…',
+      noResults: 'Ningún contacto coincide',
+      noContactData: 'Sin email ni teléfono',
+      emptyValue: 'Vacío',
+      identical: 'Los dos contactos tienen los mismos datos. Solo se moverá el historial.',
+      archiveNotice:
+        '{{name}} queda archivado y su historial —actividades, negocios, conversaciones— pasa a este contacto.',
+      done: 'Contactos fusionados',
+      moved_one: 'Se movió {{count}} registro al contacto que queda',
+      moved_other: 'Se movieron {{count}} registros al contacto que queda',
+      fields: {
+        firstName: 'Nombre',
+        lastName: 'Apellido',
+        email: 'Email',
+        phone: 'Teléfono',
+        whatsapp: 'WhatsApp',
+        documentType: 'Tipo de documento',
+        documentNumber: 'Número de documento',
+        avatarUrl: 'Foto',
+        city: 'Ciudad',
+        municipioCode: 'Municipio',
+        status: 'Estado',
+        lifecycleStage: 'Etapa',
+        source: 'Origen',
+        companyId: 'Empresa',
+        assignedToId: 'Responsable',
+      },
+    },
+    archive: {
+      action: 'Archivar',
+      done: '{{entity}} archivado',
+      confirm: {
+        title: 'Archivar {{entity}}',
+        description:
+          '{{name}} sale de la lista y deja de aparecer en búsquedas. Lo puedes restaurar desde la papelera.',
+        descriptionWithDeals_one:
+          '{{name}} tiene {{count}} negocio abierto. Al archivarlo sale de la lista, pero el negocio sigue vivo.',
+        descriptionWithDeals_other:
+          '{{name}} tiene {{count}} negocios abiertos. Al archivarlo sale de la lista, pero los negocios siguen vivos.',
+        action: 'Archivar',
+      },
+    },
     company: {
       empty: 'Sin empresa vinculada',
       link: 'Vincular empresa',

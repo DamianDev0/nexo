@@ -20,6 +20,7 @@ const LABELS = {
   notes: { title: 'Notas' },
   menu: {
     viewRecord: 'Ver registro',
+    archive: 'Archivar',
     open: 'Abrir y editar',
     call: 'Llamar',
     sms: 'Enviar SMS',

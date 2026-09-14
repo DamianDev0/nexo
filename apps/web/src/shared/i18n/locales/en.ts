@@ -1076,6 +1076,54 @@ const en = {
       blocked: '{{channel}} blocked by the contact',
       revokedHint: 'No reason on record',
     },
+    merge: {
+      action: 'Merge duplicate',
+      title: 'Merge contacts',
+      description:
+        '{{name}} survives the merge. Pick the duplicate and which value wins on each field.',
+      pickLoser: 'Pick the duplicate contact',
+      searchPlaceholder: 'Search by name, email or document…',
+      noResults: 'No contact matches',
+      noContactData: 'No email or phone',
+      emptyValue: 'Empty',
+      identical: 'Both contacts hold the same data. Only the history moves.',
+      archiveNotice:
+        '{{name}} gets archived and its history — activities, deals, conversations — moves to this contact.',
+      done: 'Contacts merged',
+      moved_one: '{{count}} record moved to the surviving contact',
+      moved_other: '{{count}} records moved to the surviving contact',
+      fields: {
+        firstName: 'First name',
+        lastName: 'Last name',
+        email: 'Email',
+        phone: 'Phone',
+        whatsapp: 'WhatsApp',
+        documentType: 'Document type',
+        documentNumber: 'Document number',
+        avatarUrl: 'Photo',
+        city: 'City',
+        municipioCode: 'Municipality',
+        status: 'Status',
+        lifecycleStage: 'Stage',
+        source: 'Source',
+        companyId: 'Company',
+        assignedToId: 'Owner',
+      },
+    },
+    archive: {
+      action: 'Archive',
+      done: '{{entity}} archived',
+      confirm: {
+        title: 'Archive {{entity}}',
+        description:
+          '{{name}} leaves the list and stops showing up in search. You can restore it from the trash.',
+        descriptionWithDeals_one:
+          '{{name}} has {{count}} open deal. Archiving takes the contact off the list, but the deal stays live.',
+        descriptionWithDeals_other:
+          '{{name}} has {{count}} open deals. Archiving takes the contact off the list, but the deals stay live.',
+        action: 'Archive',
+      },
+    },
     company: {
       empty: 'No company linked',
       link: 'Link a company',

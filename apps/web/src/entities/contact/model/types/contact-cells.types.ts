@@ -56,6 +56,7 @@ export type NotesCellLabels = {
 
 export type RowMenuLabels = {
   readonly viewRecord: string
+  readonly archive: string
   readonly open: string
   readonly call: string
   readonly sms: string
@@ -137,6 +138,8 @@ export type ContactRowActions = ContactNameActions & {
   readonly onAssign?: (change: ContactOwnerChange) => void
   readonly onFieldsChange?: (contactId: string, patch: ContactFieldsPatch) => void
   readonly onStatusChange?: (contactId: string, status: string) => void
+  readonly onArchive?: (contact: ContactListItem) => void
+  readonly onMerge?: (contact: ContactListItem) => void
   readonly onCustomFieldsChange?: (contactId: string, customFields: Record<string, unknown>) => void
 }
 

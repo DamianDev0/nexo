@@ -11,9 +11,13 @@ import { useDialNumber } from '@/features/place-call'
 import { copyToClipboard } from '@/shared/lib/copy-to-clipboard'
 
 import type { ContactRowActions } from '@/entities/contact'
+import type { ArchiveContactDialogState } from '@/features/archive-contact'
 import type { ContactComposers } from '@/features/compose-contact-actions'
 
-export function useContactDetailActions(composers: ContactComposers): ContactRowActions {
+export function useContactDetailActions(
+  composers: ContactComposers,
+  archive: ArchiveContactDialogState,
+): ContactRowActions {
   const assignOwner = useAssignContactOwner()
   const changeStatus = useChangeContactStatus()
   const dialNumber = useDialNumber()
@@ -26,6 +30,7 @@ export function useContactDetailActions(composers: ContactComposers): ContactRow
   return useMemo(
     () => ({
       onAddNote: openNote,
+      onArchive: archive.ask,
       onAssign: assignOwner,
       onCall: dialNumber,
       onCompose: openMessage,
@@ -39,6 +44,7 @@ export function useContactDetailActions(composers: ContactComposers): ContactRow
       onToggleActivity: toggleActivity,
     }),
     [
+      archive.ask,
       assignOwner,
       changeStatus,
       dialNumber,

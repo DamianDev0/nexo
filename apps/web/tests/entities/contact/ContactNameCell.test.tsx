@@ -25,6 +25,7 @@ const LABELS = {
   rowMenu: 'Acciones',
   menu: {
     viewRecord: 'Ver registro',
+    archive: 'Archivar',
     open: 'Abrir y editar',
     call: 'Llamar',
     sms: 'Enviar SMS',

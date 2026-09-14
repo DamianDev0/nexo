@@ -14,6 +14,7 @@ import type { ContactComposeChannel, ContactLogKind, ContactRowActions } from '@
 import type { ContactListItem } from '@repo/shared-types'
 
 type RowActionHandlers = {
+  readonly onArchive: (contact: ContactListItem) => void
   readonly onViewRecord: (contact: ContactListItem) => void
   readonly onOpen: (contact: ContactListItem) => void
   readonly onPreview: (contact: ContactListItem) => void
@@ -31,11 +32,20 @@ export function useContactRowActions(handlers: RowActionHandlers): ContactRowAct
   const restore = useRestoreContact()
   const assignOwner = useAssignContactOwner()
   const toggleActivity = useToggleContactActivity()
-  const { onViewRecord, onOpen, onPreview, onAddNote, onEditTags, onCompose, onLogActivity } =
-    handlers
+  const {
+    onArchive,
+    onViewRecord,
+    onOpen,
+    onPreview,
+    onAddNote,
+    onEditTags,
+    onCompose,
+    onLogActivity,
+  } = handlers
 
   return useMemo(
     () => ({
+      onArchive,
       onViewRecord,
       onOpen,
       onPreview,
@@ -53,6 +63,7 @@ export function useContactRowActions(handlers: RowActionHandlers): ContactRowAct
       onToggleActivity: toggleActivity,
     }),
     [
+      onArchive,
       onViewRecord,
       onOpen,
       onPreview,

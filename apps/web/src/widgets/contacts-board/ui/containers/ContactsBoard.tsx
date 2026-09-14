@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 
+import { ArchiveContactDialog } from '@/features/archive-contact'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { useMountedOnce } from '@/shared/lib/hooks/useMountedOnce'
 
@@ -25,7 +26,8 @@ const ViewTabDialogs = dynamic(
 )
 
 export function ContactsBoard() {
-  const { instance, lists, state, actions, bulk, sheet, preview, composers } = useContactsBoard()
+  const { instance, lists, state, actions, bulk, sheet, preview, composers, archive } =
+    useContactsBoard()
   const listMenu = useListMenu(state.views, state.viewerId)
 
   const viewDialogsMounted = useMountedOnce(listMenu.viewMenu.openMode !== null)
@@ -55,6 +57,7 @@ export function ContactsBoard() {
           taxonomy={preview.taxonomy}
         />
       )}
+      <ArchiveContactDialog state={archive} />
       <ContactComposerHost composers={composers} placement={preview.open ? 'aside' : 'corner'} />
     </div>
   )

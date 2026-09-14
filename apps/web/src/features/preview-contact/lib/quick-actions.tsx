@@ -1,5 +1,7 @@
 import { contactDialNumber, isChannelBlocked } from '@/entities/contact'
 import {
+  ArchiveIcon,
+  ArrowsMergeIcon,
   CalendarBlankIcon,
   ChatTextIcon,
   CheckSquareIcon,
@@ -132,6 +134,25 @@ export function buildContactQuickActions(
   const menu: ActionMenuItem[] = [...items, ...extras]
     .filter((action) => !action.disabled)
     .map(({ id, label, icon, onClick }) => ({ id, label, icon, onClick }))
+
+  if (actions.onMerge && contact.isActive) {
+    menu.push({
+      id: 'merge',
+      label: t('contacts.merge.action'),
+      icon: <ArrowsMergeIcon />,
+      onClick: () => actions.onMerge?.(contact),
+    })
+  }
+
+  if (actions.onArchive && contact.isActive) {
+    menu.push({
+      id: 'archive',
+      label: t('contacts.archive.action'),
+      icon: <ArchiveIcon />,
+      tone: 'danger',
+      onClick: () => actions.onArchive?.(contact),
+    })
+  }
 
   return {
     items,
