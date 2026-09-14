@@ -17,6 +17,7 @@ import type { ContactComposers } from '@/features/compose-contact-actions'
 export function useContactDetailActions(
   composers: ContactComposers,
   archive: ArchiveContactDialogState,
+  onMerge: () => void,
 ): ContactRowActions {
   const assignOwner = useAssignContactOwner()
   const changeStatus = useChangeContactStatus()
@@ -31,6 +32,7 @@ export function useContactDetailActions(
     () => ({
       onAddNote: openNote,
       onArchive: archive.ask,
+      onMerge,
       onAssign: assignOwner,
       onCall: dialNumber,
       onCompose: openMessage,
@@ -45,6 +47,7 @@ export function useContactDetailActions(
     }),
     [
       archive.ask,
+      onMerge,
       assignOwner,
       changeStatus,
       dialNumber,

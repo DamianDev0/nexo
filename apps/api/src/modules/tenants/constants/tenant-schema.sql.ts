@@ -82,10 +82,15 @@ export function getTenantSchemaSQL(schema: string): string {
       assigned_to_id UUID REFERENCES "${schema}".users(id),
       custom_fields JSONB DEFAULT '{}',
       is_active BOOLEAN DEFAULT true,
+      merged_into_id UUID,
       created_by UUID REFERENCES "${schema}".users(id),
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    ALTER TABLE "${schema}".contacts
+      ADD CONSTRAINT contacts_merged_into_fk
+      FOREIGN KEY (merged_into_id) REFERENCES "${schema}".contacts(id);
 
     -- Consent per channel (Ley 1581 / Ley 2300): one row per contact + channel
     CREATE TABLE "${schema}".data_consents (

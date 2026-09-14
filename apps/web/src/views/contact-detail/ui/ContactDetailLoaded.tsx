@@ -2,6 +2,7 @@
 
 import { ArchiveContactDialog } from '@/features/archive-contact'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
+import { MergeContactsDialog } from '@/features/merge-contacts'
 import { useContactRecord } from '@/features/preview-contact'
 import { RecordLayout } from '@/shared/ui/organisms/record-layout'
 import { useBreadcrumbTail } from '@/widgets/app-shell'
@@ -28,6 +29,7 @@ export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailL
     composers,
     rail,
     archive,
+    mergeDialog,
     panelRoute,
     tabs,
   } = detail
@@ -46,6 +48,7 @@ export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailL
       <ContactDetailPanels activities={activities} add={record.add} deals={deals} />
       <RecordLayout.Rail items={rail} />
       <ArchiveContactDialog state={archive} />
+      <MergeContactsDialog winner={contact} state={mergeDialog} />
       <ContactComposerHost composers={composers} />
     </RecordLayout>
   )

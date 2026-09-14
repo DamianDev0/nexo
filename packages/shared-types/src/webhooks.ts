@@ -5,6 +5,7 @@ export const WEBHOOK_EVENTS = [
   'contact.updated',
   'contact.deleted',
   'contact.lifecycle_changed',
+  'contact.merged',
   'company.created',
   'company.updated',
   'company.deleted',

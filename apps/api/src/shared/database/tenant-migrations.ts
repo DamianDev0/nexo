@@ -755,6 +755,16 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
     `,
   },
   {
+    id: '0043_contacts_merged_into',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS merged_into_id UUID REFERENCES "${schema}".contacts(id);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_merged_into"
+        ON "${schema}".contacts (merged_into_id)
+        WHERE merged_into_id IS NOT NULL;
+    `,
+  },
+  {
     id: '0042_activities_priority_next',
     up: (schema) => `
       ALTER TABLE "${schema}".activities

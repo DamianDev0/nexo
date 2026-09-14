@@ -1,3 +1,4 @@
+import type { ContactMergeField } from '@repo/shared-types'
 import type { FieldMap } from '@/shared/utils/field-map'
 import type { UpdateContactDto } from '../dto/contact.dto'
 import type { CreateContactData } from '../interfaces/contact-row.interfaces'
@@ -105,3 +106,40 @@ export const REASSIGN_TAXONOMY_SQL: Readonly<Record<TaxonomyColumn, string>> = {
 export const CONSENT_COLUMNS = `
   id, contact_id, channel, granted, granted_at, revoked_at, source, reason, evidence, updated_at
 `
+
+export const WINNER_CONTACT_COLUMNS = CONTACT_COLUMNS.split(',')
+  .map((column) => `winner.${column.trim()}`)
+  .join(', ')
+
+export const MERGE_TAGS_SQL = 'tags = ARRAY(SELECT DISTINCT UNNEST(winner.tags || loser.tags))'
+
+export const MERGE_CUSTOM_FIELDS_SQL = `custom_fields = jsonb_strip_nulls(
+    COALESCE(loser.custom_fields, '{}'::jsonb) || COALESCE(winner.custom_fields, '{}'::jsonb)
+  )`
+
+export const MERGE_CHILD_TABLES: ReadonlyArray<string> = [
+  'activities',
+  'deals',
+  'invoices',
+  'calls',
+  'messages',
+  'whatsapp_conversations',
+]
+
+export const MERGE_FIELD_COLUMNS: Readonly<Record<ContactMergeField, string>> = {
+  firstName: 'first_name',
+  lastName: 'last_name',
+  email: 'email',
+  phone: 'phone',
+  whatsapp: 'whatsapp',
+  documentType: 'document_type',
+  documentNumber: 'document_number',
+  avatarUrl: 'avatar_url',
+  city: 'city',
+  municipioCode: 'municipio_code',
+  status: 'status',
+  lifecycleStage: 'lifecycle_stage',
+  source: 'source',
+  companyId: 'company_id',
+  assignedToId: 'assigned_to_id',
+}

@@ -3,6 +3,7 @@ import type { QueryRunner } from 'typeorm'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { CONTACT_UNASSIGNED_RECENT_DAYS } from '@repo/shared-types'
 import { DEFAULT_PAGE_SIZE } from '@repo/shared-utils'
+import type { ContactMergeField } from '@repo/shared-types'
 import type {
   ActivityRow,
   ContactColumnChange,
@@ -12,11 +13,17 @@ import type {
   ContactStatusCountRow,
   CreateContactData,
   DealRow,
+  MergeMovedRows,
   TaxonomyUsageCountRow,
 } from '../interfaces/contact-row.interfaces'
 import {
   CONTACT_COLUMNS,
   CONTACT_LIST_COLUMNS,
+  MERGE_CHILD_TABLES,
+  MERGE_CUSTOM_FIELDS_SQL,
+  MERGE_FIELD_COLUMNS,
+  MERGE_TAGS_SQL,
+  WINNER_CONTACT_COLUMNS,
   REASSIGN_TAXONOMY_SQL,
   SORTABLE_COLUMNS,
   TAXONOMY_USAGE_SQL,
@@ -339,6 +346,72 @@ export class ContactsRepository {
       [contactId],
     )
     return rows
+  }
+
+  async moveChildRows(qr: QueryRunner, loserId: string, winnerId: string): Promise<MergeMovedRows> {
+    const moved: Record<string, number> = {}
+    for (const table of MERGE_CHILD_TABLES) {
+      const rows = await sqlRows<Array<{ id: string }>>(
+        qr,
+        `UPDATE ${table} SET contact_id = $2 WHERE contact_id = $1 RETURNING id`,
+        [loserId, winnerId],
+      )
+      moved[table] = rows.length
+    }
+    return moved
+  }
+
+  async moveMissingConsents(qr: QueryRunner, loserId: string, winnerId: string): Promise<number> {
+    const rows = await sqlRows<Array<{ id: string }>>(
+      qr,
+      `UPDATE data_consents AS loser
+       SET contact_id = $2, updated_at = NOW()
+       WHERE loser.contact_id = $1
+         AND NOT EXISTS (
+           SELECT 1 FROM data_consents AS winner
+           WHERE winner.contact_id = $2 AND winner.channel = loser.channel
+         )
+       RETURNING loser.id`,
+      [loserId, winnerId],
+    )
+    return rows.length
+  }
+
+  async dropRemainingConsents(qr: QueryRunner, loserId: string): Promise<void> {
+    await qr.query(`DELETE FROM data_consents WHERE contact_id = $1`, [loserId])
+  }
+
+  async applyMergedFields(
+    qr: QueryRunner,
+    winnerId: string,
+    loserId: string,
+    fields: ReadonlyArray<ContactMergeField>,
+  ): Promise<ContactRow | null> {
+    const taken = fields.map((field) => {
+      const column = MERGE_FIELD_COLUMNS[field]
+      return `${column} = loser.${column}`
+    })
+    const assignments = [...taken, MERGE_TAGS_SQL, MERGE_CUSTOM_FIELDS_SQL, 'updated_at = NOW()']
+
+    const rows = await sqlRows<ContactRow[]>(
+      qr,
+      `UPDATE contacts AS winner
+       SET ${assignments.join(', ')}
+       FROM contacts AS loser
+       WHERE winner.id = $1 AND loser.id = $2
+       RETURNING ${WINNER_CONTACT_COLUMNS}`,
+      [winnerId, loserId],
+    )
+    return rows[0] ?? null
+  }
+
+  async markMergedInto(qr: QueryRunner, loserId: string, winnerId: string): Promise<void> {
+    await qr.query(
+      `UPDATE contacts
+       SET is_active = false, merged_into_id = $2, updated_at = NOW()
+       WHERE id = $1`,
+      [loserId, winnerId],
+    )
   }
 
   private buildOrderClause(query: ContactListQuery): string {

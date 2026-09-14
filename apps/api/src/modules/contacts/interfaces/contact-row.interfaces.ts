@@ -125,3 +125,5 @@ export interface ContactColumnChange {
   column: string
   value: unknown
 }
+
+export type MergeMovedRows = Readonly<Record<string, number>>

@@ -24,6 +24,7 @@ import type {
   ContactListItem,
   ContactCounts,
   ContactDuplicateProbeResult,
+  ContactMergeResult,
   ContactTaxonomyUsage,
   PaginatedContacts,
   ContactTimeline,
@@ -37,6 +38,7 @@ import { TenantCtx } from '@/shared/decorators/tenant-context.decorator'
 import { CurrentUser } from '@/shared/decorators/current-user.decorator'
 import { parseAdvancedFilters } from '@/shared/utils/advanced-filters'
 import { ContactsService } from '../services/contacts.service'
+import { ContactMergeService } from '../services/contact-merge.service'
 import { ContactImportService } from '../services/contact-import.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { TenantConfigService } from '@/modules/settings/services/tenant-config.service'
@@ -48,6 +50,7 @@ import {
   ReassignTaxonomyDto,
   ExecuteContactImportDto,
   ContactTimelineQueryDto,
+  MergeContactDto,
 } from '../dto/contact.dto'
 
 @ApiTags('Contacts')
@@ -55,6 +58,7 @@ import {
 export class ContactsController {
   constructor(
     private readonly contactsService: ContactsService,
+    private readonly mergeService: ContactMergeService,
     private readonly importService: ContactImportService,
     private readonly customFields: CustomFieldsValidator,
     private readonly tenantConfig: TenantConfigService,
@@ -269,6 +273,21 @@ export class ContactsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<Contact> {
     return this.contactsService.restore(ctx.schemaName, id, user.id)
+  }
+
+  @Post(':id/merge')
+  @ApiEndpoint({
+    summary: 'Merge another contact into this one and archive the loser',
+    roles: [UserRole.SALES_REP],
+    param: 'Contact UUID that survives the merge',
+  })
+  merge(
+    @TenantCtx() ctx: TenantContext,
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: MergeContactDto,
+  ): Promise<ContactMergeResult> {
+    return this.mergeService.merge(ctx.schemaName, id, dto, user.id)
   }
 
   @Get(':id/timeline')

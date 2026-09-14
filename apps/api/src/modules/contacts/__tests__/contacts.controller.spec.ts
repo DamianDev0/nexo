@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { ContactsController } from '../controllers/contacts.controller'
 import { ContactsService } from '../services/contacts.service'
+import { ContactMergeService } from '../services/contact-merge.service'
 import { ContactImportService } from '../services/contact-import.service'
 import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields-validator.service'
 import { TenantConfigService } from '@/modules/settings/services/tenant-config.service'
@@ -69,9 +70,11 @@ function buildServiceMock() {
 describe('ContactsController', () => {
   let controller: ContactsController
   let service: ReturnType<typeof buildServiceMock>
+  let mergeService: { merge: jest.Mock }
 
   beforeEach(async () => {
     service = buildServiceMock()
+    mergeService = { merge: jest.fn() }
 
     const importService = { analyze: jest.fn(), preview: jest.fn(), execute: jest.fn() }
 
@@ -79,6 +82,7 @@ describe('ContactsController', () => {
       controllers: [ContactsController],
       providers: [
         { provide: ContactsService, useValue: service },
+        { provide: ContactMergeService, useValue: mergeService },
         { provide: ContactImportService, useValue: importService },
         { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
         {
@@ -213,6 +217,24 @@ describe('ContactsController', () => {
 
       expect(service.probeDuplicates).toHaveBeenCalledWith(mockCtx.schemaName, query)
       expect(result).toEqual({ duplicate: null })
+    })
+  })
+
+  describe('merge', () => {
+    it('hands the surviving id, the loser and the actor to the merge service', async () => {
+      const result = { contact: { id: 'c-1' }, movedRecords: 3 }
+      mergeService.merge.mockResolvedValue(result)
+
+      await expect(
+        controller.merge(mockCtx, mockUser, 'c-1', { loserId: 'c-2', fieldsFromLoser: ['email'] }),
+      ).resolves.toBe(result)
+
+      expect(mergeService.merge).toHaveBeenCalledWith(
+        mockCtx.schemaName,
+        'c-1',
+        { loserId: 'c-2', fieldsFromLoser: ['email'] },
+        mockUser.id,
+      )
     })
   })
 

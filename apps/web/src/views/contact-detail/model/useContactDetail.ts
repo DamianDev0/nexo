@@ -10,6 +10,7 @@ import { openDealCount, useContactDeals } from '@/entities/deal'
 import { useTagCatalog } from '@/entities/tag'
 import { useArchiveContactDialog } from '@/features/archive-contact'
 import { useContactComposers } from '@/features/compose-contact-actions'
+import { useMergeContactsDialog } from '@/features/merge-contacts'
 import { groupContactActivities } from '@/features/preview-contact'
 import { ROUTES } from '@/shared/config/routes'
 
@@ -32,7 +33,8 @@ export function useContactDetail(contactId: string) {
   const backToList = useCallback(() => router.push(ROUTES.app.contacts.list), [router])
   const archive = useArchiveContactDialog(backToList)
   const query = useContact(contactId)
-  const actions = useContactDetailActions(composers, archive)
+  const mergeDialog = useMergeContactsDialog(query.contact, backToList)
+  const actions = useContactDetailActions(composers, archive, mergeDialog.ask)
   const feed = useContactTimeline(contactId, true)
   const deals = useContactDeals(contactId)
   const tagsByName = useTagCatalog('contact')
@@ -68,6 +70,7 @@ export function useContactDetail(contactId: string) {
     composers,
     rail,
     archive,
+    mergeDialog,
     panelRoute,
     tabs: { active: tab, select: setTab },
   }

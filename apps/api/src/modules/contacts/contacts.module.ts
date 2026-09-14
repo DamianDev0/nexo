@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { SettingsModule } from '@/modules/settings/settings.module'
 import { ContactsController } from './controllers/contacts.controller'
 import { ContactsService } from './services/contacts.service'
+import { ContactMergeService } from './services/contact-merge.service'
 import { ContactViewsController } from './controllers/contact-views.controller'
 import { ContactViewsService } from './services/contact-views.service'
 import { ContactWorkspaceController } from './controllers/contact-workspace.controller'
@@ -26,6 +27,7 @@ import { ContactDuplicatesRepository } from './repositories/contact-duplicates.r
   ],
   providers: [
     ContactsService,
+    ContactMergeService,
     ContactViewsService,
     ContactWorkspaceService,
     ContactDuplicatesService,

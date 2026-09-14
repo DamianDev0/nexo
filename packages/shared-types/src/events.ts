@@ -8,6 +8,7 @@ export const DOMAIN_EVENTS = {
   CONTACT_LIFECYCLE_CHANGED: 'contact.lifecycle_changed',
   CONTACT_TAGGED: 'contact.tagged',
   CONTACT_IMPORTED: 'contact.imported',
+  CONTACT_MERGED: 'contact.merged',
   COMPANY_CREATED: 'company.created',
   COMPANY_UPDATED: 'company.updated',
   COMPANY_DELETED: 'company.deleted',

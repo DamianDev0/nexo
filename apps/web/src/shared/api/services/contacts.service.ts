@@ -11,6 +11,8 @@ import type {
   ContactInput,
   ContactListItem,
   ContactListQuery,
+  ContactMergeInput,
+  ContactMergeResult,
   ContactTableState,
   ContactTaxonomyUsage,
   ContactTimeline,
@@ -118,6 +120,13 @@ const contactsService = {
     }),
 
   archive: (id: string) => request<void>({ method: 'delete', url: `/contacts/${id}` }),
+
+  merge: (winnerId: string, data: ContactMergeInput) =>
+    request<ContactMergeResult>({
+      method: 'post',
+      url: `/contacts/${winnerId}/merge`,
+      data,
+    }),
 
   restore: (id: string) => request<Contact>({ method: 'post', url: `/contacts/${id}/restore` }),
 

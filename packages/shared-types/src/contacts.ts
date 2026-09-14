@@ -129,6 +129,39 @@ export type ContactActivity = {
   createdAt: string
 }
 
+export const CONTACT_MERGE_FIELDS = [
+  'firstName',
+  'lastName',
+  'email',
+  'phone',
+  'whatsapp',
+  'documentType',
+  'documentNumber',
+  'avatarUrl',
+  'city',
+  'municipioCode',
+  'status',
+  'lifecycleStage',
+  'source',
+  'companyId',
+  'assignedToId',
+] as const
+
+export type ContactMergeField = (typeof CONTACT_MERGE_FIELDS)[number]
+
+export type ContactMergeInput = {
+  loserId: string
+  fieldsFromLoser?: ContactMergeField[]
+}
+
+export type ContactMergeResult = {
+  contact: Contact
+  movedRecords: number
+  movedActivities: number
+  movedDeals: number
+  movedConsents: number
+}
+
 export type ContactDeal = {
   id: string
   title: string

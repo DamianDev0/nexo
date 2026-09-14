@@ -24,8 +24,13 @@ import { Transform, Type } from 'class-transformer'
 import { PartialType, PickType } from '@nestjs/mapped-types'
 import { DUPLICATE_STRATEGIES } from '@/shared/imports/constants/import.constants'
 import type { DuplicateStrategy } from '@repo/shared-types'
-import { DocumentType, CONTACT_SORT_FIELDS, TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
-import type { ContactSortField, TaxonomyReassignKind } from '@repo/shared-types'
+import {
+  DocumentType,
+  CONTACT_MERGE_FIELDS,
+  CONTACT_SORT_FIELDS,
+  TAXONOMY_KEY_PATTERN,
+} from '@repo/shared-types'
+import type { ContactMergeField, ContactSortField, TaxonomyReassignKind } from '@repo/shared-types'
 import { TaggedPaginationQueryDto } from '@/shared/dto/tagged-pagination-query.dto'
 import { IsOptionalNotNull } from '@/shared/decorators/is-optional-not-null.decorator'
 
@@ -268,4 +273,20 @@ export class ContactTimelineQueryDto {
   @Min(1)
   @Max(CONTACT_TIMELINE_MAX)
   limit?: number
+}
+
+export class MergeContactDto {
+  @ApiProperty({ description: 'UUID of the contact that will be archived' })
+  @IsUUID()
+  loserId: string
+
+  @ApiPropertyOptional({
+    description: 'Fields to take from the archived contact instead of keeping the winner value',
+    enum: CONTACT_MERGE_FIELDS,
+    isArray: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsIn(CONTACT_MERGE_FIELDS, { each: true })
+  fieldsFromLoser?: ContactMergeField[]
 }

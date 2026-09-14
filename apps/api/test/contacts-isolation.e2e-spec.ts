@@ -170,4 +170,25 @@ describe('Contacts Core Tenant Isolation (E2E, real HTTP)', () => {
       tenantA,
     ).expect(200)
   })
+  it('never merges across tenants, in either direction', async () => {
+    const own = await asTenant(request(server()).post(`/${API_PREFIX}/contacts`), tenantB)
+      .send({ firstName: 'Beatriz', lastName: 'Ospina' })
+      .expect(201)
+    const contactB = own.body.data.id as string
+
+    await asTenant(request(server()).post(`/${API_PREFIX}/contacts/${contactA}/merge`), tenantB)
+      .send({ loserId: contactB })
+      .expect(404)
+
+    await asTenant(request(server()).post(`/${API_PREFIX}/contacts/${contactB}/merge`), tenantB)
+      .send({ loserId: contactA })
+      .expect(404)
+
+    await asTenant(request(server()).get(`/${API_PREFIX}/contacts/${contactA}`), tenantA).expect(
+      200,
+    )
+    await asTenant(request(server()).get(`/${API_PREFIX}/contacts/${contactB}`), tenantB).expect(
+      200,
+    )
+  })
 })
