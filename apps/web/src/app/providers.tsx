@@ -22,7 +22,6 @@ const LIGHT_TOAST_OPTIONS = {
   styles: {
     title: 'text-black! normal-case!',
     description: `${TOAST_DESCRIPTION_LAYOUT} text-black/70!`,
-    badge: 'bg-black/5!',
     button: `${TOAST_BUTTON_LAYOUT} bg-black/5! text-primary-deep! hover:bg-black/10!`,
   },
 } as const
@@ -32,7 +31,6 @@ const DARK_TOAST_OPTIONS = {
   styles: {
     title: 'text-white! normal-case!',
     description: `${TOAST_DESCRIPTION_LAYOUT} text-white/75!`,
-    badge: 'bg-white/10!',
     button: `${TOAST_BUTTON_LAYOUT} bg-white/10! text-primary! hover:bg-white/15!`,
   },
 } as const

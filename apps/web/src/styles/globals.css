@@ -432,3 +432,12 @@
     animation: none;
   }
 }
+
+[data-sileo-toast] {
+  filter: drop-shadow(0 1px 2px rgba(14, 15, 12, 0.08))
+    drop-shadow(0 12px 28px rgba(14, 15, 12, 0.22));
+}
+
+.dark [data-sileo-toast] {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4)) drop-shadow(0 16px 36px rgba(0, 0, 0, 0.55));
+}
