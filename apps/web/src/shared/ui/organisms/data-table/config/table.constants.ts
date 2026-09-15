@@ -21,13 +21,10 @@ export const DATA_TABLE_SEARCH_COLLAPSED = 36
 
 export const DATA_TABLE_SEARCH_EXPANDED = 288
 
-export const DATA_TABLE_SEARCH_SPRING = { type: 'spring', stiffness: 260, damping: 26 } as const
-
 export const DATA_TABLE_TOOLBAR_SWAP = {
   initial: { opacity: 0, y: -8 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: 8, pointerEvents: 'none' },
-  transition: { duration: 0.18, ease: 'easeOut' },
 } as const
 
 export const DATA_TABLE_TOOLBAR_BUTTON =

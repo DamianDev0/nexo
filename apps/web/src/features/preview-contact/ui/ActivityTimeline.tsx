@@ -1,9 +1,16 @@
 'use client'
 
 import { formatDateCO } from '@repo/shared-utils'
+import { motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import {
+  quickEase,
+  staggerChild,
+  staggerContainer,
+  useReducedTransition,
+} from '@/shared/lib/animations'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { SegmentedControl } from '@/shared/ui/molecules/segmented-control'
@@ -31,6 +38,7 @@ type ActivityTimelineProps = {
 
 export function ActivityTimeline({ feed, onToggle, emptyAction }: Readonly<ActivityTimelineProps>) {
   const { t } = useTranslation()
+  const reveal = useReducedTransition(quickEase)
   const [filter, setFilter] = useState<ActivityTimelineFilter>('all')
   const options = useMemo(
     () =>
@@ -64,19 +72,32 @@ export function ActivityTimeline({ feed, onToggle, emptyAction }: Readonly<Activ
     <span className="flex flex-col gap-3">
       <SegmentedControl value={filter} onValueChange={setFilter} options={options} />
       {feed.isLoading ? <ActivityList items={[]} isLoading /> : null}
-      {days.map(({ day, items }) => {
-        const relative = relativeDayKey(day)
-        return (
-          <span key={day} className="flex flex-col gap-1">
-            <Text variant="hint" className="font-medium uppercase tracking-wide">
-              {relative
-                ? t(`contacts.preview.timeline.${relative}`)
-                : formatDateCO(`${day}T12:00:00-05:00`)}
-            </Text>
-            <ActivityList items={items} isLoading={false} onToggle={onToggle} />
-          </span>
-        )
-      })}
+      <motion.span
+        key={filter}
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+        className="flex flex-col gap-3"
+      >
+        {days.map(({ day, items }) => {
+          const relative = relativeDayKey(day)
+          return (
+            <motion.span
+              key={day}
+              variants={staggerChild}
+              transition={reveal}
+              className="flex flex-col gap-1"
+            >
+              <Text variant="hint" className="font-medium uppercase tracking-wide">
+                {relative
+                  ? t(`contacts.preview.timeline.${relative}`)
+                  : formatDateCO(`${day}T12:00:00-05:00`)}
+              </Text>
+              <ActivityList items={items} isLoading={false} onToggle={onToggle} />
+            </motion.span>
+          )
+        })}
+      </motion.span>
       {days.length === 0 && !feed.isLoading ? (
         <Text variant="muted">{t('contacts.preview.timeline.noneForFilter')}</Text>
       ) : null}

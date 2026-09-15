@@ -1,9 +1,8 @@
 'use client'
 
+import { blankToUndefined } from '@repo/shared-utils'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-
-import { blankToUndefined } from '@repo/shared-utils'
 
 import {
   CONTACT_AVATARS,

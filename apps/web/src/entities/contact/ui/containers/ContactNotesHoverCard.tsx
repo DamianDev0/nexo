@@ -5,9 +5,9 @@ import { useState } from 'react'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { NotePencilIcon } from '@/shared/ui/icons'
+import { GroovyHoverCard } from '@/shared/ui/molecules/groovy-hover-card'
 import { HintContent } from '@/shared/ui/molecules/hint-content'
 import { DataTable } from '@/shared/ui/organisms/data-table'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/shared/ui/shadcn/hover-card'
 import { Skeleton } from '@/shared/ui/shadcn/skeleton'
 import { Tooltip, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
@@ -57,32 +57,31 @@ export function ContactNotesHoverCard({
   const { notes, isLoading } = useContactNotes(contactId, opened)
 
   return (
-    <HoverCard
-      openDelay={150}
-      closeDelay={100}
-      onOpenChange={(open) => {
-        if (open) setOpened(true)
-      }}
+    <GroovyHoverCard
+      className="w-64 p-2"
+      onOpen={() => setOpened(true)}
+      content={
+        <>
+          <Text as="p" variant="hint" className="px-1.5 pb-1 font-medium">
+            {labels.title}
+          </Text>
+          {isLoading ? (
+            <span className="flex flex-col gap-1.5 px-1.5 py-1">
+              <Skeleton className="h-3.5 w-4/5" />
+              <Skeleton className="h-3.5 w-3/5" />
+            </span>
+          ) : (
+            <span className="flex max-h-56 flex-col overflow-y-auto">
+              {notes.map((note) => (
+                <NoteRow key={note.id} note={note} />
+              ))}
+            </span>
+          )}
+        </>
+      }
     >
-      <HoverCardTrigger asChild>{children}</HoverCardTrigger>
-      <HoverCardContent align="start" className="z-30 w-64 p-2">
-        <Text as="p" variant="hint" className="px-1.5 pb-1 font-medium">
-          {labels.title}
-        </Text>
-        {isLoading ? (
-          <span className="flex flex-col gap-1.5 px-1.5 py-1">
-            <Skeleton className="h-3.5 w-4/5" />
-            <Skeleton className="h-3.5 w-3/5" />
-          </span>
-        ) : (
-          <span className="flex max-h-56 flex-col overflow-y-auto">
-            {notes.map((note) => (
-              <NoteRow key={note.id} note={note} />
-            ))}
-          </span>
-        )}
-      </HoverCardContent>
-    </HoverCard>
+      {children}
+    </GroovyHoverCard>
   )
 }
 

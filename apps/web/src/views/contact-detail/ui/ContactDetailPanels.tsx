@@ -1,9 +1,11 @@
 'use client'
 
+import { motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
 import { DealCardList } from '@/entities/deal'
 import { ActivityCardList } from '@/features/preview-contact'
+import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { useHydrated } from '@/shared/lib/hooks/useHydrated'
 import { RecordDrawer } from '@/shared/ui/organisms/record-drawer'
 import { RecordLayout } from '@/shared/ui/organisms/record-layout'
@@ -43,6 +45,7 @@ export function ContactDetailPanels({
 }: Readonly<ContactDetailPanelsProps>) {
   const { t } = useTranslation()
   const hydrated = useHydrated()
+  const reveal = useReducedTransition(quickEase)
   const { feed, groups, onToggle } = activities
 
   if (!hydrated) return null
@@ -81,9 +84,14 @@ export function ContactDetailPanels({
             action={panel.action}
             closeLabel={t('contacts.detail.closePanel')}
           >
-            <div className="flex flex-col gap-2 px-3 py-3">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={reveal}
+              className="flex flex-col gap-2 px-3 py-3"
+            >
               {panel.isEmpty ? <RecordDrawer.Empty label={panel.empty} /> : panel.content}
-            </div>
+            </motion.div>
           </RecordLayout.Panel>
         )
       })}

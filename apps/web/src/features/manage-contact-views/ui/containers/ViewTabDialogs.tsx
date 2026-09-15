@@ -1,8 +1,7 @@
 'use client'
 
-import { useTranslation } from 'react-i18next'
-
 import { blankToUndefined } from '@repo/shared-utils'
+import { useTranslation } from 'react-i18next'
 
 import { useContactViewsAdmin } from '../../query/useContactViewsAdmin'
 import { DeleteViewDialog } from '../DeleteViewDialog'

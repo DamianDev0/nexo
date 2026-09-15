@@ -3,9 +3,9 @@ import { ColorDot } from '@/shared/ui/atoms/color-dot'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { Text } from '@/shared/ui/atoms/text'
 import { TagPlusIcon } from '@/shared/ui/icons'
+import { GroovyHoverCard } from '@/shared/ui/molecules/groovy-hover-card'
 import { HintContent } from '@/shared/ui/molecules/hint-content'
 import { DataTable } from '@/shared/ui/organisms/data-table'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/shared/ui/shadcn/hover-card'
 import { Tooltip, TooltipTrigger } from '@/shared/ui/shadcn/tooltip'
 
 import { CONTACT_TAG_CHIP } from '../../config/contact-columns.constants'
@@ -54,19 +54,23 @@ export function ContactTagsHoverCard({
   children,
 }: Readonly<TagsHoverCardProps>) {
   return (
-    <HoverCard openDelay={150} closeDelay={100}>
-      <HoverCardTrigger asChild>{children}</HoverCardTrigger>
-      <HoverCardContent align="start" className="z-30 w-56 p-2">
-        <Text as="p" variant="hint" className="px-1.5 pb-1 font-medium">
-          {labels.title}
-        </Text>
-        <span className="flex max-h-56 flex-col overflow-y-auto">
-          {tags.map((tag) => (
-            <TagRow key={tag} name={tag} meta={byName?.get(tag.toLowerCase())} />
-          ))}
-        </span>
-      </HoverCardContent>
-    </HoverCard>
+    <GroovyHoverCard
+      className="w-56 p-2"
+      content={
+        <>
+          <Text as="p" variant="hint" className="px-1.5 pb-1 font-medium">
+            {labels.title}
+          </Text>
+          <span className="flex max-h-56 flex-col overflow-y-auto">
+            {tags.map((tag) => (
+              <TagRow key={tag} name={tag} meta={byName?.get(tag.toLowerCase())} />
+            ))}
+          </span>
+        </>
+      }
+    >
+      {children}
+    </GroovyHoverCard>
   )
 }
 

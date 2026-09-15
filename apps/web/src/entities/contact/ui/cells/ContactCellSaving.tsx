@@ -13,7 +13,10 @@ export function ContactCellSaving({ saving, label, children }: Readonly<ContactC
   return (
     <span
       aria-busy={saving || undefined}
-      className={cn('flex min-w-0 flex-1 items-center gap-1', saving && 'opacity-60')}
+      className={cn(
+        'flex min-w-0 flex-1 items-center gap-1 transition-opacity duration-120',
+        saving && 'opacity-60',
+      )}
     >
       {children}
       {saving ? (

@@ -13,17 +13,15 @@ import {
 } from '@/features/filter-contacts'
 import { SaveViewControls } from '@/features/manage-contact-views'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { DotsThreeVerticalIcon, PlusIcon, UsersThreeIcon } from '@/shared/ui/icons'
+import { DotsThreeVerticalIcon, PlusIcon } from '@/shared/ui/icons'
 import { ActionMenu } from '@/shared/ui/molecules/action-menu'
 import { DataTable } from '@/shared/ui/organisms/data-table'
-import { EmptyState } from '@/shared/ui/organisms/empty-state'
 import { FilterChips, FilterTrigger } from '@/shared/ui/organisms/filter-bar'
 import { BadgeMorph } from '@/shared/ui/ruixen/badge-morph'
 
-import { resolveEmptyKind } from '../lib/empty-kind'
 import { buildToolbarMenu } from '../lib/toolbar-menu'
 
-import { ContactsPagination } from './ContactsPagination'
+import { ContactsTableStates } from './ContactsTableStates'
 
 import type { ContactsBoard } from '../model/useContactsBoard'
 import type { ListMenu } from '../model/useListMenu'
@@ -40,7 +38,6 @@ export function ContactsTable({ board, bulk, listMenu }: Readonly<ContactsTableP
   const terms = useEntityTerms('contact')
   const scrollRef = useRef<HTMLDivElement>(null)
   const toolbarMenu = useMemo(() => buildToolbarMenu(t), [t])
-  const emptyKind = resolveEmptyKind(state)
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -130,57 +127,12 @@ export function ContactsTable({ board, bulk, listMenu }: Readonly<ContactsTableP
             </span>
           </DataTable.Toolbar>
 
-          {state.isPending && <DataTable.Skeleton />}
-
-          {state.isUnavailable && (
-            <EmptyState
-              fill
-              icon={<UsersThreeIcon className="size-5" />}
-              title={t('contacts.unavailable.title')}
-              description={t('contacts.unavailable.description')}
-            />
-          )}
-
-          {!state.isUnavailable && state.isEmpty && (
-            <EmptyState
-              fill
-              icon={<UsersThreeIcon className="size-5" />}
-              title={t(`contacts.${emptyKind}.title`, { entities: terms.lowerPlural })}
-              description={t(`contacts.${emptyKind}.description`, {
-                entity: terms.lowerSingular,
-                entities: terms.lowerPlural,
-              })}
-            >
-              {emptyKind === 'empty' && (
-                <PillButton size="md" onClick={actions.onCreate}>
-                  {t('contacts.empty.cta', { entity: terms.lowerSingular })}
-                </PillButton>
-              )}
-            </EmptyState>
-          )}
-
-          {!state.isPending && !state.isEmpty && !state.isUnavailable && (
-            <>
-              <DataTable.Scroller ref={scrollRef} hideScrollbar className="min-h-0 flex-1">
-                <DataTable.Grid>
-                  <DataTable.Header />
-                  <DataTable.Body pageKey={state.page} dimmed={state.isFetching} />
-                </DataTable.Grid>
-              </DataTable.Scroller>
-              <ContactsPagination
-                nav={{
-                  page: state.page,
-                  totalPages: state.totalPages,
-                  limit: state.limit,
-                  total: state.total,
-                }}
-                scrollTarget={scrollRef}
-                onPageChange={actions.onPageChange}
-                onPrefetchPage={actions.onPrefetchPage}
-                onLimitChange={actions.onLimitChange}
-              />
-            </>
-          )}
+          <ContactsTableStates
+            state={state}
+            actions={actions}
+            terms={terms}
+            scrollRef={scrollRef}
+          />
         </DataTable>
       </div>
       <BulkDialogs dialogs={bulk.dialogs} />

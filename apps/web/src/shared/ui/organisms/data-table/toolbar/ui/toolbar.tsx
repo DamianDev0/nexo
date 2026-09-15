@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'motion/react'
 
+import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
 
 import { DATA_TABLE_GUTTER, DATA_TABLE_TOOLBAR_SWAP } from '../../config/table.constants'
@@ -21,6 +22,7 @@ interface ToolbarProps {
 export function DataTableToolbar({ children, bulk, className }: Readonly<ToolbarProps>) {
   const { selection } = useDataTableContext()
   const showBulk = bulk !== undefined && selection.active
+  const swap = useReducedTransition(quickEase)
 
   return (
     <div data-slot="table-toolbar" className={cn('grid py-1.5', DATA_TABLE_GUTTER, className)}>
@@ -28,6 +30,7 @@ export function DataTableToolbar({ children, bulk, className }: Readonly<Toolbar
         <motion.div
           key={showBulk ? 'bulk' : 'default'}
           {...DATA_TABLE_TOOLBAR_SWAP}
+          transition={swap}
           className="col-start-1 row-start-1 flex min-h-9 min-w-0 flex-wrap items-center gap-2"
         >
           {showBulk && bulk ? <DataTableBulkBar {...bulk} /> : children}

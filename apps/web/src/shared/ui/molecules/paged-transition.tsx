@@ -3,14 +3,14 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef } from 'react'
 
-import { DURATION, EASE_SMOOTH, useReducedTransition } from '@/shared/lib/animations'
+import { quickEase, subtleTween, useReducedTransition } from '@/shared/lib/animations'
 
 import type { ReactNode } from 'react'
 
 const SHIFT = 18
 
-const ENTER = { duration: DURATION.fast, ease: EASE_SMOOTH }
-const LEAVE = { duration: 0.12, ease: EASE_SMOOTH }
+const ENTER = quickEase
+const LEAVE = subtleTween
 
 interface PagedTransitionProps {
   readonly page: number

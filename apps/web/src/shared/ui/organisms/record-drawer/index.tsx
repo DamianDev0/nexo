@@ -51,8 +51,8 @@ function RecordDrawerRoot({
         onInteractOutside={keepOpenForFloatingLayers}
         data-slot="record-drawer"
         className={cn(
-          'z-40 w-full gap-0 p-0 sm:max-w-md data-[state=open]:duration-400',
-          'shadow-e3 data-[state=open]:ease-[cubic-bezier(0.32,0.72,0,1)]',
+          'z-40 w-full gap-0 p-0 sm:max-w-md data-[state=open]:duration-350',
+          'shadow-e3 data-[state=open]:ease-[cubic-bezier(0.25,0.1,0.25,1)]',
           className,
         )}
       >

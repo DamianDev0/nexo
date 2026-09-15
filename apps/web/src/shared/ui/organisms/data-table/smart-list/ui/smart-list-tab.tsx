@@ -6,6 +6,7 @@ import { motion } from 'motion/react'
 import { memo } from 'react'
 
 import { cn } from '@/shared/lib'
+import { indicatorSpring, snappySpring, useReducedTransition } from '@/shared/lib/animations'
 import { DotsSixVerticalIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Button } from '@/shared/ui/shadcn/button'
@@ -16,11 +17,13 @@ import type { SmartListItem, SmartListMenuAction } from '../model/smart-list.typ
 import type { KeyboardEvent } from 'react'
 
 export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
+  const lift = useReducedTransition(snappySpring)
+
   return (
     <motion.span
       initial={{ scale: 0.94, opacity: 0.6 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 700, damping: 40 }}
+      transition={lift}
       className="inline-flex h-10 rotate-1 cursor-grabbing items-center gap-2 whitespace-nowrap rounded-md border border-border bg-card px-3.5 text-sm font-medium text-foreground shadow-e3"
     >
       <DotsSixVerticalIcon className="-ml-1 size-3.5 text-primary" />
@@ -65,6 +68,8 @@ function SmartListTabBase({
     transition,
     isDragging,
   } = useSortable({ id: item.id, disabled: !sortable })
+  const underline = useReducedTransition(indicatorSpring)
+  const pop = useReducedTransition(snappySpring)
 
   const menuActions = actions.itemMenu?.(item) ?? []
   const hasMenu = menuActions.length > 0
@@ -89,7 +94,7 @@ function SmartListTabBase({
         <motion.span
           layoutId="smart-list-underline"
           className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-primary"
-          transition={{ type: 'spring', stiffness: 550, damping: 45 }}
+          transition={underline}
         />
       )}
       {item.icon ? <item.icon className="size-3.5 shrink-0 text-primary-deep" /> : null}
@@ -105,7 +110,7 @@ function SmartListTabBase({
             key={item.count}
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 600, damping: 30 }}
+            transition={pop}
           >
             {item.count}
           </motion.span>

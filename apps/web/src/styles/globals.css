@@ -431,6 +431,11 @@
   ::view-transition-new(root) {
     animation: none;
   }
+
+  .animate-in,
+  .animate-out {
+    animation-duration: 0.01ms !important;
+  }
 }
 
 [data-sileo-toast] {

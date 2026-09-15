@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
+import { smoothSpring, subtleTween, useReducedTransition } from '@/shared/lib/animations'
 import { cn } from '@/shared/lib/cn'
 import { MagnifyingGlassIcon, XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
@@ -10,7 +11,6 @@ import { Button } from '@/shared/ui/shadcn/button'
 import {
   DATA_TABLE_SEARCH_COLLAPSED,
   DATA_TABLE_SEARCH_EXPANDED,
-  DATA_TABLE_SEARCH_SPRING,
 } from '../../config/table.constants'
 import { useExpandableSearch } from '../model/use-expandable-search'
 
@@ -30,6 +30,8 @@ export function DataTableSearch({
   const { t } = useTranslation()
   const { open, toggle, containerRef, inputRef } = useExpandableSearch(value, onChange)
   const toggleLabel = t(open ? 'common.table.closeSearch' : 'common.table.search')
+  const expand = useReducedTransition(smoothSpring)
+  const reveal = useReducedTransition(subtleTween)
 
   return (
     <motion.div
@@ -37,7 +39,7 @@ export function DataTableSearch({
       data-slot="table-search"
       initial={false}
       animate={{ width: open ? DATA_TABLE_SEARCH_EXPANDED : DATA_TABLE_SEARCH_COLLAPSED }}
-      transition={DATA_TABLE_SEARCH_SPRING}
+      transition={expand}
       className={cn(
         'relative h-9 shrink-0 overflow-hidden rounded-full',
         open && 'border border-input bg-background shadow-xs',
@@ -56,7 +58,7 @@ export function DataTableSearch({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.12 }}
+            transition={reveal}
             className="absolute inset-y-0 left-0 h-full bg-transparent pl-10 pr-3 text-sm text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
             style={{ width: DATA_TABLE_SEARCH_EXPANDED }}
           />
