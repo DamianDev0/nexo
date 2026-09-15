@@ -92,6 +92,17 @@ export function getTenantSchemaSQL(schema: string): string {
       ADD CONSTRAINT contacts_merged_into_fk
       FOREIGN KEY (merged_into_id) REFERENCES "${schema}".contacts(id);
 
+    CREATE TABLE "${schema}".contact_lifecycle_history (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      contact_id  UUID NOT NULL REFERENCES "${schema}".contacts(id) ON DELETE CASCADE,
+      from_stage  VARCHAR(50),
+      to_stage    VARCHAR(50) NOT NULL,
+      reason      TEXT,
+      source      VARCHAR(30),
+      changed_by  UUID,
+      changed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     -- Consent per channel (Ley 1581 / Ley 2300): one row per contact + channel
     CREATE TABLE "${schema}".data_consents (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -749,6 +760,7 @@ export function getTenantIndicesSQL(schema: string): string {
       WHERE is_active = true;
     CREATE INDEX idx_${schema}_activities_calendar ON "${schema}".activities (due_date, assigned_to_id)
       WHERE is_active = true AND status = 'pending';
+    CREATE INDEX idx_${schema}_clh_contact ON "${schema}".contact_lifecycle_history (contact_id, changed_at DESC);
 
     CREATE INDEX idx_${schema}_tags_entity ON "${schema}".tags (entity_type, name);
     CREATE UNIQUE INDEX uq_${schema}_tags_active_name ON "${schema}".tags (entity_type, LOWER(name))

@@ -13,7 +13,11 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { ImportService } from '@/shared/imports/services/import.service'
 import type { UploadedImportFile } from '@/shared/imports/interfaces/import.interfaces'
 import { contactImportMapperFor } from '../constants/contact-import.mapper'
-import { IMPORT_MAX_ISSUES, IMPORT_UPDATABLE_COLUMNS } from '../constants/contact.constants'
+import {
+  IMPORT_BATCH_SIZE,
+  IMPORT_MAX_ISSUES,
+  IMPORT_UPDATABLE_COLUMNS,
+} from '../constants/contact.constants'
 import { buildImportRows } from '../mappers/contact-import-row.mapper'
 import { ContactsRepository } from '../repositories/contacts.repository'
 import type { ImportSourceRow } from '../mappers/contact-import-row.mapper'
@@ -114,7 +118,7 @@ export class ContactImportService {
         }
       })
     } finally {
-      this.importService.release(fileId, schemaName)
+      await this.importService.release(fileId, schemaName)
     }
   }
 
@@ -138,30 +142,47 @@ export class ContactImportService {
     candidates: ReadonlyArray<{ data: CreateContactData }>,
     duplicateStrategy: DuplicateStrategy,
   ): Promise<{ imported: number; updated: number; skipped: number }> {
-    let imported = 0
+    const rows = candidates.map((candidate) => candidate.data)
+    const matches = await this.repository.findImportMatches(qr, rows)
+    const seen = new Set<string>()
+    const inserts: CreateContactData[] = []
     let updated = 0
     let skipped = 0
 
-    for (const { data } of candidates) {
-      const matchId = await this.repository.findImportMatchId(qr, data.email, data.documentNumber)
-
-      if (matchId && duplicateStrategy === 'skip') {
+    for (const data of rows) {
+      const keys = importKeys(data)
+      if (keys.some((key) => seen.has(key))) {
         skipped++
         continue
       }
+      for (const key of keys) seen.add(key)
 
-      if (matchId && duplicateStrategy === 'update') {
+      const matchId = keys.map((key) => matches.get(key)).find((id) => id !== undefined)
+      if (matchId === undefined) {
+        inserts.push(data)
+        continue
+      }
+      if (duplicateStrategy === 'update') {
         await this.repository.updateById(qr, matchId, toChanges(data))
         updated++
         continue
       }
-
-      await this.repository.insert(qr, data)
-      imported++
+      skipped++
     }
 
-    return { imported, updated, skipped }
+    for (let start = 0; start < inserts.length; start += IMPORT_BATCH_SIZE) {
+      await this.repository.insertMany(qr, inserts.slice(start, start + IMPORT_BATCH_SIZE))
+    }
+
+    return { imported: inserts.length, updated, skipped }
   }
+}
+
+function importKeys(data: CreateContactData): string[] {
+  const keys: string[] = []
+  if (data.email) keys.push(`email:${data.email.toLowerCase()}`)
+  if (data.documentNumber) keys.push(`document:${data.documentNumber}`)
+  return keys
 }
 
 function toChanges(data: CreateContactData): ContactColumnChange[] {

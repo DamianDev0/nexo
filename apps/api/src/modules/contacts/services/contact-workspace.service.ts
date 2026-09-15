@@ -84,7 +84,8 @@ export class ContactWorkspaceService {
     userId: string,
     dto: UpdateContactWorkspaceDto,
   ): Promise<void> {
-    await this.db.query(schemaName, async (qr) => {
+    await this.db.transactional(schemaName, async (qr) => {
+      await this.repository.lockUser(qr, userId)
       const existing = await this.repository.loadState(qr, userId)
       const activeViewId =
         dto.activeViewId === undefined ? (existing?.active_view_id ?? null) : dto.activeViewId

@@ -91,7 +91,7 @@ export class ProductImportExportService {
       duplicateStrategy,
       createdById,
     )
-    cleanup()
+    await cleanup()
 
     return {
       imported: counts.imported,

@@ -1,5 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types'
 import { Type } from 'class-transformer'
+import { IsBoundedObject } from '@/shared/decorators/is-bounded-object.decorator'
 import {
   ArrayMaxSize,
   IsArray,
@@ -77,11 +78,11 @@ export class CreateContactViewDto {
   description?: string
 
   @IsOptional()
-  @IsObject()
+  @IsBoundedObject()
   filters?: Record<string, unknown>
 
   @IsOptional()
-  @IsObject()
+  @IsBoundedObject()
   advancedFilters?: Record<string, unknown> | null
 
   @IsOptional()

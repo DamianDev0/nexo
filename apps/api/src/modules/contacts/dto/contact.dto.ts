@@ -1,4 +1,5 @@
 import {
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsEmail,
@@ -7,7 +8,6 @@ import {
   IsInt,
   IsISO8601,
   IsNotEmpty,
-  IsObject,
   IsOptional,
   IsString,
   IsUrl,
@@ -23,16 +23,27 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform, Type } from 'class-transformer'
 import { PartialType, PickType } from '@nestjs/mapped-types'
 import { DUPLICATE_STRATEGIES } from '@/shared/imports/constants/import.constants'
-import type { DuplicateStrategy } from '@repo/shared-types'
 import {
   DocumentType,
   CONTACT_MERGE_FIELDS,
   CONTACT_SORT_FIELDS,
   TAXONOMY_KEY_PATTERN,
 } from '@repo/shared-types'
-import type { ContactMergeField, ContactSortField, TaxonomyReassignKind } from '@repo/shared-types'
+import type {
+  ContactMergeField,
+  ContactSortField,
+  DuplicateStrategy,
+  TaxonomyReassignKind,
+} from '@repo/shared-types'
 import { TaggedPaginationQueryDto } from '@/shared/dto/tagged-pagination-query.dto'
 import { IsOptionalNotNull } from '@/shared/decorators/is-optional-not-null.decorator'
+import { IsCOPhone } from '@/shared/decorators/is-co-phone.decorator'
+import { IsDocumentNumberFor } from '@/shared/decorators/is-document-number.decorator'
+import { IsBoundedObject } from '@/shared/decorators/is-bounded-object.decorator'
+
+const CONTACT_MAX_TAGS = 50
+const CONTACT_TAG_MAX_LENGTH = 60
+const IMPORT_MAX_MAPPED_COLUMNS = 200
 
 export class CreateContactDto {
   @ApiProperty()
@@ -51,16 +62,18 @@ export class CreateContactDto {
   @IsEmail()
   email?: string
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: '3001234567' })
   @IsOptional()
   @IsString()
   @Length(1, 20)
+  @IsCOPhone()
   phone?: string
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: '3001234567' })
   @IsOptional()
   @IsString()
   @Length(1, 20)
+  @IsCOPhone()
   whatsapp?: string
 
   @ApiPropertyOptional({ enum: DocumentType })
@@ -68,10 +81,11 @@ export class CreateContactDto {
   @IsEnum(DocumentType)
   documentType?: DocumentType
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'Digits only; NIT without the check digit' })
   @IsOptional()
   @IsString()
   @Length(1, 20)
+  @IsDocumentNumberFor('documentType')
   documentNumber?: string
 
   @ApiPropertyOptional()
@@ -105,10 +119,12 @@ export class CreateContactDto {
   @Matches(TAXONOMY_KEY_PATTERN)
   lifecycleStage?: string
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiPropertyOptional({ type: [String], maxItems: CONTACT_MAX_TAGS })
   @IsOptionalNotNull()
   @IsArray()
+  @ArrayMaxSize(CONTACT_MAX_TAGS)
   @IsString({ each: true })
+  @Length(1, CONTACT_TAG_MAX_LENGTH, { each: true })
   tags?: string[]
 
   @ApiPropertyOptional()
@@ -132,7 +148,7 @@ export class CreateContactDto {
     example: { industry: 'tech' },
   })
   @IsOptional()
-  @IsObject()
+  @IsBoundedObject()
   customFields?: Record<string, unknown>
 }
 
@@ -256,6 +272,7 @@ export class ExecuteContactImportDto {
   fileId: string
 
   @IsOptional()
+  @IsBoundedObject({ maxKeys: IMPORT_MAX_MAPPED_COLUMNS })
   mapping?: Record<string, string | null>
 
   @IsOptional()

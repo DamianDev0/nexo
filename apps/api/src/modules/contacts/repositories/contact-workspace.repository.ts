@@ -13,6 +13,12 @@ export class ContactWorkspaceRepository {
     return this.db.query(schemaName, async (qr) => this.loadState(qr, userId))
   }
 
+  async lockUser(qr: QueryRunner, userId: string): Promise<void> {
+    await qr.query(`SELECT pg_advisory_xact_lock(hashtext('contact_workspace'), hashtext($1))`, [
+      userId,
+    ])
+  }
+
   async loadState(qr: QueryRunner, userId: string): Promise<WorkspaceStateRow | null> {
     const rows = await sqlRows<WorkspaceStateRow[]>(
       qr,

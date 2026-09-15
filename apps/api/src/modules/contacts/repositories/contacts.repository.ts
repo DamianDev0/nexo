@@ -18,6 +18,7 @@ import type {
 } from '../interfaces/contact-row.interfaces'
 import {
   CONTACT_COLUMNS,
+  CONTACT_INSERT_COLUMNS,
   CONTACT_LIST_COLUMNS,
   MERGE_CHILD_TABLES,
   MERGE_CUSTOM_FIELDS_SQL,
@@ -31,6 +32,29 @@ import {
 } from '../constants/contact.constants'
 import { buildContactWhereClause } from '@/shared/database/contact-filter-sql'
 import { sqlRows } from '@/shared/database/sql.util'
+
+function insertValues(data: CreateContactData): unknown[] {
+  return [
+    data.firstName,
+    data.lastName,
+    data.email,
+    data.phone,
+    data.whatsapp,
+    data.documentType,
+    data.documentNumber,
+    data.avatarUrl,
+    data.city,
+    data.municipioCode,
+    data.status,
+    data.lifecycleStage,
+    data.source,
+    data.tags,
+    data.companyId,
+    data.assignedToId,
+    data.customFields,
+    data.createdBy,
+  ]
+}
 
 @Injectable()
 export class ContactsRepository {
@@ -52,18 +76,34 @@ export class ContactsRepository {
       const total = Number.parseInt(countRows[0].count, 10)
 
       const dataParams = [...params, limit, offset]
+      const orderBy = this.buildOrderClause(query)
       const rows = await sqlRows<ContactRow[]>(
         qr,
         `SELECT ${CONTACT_LIST_COLUMNS}
          FROM contacts
-         WHERE ${where}
-         ${this.buildOrderClause(query)}
-         LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length}`,
+         JOIN (
+           SELECT id FROM contacts
+           WHERE ${where}
+           ${orderBy}
+           LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length}
+         ) AS page USING (id)
+         ${orderBy}`,
         dataParams,
       )
 
       return { rows, total, page, limit }
     })
+  }
+
+  async lockByIds(qr: QueryRunner, contactIds: ReadonlyArray<string>): Promise<ContactRow[]> {
+    return sqlRows<ContactRow[]>(
+      qr,
+      `SELECT ${CONTACT_COLUMNS} FROM contacts
+       WHERE id = ANY($1::uuid[])
+       ORDER BY id
+       FOR UPDATE`,
+      [contactIds],
+    )
   }
 
   async countOwnership(
@@ -135,18 +175,16 @@ export class ContactsRepository {
       const grouped = (column: TaxonomyColumn) =>
         sqlRows<TaxonomyUsageCountRow[]>(qr, TAXONOMY_USAGE_SQL[column])
 
-      const [statuses, sources, lifecycleStages, tags] = await Promise.all([
-        grouped('status'),
-        grouped('source'),
-        grouped('lifecycle'),
-        sqlRows<TaxonomyUsageCountRow[]>(
-          qr,
-          `SELECT tag AS key, COUNT(*)::text AS count
-           FROM contacts, unnest(tags) AS tag
-           WHERE is_active = true
-           GROUP BY tag`,
-        ),
-      ])
+      const statuses = await grouped('status')
+      const sources = await grouped('source')
+      const lifecycleStages = await grouped('lifecycle')
+      const tags = await sqlRows<TaxonomyUsageCountRow[]>(
+        qr,
+        `SELECT tag AS key, COUNT(*)::text AS count
+         FROM contacts, unnest(tags) AS tag
+         WHERE is_active = true
+         GROUP BY tag`,
+      )
 
       return { statuses, sources, lifecycleStages, tags }
     })
@@ -191,13 +229,22 @@ export class ContactsRepository {
     return rows[0] ?? null
   }
 
-  async findActiveById(qr: QueryRunner, contactId: string): Promise<ContactRow | null> {
+  async findActiveById(
+    qr: QueryRunner,
+    contactId: string,
+    options: { forUpdate?: boolean } = {},
+  ): Promise<ContactRow | null> {
     const rows = await sqlRows<ContactRow[]>(
       qr,
-      `SELECT ${CONTACT_COLUMNS} FROM contacts WHERE id = $1 AND is_active = true`,
+      `SELECT ${CONTACT_COLUMNS} FROM contacts
+       WHERE id = $1 AND is_active = true ${this.lockClause(options)}`,
       [contactId],
     )
     return rows[0] ?? null
+  }
+
+  private lockClause(options: { forUpdate?: boolean }): string {
+    return options.forUpdate ? 'FOR UPDATE' : ''
   }
 
   async recordLifecycleChange(
@@ -225,37 +272,52 @@ export class ContactsRepository {
   }
 
   async insert(qr: QueryRunner, data: CreateContactData): Promise<ContactRow | null> {
-    const rows = await sqlRows<ContactRow[]>(
-      qr,
-      `INSERT INTO contacts (
-         first_name, last_name, email, phone, whatsapp,
-         document_type, document_number, avatar_url, city, municipio_code,
-         status, lifecycle_stage, source,
-         tags, company_id, assigned_to_id, custom_fields, created_by
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
-       RETURNING ${CONTACT_COLUMNS}`,
-      [
-        data.firstName,
-        data.lastName,
-        data.email,
-        data.phone,
-        data.whatsapp,
-        data.documentType,
-        data.documentNumber,
-        data.avatarUrl,
-        data.city,
-        data.municipioCode,
-        data.status,
-        data.lifecycleStage,
-        data.source,
-        data.tags,
-        data.companyId,
-        data.assignedToId,
-        data.customFields,
-        data.createdBy,
-      ],
-    )
+    const rows = await this.insertMany(qr, [data])
     return rows[0] ?? null
+  }
+
+  async insertMany(
+    qr: QueryRunner,
+    contacts: ReadonlyArray<CreateContactData>,
+  ): Promise<ContactRow[]> {
+    if (contacts.length === 0) return []
+    const width = CONTACT_INSERT_COLUMNS.length
+    const values = contacts.map(
+      (_, row) =>
+        `(${Array.from({ length: width }, (__, col) => `$${row * width + col + 1}`).join(',')})`,
+    )
+    return sqlRows<ContactRow[]>(
+      qr,
+      `INSERT INTO contacts (${CONTACT_INSERT_COLUMNS.join(', ')})
+       VALUES ${values.join(', ')}
+       RETURNING ${CONTACT_COLUMNS}`,
+      contacts.flatMap((data) => insertValues(data)),
+    )
+  }
+
+  async findImportMatches(
+    qr: QueryRunner,
+    contacts: ReadonlyArray<CreateContactData>,
+  ): Promise<Map<string, string>> {
+    const emails = contacts.flatMap((data) => (data.email ? [data.email.toLowerCase()] : []))
+    const documents = contacts.flatMap((data) => (data.documentNumber ? [data.documentNumber] : []))
+    const matches = new Map<string, string>()
+    if (emails.length === 0 && documents.length === 0) return matches
+
+    const rows = await sqlRows<
+      Array<{ id: string; email: string | null; document_number: string | null }>
+    >(
+      qr,
+      `SELECT id, email, document_number FROM contacts
+       WHERE is_active = true
+         AND (LOWER(email) = ANY($1::text[]) OR document_number = ANY($2::text[]))`,
+      [emails, documents],
+    )
+    for (const row of rows) {
+      if (row.email) matches.set(`email:${row.email.toLowerCase()}`, row.id)
+      if (row.document_number) matches.set(`document:${row.document_number}`, row.id)
+    }
+    return matches
   }
 
   async updateById(
@@ -280,7 +342,7 @@ export class ContactsRepository {
       qr,
       `UPDATE contacts
        SET ${updates.join(', ')}
-       WHERE id = $${values.length}
+       WHERE id = $${values.length} AND is_active = true
        RETURNING ${CONTACT_COLUMNS}`,
       values,
     )
@@ -291,25 +353,6 @@ export class ContactsRepository {
     await qr.query(`UPDATE contacts SET is_active = false, updated_at = NOW() WHERE id = $1`, [
       contactId,
     ])
-  }
-
-  async findImportMatchId(
-    qr: QueryRunner,
-    email: string | null,
-    documentNumber: string | null,
-  ): Promise<string | null> {
-    if (!email && !documentNumber) return null
-
-    const rows = await sqlRows<Array<{ id: string }>>(
-      qr,
-      `SELECT id FROM contacts
-       WHERE is_active = true
-         AND (($1::text IS NOT NULL AND LOWER(email) = LOWER($1))
-           OR ($2::text IS NOT NULL AND document_number = $2))
-       LIMIT 1`,
-      [email, documentNumber],
-    )
-    return rows[0]?.id ?? null
   }
 
   async findEnabledTagNames(qr: QueryRunner): Promise<string[]> {
@@ -335,15 +378,16 @@ export class ContactsRepository {
     return rows
   }
 
-  async findDeals(qr: QueryRunner, contactId: string): Promise<DealRow[]> {
+  async findDeals(qr: QueryRunner, contactId: string, limit: number): Promise<DealRow[]> {
     const rows = await sqlRows<DealRow[]>(
       qr,
       `SELECT id, title, value_cents, status, stage_id, pipeline_id,
               expected_close_date, created_at
        FROM deals
        WHERE contact_id = $1 AND is_active = true
-       ORDER BY created_at DESC`,
-      [contactId],
+       ORDER BY created_at DESC
+       LIMIT $2`,
+      [contactId, limit],
     )
     return rows
   }

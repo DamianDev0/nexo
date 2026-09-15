@@ -27,6 +27,7 @@ export const CONTACT_FILTERABLE_COLUMNS: Readonly<Record<string, FilterableColum
 export const CONTACT_SEARCH: SearchSource = {
   columns: ['first_name', 'last_name', 'email', 'document_number', 'phone'],
   customFieldsColumn: 'custom_fields',
+  indexed: { vector: 'search_vector', text: 'search_text' },
 }
 
 export const CONTACT_LIST_FILTERS: ReadonlyArray<readonly [keyof ContactFilterQuery, string]> = [

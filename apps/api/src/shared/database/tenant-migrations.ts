@@ -774,4 +774,144 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         WHERE is_active = true AND status = 'pending' AND due_date IS NOT NULL;
     `,
   },
+  {
+    id: '0044_contacts_hardening',
+    up: (schema) => `
+      SELECT pg_advisory_xact_lock(hashtext('0044_contacts_hardening'));
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS merged_into_id UUID REFERENCES "${schema}".contacts(id);
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_merged_into"
+        ON "${schema}".contacts (merged_into_id) WHERE merged_into_id IS NOT NULL;
+      CREATE TABLE IF NOT EXISTS "${schema}".contact_lifecycle_history (
+        id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        contact_id  UUID NOT NULL REFERENCES "${schema}".contacts(id) ON DELETE CASCADE,
+        from_stage  VARCHAR(50),
+        to_stage    VARCHAR(50) NOT NULL,
+        reason      TEXT,
+        source      VARCHAR(30),
+        changed_by  UUID,
+        changed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_clh_contact"
+        ON "${schema}".contact_lifecycle_history (contact_id, changed_at DESC);
+      CREATE EXTENSION IF NOT EXISTS pg_trgm;
+      CREATE OR REPLACE FUNCTION public.contact_search_text(
+        first_name text, last_name text, email text, document_number text, phone text, custom_fields jsonb
+      ) RETURNS text LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $fn$
+        SELECT concat_ws(' ', first_name, last_name, email, document_number, phone,
+          (SELECT string_agg(value, ' ' ORDER BY key)
+           FROM jsonb_each_text(COALESCE(custom_fields, '{}'::jsonb))))
+      $fn$;
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS search_text TEXT GENERATED ALWAYS AS (
+          public.contact_search_text(first_name, last_name, email, document_number, phone, custom_fields)
+        ) STORED,
+        ADD COLUMN IF NOT EXISTS search_vector TSVECTOR GENERATED ALWAYS AS (
+          to_tsvector('spanish'::regconfig,
+            public.contact_search_text(first_name, last_name, email, document_number, phone, custom_fields))
+        ) STORED;
+      DROP INDEX IF EXISTS "${schema}"."idx_${schema}_contacts_fts";
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_search_vector"
+        ON "${schema}".contacts USING GIN (search_vector) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_search_trgm"
+        ON "${schema}".contacts USING GIN (search_text gin_trgm_ops) WHERE is_active = true;
+
+      WITH ranked AS (
+        SELECT id, FIRST_VALUE(id) OVER w AS keeper, ROW_NUMBER() OVER w AS rn
+        FROM "${schema}".contacts
+        WHERE is_active = true AND email IS NOT NULL
+        WINDOW w AS (PARTITION BY LOWER(email) ORDER BY updated_at DESC, created_at DESC, id)
+      )
+      UPDATE "${schema}".contacts c
+      SET is_active = false, merged_into_id = r.keeper, updated_at = NOW()
+      FROM ranked r WHERE c.id = r.id AND r.rn > 1;
+      WITH ranked AS (
+        SELECT id, FIRST_VALUE(id) OVER w AS keeper, ROW_NUMBER() OVER w AS rn
+        FROM "${schema}".contacts
+        WHERE is_active = true AND document_number IS NOT NULL
+        WINDOW w AS (PARTITION BY document_number ORDER BY updated_at DESC, created_at DESC, id)
+      )
+      UPDATE "${schema}".contacts c
+      SET is_active = false, merged_into_id = r.keeper, updated_at = NOW()
+      FROM ranked r WHERE c.id = r.id AND r.rn > 1;
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_contacts_email_active"
+        ON "${schema}".contacts (LOWER(email)) WHERE is_active = true AND email IS NOT NULL;
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_contacts_document_active"
+        ON "${schema}".contacts (document_number) WHERE is_active = true AND document_number IS NOT NULL;
+
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_created"
+        ON "${schema}".contacts (created_at DESC NULLS LAST, id) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_assigned"
+        ON "${schema}".contacts (assigned_to_id) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_company"
+        ON "${schema}".contacts (company_id) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_city"
+        ON "${schema}".contacts (LOWER(city)) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_lifecycle"
+        ON "${schema}".contacts (lifecycle_stage) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_source"
+        ON "${schema}".contacts (source) WHERE is_active = true;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_last_contacted"
+        ON "${schema}".contacts (last_contacted_at DESC NULLS LAST, id) WHERE is_active = true;
+
+      UPDATE "${schema}".contact_views v
+      SET is_default = false
+      WHERE is_default = true AND id <> (
+        SELECT w.id FROM "${schema}".contact_views w
+        WHERE w.owner_id = v.owner_id AND w.is_default = true
+        ORDER BY w.updated_at DESC, w.id LIMIT 1
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS "uq_${schema}_contact_views_default"
+        ON "${schema}".contact_views (owner_id) WHERE is_default = true;
+    `,
+  },
+  {
+    id: '0045_contacts_next_activity_due',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts
+        ADD COLUMN IF NOT EXISTS next_activity_due TIMESTAMPTZ;
+      CREATE OR REPLACE FUNCTION "${schema}".contacts_refresh_next_activity(p_contact UUID)
+      RETURNS void LANGUAGE sql AS $fn$
+        UPDATE "${schema}".contacts SET next_activity_due = (
+          SELECT MIN(a.due_date) FROM "${schema}".activities a
+          WHERE a.contact_id = p_contact AND a.is_active = true
+            AND a.status = 'pending' AND a.due_date IS NOT NULL
+        ) WHERE id = p_contact;
+      $fn$;
+      CREATE OR REPLACE FUNCTION "${schema}".activities_sync_next_activity()
+      RETURNS trigger LANGUAGE plpgsql AS $fn$
+      BEGIN
+        IF TG_OP <> 'INSERT' AND OLD.contact_id IS NOT NULL THEN
+          PERFORM "${schema}".contacts_refresh_next_activity(OLD.contact_id);
+        END IF;
+        IF TG_OP <> 'DELETE' AND NEW.contact_id IS NOT NULL
+           AND (TG_OP = 'INSERT' OR NEW.contact_id IS DISTINCT FROM OLD.contact_id) THEN
+          PERFORM "${schema}".contacts_refresh_next_activity(NEW.contact_id);
+        END IF;
+        RETURN NULL;
+      END;
+      $fn$;
+      DROP TRIGGER IF EXISTS trg_activities_sync_next_activity ON "${schema}".activities;
+      CREATE TRIGGER trg_activities_sync_next_activity
+        AFTER INSERT OR DELETE OR UPDATE OF contact_id, due_date, status, is_active
+        ON "${schema}".activities
+        FOR EACH ROW EXECUTE FUNCTION "${schema}".activities_sync_next_activity();
+      UPDATE "${schema}".contacts c
+      SET next_activity_due = pending.due
+      FROM (
+        SELECT contact_id, MIN(due_date) AS due FROM "${schema}".activities
+        WHERE is_active = true AND status = 'pending' AND due_date IS NOT NULL
+        GROUP BY contact_id
+      ) pending
+      WHERE c.id = pending.contact_id;
+      CREATE INDEX IF NOT EXISTS "idx_${schema}_contacts_next_activity"
+        ON "${schema}".contacts (next_activity_due DESC NULLS LAST, id) WHERE is_active = true;
+    `,
+  },
 ]
+
+const FIRST_MIGRATION_NOT_IN_BASE_SCHEMA = '0044_contacts_hardening'
+
+export const FOLDED_INTO_BASE_SCHEMA: ReadonlySet<string> = new Set(
+  TENANT_MIGRATIONS.map((m) => m.id).filter((id) => id < FIRST_MIGRATION_NOT_IN_BASE_SCHEMA),
+)

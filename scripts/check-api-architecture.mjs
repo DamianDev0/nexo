@@ -13,7 +13,7 @@ const SQL_ALLOWED_SEGMENTS = new Set([
   'entities',
   'migrations',
 ])
-const CROSS_MODULE_ALLOWED = new Set(['audit-log', 'auth', 'tenants'])
+const CROSS_MODULE_ALLOWED = new Set(['audit-log', 'auth', 'tenants', 'settings'])
 const SERVICE_MAX_LINES = 400
 
 const SQL_REGEX =

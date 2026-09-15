@@ -33,6 +33,7 @@ export interface ContactRow {
   note_count?: number
   opted_out_channels?: ConsentChannel[]
   assigned_to_name?: string | null
+  next_activity_due?: string | null
   next_activity?: ContactNextActivity | null
 }
 

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsBoolean, IsIn, IsObject, IsOptional, IsString, Length } from 'class-validator'
+import { IsBoolean, IsIn, IsOptional, IsString, Length } from 'class-validator'
+import { IsBoundedObject } from '@/shared/decorators/is-bounded-object.decorator'
 import { CONSENT_CHANNELS } from '@repo/shared-types'
 import type { ConsentChannel } from '@repo/shared-types'
 
@@ -26,6 +27,6 @@ export class UpsertContactConsentDto {
 
   @ApiPropertyOptional({ description: 'Evidence payload: IP, accepted text, message id…' })
   @IsOptional()
-  @IsObject()
+  @IsBoundedObject()
   evidence?: Record<string, unknown>
 }

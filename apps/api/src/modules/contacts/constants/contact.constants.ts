@@ -4,6 +4,30 @@ import type { UpdateContactDto } from '../dto/contact.dto'
 import type { CreateContactData } from '../interfaces/contact-row.interfaces'
 
 export const IMPORT_MAX_ISSUES = 200
+export const IMPORT_BATCH_SIZE = 500
+
+export const CONTACT_INSERT_COLUMNS = [
+  'first_name',
+  'last_name',
+  'email',
+  'phone',
+  'whatsapp',
+  'document_type',
+  'document_number',
+  'avatar_url',
+  'city',
+  'municipio_code',
+  'status',
+  'lifecycle_stage',
+  'source',
+  'tags',
+  'company_id',
+  'assigned_to_id',
+  'custom_fields',
+  'created_by',
+] as const
+
+export const CONTACT_UNIQUE_CONSTRAINT = /^uq_.+_contacts_(email|document)_active$/
 
 export const IMPORT_UPDATABLE_COLUMNS: ReadonlyArray<[keyof CreateContactData, string]> = [
   ['firstName', 'first_name'],
@@ -44,7 +68,7 @@ export const CONTACT_COLUMNS = `
   id, first_name, last_name, email, phone, whatsapp,
   document_type, document_number, avatar_url, city, municipio_code,
   status, status_changed_at, lifecycle_stage, source, last_contacted_at,
-  tags, company_id, assigned_to_id, custom_fields,
+  tags, company_id, assigned_to_id, custom_fields, next_activity_due,
   is_active, created_by, created_at, updated_at
 `
 
@@ -63,13 +87,10 @@ export const SORTABLE_COLUMNS: Record<string, string> = {
 export const CONTACT_LIST_COLUMNS = `
   ${CONTACT_COLUMNS},
   (SELECT COUNT(*)::int FROM activities a
-   WHERE a.contact_id = contacts.id AND a.activity_type = 'note') AS note_count,
+   WHERE a.contact_id = contacts.id AND a.is_active = true AND a.activity_type = 'note') AS note_count,
   ARRAY(SELECT dc.channel FROM data_consents dc
         WHERE dc.contact_id = contacts.id AND dc.granted = false) AS opted_out_channels,
   (SELECT u.full_name FROM users u WHERE u.id = contacts.assigned_to_id) AS assigned_to_name,
-  (SELECT MIN(a.due_date) FROM activities a
-   WHERE a.contact_id = contacts.id AND a.is_active = true
-     AND a.status = 'pending' AND a.due_date IS NOT NULL) AS next_activity_due,
   (SELECT jsonb_build_object(
       'id', a.id, 'activityType', a.activity_type, 'title', a.title,
       'dueDate', a.due_date, 'priority', a.priority)

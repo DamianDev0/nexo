@@ -1,53 +1,52 @@
-import { Injectable, OnModuleDestroy, BadRequestException } from '@nestjs/common'
+import { Injectable, BadRequestException } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
+import { CacheService } from '@/shared/cache/cache.service'
 import type { StoredFile } from '../interfaces/import.interfaces'
 
-const FILE_TTL_MS = 10 * 60 * 1000
-const CLEANUP_INTERVAL_MS = 60 * 1000
+const FILE_TTL_SECONDS = 10 * 60
+const EXPIRED_MESSAGE = 'The uploaded file has expired. Please upload again.'
+
+type StoredFileRecord = {
+  readonly fileName: string
+  readonly scope: string
+  readonly data: string
+  readonly expiresAt: number
+}
 
 @Injectable()
-export class ImportFileStoreService implements OnModuleDestroy {
-  private readonly store = new Map<string, StoredFile>()
-  private readonly cleanupTimer: ReturnType<typeof setInterval>
+export class ImportFileStoreService {
+  constructor(private readonly cache: CacheService) {}
 
-  constructor() {
-    this.cleanupTimer = setInterval(() => this.cleanupExpired(), CLEANUP_INTERVAL_MS)
-  }
-
-  onModuleDestroy(): void {
-    clearInterval(this.cleanupTimer)
-    this.store.clear()
-  }
-
-  storeFile(buffer: Buffer, fileName: string, scope: string): string {
+  async storeFile(buffer: Buffer, fileName: string, scope: string): Promise<string> {
     const fileId = randomUUID()
-    this.store.set(fileId, { buffer, fileName, scope, expiresAt: Date.now() + FILE_TTL_MS })
+    const record: StoredFileRecord = {
+      fileName,
+      scope,
+      data: buffer.toString('base64'),
+      expiresAt: Date.now() + FILE_TTL_SECONDS * 1000,
+    }
+    await this.cache.set(this.key(fileId), record, FILE_TTL_SECONDS)
     return fileId
   }
 
-  getFile(fileId: string, scope: string): StoredFile {
-    const stored = this.store.get(fileId)
-    if (!stored || stored.expiresAt < Date.now()) {
-      this.store.delete(fileId)
-      throw new BadRequestException('The uploaded file has expired. Please upload again.')
+  async getFile(fileId: string, scope: string): Promise<StoredFile> {
+    const record = await this.cache.get<StoredFileRecord>(this.key(fileId))
+    if (record?.scope !== scope) throw new BadRequestException(EXPIRED_MESSAGE)
+    return {
+      buffer: Buffer.from(record.data, 'base64'),
+      fileName: record.fileName,
+      scope: record.scope,
+      expiresAt: record.expiresAt,
     }
-    if (stored.scope !== scope) {
-      throw new BadRequestException('The uploaded file has expired. Please upload again.')
-    }
-    return stored
   }
 
-  removeFile(fileId: string, scope: string): void {
-    if (this.store.get(fileId)?.scope !== scope) return
-    this.store.delete(fileId)
+  async removeFile(fileId: string, scope: string): Promise<void> {
+    const record = await this.cache.get<StoredFileRecord>(this.key(fileId))
+    if (record?.scope !== scope) return
+    await this.cache.del(this.key(fileId))
   }
 
-  private cleanupExpired(): void {
-    const now = Date.now()
-    for (const [id, file] of this.store) {
-      if (file.expiresAt < now) {
-        this.store.delete(id)
-      }
-    }
+  private key(fileId: string): string {
+    return `imports:file:${fileId}`
   }
 }

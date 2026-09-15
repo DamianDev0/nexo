@@ -35,7 +35,7 @@ export class ImportService {
       file.buffer,
       file.originalname,
     )
-    const fileId = this.fileStore.storeFile(file.buffer, file.originalname, scope)
+    const fileId = await this.fileStore.storeFile(file.buffer, file.originalname, scope)
     const suggestedMapping = this.fieldMapper.suggestMapping(columns, mapper.fieldDefs)
     const columnAnalysis = this.fieldMapper.analyzeColumns(columns, sampleRows, mapper.fieldDefs)
     const validationPreview = this.fieldMapper.validateSampleRows(
@@ -70,14 +70,14 @@ export class ImportService {
     mapper: ImportRowMapper,
     scope: string,
   ): Promise<ValidationPreview> {
-    const stored = this.fileStore.getFile(fileId, scope)
+    const stored = await this.fileStore.getFile(fileId, scope)
     const { sampleRows } = await this.parser.analyze(stored.buffer, stored.fileName)
 
     return this.fieldMapper.validateSampleRows(sampleRows, mapping, mapper)
   }
 
-  release(fileId: string, scope: string): void {
-    this.fileStore.removeFile(fileId, scope)
+  async release(fileId: string, scope: string): Promise<void> {
+    await this.fileStore.removeFile(fileId, scope)
   }
 
   async getRowsForExecution(
@@ -87,9 +87,9 @@ export class ImportService {
     scope: string,
   ): Promise<{
     rows: { data: Record<string, unknown>; errors: ImportFieldError[] }[]
-    cleanup: () => void
+    cleanup: () => Promise<void>
   }> {
-    const stored = this.fileStore.getFile(fileId, scope)
+    const stored = await this.fileStore.getFile(fileId, scope)
     const rawRows = await this.parser.parseAll(stored.buffer, stored.fileName)
 
     const rows = rawRows.map((raw) => {

@@ -52,6 +52,12 @@ export class ContactViewsRepository {
     return rows[0] ?? null
   }
 
+  async lockOwner(qr: QueryRunner, userId: string): Promise<void> {
+    await qr.query(`SELECT pg_advisory_xact_lock(hashtext('contact_views'), hashtext($1))`, [
+      userId,
+    ])
+  }
+
   async clearDefault(qr: QueryRunner, userId: string): Promise<void> {
     await qr.query(`UPDATE contact_views SET is_default = false WHERE owner_id = $1`, [userId])
   }
@@ -65,7 +71,7 @@ export class ContactViewsRepository {
     return positionRows[0].next
   }
 
-  async insert(qr: QueryRunner, data: ContactViewInsertData): Promise<ContactViewRow> {
+  async insert(qr: QueryRunner, data: ContactViewInsertData): Promise<ContactViewRow | null> {
     const rows = await sqlRows<ContactViewRow[]>(
       qr,
       `INSERT INTO contact_views
@@ -88,10 +94,10 @@ export class ContactViewsRepository {
         data.position,
       ],
     )
-    return rows[0]!
+    return rows[0] ?? null
   }
 
-  async insertCopy(qr: QueryRunner, data: ContactViewCopyData): Promise<ContactViewRow> {
+  async insertCopy(qr: QueryRunner, data: ContactViewCopyData): Promise<ContactViewRow | null> {
     const rows = await sqlRows<ContactViewRow[]>(
       qr,
       `INSERT INTO contact_views
@@ -111,7 +117,7 @@ export class ContactViewsRepository {
         data.position,
       ],
     )
-    return rows[0]!
+    return rows[0] ?? null
   }
 
   async updateOwned(
@@ -119,7 +125,7 @@ export class ContactViewsRepository {
     viewId: string,
     userId: string,
     data: ContactViewUpdateData,
-  ): Promise<ContactViewRow> {
+  ): Promise<ContactViewRow | null> {
     const rows = await sqlRows<ContactViewRow[]>(
       qr,
       `UPDATE contact_views SET
@@ -143,22 +149,22 @@ export class ContactViewsRepository {
         data.visibility,
       ],
     )
-    return rows[0]!
+    return rows[0] ?? null
   }
 
   async reorderOwned(schemaName: string, userId: string, ids: string[]): Promise<number> {
     return this.db.transactional(schemaName, async (qr): Promise<number> => {
-      const updated = await Promise.all(
-        ids.map((id, index) =>
-          sqlRows<Array<{ id: string }>>(
-            qr,
-            `UPDATE contact_views SET position = $3::int, updated_at = NOW()
-             WHERE id = $1 AND owner_id = $2 RETURNING id`,
-            [id, userId, index],
-          ),
-        ),
+      await this.lockOwner(qr, userId)
+      const rows = await sqlRows<Array<{ id: string }>>(
+        qr,
+        `UPDATE contact_views AS v
+         SET position = ordered.position, updated_at = NOW()
+         FROM unnest($1::uuid[]) WITH ORDINALITY AS ordered(id, position)
+         WHERE v.id = ordered.id AND v.owner_id = $2
+         RETURNING v.id`,
+        [ids, userId],
       )
-      return updated.filter((rows) => rows.length > 0).length
+      return rows.length
     })
   }
 

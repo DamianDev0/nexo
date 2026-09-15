@@ -8,6 +8,8 @@ import { ContactViewsService } from './services/contact-views.service'
 import { ContactWorkspaceController } from './controllers/contact-workspace.controller'
 import { ContactWorkspaceService } from './services/contact-workspace.service'
 import { ContactDuplicatesService } from './services/contact-duplicates.service'
+import { ContactTaxonomyService } from './services/contact-taxonomy.service'
+import { ContactStatsCacheService } from './services/contact-stats-cache.service'
 import { ContactConsentsController } from './controllers/contact-consents.controller'
 import { ContactConsentsService } from './services/contact-consents.service'
 import { ContactConsentsRepository } from './repositories/contact-consents.repository'
@@ -31,6 +33,8 @@ import { ContactDuplicatesRepository } from './repositories/contact-duplicates.r
     ContactViewsService,
     ContactWorkspaceService,
     ContactDuplicatesService,
+    ContactTaxonomyService,
+    ContactStatsCacheService,
     ContactConsentsService,
     ContactImportService,
     ContactsRepository,

@@ -6,6 +6,15 @@ import { sqlRows } from '@/shared/database/sql.util'
 const MATCH_COLUMNS = 'id, first_name, last_name, email, phone, document_number'
 const MAX_MATCHES = 5
 
+type DuplicateMatch = 'email' | 'document' | 'phones' | 'name'
+
+const MATCH_CONDITIONS: Readonly<Record<DuplicateMatch, string>> = {
+  email: 'LOWER(email) = $1',
+  document: 'document_number = $1',
+  phones: '(phone = ANY($1::text[]) OR whatsapp = ANY($1::text[]))',
+  name: "LOWER(first_name) = $1 AND LOWER(coalesce(last_name, '')) = $2",
+}
+
 @Injectable()
 export class ContactDuplicatesRepository {
   async findByEmail(
@@ -13,7 +22,7 @@ export class ContactDuplicatesRepository {
     email: string,
     excludeId?: string,
   ): Promise<ContactDuplicateRow[]> {
-    return this.query(qr, `LOWER(email) = $1`, [email], excludeId)
+    return this.query(qr, 'email', [email], excludeId)
   }
 
   async findByDocumentNumber(
@@ -21,7 +30,7 @@ export class ContactDuplicatesRepository {
     documentNumber: string,
     excludeId?: string,
   ): Promise<ContactDuplicateRow[]> {
-    return this.query(qr, `document_number = $1`, [documentNumber], excludeId)
+    return this.query(qr, 'document', [documentNumber], excludeId)
   }
 
   async findByPhones(
@@ -29,12 +38,7 @@ export class ContactDuplicatesRepository {
     phones: string[],
     excludeId?: string,
   ): Promise<ContactDuplicateRow[]> {
-    return this.query(
-      qr,
-      `(phone = ANY($1::text[]) OR whatsapp = ANY($1::text[]))`,
-      [phones],
-      excludeId,
-    )
+    return this.query(qr, 'phones', [phones], excludeId)
   }
 
   async findByName(
@@ -43,28 +47,30 @@ export class ContactDuplicatesRepository {
     lastName: string,
     excludeId?: string,
   ): Promise<ContactDuplicateRow[]> {
-    return this.query(
-      qr,
-      `LOWER(first_name) = $1 AND LOWER(coalesce(last_name, '')) = $2`,
-      [firstName, lastName],
-      excludeId,
-    )
+    return this.query(qr, 'name', [firstName, lastName], excludeId)
   }
 
   private async query(
     qr: QueryRunner,
-    condition: string,
+    match: DuplicateMatch,
     params: unknown[],
     excludeId?: string,
   ): Promise<ContactDuplicateRow[]> {
-    const exclusion = excludeId ? ` AND id != $${params.length + 1}` : ''
     const finalParams = excludeId ? [...params, excludeId] : params
     return sqlRows<ContactDuplicateRow[]>(
       qr,
       `SELECT ${MATCH_COLUMNS} FROM contacts
-       WHERE is_active = true AND ${condition}${exclusion}
+       WHERE is_active = true AND ${this.condition(match)} ${this.exclusion(finalParams.length, excludeId)}
        LIMIT ${MAX_MATCHES}`,
       finalParams,
     )
+  }
+
+  private condition(match: DuplicateMatch): string {
+    return MATCH_CONDITIONS[match]
+  }
+
+  private exclusion(paramCount: number, excludeId?: string): string {
+    return excludeId ? `AND id != $${paramCount}` : ''
   }
 }

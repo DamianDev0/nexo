@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
 import type { ContactView } from '@repo/shared-types'
 import type {
@@ -7,6 +12,7 @@ import type {
   ReorderContactViewsDto,
   UpdateContactViewDto,
 } from '../dto/contact-view.dto'
+import type { ContactViewRow } from '../interfaces/contact-view-row.interfaces'
 import { ContactViewsRepository } from '../repositories/contact-views.repository'
 import { mapContactView } from '../mappers/contact-view.mapper'
 import { sanitizeContactViewColumns } from '../mappers/contact-table-state.mapper'
@@ -29,6 +35,7 @@ export class ContactViewsService {
     dto: CreateContactViewDto,
   ): Promise<ContactView> {
     return this.db.transactional(schemaName, async (qr): Promise<ContactView> => {
+      await this.repository.lockOwner(qr, userId)
       if (dto.isDefault) await this.repository.clearDefault(qr, userId)
       const position = await this.repository.nextPosition(qr, userId)
       const row = await this.repository.insert(qr, {
@@ -45,7 +52,7 @@ export class ContactViewsService {
         visibility: dto.visibility ?? 'private',
         position,
       })
-      return mapContactView(row)
+      return mapContactView(this.requireInserted(row))
     })
   }
 
@@ -56,6 +63,7 @@ export class ContactViewsService {
     dto: UpdateContactViewDto,
   ): Promise<ContactView> {
     return this.db.transactional(schemaName, async (qr): Promise<ContactView> => {
+      await this.repository.lockOwner(qr, userId)
       const existing = await this.repository.findById(qr, viewId)
       if (!existing) throw new NotFoundException(`Contact view ${viewId} not found`)
       if (existing.owner_id !== userId) {
@@ -74,6 +82,7 @@ export class ContactViewsService {
         isFavorite: dto.isFavorite ?? existing.is_favorite,
         visibility: dto.visibility ?? existing.visibility,
       })
+      if (!row) throw new NotFoundException(`Contact view ${viewId} not found`)
       return mapContactView(row)
     })
   }
@@ -85,6 +94,7 @@ export class ContactViewsService {
     dto: DuplicateContactViewDto,
   ): Promise<ContactView> {
     return this.db.transactional(schemaName, async (qr): Promise<ContactView> => {
+      await this.repository.lockOwner(qr, userId)
       const source = await this.repository.findVisibleById(qr, viewId, userId)
       if (!source) throw new NotFoundException(`Contact view ${viewId} not found`)
       const position = await this.repository.nextPosition(qr, userId)
@@ -99,7 +109,7 @@ export class ContactViewsService {
         density: source.density,
         position,
       })
-      return mapContactView(row)
+      return mapContactView(this.requireInserted(row))
     })
   }
 
@@ -113,5 +123,10 @@ export class ContactViewsService {
   async remove(schemaName: string, userId: string, viewId: string): Promise<void> {
     const deleted = await this.repository.deleteOwned(schemaName, viewId, userId)
     if (!deleted) throw new NotFoundException(`Contact view ${viewId} not found`)
+  }
+
+  private requireInserted(row: ContactViewRow | null): ContactViewRow {
+    if (!row) throw new InternalServerErrorException('Contact view insert returned no row')
+    return row
   }
 }

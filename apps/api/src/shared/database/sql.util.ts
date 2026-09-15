@@ -1,4 +1,13 @@
-import type { QueryRunner } from 'typeorm'
+import { QueryFailedError, type QueryRunner } from 'typeorm'
+
+const UNIQUE_VIOLATION = '23505'
+
+export function isUniqueViolation(error: unknown, constraint?: RegExp): boolean {
+  if (!(error instanceof QueryFailedError)) return false
+  const driverError = error.driverError as { code?: string; constraint?: string }
+  if (driverError.code !== UNIQUE_VIOLATION) return false
+  return constraint === undefined || constraint.test(driverError.constraint ?? '')
+}
 
 function isUpdateDeleteTuple(result: unknown): result is [unknown[], number] {
   return (
