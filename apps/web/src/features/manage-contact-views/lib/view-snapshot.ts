@@ -1,3 +1,5 @@
+import { blankToUndefined } from '@repo/shared-utils'
+
 import { parseConditions } from '@/shared/ui/organisms/filter-bar'
 
 import type { ContactSort } from '@/entities/contact'
@@ -71,7 +73,7 @@ export function buildViewInput(
   const conditions = snapshot.advanced
   return {
     name: meta.name.trim(),
-    description: meta.description.trim() || null,
+    description: blankToUndefined(meta.description.trim()) ?? null,
     filters: snapshot.search.trim() ? { q: snapshot.search.trim() } : {},
     advancedFilters: conditions.length > 0 ? { conditions: [...conditions] } : null,
     sort: snapshot.sort,

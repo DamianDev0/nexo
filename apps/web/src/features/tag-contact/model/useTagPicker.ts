@@ -13,7 +13,13 @@ export function useTagPicker(
   const catalog = useTagCatalog('contact')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set(contact.tags))
-  const { mutate, isPending } = useAssignContactTags()
+  const [syncedTags, setSyncedTags] = useState(contact.tags)
+  const assignTags = useAssignContactTags()
+
+  if (syncedTags !== contact.tags) {
+    setSyncedTags(contact.tags)
+    setSelected(new Set(contact.tags))
+  }
 
   const toggle = useCallback(
     (name: string) => setSelected((current) => toggleName(current, name)),
@@ -31,8 +37,9 @@ export function useTagPicker(
   }, [selected, contact.tags])
 
   const save = useCallback(() => {
-    mutate({ id: contact.id, tags: [...selected] }, { onSuccess: onDone })
-  }, [mutate, contact.id, selected, onDone])
+    assignTags({ id: contact.id, tags: [...selected] })
+    onDone()
+  }, [assignTags, contact.id, selected, onDone])
 
   return {
     query,
@@ -42,6 +49,5 @@ export function useTagPicker(
     selectedCount: selected.size,
     isDirty,
     save,
-    isPending,
   }
 }

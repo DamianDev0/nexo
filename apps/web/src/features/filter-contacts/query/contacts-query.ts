@@ -1,3 +1,5 @@
+import { blankToUndefined } from '@repo/shared-utils'
+
 import { parseSortParam, type ContactSort } from '@/entities/contact'
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from '@/shared/config/pagination'
 import { isComplete, parseConditions } from '@/shared/ui/organisms/filter-bar'
@@ -53,12 +55,12 @@ export function contactListQuery(
   const archived = isArchivedList(status)
   const owner = ownerList(status)
   return {
-    q: search.trim() || undefined,
+    q: blankToUndefined(search.trim()),
     advanced: conditions.length > 0 ? conditions : undefined,
     status: archived || owner ? undefined : (status ?? undefined),
-    archived: archived || undefined,
+    archived: archived ? true : undefined,
     assignedToId: owner === 'mine' && viewerId ? viewerId : undefined,
-    unassigned: owner === 'unassigned' || undefined,
+    unassigned: owner === 'unassigned' ? true : undefined,
     page: pagination.page,
     limit: pagination.limit,
     sortBy: pagination.sort?.field,

@@ -10,6 +10,8 @@ import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import type { ContactViewInput } from '@repo/shared-types'
 
+const REORDER_SCOPE = { id: 'contact-views-reorder' }
+
 export function useContactViewsAdmin() {
   const client = useQueryClient()
 
@@ -46,6 +48,8 @@ export function useContactViewsAdmin() {
 
   const reorder = useMutation({
     mutationFn: (ids: ReadonlyArray<string>) => contactsService.reorderViews(ids),
+    scope: REORDER_SCOPE,
+    onMutate: () => client.cancelQueries({ queryKey: QUERY_KEYS.contacts.workspace }),
     onSuccess: refresh,
     onError,
   })

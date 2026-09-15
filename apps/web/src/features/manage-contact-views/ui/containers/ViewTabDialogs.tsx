@@ -2,6 +2,8 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { blankToUndefined } from '@repo/shared-utils'
+
 import { useContactViewsAdmin } from '../../query/useContactViewsAdmin'
 import { DeleteViewDialog } from '../DeleteViewDialog'
 import { SaveViewDialog } from '../SaveViewDialog'
@@ -33,7 +35,10 @@ export function ViewTabDialogs({ menu }: Readonly<ViewTabDialogsProps>) {
           if (!target) return
           admin.update({
             id: target.view.id,
-            data: { name: meta.name.trim(), description: meta.description.trim() || null },
+            data: {
+              name: meta.name.trim(),
+              description: blankToUndefined(meta.description.trim()) ?? null,
+            },
           })
         }}
       />

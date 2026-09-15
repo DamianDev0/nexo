@@ -57,7 +57,7 @@ export function TagComposer({ contact, onClose }: Readonly<TagComposerProps>) {
           action={{
             label: t('contacts.composers.tags.save'),
             onClick: picker.save,
-            disabled: !picker.isDirty || picker.isPending,
+            disabled: !picker.isDirty,
           }}
         />
       </Composer.Footer>

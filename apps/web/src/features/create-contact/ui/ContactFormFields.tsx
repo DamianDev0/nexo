@@ -3,6 +3,8 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
+import { blankToUndefined } from '@repo/shared-utils'
+
 import {
   CONTACT_AVATARS,
   ContactAddressField,
@@ -53,7 +55,7 @@ export function ContactFormFields({
         render={({ field }) => (
           <AvatarPicker
             avatars={CONTACT_AVATARS}
-            value={field.value || null}
+            value={blankToUndefined(field.value) ?? null}
             labels={{ trigger: t('contacts.form.avatar'), title: t('contacts.form.avatarPick') }}
             onChange={field.onChange}
           />

@@ -1,4 +1,5 @@
 import { TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
+import { blankToUndefined } from '@repo/shared-utils'
 
 import { serializeSort } from '@/entities/contact'
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE, PAGE_SIZE_OPTIONS } from '@/shared/config/pagination'
@@ -62,8 +63,9 @@ export function buildSmartLists(
       id: status.key,
       label: status.label,
       count: counts[status.key] ?? 0,
-      description:
-        t(`contacts.lists.descriptions.${status.key}`, { defaultValue: '' }) || undefined,
+      description: blankToUndefined(
+        t(`contacts.lists.descriptions.${status.key}`, { defaultValue: '' }),
+      ),
     })),
   ]
 }

@@ -1,3 +1,5 @@
+import { blankToUndefined } from '@repo/shared-utils'
+
 import { CONTACT_ADDRESS_KEY, contactAvatarUrl } from '@/entities/contact'
 
 import { resolveWhatsapp, type ContactFormValues } from './contact-form.schema'
@@ -33,16 +35,16 @@ export function toInput(
   return {
     customFields: withAddress(values, customFields),
     firstName: values.firstName,
-    lastName: values.lastName || undefined,
-    email: values.email || undefined,
-    phone: values.phone || undefined,
-    whatsapp: resolveWhatsapp(values) || undefined,
-    city: values.city || undefined,
-    municipioCode: values.municipioCode || undefined,
+    lastName: blankToUndefined(values.lastName),
+    email: blankToUndefined(values.email),
+    phone: blankToUndefined(values.phone),
+    whatsapp: blankToUndefined(resolveWhatsapp(values)),
+    city: blankToUndefined(values.city),
+    municipioCode: blankToUndefined(values.municipioCode),
     status: values.status,
-    avatarUrl: values.avatarUrl || undefined,
-    source: values.source || undefined,
-    lifecycleStage: values.lifecycleStage || undefined,
+    avatarUrl: blankToUndefined(values.avatarUrl),
+    source: blankToUndefined(values.source),
+    lifecycleStage: blankToUndefined(values.lifecycleStage),
   }
 }
 

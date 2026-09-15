@@ -1,4 +1,5 @@
 import { TAXONOMY_KEY_PATTERN } from '@repo/shared-types'
+import { blankToUndefined } from '@repo/shared-utils'
 
 import {
   EMPTY_QUICK_FILTERS,
@@ -80,8 +81,9 @@ export function buildQuickFilterDefs(
         label: choice.label,
         hint:
           choice.description ??
-          (t(`common.filters.hints.${id}.${choice.key}`, { defaultValue: '', entity }) ||
-            undefined),
+          blankToUndefined(
+            t(`common.filters.hints.${id}.${choice.key}`, { defaultValue: '', entity }),
+          ),
         icon: QUICK_FILTER_ICONS[id],
         count: choices.usage?.[key][choice.key] ?? undefined,
       })),

@@ -4,6 +4,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { blankToUndefined } from '@repo/shared-utils'
+
 import { contactFullName } from '@/entities/contact'
 import contactsService from '@/shared/api/services/contacts.service'
 import { QUERY_KEYS } from '@/shared/query/query-keys'
@@ -33,7 +35,7 @@ export function MergeLoserPicker({
 
   const fetcher = useCallback(
     async (term: string): Promise<ReadonlyArray<ContactListItem>> => {
-      const query = { q: term.trim() || undefined, limit: SEARCH_LIMIT }
+      const query = { q: blankToUndefined(term.trim()), limit: SEARCH_LIMIT }
       const page = await client.fetchQuery({
         queryKey: QUERY_KEYS.contacts.list(query),
         queryFn: () => contactsService.list(query),
