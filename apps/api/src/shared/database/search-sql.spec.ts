@@ -28,6 +28,18 @@ describe('searchClause', () => {
     expect(clause).toContain('string_agg(cf.value')
   })
 
+  it('targets the stored search columns when the source is indexed', () => {
+    const params: unknown[] = []
+    const clause = searchClause(
+      'maria',
+      { ...source, indexed: { vector: 'search_vector', text: 'search_text' } },
+      params,
+    )
+
+    expect(clause).toBe("(search_vector @@ plainto_tsquery('spanish', $1) OR search_text ILIKE $2)")
+    expect(params).toEqual(['maria', '%maria%'])
+  })
+
   it('continues numbering from existing params', () => {
     const params: unknown[] = ['prior']
     const clause = searchClause('ana', source, params)

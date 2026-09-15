@@ -1,8 +1,11 @@
 import { EventBusService } from '@/shared/events/event-bus.service'
 import { ContactDuplicatesService } from '../services/contact-duplicates.service'
+import { ContactTaxonomyService } from '../services/contact-taxonomy.service'
+import { ContactStatsCacheService } from '../services/contact-stats-cache.service'
 import { AUDIT_EVENTS, AuditAction, AuditEntityEvent } from '@/shared/events/audit.events'
-import { BadRequestException, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
+import { QueryFailedError } from 'typeorm'
 import { ContactsService } from '../services/contacts.service'
 import { ContactsRepository } from '../repositories/contacts.repository'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
@@ -45,12 +48,26 @@ describe('ContactsService', () => {
   let qr: ReturnType<typeof buildQrMock>
   let eventBus: { emit: jest.Mock; emitCrm: jest.Mock }
   let duplicates: { assertNoDuplicates: jest.Mock; probe: jest.Mock }
+  let stats: {
+    getCounts: jest.Mock
+    setCounts: jest.Mock
+    getUsage: jest.Mock
+    setUsage: jest.Mock
+    invalidate: jest.Mock
+  }
 
   beforeEach(async () => {
     qr = buildQrMock()
     db = buildDbMock(qr)
     eventBus = { emit: jest.fn(), emitCrm: jest.fn() }
     duplicates = { assertNoDuplicates: jest.fn(), probe: jest.fn() }
+    stats = {
+      getCounts: jest.fn().mockResolvedValue(null),
+      setCounts: jest.fn(),
+      getUsage: jest.fn().mockResolvedValue(null),
+      setUsage: jest.fn(),
+      invalidate: jest.fn(),
+    }
 
     const module = await Test.createTestingModule({
       providers: [
@@ -59,6 +76,8 @@ describe('ContactsService', () => {
         { provide: TenantDbService, useValue: db },
         { provide: EventBusService, useValue: eventBus },
         { provide: ContactDuplicatesService, useValue: duplicates },
+        ContactTaxonomyService,
+        { provide: ContactStatsCacheService, useValue: stats },
       ],
     }).compile()
 
@@ -259,6 +278,15 @@ describe('ContactsService', () => {
       expect(event.schemaName).toBe(SCHEMA)
     })
 
+    it('invalidates the stats cache once after the contact is created', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow()])
+
+      await service.create(SCHEMA, { firstName: 'John' }, 'user-1')
+
+      expect(stats.invalidate).toHaveBeenCalledTimes(1)
+      expect(stats.invalidate).toHaveBeenCalledWith(SCHEMA)
+    })
+
     it('defaults lifecycleStage to subscriber and never writes columns that left the core', async () => {
       qr.query.mockResolvedValueOnce([makeContactRow()])
 
@@ -410,6 +438,113 @@ describe('ContactsService', () => {
       expect(event.action).toBe(AuditAction.ContactUpdated)
       expect(event.entityId).toBe('c-1')
     })
+
+    it('emits the audit event only after db.transactional has resolved', async () => {
+      const order: string[] = []
+      db.transactional.mockImplementationOnce(async (_schema: unknown, cb: unknown) => {
+        const result = await (cb as (runner: unknown) => Promise<unknown>)(qr)
+        order.push('transactional')
+        return result
+      })
+      eventBus.emit.mockImplementationOnce(() => order.push('emit'))
+      qr.query
+        .mockResolvedValueOnce([{ id: 'c-1' }])
+        .mockResolvedValueOnce([makeContactRow({ first_name: 'Jane' })])
+
+      await service.update(SCHEMA, 'c-1', { firstName: 'Jane' })
+
+      expect(order).toEqual(['transactional', 'emit'])
+    })
+
+    it('re-probes duplicates and rethrows ConflictException on a unique email violation', async () => {
+      const driverError = Object.assign(new Error('dup'), {
+        code: '23505',
+        constraint: 'uq_tenant_acme_contacts_email_active',
+      })
+      const queryFailedError = new QueryFailedError('INSERT', [], driverError)
+      qr.query.mockResolvedValueOnce([{ id: 'c-1' }]).mockRejectedValueOnce(queryFailedError)
+
+      await expect(service.update(SCHEMA, 'c-1', { email: 'dup@example.com' })).rejects.toThrow(
+        ConflictException,
+      )
+
+      expect(db.query).toHaveBeenCalledWith(SCHEMA, expect.any(Function))
+      expect(duplicates.assertNoDuplicates).toHaveBeenCalledWith(
+        qr,
+        { email: 'dup@example.com' },
+        { excludeId: 'c-1' },
+      )
+    })
+
+    describe('ownerChanged notification', () => {
+      it('emits CONTACT_ASSIGNED when assignedToId changes to someone other than the actor', async () => {
+        qr.query
+          .mockResolvedValueOnce([makeContactRow({ assigned_to_id: null })])
+          .mockResolvedValueOnce([makeContactRow({ assigned_to_id: 'user-2' })])
+
+        await service.update(SCHEMA, 'c-1', { assignedToId: 'user-2' }, false, undefined, {
+          id: 'actor-1',
+          tenantId: 'tenant-1',
+        })
+
+        expect(eventBus.emit).toHaveBeenCalledWith(
+          DOMAIN_EVENTS.CONTACT_ASSIGNED,
+          expect.objectContaining({ userId: 'user-2', tenantId: 'tenant-1' }),
+        )
+      })
+
+      it('does not emit CONTACT_ASSIGNED when the new owner is the actor', async () => {
+        qr.query
+          .mockResolvedValueOnce([makeContactRow({ assigned_to_id: null })])
+          .mockResolvedValueOnce([makeContactRow({ assigned_to_id: 'actor-1' })])
+
+        await service.update(SCHEMA, 'c-1', { assignedToId: 'actor-1' }, false, undefined, {
+          id: 'actor-1',
+          tenantId: 'tenant-1',
+        })
+
+        expect(eventBus.emit).not.toHaveBeenCalledWith(
+          DOMAIN_EVENTS.CONTACT_ASSIGNED,
+          expect.anything(),
+        )
+      })
+
+      it('does not emit CONTACT_ASSIGNED when assignedToId is unchanged', async () => {
+        qr.query
+          .mockResolvedValueOnce([makeContactRow({ assigned_to_id: 'user-2' })])
+          .mockResolvedValueOnce([makeContactRow({ assigned_to_id: 'user-2' })])
+
+        await service.update(SCHEMA, 'c-1', { assignedToId: 'user-2' }, false, undefined, {
+          id: 'actor-1',
+          tenantId: 'tenant-1',
+        })
+
+        expect(eventBus.emit).not.toHaveBeenCalledWith(
+          DOMAIN_EVENTS.CONTACT_ASSIGNED,
+          expect.anything(),
+        )
+      })
+    })
+  })
+
+  describe('counts', () => {
+    it('returns the cached value without touching the DB when the cache hits', async () => {
+      const cached = {
+        total: 5,
+        archived: 0,
+        mine: 1,
+        unassigned: 4,
+        unassignedRecent: 2,
+        byStatus: { new: 5 },
+      }
+      stats.getCounts.mockResolvedValueOnce(cached)
+
+      const result = await service.counts(SCHEMA, 'user-1')
+
+      expect(result).toBe(cached)
+      expect(qr.query).not.toHaveBeenCalled()
+      expect(stats.setCounts).not.toHaveBeenCalled()
+    })
   })
 
   describe('remove', () => {
@@ -426,6 +561,79 @@ describe('ContactsService', () => {
       qr.query.mockResolvedValueOnce([])
 
       await expect(service.remove(SCHEMA, 'missing')).rejects.toThrow(NotFoundException)
+    })
+  })
+
+  describe('restore', () => {
+    it('maps the RETURNING row and emits the audit + CONTACT_UPDATED events after the transaction', async () => {
+      qr.query.mockResolvedValueOnce([makeContactRow({ id: 'c-1', is_active: true })])
+
+      const result = await service.restore(SCHEMA, 'c-1', 'user-1')
+
+      expect(result.id).toBe('c-1')
+      expect(db.transactional).toHaveBeenCalledWith(SCHEMA, expect.any(Function))
+      expect(eventBus.emit).toHaveBeenCalledWith(AUDIT_EVENTS.ENTITY, expect.any(AuditEntityEvent))
+      const event = eventBus.emit.mock.calls[0][1] as AuditEntityEvent
+      expect(event.action).toBe(AuditAction.ContactUpdated)
+      expect(event.entityId).toBe('c-1')
+      expect(event.userId).toBe('user-1')
+      expect(eventBus.emitCrm).toHaveBeenCalledWith(
+        DOMAIN_EVENTS.CONTACT_UPDATED,
+        expect.objectContaining({ schemaName: SCHEMA, entityId: 'c-1', contact: result }),
+      )
+    })
+
+    it('throws NotFoundException when restoreById returns null', async () => {
+      qr.query.mockResolvedValueOnce([])
+
+      await expect(service.restore(SCHEMA, 'missing')).rejects.toThrow(NotFoundException)
+      expect(eventBus.emit).not.toHaveBeenCalled()
+      expect(eventBus.emitCrm).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('taxonomyUsage', () => {
+    it('maps counts to numbers per taxonomy bucket', async () => {
+      qr.query
+        .mockResolvedValueOnce([{ key: 'new', count: '3' }])
+        .mockResolvedValueOnce([{ key: 'manual', count: '5' }])
+        .mockResolvedValueOnce([{ key: 'lead', count: '2' }])
+        .mockResolvedValueOnce([{ key: 'vip', count: '1' }])
+
+      const result = await service.taxonomyUsage(SCHEMA)
+
+      expect(result).toEqual({
+        statuses: { new: 3 },
+        sources: { manual: 5 },
+        lifecycleStages: { lead: 2 },
+        tags: { vip: 1 },
+      })
+    })
+  })
+
+  describe('reassignTaxonomy', () => {
+    it('throws BadRequestException when fromKey equals toKey', async () => {
+      await expect(service.reassignTaxonomy(SCHEMA, 'status', 'new', 'new')).rejects.toThrow(
+        BadRequestException,
+      )
+    })
+
+    it('delegates to reassignTag for kind "tag"', async () => {
+      qr.query.mockResolvedValueOnce([{ id: 'c-1' }, { id: 'c-2' }])
+
+      const result = await service.reassignTaxonomy(SCHEMA, 'tag', 'vip', 'gold')
+
+      expect(result).toEqual({ reassigned: 2 })
+      const sql = qr.query.mock.calls[0][0] as string
+      expect(sql).toContain('array_replace(tags')
+    })
+
+    it('delegates to reassignTaxonomyColumn for non-tag kinds', async () => {
+      qr.query.mockResolvedValueOnce([{ id: 'c-1' }])
+
+      const result = await service.reassignTaxonomy(SCHEMA, 'status', 'new', 'qualified')
+
+      expect(result).toEqual({ reassigned: 1 })
     })
   })
 

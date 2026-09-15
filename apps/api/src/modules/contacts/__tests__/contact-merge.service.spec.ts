@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { DOMAIN_EVENTS } from '@repo/shared-types'
 import { EventBusService } from '@/shared/events/event-bus.service'
@@ -6,6 +6,7 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { ContactMergeService } from '../services/contact-merge.service'
 import { ContactsRepository } from '../repositories/contacts.repository'
+import { ContactStatsCacheService } from '../services/contact-stats-cache.service'
 import { MERGE_CHILD_TABLES } from '../constants/contact.constants'
 
 const SCHEMA = 'tenant_acme'
@@ -47,11 +48,13 @@ describe('ContactMergeService', () => {
   let db: ReturnType<typeof buildDbMock>
   let qr: ReturnType<typeof buildQrMock>
   let eventBus: { emit: jest.Mock; emitCrm: jest.Mock }
+  let stats: { invalidate: jest.Mock }
 
   beforeEach(async () => {
     qr = buildQrMock()
     db = buildDbMock(qr)
     eventBus = { emit: jest.fn(), emitCrm: jest.fn() }
+    stats = { invalidate: jest.fn() }
 
     const module = await Test.createTestingModule({
       providers: [
@@ -59,6 +62,7 @@ describe('ContactMergeService', () => {
         ContactsRepository,
         { provide: TenantDbService, useValue: db },
         { provide: EventBusService, useValue: eventBus },
+        { provide: ContactStatsCacheService, useValue: stats },
       ],
     }).compile()
 
@@ -67,8 +71,7 @@ describe('ContactMergeService', () => {
 
   function mockHappyPath() {
     qr.query
-      .mockResolvedValueOnce([contactRow()])
-      .mockResolvedValueOnce([contactRow({ id: LOSER, tags: ['cliente'] })])
+      .mockResolvedValueOnce([contactRow(), contactRow({ id: LOSER, tags: ['cliente'] })])
       .mockResolvedValueOnce([{ id: 'a-1' }, { id: 'a-2' }])
       .mockResolvedValueOnce([{ id: 'd-1' }])
       .mockResolvedValueOnce([])
@@ -77,9 +80,39 @@ describe('ContactMergeService', () => {
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([{ id: 'dc-1' }])
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([contactRow({ tags: ['vip', 'cliente'] })])
       .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([contactRow({ tags: ['vip', 'cliente'] })])
   }
+
+  it('locks both contacts in id order before touching anything', async () => {
+    mockHappyPath()
+
+    await service.merge(SCHEMA, WINNER, { loserId: LOSER })
+
+    const [lockSql, lockParams] = qr.query.mock.calls[0] as [string, unknown[]]
+    expect(lockSql).toContain('ORDER BY id')
+    expect(lockSql).toContain('FOR UPDATE')
+    expect(lockParams).toEqual([[WINNER, LOSER]])
+  })
+
+  it('archives the loser before copying its fields so unique indexes never collide', async () => {
+    mockHappyPath()
+
+    await service.merge(SCHEMA, WINNER, { loserId: LOSER, fieldsFromLoser: ['email'] })
+
+    const statements = qr.query.mock.calls.map(([sql]) => String(sql))
+    const archiveAt = statements.findIndex((sql) => sql.includes('merged_into_id = $2'))
+    const copyAt = statements.findIndex((sql) => sql.includes('UPDATE contacts AS winner'))
+    expect(archiveAt).toBeLessThan(copyAt)
+  })
+
+  it('answers 409 when the loser was already merged by a concurrent request', async () => {
+    qr.query.mockResolvedValueOnce([contactRow(), contactRow({ id: LOSER, is_active: false })])
+
+    await expect(service.merge(SCHEMA, WINNER, { loserId: LOSER })).rejects.toThrow(
+      ConflictException,
+    )
+  })
 
   it('refuses to merge a contact into itself', async () => {
     await expect(service.merge(SCHEMA, WINNER, { loserId: WINNER })).rejects.toThrow(
@@ -168,6 +201,25 @@ describe('ContactMergeService', () => {
     )
   })
 
+  it('invalidates the stats cache once after the transaction closes', async () => {
+    mockHappyPath()
+    const order: string[] = []
+    db.transactional.mockImplementationOnce(async (_schema: unknown, cb: unknown) => {
+      const result = await (cb as (runner: unknown) => Promise<unknown>)(qr)
+      order.push('transactional')
+      return result
+    })
+    stats.invalidate.mockImplementationOnce(async () => {
+      order.push('invalidate')
+    })
+
+    await service.merge(SCHEMA, WINNER, { loserId: LOSER })
+
+    expect(stats.invalidate).toHaveBeenCalledTimes(1)
+    expect(stats.invalidate).toHaveBeenCalledWith(SCHEMA)
+    expect(order).toEqual(['transactional', 'invalidate'])
+  })
+
   it('stops when either contact is gone', async () => {
     qr.query.mockResolvedValueOnce([])
 
@@ -176,7 +228,7 @@ describe('ContactMergeService', () => {
     )
 
     qr.query.mockReset()
-    qr.query.mockResolvedValueOnce([contactRow()]).mockResolvedValueOnce([])
+    qr.query.mockResolvedValueOnce([contactRow()])
 
     await expect(service.merge(SCHEMA, WINNER, { loserId: LOSER })).rejects.toThrow(
       NotFoundException,

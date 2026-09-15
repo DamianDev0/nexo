@@ -7,6 +7,9 @@ import { DataSource } from 'typeorm'
 
 import { AppModule } from '../../src/app.module'
 import { TransformInterceptor } from '../../src/shared/interceptors/transform.interceptor'
+import { AllExceptionsFilter } from '../../src/shared/filters/all-exceptions.filter'
+import { HttpExceptionFilter } from '../../src/shared/filters/http-exception.filter'
+import { TypeOrmExceptionFilter } from '../../src/shared/filters/typeorm-exception.filter'
 import { TenantProvisioningService } from '../../src/modules/tenants/services/tenant-provisioning.service'
 import { CacheService } from '../../src/shared/cache/cache.service'
 import { TwilioMessagingService } from '../../src/shared/integrations/twilio/twilio-messaging.service'
@@ -36,6 +39,11 @@ export async function createTestApp(): Promise<TestApp> {
   app.setGlobalPrefix(API_PREFIX)
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+  )
+  app.useGlobalFilters(
+    new AllExceptionsFilter(),
+    new TypeOrmExceptionFilter(),
+    new HttpExceptionFilter(),
   )
   app.useGlobalInterceptors(new TransformInterceptor(app.get(Reflector)))
   await app.init()

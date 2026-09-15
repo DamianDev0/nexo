@@ -23,6 +23,7 @@
 pnpm test                       # whole suite (turbo)
 pnpm --filter api test          # api unit + integration
 pnpm --filter api test:e2e      # api e2e (requires Postgres + seed)
+pnpm --filter api test:perf     # api p95 budgets on a 50k-row tenant (PERF_CONTACTS / PERF_SAMPLES to tune)
 pnpm --filter web test          # web unit (vitest)
 pnpm --filter web test:e2e      # playwright
 pnpm --filter web check:arch    # file-size + colors + html-primitives

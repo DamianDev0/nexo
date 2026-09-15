@@ -6,5 +6,12 @@
   "src/features/setup-workspace/model/useStepCompany.ts",
   "src/features/setup-workspace/model/useStepNavigation.ts",
   "src/features/setup-workspace/model/useStepNomenclature.ts",
-  "src/features/setup-workspace/model/useStepPipeline.ts"
+  "src/features/setup-workspace/model/useStepPipeline.ts",
+  "src/widgets/app-shell/lib/nav-items.ts",
+  "src/widgets/app-shell/lib/settings-link.ts",
+  "src/widgets/app-shell/model/breadcrumb-tail.store.ts",
+  "src/widgets/app-shell/model/useHeaderSearch.ts",
+  "src/widgets/app-shell/model/useQuickCreate.ts",
+  "src/widgets/app-shell/model/useTenantSlugSync.ts",
+  "src/widgets/app-shell/model/useTenantThemeDefault.ts"
 ]

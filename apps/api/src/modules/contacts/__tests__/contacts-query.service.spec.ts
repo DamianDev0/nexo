@@ -3,6 +3,8 @@ import { TenantDbService } from '@/shared/database/tenant-db.service'
 import { EventBusService } from '@/shared/events/event-bus.service'
 import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
 import { ContactDuplicatesService } from '../services/contact-duplicates.service'
+import { ContactTaxonomyService } from '../services/contact-taxonomy.service'
+import { ContactStatsCacheService } from '../services/contact-stats-cache.service'
 import { ContactsService } from '../services/contacts.service'
 import { ContactsRepository } from '../repositories/contacts.repository'
 import type { ContactListQuery } from '../interfaces/contact-row.interfaces'
@@ -22,6 +24,17 @@ describe('ContactsService query extensions', () => {
         { provide: TenantDbService, useValue: buildDbMock(qr) },
         { provide: EventBusService, useValue: { emit: jest.fn() } },
         { provide: ContactDuplicatesService, useValue: { assertNoDuplicates: jest.fn() } },
+        ContactTaxonomyService,
+        {
+          provide: ContactStatsCacheService,
+          useValue: {
+            getCounts: jest.fn().mockResolvedValue(null),
+            setCounts: jest.fn(),
+            getUsage: jest.fn().mockResolvedValue(null),
+            setUsage: jest.fn(),
+            invalidate: jest.fn(),
+          },
+        },
       ],
     }).compile()
     service = module.get(ContactsService)

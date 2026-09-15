@@ -31,4 +31,36 @@ describe('useAddressAutofill', () => {
     await new Promise((tick) => setTimeout(tick, 0))
     expect(onResolved).not.toHaveBeenCalled()
   })
+
+  it('applies only the latest resolution when two calls race and the first settles last', async () => {
+    let resolveFirst!: (value: { name: string; code: string; department: string }) => void
+    let resolveSecond!: (value: { name: string; code: string; department: string }) => void
+    resolve
+      .mockImplementationOnce(
+        () =>
+          new Promise((settle) => {
+            resolveFirst = settle
+          }),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((settle) => {
+            resolveSecond = settle
+          }),
+      )
+    const onResolved = vi.fn()
+    const { result } = renderHook(() => useAddressAutofill(onResolved))
+
+    result.current('Primera consulta')
+    result.current('Segunda consulta')
+
+    resolveSecond({ name: 'Bogotá', code: '11001', department: 'Bogotá' })
+    await waitFor(() => expect(onResolved).toHaveBeenCalledOnce())
+
+    resolveFirst({ name: 'Cali', code: '76001', department: 'Valle del Cauca' })
+    await new Promise((tick) => setTimeout(tick, 0))
+
+    expect(onResolved).toHaveBeenCalledOnce()
+    expect(onResolved).toHaveBeenCalledWith({ name: 'Bogotá', code: '11001' })
+  })
 })

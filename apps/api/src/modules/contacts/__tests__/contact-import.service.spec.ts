@@ -21,10 +21,13 @@ describe('ContactImportService', () => {
   let qr: ReturnType<typeof buildQrMock>
   let repository: {
     findEnabledTagNames: jest.Mock
-    findImportMatchId: jest.Mock
-    insert: jest.Mock
+    findImportMatches: jest.Mock
+    insertMany: jest.Mock
     updateById: jest.Mock
   }
+
+  const insertedRows = () =>
+    repository.insertMany.mock.calls.flatMap(([, rows]) => rows as Array<Record<string, unknown>>)
   let importService: { analyze: jest.Mock; getRowsForExecution: jest.Mock; release: jest.Mock }
 
   async function execute(rows: Row[], strategy: 'skip' | 'create' | 'update' = 'skip') {
@@ -41,8 +44,8 @@ describe('ContactImportService', () => {
     qr = buildQrMock()
     repository = {
       findEnabledTagNames: jest.fn().mockResolvedValue(['VIP', 'Frío']),
-      findImportMatchId: jest.fn().mockResolvedValue(null),
-      insert: jest.fn().mockResolvedValue({ id: 'c-1' }),
+      findImportMatches: jest.fn().mockResolvedValue(new Map<string, string>()),
+      insertMany: jest.fn().mockResolvedValue([{ id: 'c-1' }]),
       updateById: jest.fn().mockResolvedValue({ id: 'c-1' }),
     }
     importService = { analyze: jest.fn(), getRowsForExecution: jest.fn(), release: jest.fn() }
@@ -153,7 +156,7 @@ describe('ContactImportService', () => {
   it('keeps only catalog tags, canonicalizes their case and reports the rest', async () => {
     const result = await execute([row({ firstName: 'Ana', tags: ['vip', 'fantasma'] })])
 
-    expect(repository.insert).toHaveBeenCalledWith(qr, expect.objectContaining({ tags: ['VIP'] }))
+    expect(insertedRows()).toEqual([expect.objectContaining({ tags: ['VIP'] })])
     expect(result.imported).toBe(1)
     expect(result.errors[0]?.message).toContain('fantasma')
   })
@@ -161,20 +164,45 @@ describe('ContactImportService', () => {
   it('defaults the source to import so the rows are traceable', async () => {
     await execute([row({ firstName: 'Ana' })])
 
-    expect(repository.insert).toHaveBeenCalledWith(
-      qr,
+    expect(insertedRows()).toEqual([
       expect.objectContaining({ source: 'import', status: 'new', createdBy: USER }),
+    ])
+  })
+
+  it('writes every new contact in batches instead of one insert per row', async () => {
+    const rows = Array.from({ length: 1200 }, (_, i) =>
+      row({ firstName: `Fila${i}`, email: `fila${i}@empresa.co` }),
     )
+
+    const result = await execute(rows)
+
+    expect(result.imported).toBe(1200)
+    expect(repository.insertMany).toHaveBeenCalledTimes(3)
+    expect(repository.findImportMatches).toHaveBeenCalledTimes(1)
+  })
+
+  it('imports only the first of two rows that share an email inside the same file', async () => {
+    const result = await execute([
+      row({ firstName: 'Ana', email: 'ana@empresa.co' }),
+      row({ firstName: 'Ana Otra', email: 'ANA@empresa.co' }),
+    ])
+
+    expect(result).toMatchObject({ imported: 1, skipped: 1 })
+    expect(insertedRows()).toHaveLength(1)
   })
 
   describe('duplicates', () => {
-    beforeEach(() => repository.findImportMatchId.mockResolvedValue('existing-1'))
+    beforeEach(() =>
+      repository.findImportMatches.mockResolvedValue(
+        new Map([['email:ana@empresa.co', 'existing-1']]),
+      ),
+    )
 
     it('skips the existing contact under the skip strategy', async () => {
       const result = await execute([row({ firstName: 'Ana', email: 'ana@empresa.co' })], 'skip')
 
       expect(result).toMatchObject({ imported: 0, updated: 0, skipped: 1 })
-      expect(repository.insert).not.toHaveBeenCalled()
+      expect(repository.insertMany).not.toHaveBeenCalled()
     })
 
     it('updates the existing contact under the update strategy', async () => {
@@ -184,11 +212,11 @@ describe('ContactImportService', () => {
       expect(repository.updateById).toHaveBeenCalledWith(qr, 'existing-1', expect.any(Array))
     })
 
-    it('inserts a second contact under the create strategy', async () => {
+    it('never creates a second active contact with the same email, even under create', async () => {
       const result = await execute([row({ firstName: 'Ana', email: 'ana@empresa.co' })], 'create')
 
-      expect(result).toMatchObject({ imported: 1, updated: 0, skipped: 0 })
-      expect(repository.insert).toHaveBeenCalled()
+      expect(result).toMatchObject({ imported: 0, updated: 0, skipped: 1 })
+      expect(repository.insertMany).not.toHaveBeenCalled()
     })
 
     it('never writes a null over an existing value when updating', async () => {

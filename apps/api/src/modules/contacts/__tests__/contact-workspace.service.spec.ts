@@ -136,57 +136,70 @@ describe('ContactWorkspaceService', () => {
   })
 
   describe('updateState', () => {
+    function mockState(existing: unknown[]) {
+      qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce(existing).mockResolvedValueOnce([])
+    }
+
+    function upsertCall(): [string, unknown[]] {
+      return qr.query.mock.calls[2] as [string, unknown[]]
+    }
+
+    it('serializes writers per user inside one transaction before reading the state', async () => {
+      mockState([])
+
+      await service.updateState(SCHEMA, USER, { activeViewId: 'view-1' })
+
+      expect(db.transactional).toHaveBeenCalledTimes(1)
+      const [lockSql, lockParams] = qr.query.mock.calls[0] as [string, unknown[]]
+      expect(lockSql).toContain('pg_advisory_xact_lock')
+      expect(lockParams).toEqual([USER])
+    })
+
     it('upserts active view and table state with an ON CONFLICT clause', async () => {
-      qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce([])
+      mockState([])
 
       await service.updateState(SCHEMA, USER, {
         activeViewId: 'view-1',
         tableState: { density: 'compact' },
       })
 
-      const [sql, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      const [sql, params] = upsertCall()
       expect(sql).toContain('INSERT INTO contact_workspace_states')
       expect(sql).toContain('ON CONFLICT (user_id) DO UPDATE')
       expect(params).toEqual([USER, 'view-1', { density: 'compact' }])
     })
 
     it('keeps the existing active view and table state when the dto omits them', async () => {
-      qr.query
-        .mockResolvedValueOnce([
-          { active_view_id: 'view-existing', table_state: { density: 'comfortable' } },
-        ])
-        .mockResolvedValueOnce([])
+      mockState([{ active_view_id: 'view-existing', table_state: { density: 'comfortable' } }])
 
       await service.updateState(SCHEMA, USER, {})
 
-      const [, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      const [, params] = upsertCall()
       expect(params).toEqual([USER, 'view-existing', { density: 'comfortable' }])
     })
 
     it('falls back to null active view when there is no prior state and none is provided', async () => {
-      qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce([])
+      mockState([])
 
       await service.updateState(SCHEMA, USER, { tableState: { density: 'compact' } })
 
-      const [, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      const [, params] = upsertCall()
       expect(params).toEqual([USER, null, { density: 'compact' }])
     })
 
     it('merges the incoming table state into the stored one instead of replacing it', async () => {
-      qr.query
-        .mockResolvedValueOnce([
-          {
-            active_view_id: null,
-            table_state: { density: 'compact', columns: { order: ['name', 'email'] } },
-          },
-        ])
-        .mockResolvedValueOnce([])
+      mockState([
+        {
+          active_view_id: null,
+          table_state: { density: 'compact', columns: { order: ['name', 'email'] } },
+        },
+      ])
 
       await service.updateState(SCHEMA, USER, {
         tableState: { columns: { widths: { name: 200 } } },
       })
 
-      const [, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      const [, params] = upsertCall()
       expect(params[2]).toEqual({
         density: 'compact',
         columns: { order: ['name', 'email'], widths: { name: 200 } },
@@ -194,26 +207,22 @@ describe('ContactWorkspaceService', () => {
     })
 
     it('clamps persisted widths to the catalog bounds', async () => {
-      qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce([])
+      mockState([])
 
       await service.updateState(SCHEMA, USER, {
         tableState: { columns: { widths: { name: 5, city: 10_000 } } },
       })
 
-      const [, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      const [, params] = upsertCall()
       expect(params[2]).toEqual({ columns: { widths: { name: 180, city: 480 } } })
     })
 
     it('clears the active view when the dto sends an explicit null', async () => {
-      qr.query
-        .mockResolvedValueOnce([
-          { active_view_id: 'view-existing', table_state: { density: 'comfortable' } },
-        ])
-        .mockResolvedValueOnce([])
+      mockState([{ active_view_id: 'view-existing', table_state: { density: 'comfortable' } }])
 
       await service.updateState(SCHEMA, USER, { activeViewId: null })
 
-      const [, params] = qr.query.mock.calls[1] as [string, unknown[]]
+      const [, params] = upsertCall()
       expect(params).toEqual([USER, null, { density: 'comfortable' }])
     })
   })

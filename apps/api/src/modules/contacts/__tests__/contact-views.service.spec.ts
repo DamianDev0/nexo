@@ -59,30 +59,46 @@ describe('ContactViewsService', () => {
     expect(views[0]?.columns).toEqual({ hidden: ['city'] })
   })
 
-  it('clears the previous default before creating a new default view', async () => {
+  it('serializes writers per owner, then clears the previous default before creating a new one', async () => {
     qr.query
+      .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([{ next: 3 }])
       .mockResolvedValueOnce([makeViewRow({ is_default: true, position: 3 })])
 
     const view = await service.create(SCHEMA, OWNER, { name: 'Default', isDefault: true })
 
-    const [clearSql] = qr.query.mock.calls[0] as [string]
+    const [lockSql, lockParams] = qr.query.mock.calls[0] as [string, unknown[]]
+    expect(lockSql).toContain('pg_advisory_xact_lock')
+    expect(lockParams).toEqual([OWNER])
+    const [clearSql] = qr.query.mock.calls[1] as [string]
     expect(clearSql).toContain('SET is_default = false')
     expect(view.position).toBe(3)
     expect(view.isDefault).toBe(true)
   })
 
   it('rejects updates from a user that does not own the view', async () => {
-    qr.query.mockResolvedValueOnce([makeViewRow({ owner_id: OTHER })])
+    qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce([makeViewRow({ owner_id: OTHER })])
 
     await expect(service.update(SCHEMA, OWNER, makeViewRow().id, { name: 'x' })).rejects.toThrow(
       ForbiddenException,
     )
   })
 
+  it('answers 404 when the view vanished between the ownership check and the update', async () => {
+    qr.query
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([makeViewRow()])
+      .mockResolvedValueOnce([])
+
+    await expect(service.update(SCHEMA, OWNER, makeViewRow().id, { name: 'x' })).rejects.toThrow(
+      NotFoundException,
+    )
+  })
+
   it('duplicates a shared view as a private copy', async () => {
     qr.query
+      .mockResolvedValueOnce([])
       .mockResolvedValueOnce([makeViewRow({ owner_id: OTHER, visibility: 'shared' })])
       .mockResolvedValueOnce([{ next: 1 }])
       .mockResolvedValueOnce([
@@ -91,24 +107,23 @@ describe('ContactViewsService', () => {
 
     const copy = await service.duplicate(SCHEMA, OWNER, makeViewRow().id, {})
 
-    const [insertSql, insertParams] = qr.query.mock.calls[2] as [string, unknown[]]
+    const [insertSql, insertParams] = qr.query.mock.calls[3] as [string, unknown[]]
     expect(insertSql).toContain(`false, false, 'private'`)
     expect(insertParams[1]).toBe('My leads (copy)')
     expect(copy.visibility).toBe('private')
   })
 
-  it('writes one position per id on reorder scoped to the owner', async () => {
+  it('writes every position in one statement scoped to the owner', async () => {
     const ids = ['a67c2f4e-4444-4f2c-b6d8-e4a67c056f04', 'a67c2f4e-5555-4f2c-b6d8-e4a67c056f05']
-    qr.query.mockImplementation((_sql: string, params: unknown[]) =>
-      Promise.resolve([{ id: params[0] }]),
-    )
+    qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce(ids.map((id) => ({ id })))
 
     await service.reorder(SCHEMA, OWNER, { ids })
 
     expect(qr.query).toHaveBeenCalledTimes(2)
     const [sql, params] = qr.query.mock.calls[1] as [string, unknown[]]
-    expect(sql).toContain('owner_id = $2')
-    expect(params).toEqual([ids[1], OWNER, 1])
+    expect(sql).toContain('WITH ORDINALITY')
+    expect(sql).toContain('v.owner_id = $2')
+    expect(params).toEqual([ids, OWNER])
   })
 
   it('rejects a reorder that names a view the user does not own', async () => {

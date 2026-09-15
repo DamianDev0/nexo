@@ -1,5 +1,22 @@
-import type { QueryRunner } from 'typeorm'
-import { sqlRows } from './sql.util'
+import { QueryFailedError, type QueryRunner } from 'typeorm'
+import { isUniqueViolation, sqlRows } from './sql.util'
+
+describe('isUniqueViolation', () => {
+  const failure = (code: string, constraint: string) =>
+    new QueryFailedError('INSERT', [], Object.assign(new Error('dup'), { code, constraint }))
+
+  it('recognizes a 23505 whose constraint matches the pattern', () => {
+    expect(
+      isUniqueViolation(failure('23505', 'uq_tenant_a_contacts_email_active'), /_email_/),
+    ).toBe(true)
+  })
+
+  it('ignores other codes, other constraints and non-database errors', () => {
+    expect(isUniqueViolation(failure('23503', 'uq_x'), /uq_/)).toBe(false)
+    expect(isUniqueViolation(failure('23505', 'uq_views_default'), /_contacts_/)).toBe(false)
+    expect(isUniqueViolation(new Error('boom'))).toBe(false)
+  })
+})
 
 function runnerReturning(result: unknown): QueryRunner {
   return { query: jest.fn().mockResolvedValue(result) } as unknown as QueryRunner

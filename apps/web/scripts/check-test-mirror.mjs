@@ -3,7 +3,7 @@ import { basename } from 'node:path'
 
 import { loadBaseline, relPath, report, walkSource } from './lib.mjs'
 
-const TESTABLE = /^src\/(features|entities)\/[^/]+\/(lib|model)\//
+const TESTABLE = /^src\/(features|entities|widgets|views)\/[^/]+\/(lib|model)\//
 const EXEMPT = /\/model\/types\/|\/index\.tsx?$|-context\.tsx$|\.d\.ts$/
 
 function collectTestNames() {

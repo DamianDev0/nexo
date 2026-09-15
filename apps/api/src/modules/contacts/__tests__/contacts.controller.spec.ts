@@ -7,7 +7,20 @@ import { CustomFieldsValidator } from '@/modules/settings/services/custom-fields
 import { TenantConfigService } from '@/modules/settings/services/tenant-config.service'
 import { makeAuthenticatedUser, makeTenantContext } from '@/shared/testing/tenant-context.mock'
 import { DEFAULT_CONTACT_TAXONOMY, LifecycleStage, UserRole } from '@repo/shared-types'
-import type { Contact, PaginatedContacts } from '@repo/shared-types'
+import type { Contact, FieldDef, PaginatedContacts } from '@repo/shared-types'
+
+function makeFieldDef(overrides: Partial<FieldDef> = {}): FieldDef {
+  return {
+    key: 'industry',
+    label: 'Industry',
+    type: 'text',
+    required: false,
+    unique: false,
+    order: 1,
+    isActive: true,
+    ...overrides,
+  }
+}
 
 const mockCtx = makeTenantContext()
 const mockUser = makeAuthenticatedUser({ email: 'owner@acme.com', role: UserRole.OWNER })
@@ -61,9 +74,21 @@ function buildServiceMock() {
     create: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    restore: jest.fn(),
     getTimeline: jest.fn(),
     counts: jest.fn(),
+    taxonomyUsage: jest.fn(),
+    reassignTaxonomy: jest.fn(),
     probeDuplicates: jest.fn(),
+  }
+}
+
+function buildImportServiceMock() {
+  return {
+    analyze: jest.fn(),
+    preview: jest.fn(),
+    validate: jest.fn(),
+    execute: jest.fn(),
   }
 }
 
@@ -71,12 +96,17 @@ describe('ContactsController', () => {
   let controller: ContactsController
   let service: ReturnType<typeof buildServiceMock>
   let mergeService: { merge: jest.Mock }
+  let importService: ReturnType<typeof buildImportServiceMock>
+  let tenantConfig: { getContactTaxonomy: jest.Mock; getCustomFields: jest.Mock }
 
   beforeEach(async () => {
     service = buildServiceMock()
     mergeService = { merge: jest.fn() }
-
-    const importService = { analyze: jest.fn(), preview: jest.fn(), execute: jest.fn() }
+    importService = buildImportServiceMock()
+    tenantConfig = {
+      getContactTaxonomy: jest.fn().mockResolvedValue(DEFAULT_CONTACT_TAXONOMY),
+      getCustomFields: jest.fn().mockResolvedValue({ contacts: [], companies: [], deals: [] }),
+    }
 
     const module = await Test.createTestingModule({
       controllers: [ContactsController],
@@ -85,12 +115,7 @@ describe('ContactsController', () => {
         { provide: ContactMergeService, useValue: mergeService },
         { provide: ContactImportService, useValue: importService },
         { provide: CustomFieldsValidator, useValue: { validate: jest.fn() } },
-        {
-          provide: TenantConfigService,
-          useValue: {
-            getContactTaxonomy: jest.fn().mockResolvedValue(DEFAULT_CONTACT_TAXONOMY),
-          },
-        },
+        { provide: TenantConfigService, useValue: tenantConfig },
       ],
     }).compile()
 
@@ -189,6 +214,53 @@ describe('ContactsController', () => {
     })
   })
 
+  describe('restore', () => {
+    it('delegates to service with schema, id and the current user id', async () => {
+      service.restore.mockResolvedValue(mockContact)
+
+      const result = await controller.restore('c-1', mockCtx, mockUser)
+
+      expect(service.restore).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1', mockUser.id)
+      expect(result).toBe(mockContact)
+    })
+  })
+
+  describe('taxonomyUsage', () => {
+    it('delegates to service with schema', async () => {
+      const usage = {
+        statuses: { new: 3 },
+        sources: { manual: 5 },
+        lifecycleStages: { lead: 2 },
+        tags: { vip: 1 },
+      }
+      service.taxonomyUsage.mockResolvedValue(usage)
+
+      const result = await controller.taxonomyUsage(mockCtx)
+
+      expect(service.taxonomyUsage).toHaveBeenCalledWith(mockCtx.schemaName)
+      expect(result).toEqual(usage)
+    })
+  })
+
+  describe('reassignTaxonomy', () => {
+    it('delegates to service with schema, kind, fromKey and toKey', async () => {
+      service.reassignTaxonomy.mockResolvedValue({ reassigned: 4 })
+
+      const result = await controller.reassignTaxonomy(
+        { kind: 'tag', fromKey: 'vip', toKey: 'gold' },
+        mockCtx,
+      )
+
+      expect(service.reassignTaxonomy).toHaveBeenCalledWith(
+        mockCtx.schemaName,
+        'tag',
+        'vip',
+        'gold',
+      )
+      expect(result).toEqual({ reassigned: 4 })
+    })
+  })
+
   describe('counts', () => {
     it('delegates to service with schema', async () => {
       const counts = {
@@ -247,6 +319,163 @@ describe('ContactsController', () => {
 
       expect(service.getTimeline).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1', undefined)
       expect(result.activities).toHaveLength(0)
+    })
+
+    it('leaves the default limit to the service when the query omits it', async () => {
+      service.getTimeline.mockResolvedValue({ activities: [], deals: [] })
+
+      await controller.getTimeline('c-1', mockCtx, {})
+
+      const [, , limitArg] = service.getTimeline.mock.calls[0] as [
+        string,
+        string,
+        number | undefined,
+      ]
+      expect(limitArg).toBeUndefined()
+    })
+
+    it('passes a caller-provided limit through to the service', async () => {
+      service.getTimeline.mockResolvedValue({ activities: [], deals: [] })
+
+      await controller.getTimeline('c-1', mockCtx, { limit: 10 })
+
+      expect(service.getTimeline).toHaveBeenCalledWith(mockCtx.schemaName, 'c-1', 10)
+    })
+  })
+
+  describe('import routes', () => {
+    const customFieldsConfig = {
+      contacts: [
+        makeFieldDef({ key: 'industry' }),
+        makeFieldDef({ key: 'legacy', isActive: false }),
+      ],
+      companies: [],
+      deals: [],
+    }
+
+    beforeEach(() => {
+      tenantConfig.getCustomFields.mockResolvedValue(customFieldsConfig)
+    })
+
+    describe('analyzeImport', () => {
+      it('passes the uploaded file and the active custom field defs to the import service', async () => {
+        const file = { originalname: 'contacts.csv' } as Express.Multer.File
+        const analyzeResult = { columns: [], suggestions: [], sampleRows: [] }
+        importService.analyze.mockResolvedValue(analyzeResult)
+
+        const result = await controller.analyzeImport(file, mockCtx)
+
+        expect(tenantConfig.getCustomFields).toHaveBeenCalledWith(mockCtx.tenantId)
+        expect(importService.analyze).toHaveBeenCalledWith(mockCtx.schemaName, file, [
+          makeFieldDef({ key: 'industry' }),
+        ])
+        expect(result).toBe(analyzeResult)
+      })
+    })
+
+    describe('previewImport', () => {
+      it('passes fileId, mapping and the active custom fields', async () => {
+        const preview = { rows: [], issues: [] }
+        importService.preview.mockResolvedValue(preview)
+
+        const result = await controller.previewImport(
+          { fileId: 'file-1', mapping: { email: 'Email' } },
+          mockCtx,
+        )
+
+        expect(importService.preview).toHaveBeenCalledWith(
+          mockCtx.schemaName,
+          'file-1',
+          { email: 'Email' },
+          [makeFieldDef({ key: 'industry' })],
+        )
+        expect(result).toBe(preview)
+      })
+
+      it('defaults mapping to an empty object when not provided', async () => {
+        importService.preview.mockResolvedValue({ rows: [], issues: [] })
+
+        await controller.previewImport({ fileId: 'file-1' }, mockCtx)
+
+        expect(importService.preview).toHaveBeenCalledWith(mockCtx.schemaName, 'file-1', {}, [
+          makeFieldDef({ key: 'industry' }),
+        ])
+      })
+    })
+
+    describe('validateImport', () => {
+      it('passes fileId, mapping, taxonomy and the active custom fields', async () => {
+        const report = { valid: 0, invalid: 0, issues: [] }
+        importService.validate.mockResolvedValue(report)
+
+        const result = await controller.validateImport(
+          { fileId: 'file-1', mapping: { email: 'Email' } },
+          mockCtx,
+        )
+
+        expect(importService.validate).toHaveBeenCalledWith(
+          mockCtx.schemaName,
+          'file-1',
+          { email: 'Email' },
+          DEFAULT_CONTACT_TAXONOMY,
+          [makeFieldDef({ key: 'industry' })],
+        )
+        expect(result).toBe(report)
+      })
+
+      it('defaults mapping to an empty object when not provided', async () => {
+        importService.validate.mockResolvedValue({ valid: 0, invalid: 0, issues: [] })
+
+        await controller.validateImport({ fileId: 'file-1' }, mockCtx)
+
+        expect(importService.validate).toHaveBeenCalledWith(
+          mockCtx.schemaName,
+          'file-1',
+          {},
+          DEFAULT_CONTACT_TAXONOMY,
+          [makeFieldDef({ key: 'industry' })],
+        )
+      })
+    })
+
+    describe('executeImport', () => {
+      it('passes fileId, mapping, duplicateStrategy, user id, taxonomy and custom fields', async () => {
+        const importResult = { created: 1, updated: 0, skipped: 0, errors: [] }
+        importService.execute.mockResolvedValue(importResult)
+
+        const result = await controller.executeImport(
+          { fileId: 'file-1', mapping: { email: 'Email' }, duplicateStrategy: 'update' },
+          mockCtx,
+          mockUser,
+        )
+
+        expect(importService.execute).toHaveBeenCalledWith(
+          mockCtx.schemaName,
+          'file-1',
+          { email: 'Email' },
+          'update',
+          mockUser.id,
+          DEFAULT_CONTACT_TAXONOMY,
+          [makeFieldDef({ key: 'industry' })],
+        )
+        expect(result).toBe(importResult)
+      })
+
+      it('defaults mapping to {} and duplicateStrategy to "skip" when not provided', async () => {
+        importService.execute.mockResolvedValue({ created: 0, updated: 0, skipped: 0, errors: [] })
+
+        await controller.executeImport({ fileId: 'file-1' }, mockCtx, mockUser)
+
+        expect(importService.execute).toHaveBeenCalledWith(
+          mockCtx.schemaName,
+          'file-1',
+          {},
+          'skip',
+          mockUser.id,
+          DEFAULT_CONTACT_TAXONOMY,
+          [makeFieldDef({ key: 'industry' })],
+        )
+      })
     })
   })
 })

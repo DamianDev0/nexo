@@ -78,7 +78,18 @@ describe('useTagPicker', () => {
     const { result } = renderHook(() => useTagPicker(CONTACT, onDone), { wrapper })
     act(() => result.current.toggle('Manual'))
     act(() => result.current.save())
-    await waitFor(() => expect(onDone).toHaveBeenCalledOnce())
-    expect(patches).toEqual([{ tags: ['VIP'] }])
+    expect(onDone).toHaveBeenCalledOnce()
+    await waitFor(() => expect(patches).toEqual([{ tags: ['VIP'] }]))
+  })
+
+  it('resyncs the selection when the contact tags change underneath', () => {
+    const { result, rerender } = renderHook(({ contact }) => useTagPicker(contact, vi.fn()), {
+      wrapper,
+      initialProps: { contact: CONTACT },
+    })
+    act(() => result.current.toggle('Lead frío'))
+    rerender({ contact: { id: 'c1', tags: ['VIP', 'Manual', 'Nuevo'] } })
+    expect(result.current.isDirty).toBe(false)
+    expect(result.current.selectedCount).toBe(3)
   })
 })
