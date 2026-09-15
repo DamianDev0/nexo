@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { type ReactNode, useCallback, useId, useState } from 'react'
 
 import { cn } from '@/shared/lib'
+import { gooeySpring, smoothSpring } from '@/shared/lib/animations'
 
 export interface StepItem {
   content?: ReactNode
@@ -33,17 +34,8 @@ export interface AnimatedStepperProps {
  *  slide   content slides directionally with crossfade
  * ───────────────────────────────────────────────────────── */
 
-const SPRING = {
-  bounce: 0.1,
-  duration: 0.25,
-  type: 'spring' as const,
-}
-
-const SPRING_BOUNCY = {
-  bounce: 0.2,
-  duration: 0.3,
-  type: 'spring' as const,
-}
+const SPRING = smoothSpring
+const SPRING_BOUNCY = gooeySpring
 
 function CheckIcon() {
   return (

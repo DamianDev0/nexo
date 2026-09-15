@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useCallback, useState } from 'react'
 
 import { cn } from '@/shared/lib'
-import { SPRING_DEFAULT } from '@/shared/ui/smoothui/lib/animation'
+import { smoothSpring, useReducedTransition } from '@/shared/lib/animations'
 
 import type { KeyboardEvent, ReactNode } from 'react'
 
@@ -38,6 +38,7 @@ export function AnimatedToggle({
   className,
 }: Readonly<AnimatedToggleProps>) {
   const shouldReduceMotion = useReducedMotion()
+  const spring = useReducedTransition(smoothSpring)
   const [internalChecked, setInternalChecked] = useState(defaultChecked)
 
   const isControlled = controlledChecked !== undefined
@@ -90,7 +91,7 @@ export function AnimatedToggle({
         )}
         initial={false}
         style={{ borderRadius: thumbRadius }}
-        transition={shouldReduceMotion ? { duration: 0 } : SPRING_DEFAULT}
+        transition={spring}
       >
         {variant === 'icon' && icons && (
           <AnimatePresence initial={false} mode="wait">
@@ -107,7 +108,7 @@ export function AnimatedToggle({
               }
               initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, rotate: 90, scale: 0.5 }}
               key={checked ? 'on' : 'off'}
-              transition={shouldReduceMotion ? { duration: 0 } : SPRING_DEFAULT}
+              transition={spring}
             >
               {checked ? icons.on : icons.off}
             </motion.span>

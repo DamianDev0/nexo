@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 
 import { cn } from '@/shared/lib'
-import { SPRING_SNAPPY } from '@/shared/ui/smoothui/lib/animation'
+import { snappySpring, useReducedTransition } from '@/shared/lib/animations'
 
 export type CheckboxVisualState = 'checked' | 'unchecked' | 'indeterminate'
 
@@ -20,6 +20,7 @@ const MotionSvg = motion.svg
 
 export function CheckboxMark({ state }: { readonly state: CheckboxVisualState }) {
   const shouldReduceMotion = useReducedMotion()
+  const spring = useReducedTransition(snappySpring)
 
   return (
     <AnimatePresence mode="wait">
@@ -39,14 +40,14 @@ export function CheckboxMark({ state }: { readonly state: CheckboxVisualState })
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={3}
-          transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
+          transition={spring}
           viewBox="0 0 24 24"
         >
           <CheckmarkPath
             animate={shouldReduceMotion ? {} : { pathLength: 1 }}
             d={GLYPH_PATHS[state]}
             initial={shouldReduceMotion ? {} : { pathLength: 0 }}
-            transition={shouldReduceMotion ? { duration: 0 } : SPRING_SNAPPY}
+            transition={spring}
           />
         </MotionSvg>
       )}

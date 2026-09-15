@@ -4,10 +4,6 @@ import { CREATE_PARAM, ROUTES } from '@/shared/config/routes'
 
 import type { QuickCreateTarget } from '../model/types'
 
-export const QUICK_CREATE_TRIGGER_SIZE = 32
-export const QUICK_CREATE_PANEL_WIDTH = 208
-export const QUICK_CREATE_PANEL_RADIUS = 24
-
 type QuickCreateSeed = Omit<QuickCreateTarget, 'available'>
 
 const QUICK_CREATE_SEEDS: ReadonlyArray<QuickCreateSeed> = [
