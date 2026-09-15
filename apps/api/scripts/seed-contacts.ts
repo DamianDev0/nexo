@@ -3,7 +3,7 @@
  *
  * Usage:
  *   pnpm --filter api seed:contacts --tenant damiantest
- *   pnpm --filter api seed:contacts --tenant damiantest --count 200
+ *   pnpm --filter api seed:contacts --tenant damiantest --count 50000
  *   pnpm --filter api seed:contacts --tenant damiantest --purge
  *
  * Rows are tagged `seed` so `--purge` can remove exactly what this script created
@@ -36,6 +36,9 @@ interface TaxonomyConfig {
   statuses?: TaxonomyEntry[]
   sources?: TaxonomyEntry[]
 }
+
+const MAX_COUNT = 50_000
+const BATCH_SIZE = 1_000
 
 interface Options {
   tenantSlug: string
@@ -152,8 +155,8 @@ function parseOptions(argv: string[]): Options {
 
   const rawCount = read('--count')
   const count = rawCount === null ? 50 : Number.parseInt(rawCount, 10)
-  if (!Number.isInteger(count) || count < 1 || count > 5000) {
-    throw new Error('--count must be an integer between 1 and 5000')
+  if (!Number.isInteger(count) || count < 1 || count > MAX_COUNT) {
+    throw new Error(`--count must be an integer between 1 and ${MAX_COUNT}`)
   }
 
   return { tenantSlug, count, purge: argv.includes('--purge') }
@@ -245,7 +248,8 @@ function insertStatement(schema: string, rowCount: number): string {
     const params = Array.from({ length: width }, (_, column) => `$${row * width + column + 1}`)
     return `(${params.join(', ')})`
   })
-  return `INSERT INTO "${schema}".contacts (${COLUMNS.join(', ')}) VALUES ${tuples.join(', ')}`
+  return `INSERT INTO "${schema}".contacts (${COLUMNS.join(', ')}) VALUES ${tuples.join(', ')}
+    ON CONFLICT DO NOTHING RETURNING id`
 }
 
 async function purgeSeeded(runner: QueryRunner, schema: string): Promise<number> {
@@ -278,14 +282,30 @@ async function main(): Promise<void> {
     await upsertContactTagCatalog(runner, schema)
 
     const rows = Array.from({ length: options.count }, (_, index) => buildRow(index, taxonomy))
-    await runner.query(insertStatement(schema, rows.length), rows.flat())
+    let inserted = 0
+    await runner.startTransaction()
+    try {
+      for (let start = 0; start < rows.length; start += BATCH_SIZE) {
+        const batch = rows.slice(start, start + BATCH_SIZE)
+        const result = (await runner.query(
+          insertStatement(schema, batch.length),
+          batch.flat(),
+        )) as unknown[]
+        inserted += result.length
+      }
+      await runner.commitTransaction()
+    } catch (error) {
+      await runner.rollbackTransaction()
+      throw error
+    }
+    await runner.query(`ANALYZE "${schema}".contacts`)
 
     const totals = (await runner.query(
       `SELECT count(*)::int AS count FROM "${schema}".contacts WHERE is_active = true`,
     )) as Array<{ count: number }>
 
     console.log(
-      `Inserted ${rows.length} contacts into ${schema} (${totals[0]?.count ?? 0} active total)`,
+      `Inserted ${inserted} of ${rows.length} contacts into ${schema} (${rows.length - inserted} skipped as duplicates, ${totals[0]?.count ?? 0} active total)`,
     )
     console.log(
       `To UNDO later (deletes every seeded row): pnpm --filter api seed:contacts --tenant ${tenant.slug} --purge`,
