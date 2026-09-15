@@ -1,0 +1,17 @@
+export const CONTACT_COLUMN_FIELDS: Readonly<Record<string, ReadonlyArray<string>>> = {
+  name: ['firstName', 'lastName', 'avatarUrl'],
+  status: ['status'],
+  email: ['email'],
+  phone: ['phone'],
+  whatsapp: ['whatsapp'],
+  documentNumber: ['documentNumber', 'documentType'],
+  lifecycleStage: ['lifecycleStage'],
+  source: ['source'],
+  assignedTo: ['assignedToId', 'assignedToName'],
+  tags: ['tags'],
+  city: ['city', 'municipioCode'],
+  lastContactedAt: ['lastContactedAt'],
+  nextActivity: ['nextActivity'],
+  notes: ['noteCount'],
+  createdAt: ['createdAt'],
+}

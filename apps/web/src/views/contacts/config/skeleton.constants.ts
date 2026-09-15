@@ -1,8 +1,8 @@
 import type { ContactsSkeletonHint } from '@/entities/contact'
 
 export const DEFAULT_SKELETON_HINT: ContactsSkeletonHint = {
-  widths: [40, 220, 150, 190, 130, 110],
-  rows: 8,
+  widths: [40, 240, 150, 210, 130, 160, 150, 130, 150, 120, 130],
+  rows: 10,
 }
 
 export const HEADER_TABS = [

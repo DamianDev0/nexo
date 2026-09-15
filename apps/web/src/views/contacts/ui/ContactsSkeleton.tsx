@@ -21,13 +21,13 @@ function SkeletonCells({
           className="flex shrink-0 items-center gap-2.5 px-3"
         >
           {cell.kind === 'select' ? (
-            <Skeleton className="size-4 rounded-[4px]" />
+            <Skeleton className="size-4 rounded-sm" />
           ) : (
             <>
               {cell.kind === 'lead' && !header && (
                 <Skeleton className="size-7 shrink-0 rounded-full" />
               )}
-              <Skeleton className={header ? 'h-3 w-2/3' : 'h-3.5 w-3/5'} />
+              <Skeleton className={header ? 'h-3 w-2/3 rounded-md' : 'h-4 w-3/5 rounded-md'} />
             </>
           )}
         </span>

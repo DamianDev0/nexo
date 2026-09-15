@@ -70,7 +70,9 @@ export function useOptimisticContactListPatch<TChange>({
             }
           : page,
       )
-      usePendingContactPatches.getState().begin(reversals.map((reversal) => reversal.id))
+      usePendingContactPatches
+        .getState()
+        .begin(reversals.map((reversal) => ({ id: reversal.id, keys: reversal.keys })))
       return { reversals }
     },
     onSuccess: () => sileo.success({ title: successTitle() }),

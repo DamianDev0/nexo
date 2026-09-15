@@ -36,7 +36,7 @@ export function useBoardColumns({
   const tagsByName = useTagCatalog('contact')
   const members = useTeamMembers()
   const owners = useMemo(() => buildOwnerOptions(t, members), [t, members])
-  const pendingIds = usePendingContactPatches((state) => state.ids)
+  const pendingCells = usePendingContactPatches((state) => state.cells)
 
   return useMemo(
     () =>
@@ -49,7 +49,7 @@ export function useBoardColumns({
         sources: taxonomy.sources,
         lifecycleStages: taxonomy.lifecycleStages,
         owners,
-        pendingIds,
+        pendingCells,
         actions: rowActions,
         taxonomy,
         tagsByName,
@@ -62,7 +62,7 @@ export function useBoardColumns({
       dense,
       taxonomy,
       owners,
-      pendingIds,
+      pendingCells,
       rowActions,
       tagsByName,
     ],

@@ -15,7 +15,7 @@ interface DataTableSkeletonProps {
 
 const CELL_FILL: Readonly<Record<number, string>> = { 0: 'w-4/5', 1: 'w-3/5', 2: 'w-2/3' }
 
-export function DataTableSkeleton({ rows = 6, className }: Readonly<DataTableSkeletonProps>) {
+export function DataTableSkeleton({ rows = 10, className }: Readonly<DataTableSkeletonProps>) {
   const { table, rowHeight } = useDataTableContext()
   const { columnSizing } = table.getState()
   const columns = table.getHeaderGroups()[0]?.headers ?? []
@@ -57,14 +57,19 @@ export function DataTableSkeleton({ rows = 6, className }: Readonly<DataTableSke
                   key={column.id}
                   className="overflow-hidden border-b border-row-divider px-2"
                 >
-                  <Skeleton
-                    className={cn(
-                      'h-4 rounded-md',
-                      column.id === DATA_TABLE_SELECTION_ID
-                        ? 'size-4 rounded-sm'
-                        : (CELL_FILL[(row + index) % 3] ?? 'w-3/5'),
+                  <span className="flex items-center gap-2.5">
+                    {column.columnDef.meta?.grow && (
+                      <Skeleton className="size-7 shrink-0 rounded-full" />
                     )}
-                  />
+                    <Skeleton
+                      className={cn(
+                        'h-4 rounded-md',
+                        column.id === DATA_TABLE_SELECTION_ID
+                          ? 'size-4 rounded-sm'
+                          : (CELL_FILL[(row + index) % 3] ?? 'w-3/5'),
+                      )}
+                    />
+                  </span>
                 </TableCell>
               ))}
             </TableRow>

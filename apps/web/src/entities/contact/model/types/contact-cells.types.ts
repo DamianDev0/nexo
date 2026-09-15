@@ -159,7 +159,7 @@ export type ContactColumnContext = {
   readonly sources?: ReadonlyArray<TaxonomyChoice>
   readonly lifecycleStages?: ReadonlyArray<TaxonomyChoice>
   readonly owners?: ReadonlyArray<AssigneeOption>
-  readonly pendingIds?: ReadonlySet<string>
+  readonly pendingCells?: ReadonlySet<string>
   readonly actions?: ContactRowActions
   readonly tagsByName?: ReadonlyMap<string, Tag>
 }

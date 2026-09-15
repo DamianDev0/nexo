@@ -64,16 +64,25 @@ beforeEach(() => {
 })
 
 describe('useBoardColumns', () => {
-  it('marks the contact row as saving only while a patch is pending for it', () => {
+  it('marks only the cell whose field is being saved', () => {
     const contact = buildContact({ id: 'c-1' })
     const { container } = render(<Harness contact={contact} columnId="name" />)
 
     expect(container.querySelector('[aria-busy="true"]')).toBeNull()
 
-    act(() => usePendingContactPatches.getState().begin(['c-1']))
+    act(() => usePendingContactPatches.getState().begin([{ id: 'c-1', keys: ['firstName'] }]))
     expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
 
     act(() => usePendingContactPatches.getState().end(['c-1']))
+    expect(container.querySelector('[aria-busy="true"]')).toBeNull()
+  })
+
+  it('leaves the other cells of the row alone while one field saves', () => {
+    const contact = buildContact({ id: 'c-1' })
+    const { container } = render(<Harness contact={contact} columnId="name" />)
+
+    act(() => usePendingContactPatches.getState().begin([{ id: 'c-1', keys: ['assignedToId'] }]))
+
     expect(container.querySelector('[aria-busy="true"]')).toBeNull()
   })
 
@@ -81,7 +90,9 @@ describe('useBoardColumns', () => {
     const contact = buildContact({ id: 'c-2' })
     const { container } = render(<Harness contact={contact} columnId="name" />)
 
-    act(() => usePendingContactPatches.getState().begin(['someone-else']))
+    act(() =>
+      usePendingContactPatches.getState().begin([{ id: 'someone-else', keys: ['firstName'] }]),
+    )
 
     expect(container.querySelector('[aria-busy="true"]')).toBeNull()
   })
