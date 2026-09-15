@@ -48,10 +48,10 @@ export function ContactChoiceCell({
           size="sm"
           aria-label={label}
           data-slot="choice-picker"
-          className="h-auto w-full min-w-0 justify-between gap-1 rounded-md px-1 py-0.5 font-normal hover:bg-muted"
+          className="group/choice h-auto w-full min-w-0 justify-between gap-1 rounded-md px-1 py-0.5 font-normal hover:bg-muted"
         >
           {children}
-          <CaretDownIcon className="size-3.5 shrink-0 text-faint" />
+          <CaretDownIcon className="size-3.5 shrink-0 text-faint opacity-0 transition-opacity duration-120 group-hover/row:opacity-100 group-focus-visible/choice:opacity-100 group-data-[state=open]/choice:opacity-100" />
         </PillButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">

@@ -13,7 +13,7 @@ type ContactCityCellProps = {
 }
 
 const TRIGGER =
-  'h-auto w-full min-w-0 justify-between gap-1 rounded-md border-transparent bg-transparent px-1 py-0.5 font-light text-muted-foreground shadow-none hover:bg-muted'
+  'h-auto w-full min-w-0 justify-between gap-1 rounded-md border-transparent bg-transparent px-1 py-0.5 font-light text-muted-foreground shadow-none hover:bg-muted [&_svg]:opacity-0 [&_svg]:transition-opacity [&_svg]:duration-120 group-hover/row:[&_svg]:opacity-100 focus-visible:[&_svg]:opacity-100 data-[state=open]:[&_svg]:opacity-100'
 
 export function ContactCityCell({ value, labels, onSelect }: Readonly<ContactCityCellProps>) {
   if (!onSelect) return <DataTable.CellText muted>{value}</DataTable.CellText>

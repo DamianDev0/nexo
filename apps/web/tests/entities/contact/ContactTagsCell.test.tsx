@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { queryWrapper as wrapper } from '../../query-wrapper'
 
@@ -11,6 +11,7 @@ import { ContactTagsCell } from '@/entities/contact/ui/cells/ContactTagsCell'
 const LABELS = {
   title: 'Etiquetas',
   count: (total: number) => `${total} etiquetas`,
+  add: 'Editar etiquetas',
 }
 
 function tagMeta(name: string, description: string | null = null): Tag {
@@ -73,5 +74,15 @@ describe('ContactTagsCell', () => {
 
     expect(screen.getByText('vip')).toBeInTheDocument()
     expect(container.ownerDocument.querySelector('[style*="rgb(59, 130, 246)"]')).not.toBeNull()
+  })
+
+  it('offers the edit action through the same dock as the other cells', async () => {
+    const onEdit = vi.fn()
+    render(<ContactTagsCell tags={['vip']} labels={LABELS} onEdit={onEdit} />, { wrapper })
+
+    await userEvent.hover(screen.getByText('vip'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Editar etiquetas' }))
+
+    expect(onEdit).toHaveBeenCalledOnce()
   })
 })

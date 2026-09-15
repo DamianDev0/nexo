@@ -147,7 +147,8 @@ describe('refined cells', () => {
   it('offers an add-tag affordance that opens the tag editor for the row', async () => {
     const onEditTags = vi.fn()
     const contact = renderCell('tags', { tags: ['vip'] }, { actions: { onEditTags } })
-    await userEvent.click(screen.getByRole('button', { name: 'contacts.cells.addTag' }))
+    await userEvent.hover(screen.getByText('vip'))
+    await userEvent.click(await screen.findByRole('button', { name: 'contacts.cells.addTag' }))
     expect(onEditTags).toHaveBeenCalledWith(contact)
   })
 })

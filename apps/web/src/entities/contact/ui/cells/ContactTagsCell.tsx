@@ -81,20 +81,6 @@ type ContactTagsCellProps = {
   readonly onEdit?: () => void
 }
 
-function AddTagButton({ label, onEdit }: Readonly<{ label: string; onEdit: () => void }>) {
-  return (
-    <PillButton
-      variant="ghost"
-      size="xs"
-      aria-label={label}
-      onClick={onEdit}
-      className="size-5.5 shrink-0 rounded-md px-0 text-muted-foreground opacity-0 transition-opacity duration-120 group-hover/tags:opacity-100 focus-visible:opacity-100"
-    >
-      <TagPlusIcon className="size-3.5" />
-    </PillButton>
-  )
-}
-
 function TagChip({ name, meta }: Readonly<{ name: string; meta?: Tag }>) {
   return (
     <span className={cn(CONTACT_TAG_CHIP, 'min-w-0 gap-1 truncate')}>
@@ -144,9 +130,12 @@ export function ContactTagsCell({ tags, labels, byName, onEdit }: Readonly<Conta
   if (!onEdit || !labels.add) return summary
 
   return (
-    <span className="group/tags flex min-w-0 items-center gap-1">
-      {summary}
-      <AddTagButton label={labels.add} onEdit={onEdit} />
-    </span>
+    <DataTable.CellFrame
+      display={summary}
+      actions={{
+        label: labels.title,
+        items: [{ id: 'edit', label: labels.add, icon: <TagPlusIcon />, onClick: onEdit }],
+      }}
+    />
   )
 }
