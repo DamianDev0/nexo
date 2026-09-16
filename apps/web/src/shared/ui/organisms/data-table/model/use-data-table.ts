@@ -2,7 +2,6 @@
 
 import {
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
   type ColumnDef,
   type OnChangeFn,
@@ -10,8 +9,6 @@ import {
   type Table,
 } from '@tanstack/react-table'
 import { useCallback, useMemo, useRef } from 'react'
-
-import { DEFAULT_PAGE_SIZE } from '@/shared/config/pagination'
 
 import {
   DATA_TABLE_MAX_COLUMN_WIDTH,
@@ -30,7 +27,6 @@ import './table-meta'
 interface UseDataTableOptions<TData> {
   readonly data: ReadonlyArray<TData>
   readonly columns: ReadonlyArray<ColumnDef<TData, unknown>>
-  readonly pageSize?: number
   readonly getRowId?: (row: TData) => string
   readonly layout?: DataTableLayoutBinding
   readonly sort?: DataTableSortBinding
@@ -59,7 +55,6 @@ export interface DataTableInstance<TData> {
 export function useDataTable<TData>({
   data,
   columns,
-  pageSize = DEFAULT_PAGE_SIZE,
   getRowId,
   layout,
   sort,
@@ -99,10 +94,8 @@ export function useDataTable<TData>({
     onSortingChange,
     getRowId,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     defaultColumn: { minSize: DATA_TABLE_MIN_COLUMN_WIDTH, maxSize: DATA_TABLE_MAX_COLUMN_WIDTH },
-    initialState: { pagination: { pageSize } },
-    autoResetPageIndex: false,
+    manualPagination: true,
     manualSorting: true,
     enableRowSelection: true,
     enableColumnPinning: true,

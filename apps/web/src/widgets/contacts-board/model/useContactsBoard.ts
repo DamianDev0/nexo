@@ -58,7 +58,6 @@ export function useContactsBoard() {
   const instance = useDataTable({
     data: table.rows,
     columns,
-    pageSize: table.limit,
     getRowId: (row) => row.id,
     layout,
     sort,
