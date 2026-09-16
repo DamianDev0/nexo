@@ -1,5 +1,6 @@
 import {
   ArchiveIcon,
+  ArrowCounterClockwiseIcon,
   CalendarBlankIcon,
   ChatTextIcon,
   ArrowRightIcon,
@@ -80,6 +81,15 @@ export function buildRowMenuItems(
         onClick: () => actions.onLogActivity?.('meeting', contact),
       },
     )
+  }
+
+  if (actions.onRestore && !contact.isActive) {
+    items.push({
+      id: 'restore',
+      label: labels.restore,
+      icon: <ArrowCounterClockwiseIcon />,
+      onClick: () => actions.onRestore?.(contact),
+    })
   }
 
   if (actions.onArchive && contact.isActive) {

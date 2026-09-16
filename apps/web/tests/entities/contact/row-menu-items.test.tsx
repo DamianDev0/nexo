@@ -78,6 +78,13 @@ describe('buildRowMenuItems', () => {
     expect(onCall).toHaveBeenCalledWith('+573001234567')
   })
 
+  it('swaps archive for restore once the contact is archived', () => {
+    const actions: ContactRowActions = { onArchive: vi.fn(), onRestore: vi.fn() }
+
+    expect(idsFor(actions)).toEqual(['archive'])
+    expect(idsFor(actions, { isActive: false })).toEqual(['restore'])
+  })
+
   it('routes compose actions to the right channel', () => {
     const onCompose = vi.fn()
     const items = buildRowMenuItems(CONTACT, LABELS, { onCompose })
