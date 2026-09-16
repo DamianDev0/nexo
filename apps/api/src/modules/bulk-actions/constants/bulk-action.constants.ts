@@ -22,11 +22,13 @@ export const BULK_TABLES: Readonly<Record<CustomFieldEntity, string>> = {
 
 const ALL_ENTITIES: ReadonlyArray<CustomFieldEntity> = ['contacts', 'companies', 'deals']
 
+const TAGGABLE_ENTITIES: ReadonlyArray<CustomFieldEntity> = ['contacts', 'companies']
+
 export const BULK_ACTION_ENTITIES: Readonly<
   Record<BulkActionKind, ReadonlyArray<CustomFieldEntity>>
 > = {
-  add_tags: ALL_ENTITIES,
-  remove_tags: ALL_ENTITIES,
+  add_tags: TAGGABLE_ENTITIES,
+  remove_tags: TAGGABLE_ENTITIES,
   assign: ALL_ENTITIES,
   update_field: ['contacts'],
   send_email: ['contacts'],

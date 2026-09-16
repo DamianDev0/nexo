@@ -183,6 +183,26 @@ describe('BulkActionsService', () => {
       ).rejects.toThrow(/not available/)
     })
 
+    it('refuses to tag deals, which have no tags column to write to', async () => {
+      await expect(
+        service.create(ctx, user(), {
+          entity: 'deals',
+          action: 'add_tags',
+          params: { tags: ['VIP'] },
+          selection: { mode: 'ids', ids: [ID_A] },
+        }),
+      ).rejects.toThrow(/not available/)
+
+      await expect(
+        service.create(ctx, user(), {
+          entity: 'companies',
+          action: 'add_tags',
+          params: { tags: ['VIP'] },
+          selection: { mode: 'ids', ids: [ID_A] },
+        }),
+      ).resolves.toBeDefined()
+    })
+
     it('caps concurrent bulk actions per tenant', async () => {
       repository.countActive.mockResolvedValue(5)
 

@@ -54,6 +54,35 @@ describe('Deals Tenant Isolation (E2E, real HTTP)', () => {
     ).expect(404)
   })
 
+  it('searches deals by title and by the name of the contact behind them', async () => {
+    const contact = await asTenant(
+      request(app.getHttpServer()).post(`/${API_PREFIX}/contacts`),
+      tenantA,
+    )
+      .send({ firstName: 'Mariana', lastName: 'Restrepo', email: 'mariana@iso-deals.co' })
+      .expect(201)
+
+    await asTenant(request(app.getHttpServer()).post(`/${API_PREFIX}/deals`), tenantA)
+      .send({
+        title: 'Renovación anual',
+        valueCents: 900000,
+        contactId: contact.body.data.id as string,
+      })
+      .expect(201)
+
+    const byTitle = await asTenant(
+      request(app.getHttpServer()).get(`/${API_PREFIX}/deals?q=Renovaci`),
+      tenantA,
+    ).expect(200)
+    expect(byTitle.body.data.data).toHaveLength(1)
+
+    const byContact = await asTenant(
+      request(app.getHttpServer()).get(`/${API_PREFIX}/deals?q=Restrepo`),
+      tenantA,
+    ).expect(200)
+    expect(byContact.body.data.data).toHaveLength(1)
+  })
+
   it('rejects unauthenticated access to the deals list', async () => {
     await request(app.getHttpServer())
       .get(`/${API_PREFIX}/deals`)

@@ -60,6 +60,8 @@ export const DEAL_LIST_FROM = `
   FROM deals d
   LEFT JOIN pipeline_stages ps ON ps.id = d.stage_id
   LEFT JOIN pipelines        p  ON p.id  = d.pipeline_id
+  LEFT JOIN contacts         c  ON c.id  = d.contact_id
+  LEFT JOIN companies        co ON co.id = d.company_id
 `
 
 export const DEAL_DETAIL_FROM = `
