@@ -4,7 +4,7 @@ import {
   customFieldDatePart,
   nextCustomFieldDate,
   parseCustomValue,
-  withCustomField,
+  customFieldPatch,
 } from '@/entities/contact/lib/custom-field-edit'
 
 describe('customFieldDatePart', () => {
@@ -33,16 +33,13 @@ describe('nextCustomFieldDate', () => {
   })
 })
 
-describe('withCustomField', () => {
-  it('merges into existing fields without mutating', () => {
-    const fields = { birthday: '1990-04-15' }
-    const next = withCustomField(fields, 'vip', true)
-    expect(next).toEqual({ birthday: '1990-04-15', vip: true })
-    expect(fields).toEqual({ birthday: '1990-04-15' })
+describe('customFieldPatch', () => {
+  it('sends only the edited key so unknown stored keys cannot fail validation', () => {
+    expect(customFieldPatch('vip', true)).toEqual({ vip: true })
   })
 
-  it('starts from empty when fields are undefined', () => {
-    expect(withCustomField(undefined, 'vip', false)).toEqual({ vip: false })
+  it('sends null to clear a value', () => {
+    expect(customFieldPatch('vip', null)).toEqual({ vip: null })
   })
 })
 

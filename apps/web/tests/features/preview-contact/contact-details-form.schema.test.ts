@@ -59,10 +59,9 @@ describe('buildDetailsPatch', () => {
 })
 
 describe('buildAddressCustomFields', () => {
-  it('merges the address into the existing custom fields', () => {
+  it('sends only the address key so stored fields are untouched', () => {
     const contact = buildContact({ customFields: { role: 'CEO' } })
     expect(buildAddressCustomFields(contact, 'Cl 100 #7-21')).toEqual({
-      role: 'CEO',
       address: 'Cl 100 #7-21',
     })
   })

@@ -6,5 +6,9 @@ export function applyCustomFields(
   contact: ContactListItem,
   change: CustomFieldsChange,
 ): ContactListItem {
-  return { ...contact, customFields: change.customFields }
+  const merged = { ...contact.customFields, ...change.customFields }
+  const customFields = Object.fromEntries(
+    Object.entries(merged).filter(([, value]) => value !== null && value !== undefined),
+  )
+  return { ...contact, customFields }
 }

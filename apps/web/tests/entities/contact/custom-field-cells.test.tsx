@@ -36,7 +36,7 @@ function contextWith(onCustomFieldsChange?: ContactColumnContext['actions']) {
 }
 
 describe('customFieldCellRenderer', () => {
-  it('edits a text field and merges it into customFields', async () => {
+  it('edits a text field and sends only that key', async () => {
     const onCustomFieldsChange = vi.fn()
     const contact = { ...CONTACTS_FIXTURE[0]!, customFields: { zone: 'Norte', other: 1 } }
     render(
@@ -52,7 +52,7 @@ describe('customFieldCellRenderer', () => {
     const input = screen.getByRole('textbox', { name: 'Zona' })
     await userEvent.clear(input)
     await userEvent.type(input, 'Sur{Enter}')
-    expect(onCustomFieldsChange).toHaveBeenCalledWith(contact.id, { zone: 'Sur', other: 1 })
+    expect(onCustomFieldsChange).toHaveBeenCalledWith(contact.id, { zone: 'Sur' })
   })
 
   it('stores numbers as numbers and empty as null', async () => {

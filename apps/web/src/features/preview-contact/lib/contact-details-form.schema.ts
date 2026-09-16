@@ -52,5 +52,5 @@ export function buildAddressCustomFields(
   address: string,
 ): Record<string, unknown> | null {
   if (address === contactDetailsDefaults(contact).address) return null
-  return { ...contact.customFields, [CONTACT_ADDRESS_KEY]: address }
+  return { [CONTACT_ADDRESS_KEY]: address }
 }

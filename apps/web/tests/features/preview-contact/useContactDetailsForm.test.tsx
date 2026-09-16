@@ -48,7 +48,7 @@ describe('useContactDetailsForm', () => {
     const { result } = renderHook(() => useContactDetailsForm(contact, { customFields }))
     act(() => result.current.form.setValue('address', 'Cl 100 #7-21'))
     await act(() => result.current.commit('address'))
-    expect(customFields).toHaveBeenCalledWith(contact.id, { role: 'CEO', address: 'Cl 100 #7-21' })
+    expect(customFields).toHaveBeenCalledWith(contact.id, { address: 'Cl 100 #7-21' })
   })
 
   it('does not save unchanged or invalid values', async () => {

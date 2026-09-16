@@ -12,7 +12,7 @@ import {
   customFieldDatePart,
   nextCustomFieldDate,
   parseCustomValue,
-  withCustomField,
+  customFieldPatch,
 } from '../../lib/custom-field-edit'
 import { ContactBooleanFieldCell } from '../cells/ContactBooleanFieldCell'
 import { ContactChoiceCell } from '../cells/ContactChoiceCell'
@@ -39,7 +39,7 @@ function dateRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRende
           onChange
             ? (iso) => {
                 const next = nextCustomFieldDate(def.fieldType, raw, iso)
-                onChange(contact.id, withCustomField(contact.customFields, fieldKey, next))
+                onChange(contact.id, customFieldPatch(fieldKey, next))
               }
             : undefined
         }
@@ -57,8 +57,7 @@ function booleanRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRe
         label={customFieldLabel(def, fieldKey)}
         onSave={
           onChange
-            ? (checked) =>
-                onChange(contact.id, withCustomField(contact.customFields, fieldKey, checked))
+            ? (checked) => onChange(contact.id, customFieldPatch(fieldKey, checked))
             : undefined
         }
       />
@@ -97,7 +96,7 @@ function selectRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRen
           options,
           clearLabel: labels.choice.clear,
           onChange: onChange
-            ? (next) => onChange(contact.id, withCustomField(contact.customFields, fieldKey, next))
+            ? (next) => onChange(contact.id, customFieldPatch(fieldKey, next))
             : undefined,
         }}
       >
@@ -124,10 +123,7 @@ function textRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRende
         onSave={
           onChange
             ? (next) =>
-                onChange(
-                  contact.id,
-                  withCustomField(contact.customFields, fieldKey, parseCustomValue(next, numeric)),
-                )
+                onChange(contact.id, customFieldPatch(fieldKey, parseCustomValue(next, numeric)))
             : undefined
         }
       />

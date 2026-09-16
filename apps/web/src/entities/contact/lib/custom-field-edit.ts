@@ -17,12 +17,8 @@ export function nextCustomFieldDate(
   return iso
 }
 
-export function withCustomField(
-  fields: Record<string, unknown> | undefined,
-  key: string,
-  value: unknown,
-): Record<string, unknown> {
-  return { ...fields, [key]: value }
+export function customFieldPatch(key: string, value: unknown): Record<string, unknown> {
+  return { [key]: value }
 }
 
 export function parseCustomValue(raw: string, numeric: boolean): string | number | null {

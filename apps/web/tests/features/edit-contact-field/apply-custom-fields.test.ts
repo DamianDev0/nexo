@@ -36,10 +36,16 @@ const BASE: ContactListItem = {
 }
 
 describe('applyCustomFields', () => {
-  it('replaces customFields with the incoming map', () => {
+  it('merges the edited key over the stored ones, like the jsonb merge on the server', () => {
     const patched = applyCustomFields(BASE, { id: 'c1', customFields: { sector: 'salud' } })
 
-    expect(patched.customFields).toEqual({ sector: 'salud' })
+    expect(patched.customFields).toEqual({ sector: 'salud', empleados: 12 })
+  })
+
+  it('drops keys cleared with null so the optimistic row matches the server', () => {
+    const patched = applyCustomFields(BASE, { id: 'c1', customFields: { sector: null } })
+
+    expect(patched.customFields).toEqual({ empleados: 12 })
   })
 
   it('keeps every other field intact and does not mutate the input', () => {
