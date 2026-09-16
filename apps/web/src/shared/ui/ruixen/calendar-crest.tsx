@@ -373,7 +373,7 @@ export function CalendarCrest({
               >
                 <span
                   className={cn(
-                    'relative z-[1] text-[13px] tabular-nums transition-colors duration-100',
+                    'relative z-1 text-[13px] tabular-nums transition-colors duration-100',
                     isHov ? 'text-neutral-600 dark:text-neutral-400' : textCls,
                   )}
                   style={{

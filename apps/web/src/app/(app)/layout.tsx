@@ -4,7 +4,8 @@ import { ActivityCatalogProvider } from '@/entities/activity'
 import { CallDock } from '@/features/place-call'
 import { ShortcutsDialog } from '@/features/show-shortcuts'
 import { LanguageSwitcher } from '@/features/switch-language'
-import { APP_SCROLL_ID } from '@/shared/lib/hooks/useScrollTopOnChange'
+import { getT } from '@/shared/i18n/server'
+import { APP_SCROLL_ID } from '@/shared/config/dom-ids'
 import { prefetchAppShell } from '@/shared/query/prefetch-session'
 import { ThemeToggle } from '@/shared/ui/atoms/theme-toggle'
 import { Separator } from '@/shared/ui/shadcn/separator'
@@ -29,6 +30,7 @@ export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 export default async function AppLayout({ children }: Readonly<{ children: ReactNode }>) {
   const queryClient = await prefetchAppShell({ requireOnboarded: true })
+  const t = await getT()
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -39,6 +41,12 @@ export default async function AppLayout({ children }: Readonly<{ children: React
             className="h-svh overflow-hidden"
             style={{ '--sidebar-width': '13.5rem' } as React.CSSProperties}
           >
+            <a
+              href={`#${APP_SCROLL_ID}`}
+              className="sr-only z-50 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground focus-visible:not-sr-only focus-visible:fixed focus-visible:top-3 focus-visible:left-3"
+            >
+              {t('nav.skipToContent')}
+            </a>
             <AppSidebar />
             <SidebarInset className="min-w-0">
               <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">

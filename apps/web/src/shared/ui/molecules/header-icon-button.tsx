@@ -12,7 +12,10 @@ export function HeaderIconButton({ className, ...props }: Readonly<HeaderIconBut
     <Button
       variant="ghost"
       size="icon-sm"
-      className={cn('text-foreground/60 hover:text-foreground', className)}
+      className={cn(
+        'text-foreground/60 transition-[colors,translate] hover:text-foreground active:translate-y-px',
+        className,
+      )}
       {...props}
     />
   )

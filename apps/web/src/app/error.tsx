@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { CloudSlashIcon } from '@/shared/ui/icons'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
+import { PageState } from '@/shared/ui/organisms/page-state'
 
 interface ErrorPageProps {
   readonly error: Error & { digest?: string }
@@ -15,7 +16,7 @@ export default function ErrorPage({ reset }: Readonly<ErrorPageProps>) {
   const { t } = useTranslation()
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <PageState>
       <EmptyState
         icon={<CloudSlashIcon className="size-5" />}
         title={t('errors.serverTitle')}
@@ -25,6 +26,6 @@ export default function ErrorPage({ reset }: Readonly<ErrorPageProps>) {
           {t('errors.retry')}
         </PillButton>
       </EmptyState>
-    </div>
+    </PageState>
   )
 }

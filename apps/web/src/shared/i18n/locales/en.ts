@@ -219,6 +219,10 @@ const en = {
     and: 'and',
   },
   errors: {
+    notFoundTitle: 'This page does not exist',
+    notFoundDescription:
+      'The link is broken or the record moved. Head back to the dashboard to keep working.',
+    notFoundCta: 'Go to the dashboard',
     serverTitle: 'We could not reach the server',
     serverDescription: 'Check your connection or try again in a few seconds.',
     retry: 'Retry',
@@ -662,11 +666,11 @@ const en = {
       avatar: 'Avatar',
       avatarPick: 'Pick an avatar',
       firstName: 'First name',
-      firstNamePlaceholder: 'John',
+      firstNamePlaceholder: 'Sofia',
       lastName: 'Last name',
-      lastNamePlaceholder: 'Doe',
+      lastNamePlaceholder: 'Okafor',
       email: 'Email',
-      emailPlaceholder: 'john.doe@company.com',
+      emailPlaceholder: 'sofia@empresa.com',
       phone: 'Phone',
       whatsapp: 'WhatsApp',
       whatsappSameAsPhone: 'This number is also on WhatsApp',
@@ -1631,6 +1635,7 @@ const en = {
       'Select several {{entities}} in the list to tag, change status, export or archive in one go.',
   },
   nav: {
+    skipToContent: 'Skip to content',
     primary: 'Main navigation',
     comingSoon: 'Coming soon',
     toggleSidebar: 'Toggle sidebar',

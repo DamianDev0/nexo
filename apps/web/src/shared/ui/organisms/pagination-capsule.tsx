@@ -48,12 +48,12 @@ function IconButton({ label, state, onClick, children }: Readonly<IconButtonProp
       disabled={state?.disabled}
       onClick={onClick}
       className={cn(
-        'inline-flex size-7 shrink-0 items-center justify-center rounded-md transition-colors duration-120',
+        'inline-flex size-7 shrink-0 items-center justify-center rounded-md transition-[colors,translate] duration-120',
         state?.disabled && 'cursor-default text-disabled-fg',
         !state?.disabled &&
           (state?.pressed
             ? 'cursor-pointer bg-accent text-primary-deep hover:bg-accent dark:text-primary'
-            : 'cursor-pointer text-body hover:bg-muted'),
+            : 'cursor-pointer text-body hover:bg-muted active:translate-y-px'),
       )}
     >
       {children}

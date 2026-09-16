@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react'
 
+import { APP_SCROLL_ID } from '@/shared/config/dom-ids'
+
 import type { RefObject } from 'react'
 
-export const APP_SCROLL_ID = 'app-scroll'
+export { APP_SCROLL_ID }
 
 export function useScrollTopOnChange(key: string, ref?: RefObject<HTMLElement | null>): void {
   useEffect(() => {

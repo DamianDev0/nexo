@@ -252,7 +252,7 @@ export function ToolbarDock({
               ref={(el) => {
                 segRefs.current[i] = el
               }}
-              className="z-[1] inline-flex h-8 items-center justify-center"
+              className="z-1 inline-flex h-8 items-center justify-center"
             >
               <div className="flex items-center justify-center gap-2 whitespace-nowrap px-3 text-[13px] font-medium leading-tight tracking-[-0.01em] text-primary-foreground">
                 {item.label}

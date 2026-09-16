@@ -180,7 +180,7 @@ const es = {
       invitesFailed: 'No se pudieron enviar las invitaciones',
       pipelineFailed: 'No se pudo crear el pipeline',
       themeRestored: 'Tema restaurado',
-      setupComplete: '¡Configuración completa!',
+      setupComplete: 'Configuración completa',
       welcomeToNexo: 'Bienvenido a Nexo CRM',
     },
     welcomeBack: 'Bienvenido de vuelta',
@@ -220,6 +220,10 @@ const es = {
     and: 'y',
   },
   errors: {
+    notFoundTitle: 'Esta página no existe',
+    notFoundDescription:
+      'El enlace está roto o el registro se movió. Vuelve al tablero para seguir trabajando.',
+    notFoundCta: 'Ir al dashboard',
     serverTitle: 'No pudimos conectar con el servidor',
     serverDescription: 'Revisa tu conexión o inténtalo de nuevo en unos segundos.',
     retry: 'Reintentar',
@@ -400,9 +404,9 @@ const es = {
         colConfig: 'Config',
       },
       done: {
-        label: '¡Listo!',
+        label: 'Listo',
         description: 'Ir al dashboard',
-        title: '¡Nexo está listo para ti!',
+        title: 'Nexo está listo para ti',
         subtitle:
           'Configuraste tu empresa, pipeline de ventas y equipo. Ahora puedes empezar a cerrar negocios.',
         goToDashboard: 'Ir al Dashboard',
@@ -1640,6 +1644,7 @@ const es = {
       'Selecciona varios {{entities}} en la lista para etiquetar, cambiar estado, exportar o archivar en bloque.',
   },
   nav: {
+    skipToContent: 'Saltar al contenido',
     primary: 'Navegación principal',
     comingSoon: 'Próximamente',
     toggleSidebar: 'Colapsar sidebar',
