@@ -6,6 +6,7 @@ import { initialsOf } from '@/shared/lib/initials'
 import { Avatar } from '@/shared/ui/atoms/avatar'
 import { Text } from '@/shared/ui/atoms/text'
 import { CaretDownIcon, CheckIcon, UserXIcon } from '@/shared/ui/icons'
+import { EDITABLE_CELL_CARET, EDITABLE_CELL_TRIGGER } from '@/shared/ui/molecules/editable-cell'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { SearchableCommand } from '@/shared/ui/molecules/searchable-command'
@@ -51,9 +52,8 @@ type AssigneePickerProps = {
 
 function CompactTrigger({
   current,
-  open,
   placeholder,
-}: Readonly<{ current: AssigneeOption | null; open: boolean; placeholder: string }>) {
+}: Readonly<{ current: AssigneeOption | null; placeholder: string }>) {
   return (
     <>
       {current ? (
@@ -64,12 +64,7 @@ function CompactTrigger({
       <Text variant={current ? 'body' : 'muted'} className="min-w-0 truncate">
         {current?.name ?? placeholder}
       </Text>
-      <CaretDownIcon
-        className={cn(
-          'ml-auto size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity duration-120 group-hover/assignee:opacity-100',
-          open && 'opacity-100',
-        )}
-      />
+      <CaretDownIcon className={cn(EDITABLE_CELL_CARET, 'ml-auto')} />
     </>
   )
 }
@@ -98,15 +93,15 @@ export function AssigneePicker({
             aria-expanded={state.open}
             disabled={view?.disabled}
             className={cn(
-              'outline-none transition-colors duration-120 focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-50',
+              'disabled:opacity-50',
               view?.compact
-                ? 'group/assignee flex h-auto w-full min-w-0 items-center gap-1.5 rounded-md px-1 py-0.5 hover:bg-muted'
-                : 'flex h-10 items-center gap-1 rounded-full border border-transparent bg-muted py-1 pr-2 pl-1 hover:border-border-strong',
-              state.open && (view?.compact ? 'bg-muted' : 'border-ring ring-2 ring-ring/30'),
+                ? EDITABLE_CELL_TRIGGER
+                : 'flex h-10 items-center gap-1 rounded-full border border-transparent bg-muted py-1 pr-2 pl-1 outline-none transition-colors duration-120 hover:border-border-strong focus-visible:ring-2 focus-visible:ring-ring/50',
+              state.open && !view?.compact && 'border-ring ring-2 ring-ring/30',
             )}
           >
             {view?.compact ? (
-              <CompactTrigger current={current} open={state.open} placeholder={labels.trigger} />
+              <CompactTrigger current={current} placeholder={labels.trigger} />
             ) : (
               <>
                 {current ? (

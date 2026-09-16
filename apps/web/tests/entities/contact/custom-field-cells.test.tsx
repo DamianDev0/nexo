@@ -11,6 +11,8 @@ import type { ContactColumnDef } from '@repo/shared-types'
 import { withContactCellLabels } from '@/entities/contact/ui/columns/cell-renderers'
 import { customFieldCellRenderer } from '@/entities/contact/ui/columns/custom-field-cells'
 
+Element.prototype.scrollIntoView = vi.fn()
+
 const BASE: ContactColumnDef = {
   key: 'custom:zone',
   labelKey: '',
@@ -87,8 +89,8 @@ describe('customFieldCellRenderer', () => {
       wrapper,
     })
     expect(screen.getByText('Alfa')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'contacts.cells.pick:Zona' }))
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Beta' }))
+    await userEvent.click(screen.getByRole('combobox', { name: 'contacts.cells.pick:Zona' }))
+    await userEvent.click(screen.getByRole('option', { name: 'Beta' }))
     expect(onCustomFieldsChange).toHaveBeenCalledWith(contact.id, { zone: 'b' })
   })
 

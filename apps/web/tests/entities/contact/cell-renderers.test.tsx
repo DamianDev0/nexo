@@ -104,8 +104,8 @@ describe('refined cells', () => {
       { lifecycleStage: 'lead' },
       { lifecycleStages: [LEAD, CUSTOMER], actions: { onFieldsChange } },
     )
-    await userEvent.click(screen.getByRole('button', { name: /contacts.cells.pick/ }))
-    await userEvent.click(screen.getByRole('menuitem', { name: /Cliente/ }))
+    await userEvent.click(screen.getByRole('combobox', { name: /contacts.cells.pick/ }))
+    await userEvent.click(screen.getByRole('option', { name: /Cliente/ }))
     expect(onFieldsChange).toHaveBeenCalledWith(contact.id, { lifecycleStage: 'customer' })
   })
 
@@ -116,8 +116,8 @@ describe('refined cells', () => {
       { source: 'manual' },
       { sources: [MANUAL], actions: { onFieldsChange } },
     )
-    await userEvent.click(screen.getByRole('button', { name: /contacts.cells.pick/ }))
-    await userEvent.click(screen.getByRole('menuitem', { name: 'contacts.cells.clear' }))
+    await userEvent.click(screen.getByRole('combobox', { name: /contacts.cells.pick/ }))
+    await userEvent.click(screen.getByRole('option', { name: 'contacts.cells.clear' }))
     expect(onFieldsChange).toHaveBeenCalledWith(contact.id, { source: null })
   })
 

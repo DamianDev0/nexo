@@ -2,15 +2,18 @@
 
 import { cn } from '@/shared/lib/cn'
 import { useAsyncSelect } from '@/shared/lib/hooks/useAsyncSelect'
-import { CaretUpDownIcon, CheckIcon } from '@/shared/ui/icons'
+import { CaretDownIcon, CaretUpDownIcon, CheckIcon } from '@/shared/ui/icons'
+import { EDITABLE_CELL_CARET, EDITABLE_CELL_TRIGGER } from '@/shared/ui/molecules/editable-cell'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { SearchableCommand } from '@/shared/ui/molecules/searchable-command'
 import { Button } from '@/shared/ui/shadcn/button'
-import { CommandItem } from '@/shared/ui/shadcn/command'
+import { CommandItem, CommandSeparator } from '@/shared/ui/shadcn/command'
 
 import type { AsyncSelectSource, AsyncSelectView } from './types'
 
 const ASYNC_SELECT_COLLISION_PADDING = 12
+const CLEAR_VALUE = '__clear__'
+const ITEM = 'rounded-md data-[selected=true]:bg-muted data-[selected=true]:text-foreground'
 
 export type { AsyncSelectSource, AsyncSelectView } from './types'
 
@@ -39,19 +42,25 @@ export function AsyncSelect<T>({
       <GroovyPopover.Trigger asChild>
         <Button
           type="button"
-          variant="outline"
+          variant={view.compact ? 'ghost' : 'outline'}
           role="combobox"
           aria-label={view.label}
           aria-expanded={state.open}
           disabled={disabled}
           className={cn(
-            'h-9 w-full justify-between border-border bg-surface-input px-3 text-sm font-normal',
+            view.compact
+              ? EDITABLE_CELL_TRIGGER
+              : 'h-9 w-full justify-between border-border bg-surface-input px-3 text-sm font-normal',
             view.display ? 'text-foreground' : 'text-muted-foreground',
             view.triggerClassName,
           )}
         >
           <span className="truncate">{view.display ?? view.placeholder}</span>
-          <CaretUpDownIcon className="size-3.5 shrink-0 text-muted-foreground" />
+          {view.compact ? (
+            <CaretDownIcon className={EDITABLE_CELL_CARET} />
+          ) : (
+            <CaretUpDownIcon className="size-3.5 shrink-0 text-muted-foreground" />
+          )}
         </Button>
       </GroovyPopover.Trigger>
 
@@ -63,11 +72,11 @@ export function AsyncSelect<T>({
         className="w-(--radix-popover-trigger-width) p-0"
       >
         <SearchableCommand
-          search={{
-            value: state.term,
-            onChange: state.setTerm,
-            placeholder: view.searchPlaceholder,
-          }}
+          search={
+            view.searchable === false
+              ? undefined
+              : { value: state.term, onChange: state.setTerm, placeholder: view.searchPlaceholder }
+          }
           highlight={{ value: state.highlightedValue, onChange: state.setHighlighted }}
           view={{
             empty: !state.loading && state.visible.length === 0 ? listFallback : null,
@@ -80,7 +89,7 @@ export function AsyncSelect<T>({
               key={source.getValue(option)}
               value={source.getValue(option)}
               onSelect={() => state.select(option)}
-              className="rounded-md data-[selected=true]:bg-muted data-[selected=true]:text-foreground"
+              className={ITEM}
             >
               {source.renderOption(option)}
               <CheckIcon
@@ -92,6 +101,21 @@ export function AsyncSelect<T>({
               />
             </CommandItem>
           ))}
+          {view.clear && value !== '' ? (
+            <>
+              <CommandSeparator />
+              <CommandItem
+                value={CLEAR_VALUE}
+                onSelect={() => {
+                  onChange('', null)
+                  state.onOpenChange(false)
+                }}
+                className={cn(ITEM, 'text-muted-foreground')}
+              >
+                {view.clear}
+              </CommandItem>
+            </>
+          ) : null}
         </SearchableCommand>
       </GroovyPopover.Content>
     </GroovyPopover>

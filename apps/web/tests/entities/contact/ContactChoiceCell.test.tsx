@@ -6,10 +6,17 @@ import { queryWrapper as wrapper } from '../../query-wrapper'
 
 import { ContactChoiceCell } from '@/entities/contact/ui/cells/ContactChoiceCell'
 
+Element.prototype.scrollIntoView = vi.fn()
+
 const OPTIONS = [
   { key: 'lead', label: 'Lead', color: '#60A5FA' },
   { key: 'customer', label: 'Cliente', color: '#22C55E' },
 ]
+
+const MANY = Array.from({ length: 12 }, (_, index) => ({
+  key: `source-${index}`,
+  label: `Fuente ${index}`,
+}))
 
 describe('ContactChoiceCell', () => {
   it('renders the display only when the cell is read-only', () => {
@@ -20,10 +27,10 @@ describe('ContactChoiceCell', () => {
       { wrapper },
     )
     expect(screen.getByText('Lead')).toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  it('opens the options and reports the picked key, disabling the current one', async () => {
+  it('opens the options and reports the picked key', async () => {
     const onChange = vi.fn()
     render(
       <ContactChoiceCell label="Etapa" selection={{ value: 'lead', options: OPTIONS, onChange }}>
@@ -31,16 +38,31 @@ describe('ContactChoiceCell', () => {
       </ContactChoiceCell>,
       { wrapper },
     )
-    await userEvent.click(screen.getByRole('button', { name: 'Etapa' }))
-    expect(screen.getByRole('menuitem', { name: /Lead/ })).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(screen.getByRole('combobox', { name: 'Etapa' }))
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
 
-    await userEvent.click(screen.getByRole('menuitem', { name: /Cliente/ }))
+    await userEvent.click(screen.getByRole('option', { name: /Cliente/ }))
     expect(onChange).toHaveBeenCalledWith('customer')
+  })
+
+  it('adds a search box once the list is long enough to need one', async () => {
+    render(
+      <ContactChoiceCell
+        label="Fuente"
+        selection={{ value: null, options: MANY, onChange: vi.fn() }}
+      >
+        <span>—</span>
+      </ContactChoiceCell>,
+      { wrapper },
+    )
+    await userEvent.click(screen.getByRole('combobox', { name: 'Fuente' }))
+    await userEvent.type(screen.getByRole('textbox'), 'fuente 1')
+    expect(screen.getAllByRole('option')).toHaveLength(3)
   })
 
   it('offers a clear entry only when there is a value and a label for it', async () => {
     const onChange = vi.fn()
-    render(
+    const { rerender } = render(
       <ContactChoiceCell
         label="Fuente"
         selection={{ value: 'lead', options: OPTIONS, onChange, clearLabel: 'Sin valor' }}
@@ -49,8 +71,19 @@ describe('ContactChoiceCell', () => {
       </ContactChoiceCell>,
       { wrapper },
     )
-    await userEvent.click(screen.getByRole('button', { name: 'Fuente' }))
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Sin valor' }))
+    await userEvent.click(screen.getByRole('combobox', { name: 'Fuente' }))
+    await userEvent.click(screen.getByRole('option', { name: 'Sin valor' }))
     expect(onChange).toHaveBeenCalledWith(null)
+
+    rerender(
+      <ContactChoiceCell
+        label="Fuente"
+        selection={{ value: null, options: OPTIONS, onChange, clearLabel: 'Sin valor' }}
+      >
+        <span>—</span>
+      </ContactChoiceCell>,
+    )
+    await userEvent.click(screen.getByRole('combobox', { name: 'Fuente' }))
+    expect(screen.queryByRole('option', { name: 'Sin valor' })).not.toBeInTheDocument()
   })
 })

@@ -13,4 +13,7 @@ export interface AsyncSelectView {
   readonly empty: ReactNode | ((term: string) => ReactNode)
   readonly error?: ReactNode
   readonly triggerClassName?: string
+  readonly compact?: boolean
+  readonly searchable?: boolean
+  readonly clear?: string
 }

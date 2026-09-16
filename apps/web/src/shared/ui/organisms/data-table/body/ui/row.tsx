@@ -18,6 +18,7 @@ export function DataTableRow<TData>({
 
   return (
     <TableRow
+      data-row-id={row.id}
       data-state={selected ? 'selected' : undefined}
       style={{ height }}
       className={cn(
@@ -32,8 +33,11 @@ export function DataTableRow<TData>({
           className={cn(
             'overflow-hidden border-b border-row-divider px-2 text-sm text-ellipsis text-body',
             cellAlignment(cell.column.columnDef),
-            cell.column.getIsPinned() &&
-              (selected ? 'z-11 bg-row-selected' : 'z-11 bg-card group-hover/row:bg-row-hover'),
+            cell.column.getIsPinned()
+              ? selected
+                ? 'z-11 bg-row-selected'
+                : 'z-11 bg-card group-hover/row:bg-row-hover'
+              : 'relative isolate',
             pinClasses(cell.column),
           )}
         >

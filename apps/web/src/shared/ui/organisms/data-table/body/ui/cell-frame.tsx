@@ -102,7 +102,10 @@ export function DataTableCellFrame({
             schedule(true, DOCK_OPEN_DELAY_MS)
           }}
           onMouseLeave={() => schedule(false, DOCK_CLOSE_GRACE_MS)}
-          className={cn('flex h-full w-full min-w-0 items-center', dense ? 'gap-1' : 'gap-1.5')}
+          className={cn(
+            "static flex h-full w-full min-w-0 items-center before:absolute before:inset-0 before:-z-10 before:content-['']",
+            dense ? 'gap-1' : 'gap-1.5',
+          )}
         >
           <span
             ref={textRef}

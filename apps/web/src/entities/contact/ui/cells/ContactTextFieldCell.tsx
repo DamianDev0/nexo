@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { PencilSimpleIcon } from '@/shared/ui/icons'
+import { EDITABLE_CELL_ICON, EDITABLE_CELL_TRIGGER } from '@/shared/ui/molecules/editable-cell'
 import { GroovyPopover } from '@/shared/ui/molecules/groovy-popover'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { SmoothInput } from '@/shared/ui/smoothui/input'
@@ -51,13 +52,10 @@ function EditPopover({
           variant="ghost"
           size="xs"
           aria-label={labels.edit(field)}
-          className="group/edit -mx-1.5 h-auto w-full min-w-0 justify-between gap-1.5 rounded-md px-1.5 py-0.5 font-normal"
+          className={EDITABLE_CELL_TRIGGER}
         >
           <DataTable.CellText numeric={value.numeric}>{value.display}</DataTable.CellText>
-          <PencilSimpleIcon
-            aria-hidden
-            className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity duration-120 group-hover/edit:opacity-100"
-          />
+          <PencilSimpleIcon aria-hidden className={EDITABLE_CELL_ICON} />
         </PillButton>
       </GroovyPopover.Trigger>
       <GroovyPopover.Content subtle align="start" autoFocusContent className="w-64 p-2">
