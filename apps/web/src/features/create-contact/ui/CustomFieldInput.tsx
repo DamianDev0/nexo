@@ -11,19 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/shadcn/select'
+import { customFieldFromInput, customFieldToInput } from '@/entities/contact'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
 import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
 import { SmoothInput as Input } from '@/shared/ui/smoothui/input'
 
 import { CUSTOM_FIELD_INPUT_TYPES } from '../config/custom-field-input.constants'
-import {
-  formatCustomFieldValue,
-  joinDateTime,
-  parseCustomFieldNumber,
-  splitDateTimeValue,
-  toggleListItem,
-} from '../lib/custom-field-input'
+import { joinDateTime, splitDateTimeValue, toggleListItem } from '../lib/custom-field-input'
 
 import type { FieldDef } from '@repo/shared-types'
 
@@ -120,16 +115,11 @@ export function CustomFieldInput({ def, value, onChange }: Readonly<CustomFieldI
     )
   }
 
-  const isCurrency = def.type === 'currency'
-  const isNumeric = def.type === 'number' || isCurrency
   return (
     <Input
       type={CUSTOM_FIELD_INPUT_TYPES[def.type] ?? 'text'}
-      value={formatCustomFieldValue(value, isCurrency)}
-      onChange={(event) => {
-        const raw = event.target.value
-        onChange(isNumeric ? parseCustomFieldNumber(raw, isCurrency) : raw)
-      }}
+      value={customFieldToInput(value, def.type)}
+      onChange={(event) => onChange(customFieldFromInput(event.target.value, def.type) ?? '')}
       placeholder={def.placeholder}
       aria-label={def.label}
     />

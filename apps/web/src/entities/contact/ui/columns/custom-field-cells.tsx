@@ -10,10 +10,14 @@ import {
 } from '../../lib/custom-field-display'
 import {
   customFieldDatePart,
-  nextCustomFieldDate,
-  parseCustomValue,
   customFieldPatch,
+  nextCustomFieldDate,
 } from '../../lib/custom-field-edit'
+import {
+  customFieldFromInput,
+  customFieldToInput,
+  isNumericField,
+} from '../../lib/custom-field-value'
 import { ContactBooleanFieldCell } from '../cells/ContactBooleanFieldCell'
 import { ContactChoiceCell } from '../cells/ContactChoiceCell'
 import { ContactDateFieldCell } from '../cells/ContactDateFieldCell'
@@ -107,7 +111,7 @@ function selectRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRen
 }
 
 function textRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRenderer {
-  const numeric = def.fieldType === 'number' || def.fieldType === 'currency'
+  const numeric = isNumericField(def.fieldType)
   return function renderCustomTextField(contact, { t, actions, labels }) {
     const raw = contact.customFields?.[fieldKey]
     const onChange = actions?.onCustomFieldsChange
@@ -115,7 +119,7 @@ function textRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRende
       <ContactTextFieldCell
         field={customFieldLabel(def, fieldKey)}
         value={{
-          raw: raw === null || raw === undefined ? '' : String(raw),
+          raw: customFieldToInput(raw, def.fieldType),
           display: customFieldDisplay(def, raw, t).text,
           numeric,
         }}
@@ -123,7 +127,10 @@ function textRenderer(def: ContactColumnDef, fieldKey: string): ContactCellRende
         onSave={
           onChange
             ? (next) =>
-                onChange(contact.id, customFieldPatch(fieldKey, parseCustomValue(next, numeric)))
+                onChange(
+                  contact.id,
+                  customFieldPatch(fieldKey, customFieldFromInput(next, def.fieldType)),
+                )
             : undefined
         }
       />

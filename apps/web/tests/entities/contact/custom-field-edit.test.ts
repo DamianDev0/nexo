@@ -2,9 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   customFieldDatePart,
-  nextCustomFieldDate,
-  parseCustomValue,
   customFieldPatch,
+  nextCustomFieldDate,
 } from '@/entities/contact/lib/custom-field-edit'
 
 describe('customFieldDatePart', () => {
@@ -40,14 +39,5 @@ describe('customFieldPatch', () => {
 
   it('sends null to clear a value', () => {
     expect(customFieldPatch('vip', null)).toEqual({ vip: null })
-  })
-})
-
-describe('parseCustomValue', () => {
-  it('keeps text, converts numbers, and maps empty or invalid numerics to null', () => {
-    expect(parseCustomValue('hola', false)).toBe('hola')
-    expect(parseCustomValue('42.5', true)).toBe(42.5)
-    expect(parseCustomValue('', false)).toBeNull()
-    expect(parseCustomValue('abc', true)).toBeNull()
   })
 })

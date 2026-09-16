@@ -20,10 +20,3 @@ export function nextCustomFieldDate(
 export function customFieldPatch(key: string, value: unknown): Record<string, unknown> {
   return { [key]: value }
 }
-
-export function parseCustomValue(raw: string, numeric: boolean): string | number | null {
-  if (raw === '') return null
-  if (!numeric) return raw
-  const parsed = Number(raw)
-  return Number.isFinite(parsed) ? parsed : null
-}
