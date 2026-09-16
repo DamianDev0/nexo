@@ -128,15 +128,18 @@ describe('useOptimisticContactListPatch', () => {
     expect(sileoSuccess).not.toHaveBeenCalled()
   })
 
-  it('invalidates the contacts scope after settling', async () => {
+  it('refreshes list data after settling and leaves the workspace cache alone', async () => {
     const { client, result } = renderPatchHook(() => Promise.resolve(null))
     const invalidate = vi.spyOn(client, 'invalidateQueries')
 
     act(() => result.current({ id: 'c2', firstName: 'Lucía' }))
 
     await waitFor(() =>
-      expect(invalidate).toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.all }),
+      expect(invalidate).toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.lists }),
     )
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.counts })
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.workspace })
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.all })
   })
 })
 

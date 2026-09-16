@@ -47,6 +47,7 @@ export {
 export { useContactList, usePrefetchContactList } from './query/useContactList'
 export { useContact, type ContactRecordQuery } from './query/useContact'
 export { clearedFieldsToNull } from './lib/contact-patch'
+export { invalidateContactRecords } from './query/invalidate-contact-records'
 export { useOptimisticContactListPatch } from './query/useOptimisticContactListPatch'
 export { usePendingContactPatches } from './model/contact-pending.store'
 export { contactDialNumber, contactPhoneLabel } from './lib/contact-links'

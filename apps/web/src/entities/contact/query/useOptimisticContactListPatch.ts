@@ -9,6 +9,8 @@ import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import { usePendingContactPatches } from '../model/contact-pending.store'
 
+import { invalidateContactRecords } from './invalidate-contact-records'
+
 import type { ContactListItem, PaginatedContacts } from '@repo/shared-types'
 
 type ContactKey = keyof ContactListItem
@@ -93,7 +95,7 @@ export function useOptimisticContactListPatch<TChange>({
     },
     onSettled: (_data, _error, _change, context) => {
       usePendingContactPatches.getState().end(context?.reversals.map((r) => r.id) ?? [])
-      void client.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
+      void invalidateContactRecords(client)
     },
   })
 

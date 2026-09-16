@@ -3,8 +3,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { sileo } from 'sileo'
 
+import { invalidateContactRecords } from '@/entities/contact'
 import { notifySaveFailed } from '@/shared/lib/notify-save-failed'
-import { QUERY_KEYS } from '@/shared/query/query-keys'
 
 import type { ApiHandledError } from '@/shared/api/error-handler'
 import type { Contact, ContactDuplicatePayload } from '@repo/shared-types'
@@ -29,8 +29,8 @@ export function useSaveContact<TValues>(options: SaveContactOptions<TValues>) {
   const mutation = useMutation<Contact, ApiHandledError, SaveContactVariables<TValues>>({
     mutationFn: options.mutationFn,
     onMutate: options.onSubmitStart,
-    onSuccess: (_, { addAnother }) => {
-      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.contacts.all })
+    onSuccess: (contact, { addAnother }) => {
+      void invalidateContactRecords(queryClient, contact.id)
       sileo.success({ title: options.successTitle() })
       options.onSaved(addAnother)
     },
