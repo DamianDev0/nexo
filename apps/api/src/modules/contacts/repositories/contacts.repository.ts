@@ -303,21 +303,33 @@ export class ContactsRepository {
   ): Promise<Map<string, string>> {
     const emails = contacts.flatMap((data) => (data.email ? [data.email.toLowerCase()] : []))
     const documents = contacts.flatMap((data) => (data.documentNumber ? [data.documentNumber] : []))
+    const phones = contacts.flatMap((data) => (data.phone ? [data.phone] : []))
     const matches = new Map<string, string>()
-    if (emails.length === 0 && documents.length === 0) return matches
+    if (emails.length === 0 && documents.length === 0 && phones.length === 0) return matches
 
     const rows = await sqlRows<
-      Array<{ id: string; email: string | null; document_number: string | null }>
+      Array<{
+        id: string
+        email: string | null
+        document_number: string | null
+        phone: string | null
+        whatsapp: string | null
+      }>
     >(
       qr,
-      `SELECT id, email, document_number FROM contacts
+      `SELECT id, email, document_number, phone, whatsapp FROM contacts
        WHERE is_active = true
-         AND (LOWER(email) = ANY($1::text[]) OR document_number = ANY($2::text[]))`,
-      [emails, documents],
+         AND (LOWER(email) = ANY($1::text[])
+           OR document_number = ANY($2::text[])
+           OR phone = ANY($3::text[])
+           OR whatsapp = ANY($3::text[]))`,
+      [emails, documents, phones],
     )
     for (const row of rows) {
       if (row.email) matches.set(`email:${row.email.toLowerCase()}`, row.id)
       if (row.document_number) matches.set(`document:${row.document_number}`, row.id)
+      if (row.phone) matches.set(`phone:${row.phone}`, row.id)
+      if (row.whatsapp) matches.set(`phone:${row.whatsapp}`, row.id)
     }
     return matches
   }

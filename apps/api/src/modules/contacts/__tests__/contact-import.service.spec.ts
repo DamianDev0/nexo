@@ -169,6 +169,49 @@ describe('ContactImportService', () => {
     ])
   })
 
+  it('falls back to the tenant defaults when status or source are not in the catalog', async () => {
+    const result = await validate([
+      row({ firstName: 'Ana', status: 'interesado_vip', source: 'tiktok_ads' }),
+    ])
+
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: 'status', severity: 'warning', value: 'interesado_vip' }),
+        expect.objectContaining({ field: 'source', severity: 'warning', value: 'tiktok_ads' }),
+      ]),
+    )
+
+    await execute([row({ firstName: 'Ana', status: 'interesado_vip', source: 'tiktok_ads' })])
+
+    expect(insertedRows()).toEqual([expect.objectContaining({ status: 'new', source: 'import' })])
+  })
+
+  it('keeps a status and a source that do belong to the catalog', async () => {
+    await execute([row({ firstName: 'Ana', status: 'in_contact', source: 'referral' })])
+
+    expect(insertedRows()).toEqual([
+      expect.objectContaining({ status: 'in_contact', source: 'referral' }),
+    ])
+  })
+
+  it('treats a repeated phone as a duplicate even when the row carries no email', async () => {
+    await execute([
+      row({ firstName: 'Ana', phone: '3001234567' }),
+      row({ firstName: 'Ana Maria', phone: '3001234567' }),
+    ])
+
+    expect(insertedRows()).toHaveLength(1)
+  })
+
+  it('skips a phone that already exists in the workspace', async () => {
+    repository.findImportMatches.mockResolvedValue(new Map([['phone:3001234567', 'c-existing']]))
+
+    const result = await execute([row({ firstName: 'Ana', phone: '3001234567' })])
+
+    expect(result.skipped).toBe(1)
+    expect(insertedRows()).toHaveLength(0)
+  })
+
   it('writes every new contact in batches instead of one insert per row', async () => {
     const rows = Array.from({ length: 1200 }, (_, i) =>
       row({ firstName: `Fila${i}`, email: `fila${i}@empresa.co` }),

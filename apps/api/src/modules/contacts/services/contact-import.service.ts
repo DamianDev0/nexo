@@ -182,6 +182,7 @@ function importKeys(data: CreateContactData): string[] {
   const keys: string[] = []
   if (data.email) keys.push(`email:${data.email.toLowerCase()}`)
   if (data.documentNumber) keys.push(`document:${data.documentNumber}`)
+  if (data.phone) keys.push(`phone:${data.phone}`)
   return keys
 }
 

@@ -64,6 +64,7 @@ function toContactData(
     createdById: string | null
     lifecycleStage: string
     status: string
+    source: string | null
   },
 ): CreateContactData {
   return {
@@ -79,7 +80,7 @@ function toContactData(
     municipioCode: null,
     status: resolved.status,
     lifecycleStage: resolved.lifecycleStage,
-    source: text(data, 'source') ?? 'import',
+    source: resolved.source,
     tags: resolved.tags,
     companyId: null,
     assignedToId: null,
@@ -87,6 +88,8 @@ function toContactData(
     createdBy: resolved.createdById ?? '',
   }
 }
+
+const IMPORT_SOURCE_KEY = 'import'
 
 export function buildImportRows(
   rows: ImportSourceRow[],
@@ -98,6 +101,13 @@ export function buildImportRows(
   const knownStages = new Set(
     taxonomy.lifecycleStages.filter((stage) => stage.enabled).map((stage) => stage.key),
   )
+  const knownStatuses = new Set(
+    taxonomy.statuses.filter((option) => option.enabled).map((option) => option.key),
+  )
+  const knownSources = new Set(
+    taxonomy.sources.filter((option) => option.enabled).map((option) => option.key),
+  )
+  const importSource = knownSources.has(IMPORT_SOURCE_KEY) ? IMPORT_SOURCE_KEY : null
   const defaultStage = firstEnabledOptionKey(taxonomy.lifecycleStages)
   const defaultStatus = firstEnabledOptionKey(taxonomy.statuses)
   const candidates: ImportCandidate[] = []
@@ -162,18 +172,23 @@ export function buildImportRows(
       })
     }
 
-    const rawStage = text(data, 'lifecycleStage')
-    let lifecycleStage = rawStage ?? defaultStage
-    if (rawStage && !knownStages.has(rawStage)) {
+    const taxonomyValue = (
+      field: 'lifecycleStage' | 'status' | 'source',
+      known: ReadonlySet<string>,
+      fallback: string | null,
+    ): string | null => {
+      const raw = text(data, field)
+      if (!raw) return fallback
+      if (known.has(raw)) return raw
       warningRows++
       issues.push({
         row,
         severity: 'warning',
-        field: 'lifecycleStage',
-        message: 'Lifecycle stage is not in the catalog; the default stage will be used',
-        value: rawStage,
+        field,
+        message: `Value is not in the ${field} catalog; the default will be used`,
+        value: raw,
       })
-      lifecycleStage = defaultStage
+      return fallback
     }
 
     candidates.push({
@@ -184,8 +199,9 @@ export function buildImportRows(
         documentNumber,
         tags,
         createdById,
-        lifecycleStage,
-        status: text(data, 'status') ?? defaultStatus,
+        lifecycleStage: taxonomyValue('lifecycleStage', knownStages, defaultStage) ?? defaultStage,
+        status: taxonomyValue('status', knownStatuses, defaultStatus) ?? defaultStatus,
+        source: taxonomyValue('source', knownSources, importSource),
       }),
     })
   }
