@@ -106,7 +106,7 @@ export function useContactsTable() {
     [urlSearch, status, filters, page, limit, sort, advanced, viewerId],
   )
 
-  const { data, isPending, isFetching } = useContactList(query)
+  const { data, isPending, isFetching, isError, refetch } = useContactList(query)
 
   const handleStatus = useCallback(
     (value: string | null) => commit({ status: value, page: FIRST_PAGE }),
@@ -166,6 +166,8 @@ export function useContactsTable() {
     sort,
     isPending,
     isFetching,
+    isError,
+    retry: refetch,
     isFiltered:
       Boolean(urlSearch.trim() || status) || hasQuickFilters(filters) || advanced.length > 0,
     advanced,

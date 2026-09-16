@@ -622,6 +622,11 @@ const en = {
       edit: 'Edit',
       archive: 'Archive',
     },
+    loadFailed: {
+      title: 'We could not load your {{entities}}',
+      description: 'The connection failed or the server did not answer. Your data is still there.',
+      retry: 'Try again',
+    },
     empty: {
       title: 'No {{entities}} yet',
       description:

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { quickEase, useReducedTransition } from '@/shared/lib/animations'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
-import { UsersThreeIcon } from '@/shared/ui/icons'
+import { UsersThreeIcon, WarningCircleIcon } from '@/shared/ui/icons'
 import { DataTable } from '@/shared/ui/organisms/data-table'
 import { EmptyState } from '@/shared/ui/organisms/empty-state'
 
@@ -55,6 +55,19 @@ export function ContactsTableStates({
             title={t('contacts.unavailable.title')}
             description={t('contacts.unavailable.description')}
           />
+        )}
+
+        {phase === 'failed' && (
+          <EmptyState
+            fill
+            icon={<WarningCircleIcon className="size-5" />}
+            title={t('contacts.loadFailed.title', { entities: terms.lowerPlural })}
+            description={t('contacts.loadFailed.description')}
+          >
+            <PillButton size="md" variant="tertiary" onClick={() => void actions.onRetry()}>
+              {t('contacts.loadFailed.retry')}
+            </PillButton>
+          </EmptyState>
         )}
 
         {phase === 'empty' && (

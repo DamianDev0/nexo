@@ -625,6 +625,11 @@ const es = {
       edit: 'Editar',
       archive: 'Archivar',
     },
+    loadFailed: {
+      title: 'No pudimos cargar los {{entities}}',
+      description: 'La conexión falló o el servidor no respondió. Tus datos siguen ahí.',
+      retry: 'Volver a intentar',
+    },
     empty: {
       title: 'Aún no hay {{entities}}',
       description:
