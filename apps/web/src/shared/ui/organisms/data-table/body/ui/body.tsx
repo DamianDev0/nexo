@@ -1,35 +1,28 @@
 'use client'
 
-import { motion } from 'motion/react'
-
-import { quickEase, useReducedTransition } from '@/shared/lib/animations'
+import { ContextActionMenu } from '@/shared/ui/molecules/context-action-menu'
 
 import { useDataTableContext } from '../../model/context'
+import { useRowContextMenu } from '../../model/use-row-context-menu'
 
 import { DataTableRow } from './row'
 
 interface DataTableBodyProps {
-  readonly pageKey?: string | number
-  readonly dimmed?: boolean
+  readonly busy?: boolean
   readonly className?: string
 }
 
-export function DataTableBody({ pageKey, dimmed, className }: Readonly<DataTableBodyProps>) {
-  const { table, rowHeight } = useDataTableContext()
-  const transition = useReducedTransition(quickEase)
+export function DataTableBody({ busy, className }: Readonly<DataTableBodyProps>) {
+  const { table, rowHeight, rowContextMenu } = useDataTableContext()
+  const contextMenu = useRowContextMenu(table, rowContextMenu)
 
   return (
-    <motion.tbody
-      key={pageKey}
-      data-slot="table-body"
-      initial={false}
-      animate={{ opacity: dimmed ? 0.55 : 1 }}
-      transition={transition}
-      className={className}
-    >
-      {table.getRowModel().rows.map((row) => (
-        <DataTableRow key={row.id} row={row} height={rowHeight} />
-      ))}
-    </motion.tbody>
+    <ContextActionMenu items={contextMenu.items} onContextMenu={contextMenu.onContextMenu}>
+      <tbody data-slot="table-body" aria-busy={busy || undefined} className={className}>
+        {table.getRowModel().rows.map((row) => (
+          <DataTableRow key={row.id} row={row} height={rowHeight} />
+        ))}
+      </tbody>
+    </ContextActionMenu>
   )
 }

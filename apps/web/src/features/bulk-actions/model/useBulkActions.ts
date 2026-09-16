@@ -9,7 +9,7 @@ import { buildBulkLabels } from '../lib/bulk-labels'
 import { useBulkDialog } from './useBulkDialog'
 import { useBulkFeedback } from './useBulkFeedback'
 import { useBulkJob } from './useBulkJob'
-import { useBulkSelection } from './useBulkSelection'
+import { useBulkSelection, type BulkPageSelection } from './useBulkSelection'
 
 import type { BulkActionId } from '../config/bulk-action-registry.constants'
 import type { BulkActionSelection, CustomFieldEntity } from '@repo/shared-types'
@@ -22,6 +22,7 @@ type BulkActionsArgs = {
     readonly selectedIds: () => string[]
     readonly selectedTags: () => string[]
     readonly selectedCount: number
+    readonly page: BulkPageSelection
     readonly clear: () => void
   }
   readonly filterSelection: () => BulkActionSelection
@@ -39,6 +40,7 @@ export function useBulkActions({
     selectedIds: rows.selectedIds,
     selectedCount: rows.selectedCount,
     total,
+    page: rows.page,
     filterSelection,
     clear: rows.clear,
   })
@@ -79,6 +81,7 @@ export function useBulkActions({
       labels,
       actions: bulkActionsFor(bulkScope(archived)),
       onSelectAll: selection.allMatching ? undefined : selection.selectAll,
+      onUnselectAll: selection.allMatching ? selection.reset : undefined,
       isBusy: job.isBusy,
       progress: job.running,
       onOpen: openDialog,

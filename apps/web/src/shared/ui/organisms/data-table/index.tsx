@@ -5,6 +5,7 @@ import { DataTableColumnEditor } from './column-editor'
 import { DataTableGrid, DataTableRoot, DataTableScroller, DataTableSkeleton } from './grid'
 import { DataTableHeader } from './header'
 import { DataTableQuickFilters } from './quick-filters'
+import { DataTableSelectPage } from './selection'
 import { DataTableSmartLists } from './smart-list'
 import { DataTableDensity, DataTableSearch, DataTableToolbar } from './toolbar'
 
@@ -20,7 +21,7 @@ export type {
 export type { DataTableBulkConfig, DataTableBulkLabels } from './toolbar'
 export type { SmartListItem, SmartListMenuAction } from './smart-list'
 export type { QuickFilterDef, QuickFilterOption } from './quick-filters'
-export { selectionColumn } from './selection'
+export { selectionColumn, type SelectPageLabels } from './selection'
 
 export const DataTable = Object.assign(DataTableRoot, {
   SmartLists: DataTableSmartLists,
@@ -38,4 +39,5 @@ export const DataTable = Object.assign(DataTableRoot, {
   CellFrame: DataTableCellFrame,
   CellHint: DataTableCellHint,
   Pagination: PaginationCapsule,
+  SelectPage: DataTableSelectPage,
 })

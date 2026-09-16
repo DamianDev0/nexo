@@ -45,6 +45,7 @@ export function ContactsPagination({
         label={t('common.pagination.pages')}
         collapseLabel={t('common.pagination.collapse')}
       >
+        <DataTable.Pagination.Divider />
         <DataTable.Pagination.Nav
           page={nav.page}
           totalPages={nav.totalPages}

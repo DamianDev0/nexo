@@ -28,14 +28,38 @@ export function useBoardSelection({
     [closePreview, openEdit],
   )
 
-  const selectedRows = useCallback(
-    () => instance.table.getSelectedRowModel().rows.map((row) => row.original),
-    [instance.table],
-  )
+  const { table, selection } = instance
+  const seen = useRef(new Map<string, ContactListItem>())
 
-  const selectedIds = useCallback(() => selectedRows().map((row) => row.id), [selectedRows])
-  const selectedTags = useCallback(() => collectTags(selectedRows()), [selectedRows])
-  const clearSelection = useCallback(() => instance.table.resetRowSelection(), [instance.table])
+  useEffect(() => {
+    for (const row of table.getSelectedRowModel().rows)
+      seen.current.set(row.original.id, row.original)
+  }, [table, selection.ids])
+
+  const selectedIds = useCallback(() => [...selection.ids], [selection.ids])
+  const selectedTags = useCallback(
+    () =>
+      collectTags(
+        selection.ids.flatMap((id) => {
+          const row = seen.current.get(id)
+          return row ? [row] : []
+        }),
+      ),
+    [selection.ids],
+  )
+  const clearSelection = useCallback(() => {
+    seen.current.clear()
+    table.resetRowSelection()
+  }, [table])
+
+  const selectPage = useCallback(() => table.toggleAllPageRowsSelected(true), [table])
+  const bulkRows = {
+    selectedIds,
+    selectedTags,
+    selectedCount: selection.count,
+    page: { selected: table.getIsAllPageRowsSelected(), select: selectPage },
+    clear: clearSelection,
+  }
 
   const previousScope = useRef(scopeKey)
   useEffect(() => {
@@ -45,5 +69,5 @@ export function useBoardSelection({
     closePreview()
   }, [scopeKey, clearSelection, closePreview])
 
-  return { openFromPreview, selectedIds, selectedTags, clearSelection }
+  return { openFromPreview, bulkRows, clearSelection }
 }

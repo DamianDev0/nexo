@@ -28,6 +28,7 @@ const LABELS = {
 }
 
 function Harness({ onSelectAll }: Readonly<{ onSelectAll?: () => void }>) {
+  const unselect = () => instance.table.resetRowSelection()
   const instance = useDataTable({
     data: ROWS,
     columns: COLUMNS,
@@ -37,12 +38,19 @@ function Harness({ onSelectAll }: Readonly<{ onSelectAll?: () => void }>) {
 
   return (
     <DataTable instance={instance}>
-      <DataTable.Toolbar bulk={{ labels: LABELS, onSelectAll, actions: <span>bulk-actions</span> }}>
+      <DataTable.Toolbar
+        bulk={{
+          labels: LABELS,
+          onSelectAll,
+          onUnselectAll: unselect,
+          actions: <span>bulk-actions</span>,
+        }}
+      >
         <DataTable.Search value="" placeholder="Buscar" onChange={vi.fn()} />
       </DataTable.Toolbar>
       <DataTable.Grid>
         <DataTable.Header />
-        <DataTable.Body pageKey={1} />
+        <DataTable.Body />
       </DataTable.Grid>
     </DataTable>
   )
@@ -68,7 +76,7 @@ describe('DataTable.Toolbar bulk swap', () => {
     render(<Harness />)
 
     await userEvent.click(screen.getAllByLabelText('Select row')[0]!)
-    await userEvent.click(await screen.findByLabelText('Limpiar selección'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Limpiar selección' }))
 
     await waitFor(() =>
       expect(document.querySelector('[data-slot="table-search"]')).toBeInTheDocument(),

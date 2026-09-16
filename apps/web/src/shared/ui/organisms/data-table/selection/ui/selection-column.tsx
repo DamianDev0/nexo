@@ -3,6 +3,7 @@
 import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
 
 import { DATA_TABLE_SELECTION_ID } from '../../config/table.constants'
+import { selectRowRange } from '../../lib/row-range'
 
 import type { ColumnDef } from '@tanstack/react-table'
 
@@ -26,14 +27,18 @@ export function selectionColumn<TData>(labels: SelectionLabels): ColumnDef<TData
       <SmoothCheckbox
         className={SELECTION_BOX}
         checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(value === true)}
         aria-label={labels.all}
       />
     ),
-    cell: ({ row }) => (
+    cell: ({ row, table }) => (
       <SmoothCheckbox
         className={SELECTION_BOX}
         checked={row.getIsSelected()}
+        onClick={(event) => {
+          if (selectRowRange(table, row, event.shiftKey)) event.preventDefault()
+        }}
         onCheckedChange={(value) => row.toggleSelected(value === true)}
         aria-label={labels.row}
       />

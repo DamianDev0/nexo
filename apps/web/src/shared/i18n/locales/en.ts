@@ -70,7 +70,7 @@ const en = {
         selected_other: '{{count}} selected',
         selectAll_one: 'Select the {{count}}',
         selectAll_other: 'Select all {{count}}',
-        clear: 'Clear selection',
+        clear: 'Unselect all',
       },
     },
     pagination: {
@@ -80,6 +80,9 @@ const en = {
       perPage: 'Rows per page',
       scroll: 'Scroll columns',
       collapse: 'Collapse pagination',
+      selectPage_one: 'Select the only row on this page',
+      selectPage_other: 'Select the {{count}} on this page',
+      clearPage: "Clear this page's selection",
     },
     moreOptions: 'More options',
     filters: {

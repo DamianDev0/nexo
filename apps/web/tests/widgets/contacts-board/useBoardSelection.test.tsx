@@ -15,8 +15,11 @@ function makeInstance(
   return {
     table: {
       getSelectedRowModel: () => ({ rows: selectedRows.map((original) => ({ original })) }),
+      getIsAllPageRowsSelected: () => false,
+      toggleAllPageRowsSelected: vi.fn(),
       resetRowSelection,
     },
+    selection: { ids: selectedRows.map((row) => row.id), count: selectedRows.length },
   } as unknown as ReturnType<typeof useDataTable<ContactListItem>>
 }
 
@@ -36,8 +39,10 @@ describe('useBoardSelection', () => {
       }),
     )
 
-    expect(result.current.selectedIds()).toEqual(['a', 'b'])
-    expect(result.current.selectedTags()).toEqual(['vip', 'lead'])
+    expect(result.current.bulkRows.selectedIds()).toEqual(['a', 'b'])
+    expect(result.current.bulkRows.selectedTags()).toEqual(['vip', 'lead'])
+    expect(result.current.bulkRows.selectedCount).toBe(2)
+    expect(result.current.bulkRows.page.selected).toBe(false)
   })
 
   it('clears the row selection by delegating to the table instance', () => {

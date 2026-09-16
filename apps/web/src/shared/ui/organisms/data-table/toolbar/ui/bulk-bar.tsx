@@ -1,6 +1,8 @@
 'use client'
 
 import { cn } from '@/shared/lib/cn'
+import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { SwapText } from '@/shared/ui/atoms/swap-text'
 import { XIcon } from '@/shared/ui/icons'
 import { Button } from '@/shared/ui/shadcn/button'
 
@@ -9,7 +11,12 @@ import { useDataTableContext } from '../../model/context'
 
 import type { DataTableBulkConfig } from '../model/types'
 
-export function DataTableBulkBar({ labels, actions, onSelectAll }: Readonly<DataTableBulkConfig>) {
+export function DataTableBulkBar({
+  labels,
+  actions,
+  onSelectAll,
+  onUnselectAll,
+}: Readonly<DataTableBulkConfig>) {
   const { selection } = useDataTableContext()
   const canSelectAll = onSelectAll !== undefined && selection.count < selection.total
 
@@ -18,9 +25,9 @@ export function DataTableBulkBar({ labels, actions, onSelectAll }: Readonly<Data
       {actions && <span className="flex items-center gap-0.5">{actions}</span>}
       {actions && <span aria-hidden className="mx-1 h-5 w-px shrink-0 bg-border" />}
 
-      <span className="text-sm font-medium tabular-nums text-body">
+      <SwapText id={selection.count} className="text-sm font-medium tabular-nums text-body">
         {labels.selected(selection.count)}
-      </span>
+      </SwapText>
 
       {canSelectAll && (
         <Button
@@ -35,15 +42,12 @@ export function DataTableBulkBar({ labels, actions, onSelectAll }: Readonly<Data
         </Button>
       )}
 
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        onClick={selection.clear}
-        aria-label={labels.clear}
-        className="ml-auto text-faint hover:text-foreground"
-      >
-        <XIcon className="size-4" />
-      </Button>
+      {onUnselectAll && (
+        <PillButton variant="primary" size="sm" onClick={onUnselectAll} className="gap-1.5 pr-3">
+          {labels.clear}
+          <XIcon aria-hidden className="size-4" />
+        </PillButton>
+      )}
     </>
   )
 }

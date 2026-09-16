@@ -7,6 +7,8 @@ export {
 export { CONTACT_AVATARS } from './config/contact-avatars.constants'
 export type { AvatarTone } from './lib/contact-display'
 export { buildContactColumns } from './ui/columns/contact-columns'
+export { buildRowMenuItems } from './lib/row-menu-items'
+export { buildContactCellLabels } from './lib/contact-cell-labels'
 export type {
   ContactColumnContext,
   ContactComposeChannel,

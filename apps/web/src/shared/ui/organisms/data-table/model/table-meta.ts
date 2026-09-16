@@ -1,4 +1,5 @@
 import type { RowData } from '@tanstack/react-table'
+import type { RefObject } from 'react'
 
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line unused-imports/no-unused-vars -- module augmentation must repeat the upstream type parameters
@@ -8,6 +9,11 @@ declare module '@tanstack/react-table' {
     label?: string
     description?: string
     lockable?: boolean
+  }
+
+  // eslint-disable-next-line unused-imports/no-unused-vars -- module augmentation must repeat the upstream type parameters
+  interface TableMeta<TData extends RowData> {
+    selectionAnchor?: RefObject<string | null>
   }
 }
 

@@ -58,6 +58,7 @@ function setup(ids: string[] = ['a', 'b'], total = 40, archived = false) {
           selectedIds: () => ids,
           selectedTags: () => ['vip', 'seed'],
           selectedCount: ids.length,
+          page: { selected: true, select: vi.fn() },
           clear,
         },
         filterSelection: () => FILTER,

@@ -80,7 +80,7 @@ export function ContactsTableStates({
             <DataTable.Scroller ref={scrollRef} hideScrollbar className="min-h-0 flex-1">
               <DataTable.Grid>
                 <DataTable.Header />
-                <DataTable.Body pageKey={state.page} dimmed={state.isFetching} />
+                <DataTable.Body busy={state.isFetching} />
               </DataTable.Grid>
             </DataTable.Scroller>
             <ContactsPagination

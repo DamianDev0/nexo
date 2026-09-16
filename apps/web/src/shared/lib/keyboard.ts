@@ -80,6 +80,13 @@ export function matchesShortcut(
   )
 }
 
+const OVERLAY_SELECTOR =
+  '[role="dialog"],[role="menu"],[role="listbox"],[data-slot="popover-content"]'
+
+export function isInsideOverlay(target: EventTarget | null): boolean {
+  return target instanceof Element && target.closest(OVERLAY_SELECTOR) !== null
+}
+
 export function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   if (target.isContentEditable) return true

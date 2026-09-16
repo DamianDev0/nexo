@@ -110,6 +110,7 @@ function ContactsTable({ rows }: Readonly<{ rows: ReadonlyArray<ContactRow> }>) 
             bulk={{
               labels: BULK_LABELS,
               onSelectAll: () => instance.table.toggleAllRowsSelected(true),
+              onUnselectAll: () => instance.table.resetRowSelection(),
               actions: (
                 <Button variant="ghost" size="icon-sm" aria-label="Archive">
                   <TrashIcon className="size-4" />

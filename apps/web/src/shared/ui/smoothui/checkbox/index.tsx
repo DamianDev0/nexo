@@ -7,6 +7,8 @@ import { cn } from '@/shared/lib'
 
 import { CHECKBOX_BOX_CLASSES, CheckboxMark } from './mark'
 
+import type { MouseEvent } from 'react'
+
 export { SmoothCheckboxGlyph } from './mark'
 
 export interface CheckboxProps {
@@ -19,6 +21,7 @@ export interface CheckboxProps {
   indeterminate?: boolean
   name?: string
   onCheckedChange?: (checked: boolean) => void
+  onClick?: (event: MouseEvent<HTMLButtonElement>) => void
   required?: boolean
   value?: string
 }
@@ -29,6 +32,7 @@ export function SmoothCheckbox({
   defaultChecked = false,
   indeterminate = false,
   onCheckedChange,
+  onClick,
   disabled = false,
   className,
   name,
@@ -60,6 +64,7 @@ export function SmoothCheckbox({
       id={id}
       name={name}
       onCheckedChange={handleChange}
+      onClick={onClick}
       required={required}
       value={value}
     >

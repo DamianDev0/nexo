@@ -24,7 +24,7 @@ import { selectionScopeKey } from '../lib/selection-scope'
 
 import { useBoardColumns } from './useBoardColumns'
 import { useBoardEditors } from './useBoardEditors'
-import { useBoardHotkeys } from './useBoardHotkeys'
+import { useBoardKeyboard } from './useBoardKeyboard'
 import { useBoardPreview } from './useBoardPreview'
 import { useBoardSelection } from './useBoardSelection'
 import { useBoardViews } from './useBoardViews'
@@ -36,18 +36,15 @@ export function useContactsBoard() {
   const counts = useContactCounts()
   const taxonomy = useContactTaxonomy()
   const terms = useEntityTerms('contact')
-  const { sheet, preview, composers, archive, rowActions } = useBoardEditors()
+  const { sheet, preview, composers, archive, rowActions, rowContextMenu } = useBoardEditors()
   const workspace = useContactWorkspace()
   const usage = useTaxonomyUsage()
 
-  useBoardHotkeys({ onCreate: sheet.openCreate, enabled: !sheet.open && !preview.open })
-
   const catalog = workspace.data?.columns ?? EMPTY_COLUMNS
-  const { handleSort } = table
   const { layout, sort, setListOrder, applyState, saveStatus } = useContactsLayout(
     catalog,
     workspace.data?.tableState ?? EMPTY_TABLE_STATE,
-    { value: table.sort, onChange: handleSort },
+    { value: table.sort, onChange: table.handleSort },
   )
 
   const columns = useBoardColumns({
@@ -66,9 +63,10 @@ export function useContactsBoard() {
     layout,
     sort,
     totalRows: table.total,
+    rowContextMenu,
   })
 
-  const { openFromPreview, selectedIds, selectedTags, clearSelection } = useBoardSelection({
+  const { openFromPreview, bulkRows, clearSelection } = useBoardSelection({
     instance,
     scopeKey: selectionScopeKey(table.query),
     closePreview: () => preview.setOpen(false),
@@ -81,18 +79,19 @@ export function useContactsBoard() {
     siblings: table.rows,
     taxonomy,
   })
-  const { query: tableQuery } = table
-  const bulkFilter = useCallback(() => filterSelection(tableQuery), [tableQuery])
+  const bulkFilter = useCallback(() => filterSelection(table.query), [table.query])
   const bulk = useBulkActions({
     archived: table.archived,
     total: table.total,
-    rows: {
-      selectedIds,
-      selectedTags,
-      selectedCount: instance.selection.count,
-      clear: clearSelection,
-    },
+    rows: bulkRows,
     filterSelection: bulkFilter,
+  })
+
+  useBoardKeyboard({
+    instance,
+    bulk,
+    editors: { sheetOpen: sheet.open, previewOpen: preview.open, openCreate: sheet.openCreate },
+    clearSelection,
   })
 
   const listOrder = workspace.data?.tableState.listOrder

@@ -66,7 +66,7 @@ const es = {
         selected_other: '{{count}} seleccionados',
         selectAll_one: 'Seleccionar el {{count}}',
         selectAll_other: 'Seleccionar los {{count}}',
-        clear: 'Limpiar selección',
+        clear: 'Deseleccionar todo',
       },
       density: {
         comfortable: 'Vista cómoda',
@@ -80,6 +80,9 @@ const es = {
       perPage: 'Filas por página',
       scroll: 'Desplazar columnas',
       collapse: 'Contraer paginación',
+      selectPage_one: 'Seleccionar el único registro de esta página',
+      selectPage_other: 'Seleccionar los {{count}} de esta página',
+      clearPage: 'Quitar la selección de esta página',
     },
     moreOptions: 'Más opciones',
     filters: {

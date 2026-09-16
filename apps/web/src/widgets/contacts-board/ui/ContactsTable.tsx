@@ -88,6 +88,7 @@ export function ContactsTable({ board, bulk, listMenu }: Readonly<ContactsTableP
             bulk={{
               labels: bulk.bar.labels,
               onSelectAll: bulk.bar.onSelectAll,
+              onUnselectAll: bulk.bar.onUnselectAll,
               actions: <BulkActionBar bar={bulk.bar} />,
             }}
           >

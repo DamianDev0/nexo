@@ -16,7 +16,7 @@ const COLUMNS: ReadonlyArray<ColumnDef<Row, unknown>> = [
   { id: 'name', accessorKey: 'name', size: 200 },
 ]
 
-function renderBody(dimmed?: boolean) {
+function renderBody(busy?: boolean) {
   const { result } = renderHook(() =>
     useDataTable<Row>({ data: DATA, columns: COLUMNS, getRowId: (row) => row.id }),
   )
@@ -24,25 +24,27 @@ function renderBody(dimmed?: boolean) {
   return render(
     <DataTable instance={result.current}>
       <DataTable.Grid>
-        <DataTable.Body dimmed={dimmed} />
+        <DataTable.Body busy={busy} />
       </DataTable.Grid>
     </DataTable>,
   )
 }
 
 describe('DataTableBody', () => {
-  it('paints the rows visible on first render instead of fading them in', () => {
+  it('paints the rows visible on first render', () => {
     const { container } = renderBody()
     const body = container.querySelector('[data-slot="table-body"]')
 
     expect(body).toBeInTheDocument()
-    expect(body).not.toHaveStyle({ opacity: '0' })
+    expect(body).not.toHaveAttribute('aria-busy')
     expect(container.querySelectorAll('tbody tr')).toHaveLength(2)
   })
 
-  it('dims the rows it is keeping on screen while the next page loads', () => {
+  it('keeps the rows fully readable and flags them busy while the next page loads', () => {
     const { container } = renderBody(true)
+    const body = container.querySelector('[data-slot="table-body"]')
 
-    expect(container.querySelector('[data-slot="table-body"]')).toHaveStyle({ opacity: '0.55' })
+    expect(body).toHaveAttribute('aria-busy', 'true')
+    expect(body).not.toHaveStyle({ opacity: '0.55' })
   })
 })

@@ -2,7 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 
+import { buildContactCellLabels, buildRowMenuItems } from '@/entities/contact'
 import { useArchiveContactDialog } from '@/features/archive-contact'
 import { useContactComposers } from '@/features/compose-contact-actions'
 import { useCreateFromUrl } from '@/features/create-contact'
@@ -37,5 +39,12 @@ export function useBoardEditors() {
     onLogActivity: composers.openActivity,
   })
 
-  return { sheet, preview, composers, archive, rowActions, viewRecord }
+  const { t } = useTranslation()
+  const rowContextMenu = useCallback(
+    (contact: ContactListItem) =>
+      buildRowMenuItems(contact, buildContactCellLabels(t).name, rowActions),
+    [t, rowActions],
+  )
+
+  return { sheet, preview, composers, archive, rowActions, rowContextMenu, viewRecord }
 }

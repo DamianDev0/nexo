@@ -10,4 +10,5 @@ export interface DataTableBulkConfig {
   readonly labels: DataTableBulkLabels
   readonly actions?: ReactNode
   readonly onSelectAll?: () => void
+  readonly onUnselectAll?: () => void
 }
