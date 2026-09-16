@@ -6,6 +6,9 @@ import type {
   ContactDeal,
   ContactListItem,
 } from '@repo/shared-types'
+
+import { toCents } from '@/shared/utils/money'
+
 import type { ActivityRow, ContactRow, DealRow } from '../interfaces/contact-row.interfaces'
 
 export function mapContact(r: ContactRow): Contact {
@@ -23,7 +26,7 @@ export function mapContact(r: ContactRow): Contact {
     municipioCode: r.municipio_code,
     status: r.status,
     statusChangedAt: r.status_changed_at ?? null,
-    lifecycleStage: r.lifecycle_stage ?? 'subscriber',
+    lifecycleStage: r.lifecycle_stage ?? '',
     source: r.source,
     lastContactedAt: r.last_contacted_at ?? null,
     tags: r.tags,
@@ -68,7 +71,7 @@ export function mapContactDeal(d: DealRow): ContactDeal {
   return {
     id: d.id,
     title: d.title,
-    valueCents: d.value_cents,
+    valueCents: toCents(d.value_cents),
     status: d.status,
     stageId: d.stage_id,
     pipelineId: d.pipeline_id,

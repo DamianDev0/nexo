@@ -135,7 +135,9 @@ export class ContactsRepository {
     return this.db.query(schemaName, async (qr): Promise<number> => {
       const rows = await sqlRows<[{ count: string }]>(
         qr,
-        `SELECT COUNT(*)::text AS count FROM contacts WHERE is_active = false`,
+        `SELECT COUNT(*)::text AS count
+         FROM contacts
+         WHERE is_active = false AND merged_into_id IS NULL`,
       )
       return Number.parseInt(rows[0].count, 10)
     })
@@ -145,7 +147,7 @@ export class ContactsRepository {
     const rows = await sqlRows<ContactRow[]>(
       qr,
       `UPDATE contacts SET is_active = true, updated_at = NOW()
-       WHERE id = $1 AND is_active = false
+       WHERE id = $1 AND is_active = false AND merged_into_id IS NULL
        RETURNING ${CONTACT_COLUMNS}`,
       [contactId],
     )

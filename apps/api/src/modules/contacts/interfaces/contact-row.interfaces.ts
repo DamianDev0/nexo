@@ -55,7 +55,7 @@ export interface ActivityRow {
 export interface DealRow {
   id: string
   title: string
-  value_cents: number
+  value_cents: string | number
   status: string
   stage_id: string | null
   pipeline_id: string | null

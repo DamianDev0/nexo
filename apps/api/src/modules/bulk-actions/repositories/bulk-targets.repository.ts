@@ -105,11 +105,12 @@ export class BulkTargetsRepository {
 
   async restore(schemaName: string, entity: CustomFieldEntity, ids: string[]): Promise<string[]> {
     const TABLE = BULK_TABLES[entity]
+    const MERGED_GUARD = entity === 'contacts' ? 'AND merged_into_id IS NULL' : ''
     return this.updateReturningIds(
       schemaName,
       `UPDATE ${TABLE}
        SET is_active = true, updated_at = NOW()
-       WHERE id = ANY($1::uuid[]) AND is_active = false
+       WHERE id = ANY($1::uuid[]) AND is_active = false ${MERGED_GUARD}
        RETURNING id`,
       [ids],
     )

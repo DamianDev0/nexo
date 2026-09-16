@@ -908,6 +908,26 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         ON "${schema}".contacts (next_activity_due DESC NULLS LAST, id) WHERE is_active = true;
     `,
   },
+  {
+    id: '0046_contacts_lifecycle_tenant_default',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contacts ALTER COLUMN lifecycle_stage DROP DEFAULT;
+      UPDATE "${schema}".contacts c
+      SET lifecycle_stage = stage.key
+      FROM (
+        SELECT option ->> 'key' AS key
+        FROM public.tenants t
+        CROSS JOIN LATERAL jsonb_array_elements(
+          COALESCE(t.config -> 'contactTaxonomy' -> 'lifecycleStages', '[]'::jsonb)
+        ) AS option
+        WHERE t."schemaName" = '${schema}'
+          AND COALESCE((option ->> 'enabled')::boolean, true)
+        ORDER BY COALESCE((option ->> 'position')::int, 0)
+        LIMIT 1
+      ) stage
+      WHERE c.lifecycle_stage IS NULL;
+    `,
+  },
 ]
 
 const FIRST_MIGRATION_NOT_IN_BASE_SCHEMA = '0044_contacts_hardening'

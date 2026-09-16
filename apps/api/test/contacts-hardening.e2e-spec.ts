@@ -142,6 +142,33 @@ describe('Contacts hardening: fresh tenants, concurrency, search (E2E, real HTTP
     }
   })
 
+  it('refuses to resurrect the loser of a merge and keeps it out of the trash', async () => {
+    const winner = await createContact({ firstName: 'Winner', email: 'winner@hardening.co' })
+    const loser = await createContact({ firstName: 'Loser', email: 'loser@hardening.co' })
+
+    await asTenant(request(server()).post(`/${API_PREFIX}/contacts/${winner}/merge`), tenant)
+      .send({ loserId: loser })
+      .expect(201)
+
+    await asTenant(
+      request(server()).post(`/${API_PREFIX}/contacts/${loser}/restore`),
+      tenant,
+    ).expect(404)
+
+    const archived = await asTenant(
+      request(server()).get(`/${API_PREFIX}/contacts?archived=true&limit=100`),
+      tenant,
+    ).expect(200)
+    const ids = (archived.body.data.data as Array<{ id: string }>).map((row) => row.id)
+    expect(ids).not.toContain(loser)
+
+    const counts = await asTenant(
+      request(server()).get(`/${API_PREFIX}/contacts/counts`),
+      tenant,
+    ).expect(200)
+    expect(counts.body.data.archived).toBe(ids.length)
+  })
+
   it('answers 404, not 200, when patching a contact archived by someone else', async () => {
     const id = await createContact({ firstName: 'Archived', email: 'archived@hardening.co' })
     await asTenant(request(server()).delete(`/${API_PREFIX}/contacts/${id}`), tenant).expect(204)

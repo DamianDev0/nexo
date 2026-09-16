@@ -56,7 +56,9 @@ export function buildContactWhereClause(query: ContactFilterQuery): {
     conditions.push(condition.replace('?', `$${params.length}`))
   }
 
-  conditions.push(query.archived === true ? 'is_active = false' : 'is_active = true')
+  conditions.push(
+    query.archived === true ? 'is_active = false AND merged_into_id IS NULL' : 'is_active = true',
+  )
 
   if (query.q) conditions.push(searchClause(query.q, CONTACT_SEARCH, params))
   if (query.unassigned === true) conditions.push('assigned_to_id IS NULL')
