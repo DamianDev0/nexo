@@ -1,4 +1,4 @@
-import { isValidCOPhone, phoneDigits } from '@repo/shared-utils'
+import { isValidCOPhone, normalizeDocumentNumber, phoneDigits } from '@repo/shared-utils'
 import { z } from 'zod'
 
 import type { TFunction } from 'i18next'
@@ -13,6 +13,10 @@ export function optionalPhoneSchema(t: TFunction) {
 
 export function optionalEmailSchema(t: TFunction) {
   return z.string().trim().email(t('contacts.errors.emailInvalid')).or(z.literal(''))
+}
+
+export function documentNumberSchema() {
+  return z.string().trim().transform(normalizeDocumentNumber)
 }
 
 export function contactCoreFieldsSchema(t: TFunction) {

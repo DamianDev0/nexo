@@ -928,6 +928,23 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       WHERE c.lifecycle_stage IS NULL;
     `,
   },
+  {
+    id: '0047_contacts_document_number_normalized',
+    up: (schema) => `
+      UPDATE "${schema}".contacts c
+      SET document_number = regexp_replace(c.document_number, '[.\\s-]', '', 'g')
+      WHERE c.document_number IS NOT NULL
+        AND c.document_number <> regexp_replace(c.document_number, '[.\\s-]', '', 'g')
+        AND NOT EXISTS (
+          SELECT 1 FROM "${schema}".contacts twin
+          WHERE twin.id <> c.id
+            AND twin.is_active = c.is_active
+            AND twin.document_number IS NOT NULL
+            AND regexp_replace(twin.document_number, '[.\\s-]', '', 'g')
+                = regexp_replace(c.document_number, '[.\\s-]', '', 'g')
+        );
+    `,
+  },
 ]
 
 const FIRST_MIGRATION_NOT_IN_BASE_SCHEMA = '0044_contacts_hardening'

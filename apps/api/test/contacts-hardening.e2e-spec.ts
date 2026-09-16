@@ -142,6 +142,25 @@ describe('Contacts hardening: fresh tenants, concurrency, search (E2E, real HTTP
     }
   })
 
+  it('stores the same document one way no matter how it was typed', async () => {
+    const id = await createContact({
+      firstName: 'Documentada',
+      documentType: 'nit',
+      documentNumber: '900.373.115',
+    })
+
+    const rows = (await ctx.dataSource.query(
+      `SELECT document_number FROM "${tenant.schemaName}".contacts WHERE id = $1`,
+      [id],
+    )) as Array<{ document_number: string }>
+    expect(rows[0]?.document_number).toBe('900373115')
+
+    const clash = await contacts()
+      .send({ firstName: 'Repetida', documentType: 'nit', documentNumber: '900373115' })
+      .expect(409)
+    expect(clash.body.message).toBeDefined()
+  })
+
   it('refuses to resurrect the loser of a merge and keeps it out of the trash', async () => {
     const winner = await createContact({ firstName: 'Winner', email: 'winner@hardening.co' })
     const loser = await createContact({ firstName: 'Loser', email: 'loser@hardening.co' })

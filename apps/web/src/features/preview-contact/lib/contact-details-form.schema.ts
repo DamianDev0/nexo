@@ -1,9 +1,10 @@
-import { z } from 'zod'
+import { type z } from 'zod'
 
 import {
   clearedFieldsToNull,
   CONTACT_ADDRESS_KEY,
   contactCoreFieldsSchema,
+  documentNumberSchema,
 } from '@/entities/contact'
 
 import type { ContactFieldsPatch } from '@/entities/contact'
@@ -11,7 +12,7 @@ import type { ContactListItem } from '@repo/shared-types'
 import type { TFunction } from 'i18next'
 
 export function buildContactDetailsSchema(t: TFunction) {
-  return contactCoreFieldsSchema(t).extend({ documentNumber: z.string().trim() })
+  return contactCoreFieldsSchema(t).extend({ documentNumber: documentNumberSchema() })
 }
 
 export type ContactDetailsSchema = ReturnType<typeof buildContactDetailsSchema>

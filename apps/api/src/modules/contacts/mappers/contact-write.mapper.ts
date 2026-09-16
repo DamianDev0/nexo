@@ -1,4 +1,5 @@
 import { firstEnabledOptionKey } from '@repo/shared-types'
+import { normalizeDocumentNumber } from '@repo/shared-utils'
 import type { ContactTaxonomy } from '@repo/shared-types'
 import type { CreateContactDto, UpdateContactDto } from '../dto/contact.dto'
 import type { ContactColumnChange, CreateContactData } from '../interfaces/contact-row.interfaces'
@@ -16,7 +17,7 @@ export function toCreateContactData(
     phone: dto.phone ?? null,
     whatsapp: dto.whatsapp ?? null,
     documentType: dto.documentType ?? null,
-    documentNumber: dto.documentNumber ?? null,
+    documentNumber: dto.documentNumber ? normalizeDocumentNumber(dto.documentNumber) : null,
     avatarUrl: dto.avatarUrl ?? null,
     city: dto.city ?? null,
     municipioCode: dto.municipioCode ?? null,
@@ -34,7 +35,12 @@ export function toCreateContactData(
 export function toContactChanges(dto: UpdateContactDto): ContactColumnChange[] {
   const changes: ContactColumnChange[] = []
   for (const [dtoKey, col] of UPDATABLE_FIELDS) {
-    if (dto[dtoKey] !== undefined) changes.push({ column: col, value: dto[dtoKey] })
+    if (dto[dtoKey] === undefined) continue
+    const value =
+      col === 'document_number' && typeof dto[dtoKey] === 'string'
+        ? normalizeDocumentNumber(dto[dtoKey])
+        : dto[dtoKey]
+    changes.push({ column: col, value })
   }
   return changes
 }

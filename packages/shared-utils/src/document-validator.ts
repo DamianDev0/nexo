@@ -15,11 +15,15 @@ const DOCUMENT_RULES: Record<
   [DocumentType.PPT]: { pattern: /^[a-zA-Z0-9]+$/, minLength: 6, maxLength: 15 },
 }
 
+export function normalizeDocumentNumber(value: string): string {
+  return value.replace(/[.\-\s]/g, '')
+}
+
 export function validateDocumentNumber(
   type: DocumentType,
   number: string,
 ): { isValid: boolean; error?: string } {
-  const cleaned = number.replace(/[.\-\s]/g, '')
+  const cleaned = normalizeDocumentNumber(number)
   const rule = DOCUMENT_RULES[type]
 
   if (!rule.pattern.test(cleaned)) {
@@ -44,7 +48,7 @@ export function validateDocumentNumber(
 }
 
 export function formatDocumentNumber(type: DocumentType, number: string): string {
-  const cleaned = number.replace(/[.\-\s]/g, '')
+  const cleaned = normalizeDocumentNumber(number)
 
   if (type === DocumentType.NIT) {
     const result = validateNIT(cleaned)

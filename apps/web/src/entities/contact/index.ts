@@ -23,6 +23,7 @@ export { buildContactPreviewRows, customText } from './lib/contact-preview'
 export { useContactTimeline, type ContactTimelineFeed } from './query/useContactTimeline'
 export {
   contactCoreFieldsSchema,
+  documentNumberSchema,
   optionalEmailSchema,
   optionalPhoneSchema,
 } from './lib/contact-field-schemas'
