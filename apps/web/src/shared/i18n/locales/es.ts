@@ -1147,6 +1147,8 @@ const es = {
       colleagues_other: '{{count}} contactos más aquí',
     },
     detail: {
+      rail: 'Paneles del registro',
+      summary: 'Resumen del registro',
       back: 'Volver a contactos',
       closePanel: 'Cerrar panel',
       tabs: {
@@ -1633,6 +1635,7 @@ const es = {
       'Selecciona varios {{entities}} en la lista para etiquetar, cambiar estado, exportar o archivar en bloque.',
   },
   nav: {
+    primary: 'Navegación principal',
     comingSoon: 'Próximamente',
     toggleSidebar: 'Colapsar sidebar',
     search: 'Buscar...',

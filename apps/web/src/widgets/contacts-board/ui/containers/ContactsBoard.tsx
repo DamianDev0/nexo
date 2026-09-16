@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 
+import { useEntityTerms } from '@/entities/nomenclature'
 import { ArchiveContactDialog } from '@/features/archive-contact'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { useMountedOnce } from '@/shared/lib/hooks/useMountedOnce'
@@ -29,12 +30,14 @@ export function ContactsBoard() {
   const { instance, lists, state, actions, bulk, sheet, preview, composers, archive } =
     useContactsBoard()
   const listMenu = useListMenu(state.views, state.viewerId)
+  const terms = useEntityTerms('contact')
 
   const viewDialogsMounted = useMountedOnce(listMenu.viewMenu.openMode !== null)
   const formMounted = useMountedOnce(sheet.open)
   const previewMounted = useMountedOnce(preview.open)
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <h1 className="sr-only">{terms.plural}</h1>
       <ContactsTable board={{ instance, lists, state, actions }} bulk={bulk} listMenu={listMenu} />
       {viewDialogsMounted && <ViewTabDialogs menu={listMenu.viewMenu} />}
       {formMounted && (

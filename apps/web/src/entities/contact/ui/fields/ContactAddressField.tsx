@@ -1,5 +1,6 @@
 'use client'
 
+import { useId } from 'react'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -25,6 +26,7 @@ export function ContactAddressField<T extends FieldValues>({
   compact,
 }: Readonly<ContactAddressFieldProps<T>>) {
   const { t } = useTranslation()
+  const fieldId = useId()
 
   return (
     <Controller
@@ -32,9 +34,10 @@ export function ContactAddressField<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <div onBlur={onBlur}>
-          <FieldLabel>{t('contacts.form.address')}</FieldLabel>
+          <FieldLabel htmlFor={fieldId}>{t('contacts.form.address')}</FieldLabel>
           <div className={compact ? 'mt-1' : 'mt-1.5'}>
             <AddressField
+              inputId={fieldId}
               value={String(field.value ?? '')}
               onChange={field.onChange}
               onPlaceSelect={onPlaceSelect}

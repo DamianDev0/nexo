@@ -1140,6 +1140,8 @@ const en = {
       colleagues_other: '{{count}} more contacts here',
     },
     detail: {
+      rail: 'Record panels',
+      summary: 'Record summary',
       back: 'Back to contacts',
       closePanel: 'Close panel',
       tabs: {
@@ -1624,6 +1626,7 @@ const en = {
       'Select several {{entities}} in the list to tag, change status, export or archive in one go.',
   },
   nav: {
+    primary: 'Main navigation',
     comingSoon: 'Coming soon',
     toggleSidebar: 'Toggle sidebar',
     search: 'Search...',

@@ -16,9 +16,16 @@ interface AddressFieldProps {
   readonly state: AddressFieldState
   readonly actions: AddressFieldActions
   readonly placeholder?: string
+  readonly inputId?: string
 }
 
-export function AddressField({ value, state, actions, placeholder }: Readonly<AddressFieldProps>) {
+export function AddressField({
+  value,
+  state,
+  actions,
+  placeholder,
+  inputId,
+}: Readonly<AddressFieldProps>) {
   const { t } = useTranslation()
   const listboxId = useId()
   const { options, activeIndex, isSearching, open } = state
@@ -31,6 +38,7 @@ export function AddressField({ value, state, actions, placeholder }: Readonly<Ad
   return (
     <div className="relative">
       <Input
+        id={inputId}
         className="h-9 bg-surface-input pr-8 text-sm"
         placeholder={placeholder}
         autoComplete="off"

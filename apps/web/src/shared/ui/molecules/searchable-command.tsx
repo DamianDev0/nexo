@@ -20,6 +20,7 @@ type SearchableCommandHighlight = {
 type SearchableCommandView = {
   readonly empty: ReactNode | null
   readonly listClassName?: string
+  readonly label?: string
 }
 
 type SearchableCommandProps = {
@@ -50,7 +51,10 @@ export function SearchableCommand({
           }}
         />
       )}
-      <CommandList className={cn('scroll-smooth scrollbar-hidden', view.listClassName)}>
+      <CommandList
+        label={view.label}
+        className={cn('scroll-smooth scrollbar-hidden', view.listClassName)}
+      >
         {view.empty !== null && <CommandEmpty>{view.empty}</CommandEmpty>}
         {children}
       </CommandList>

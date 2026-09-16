@@ -2,6 +2,7 @@
 
 import { formatCOPhone, phoneDigits } from '@repo/shared-utils'
 import Image from 'next/image'
+import { useId } from 'react'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -37,6 +38,8 @@ export function ContactPhoneField<T extends FieldValues>({
   view,
 }: Readonly<ContactPhoneFieldProps<T>>) {
   const { t } = useTranslation()
+  const fieldId = useId()
+  const messageId = `${fieldId}-message`
   const isWhatsapp = name === 'whatsapp'
   const disabled = view?.disabled ?? false
 
@@ -48,7 +51,7 @@ export function ContactPhoneField<T extends FieldValues>({
         const message = fieldState.error?.message ?? (fieldState.isDirty ? undefined : view?.hint)
         return (
           <div>
-            <FieldLabel>{label}</FieldLabel>
+            <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>
             <InputGroup
               className={view?.compact ? 'mt-1 bg-surface-input' : 'mt-1.5 bg-surface-input'}
               aria-disabled={disabled}
@@ -67,6 +70,8 @@ export function ContactPhoneField<T extends FieldValues>({
                 </Text>
               </InputGroupAddon>
               <InputGroupInput
+                id={fieldId}
+                aria-describedby={message ? messageId : undefined}
                 className="text-sm tabular-nums"
                 placeholder="300 123 4567"
                 inputMode="tel"
@@ -80,7 +85,7 @@ export function ContactPhoneField<T extends FieldValues>({
                 }}
               />
             </InputGroup>
-            {view?.compact && !message ? null : <FieldError message={message} />}
+            {view?.compact && !message ? null : <FieldError id={messageId} message={message} />}
           </div>
         )
       }}

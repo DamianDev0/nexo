@@ -37,7 +37,7 @@ function renderLayout(defaultPanel: string | null = 'files') {
         <RecordLayout.Panel id="notes" title="Notas" closeLabel="Cerrar panel">
           <span>lista de notas</span>
         </RecordLayout.Panel>
-        <RecordLayout.Rail items={RAIL} />
+        <RecordLayout.Rail items={RAIL} label="Record panels" />
       </RecordLayout>
     </TooltipProvider>,
   )
@@ -114,7 +114,7 @@ describe('RecordLayout', () => {
   it('throws when a part is used outside the layout', () => {
     const quiet = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
-    expect(() => render(<RecordLayout.Rail items={RAIL} />)).toThrow(
+    expect(() => render(<RecordLayout.Rail items={RAIL} label="Record panels" />)).toThrow(
       /must be used within <RecordLayout>/,
     )
 

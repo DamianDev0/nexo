@@ -79,6 +79,7 @@ export function AsyncSelect<T>({
           }
           highlight={{ value: state.highlightedValue, onChange: state.setHighlighted }}
           view={{
+            label: view.label,
             empty: !state.loading && state.visible.length === 0 ? listFallback : null,
             listClassName:
               'max-h-[min(16rem,max(9rem,calc(var(--radix-popover-content-available-height)-3.25rem)))] scroll-py-1 p-1',

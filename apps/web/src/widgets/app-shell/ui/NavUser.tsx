@@ -30,7 +30,7 @@ function UserIdentity({ user }: Readonly<{ user: SidebarUser }>) {
     <>
       <Avatar size="sm" variant="soft">
         {user.avatarUrl && <Avatar.Image src={user.avatarUrl} alt={user.name} />}
-        <Avatar.Fallback aria-label={user.name} className="bg-transparent dark:bg-transparent">
+        <Avatar.Fallback aria-hidden className="bg-transparent dark:bg-transparent">
           <AvatarGradient seed={user.email} />
         </Avatar.Fallback>
       </Avatar>

@@ -1,4 +1,7 @@
+'use client'
+
 import { formatDateTimeCO, timeAgo } from '@repo/shared-utils'
+import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
 import { ColorDot } from '@/shared/ui/atoms/color-dot'
@@ -32,6 +35,7 @@ export function ContactStatusCell({
   locale,
   onChange,
 }: Readonly<ContactStatusCellProps>) {
+  const { t } = useTranslation()
   const label = (
     <span className="flex min-w-0 flex-col text-left">
       <span className="flex min-w-0 items-center gap-1.5">
@@ -48,7 +52,7 @@ export function ContactStatusCell({
 
   return (
     <ContactChoiceCell
-      label={choice?.label ?? contact.status}
+      label={`${t('contacts.form.status')}: ${choice?.label ?? contact.status}`}
       selection={{
         value: contact.status,
         options,

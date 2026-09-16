@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from 'motion/react'
 
 interface FieldErrorProps {
   readonly message?: string
+  readonly id?: string
 }
 
-export function FieldError({ message }: Readonly<FieldErrorProps>) {
+export function FieldError({ message, id }: Readonly<FieldErrorProps>) {
   return (
-    <span className="mt-0.5 block min-h-4 text-xs leading-4">
+    <span className="mt-0.5 block min-h-4 text-xs leading-4" id={id}>
       <AnimatePresence>
         {message && (
           <motion.span

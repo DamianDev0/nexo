@@ -30,7 +30,7 @@ export function ContactRecordHeader({ record, owner }: Readonly<ContactRecordHea
           <>
             <Avatar size="lg" variant="soft" className="rounded-xl border border-border bg-card">
               <Avatar.Image src={record.avatarUrl} alt="" className="bg-muted" />
-              <Avatar.Fallback aria-label={record.name} className="bg-muted" />
+              <Avatar.Fallback aria-hidden className="bg-muted" />
             </Avatar>
             {record.missingHint ? (
               <AlertMark

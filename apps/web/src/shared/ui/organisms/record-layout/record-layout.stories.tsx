@@ -138,7 +138,7 @@ function Demo() {
             </div>
           </RecordLayout.Panel>
 
-          <RecordLayout.Rail items={RAIL} />
+          <RecordLayout.Rail items={RAIL} label="Record panels" />
         </RecordLayout>
       </div>
     </TooltipProvider>

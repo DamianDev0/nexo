@@ -40,7 +40,7 @@ function ContactRow({
     <div className="group relative flex h-12 items-center gap-2.5 px-4 transition-colors hover:bg-muted/60">
       <Avatar size="sm" variant="soft" className="size-7 shrink-0 rounded-full">
         <Avatar.Image src={contactAvatarUrl(contact)} alt="" className="bg-muted" />
-        <Avatar.Fallback aria-label={name} className="bg-muted">
+        <Avatar.Fallback aria-hidden className="bg-muted">
           {contactInitials(contact)}
         </Avatar.Fallback>
       </Avatar>

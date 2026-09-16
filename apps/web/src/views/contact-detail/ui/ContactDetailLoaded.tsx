@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
+
 import { ArchiveContactDialog } from '@/features/archive-contact'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { MergeContactsDialog } from '@/features/merge-contacts'
@@ -33,11 +35,13 @@ export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailL
     panelRoute,
     tabs,
   } = detail
+  const { t } = useTranslation()
   const record = useContactRecord({ contact, taxonomy, actions })
   useBreadcrumbTail(record.name)
 
   return (
     <RecordLayout panel={panelRoute.panel} onPanelChange={panelRoute.onPanelChange}>
+      <h1 className="sr-only">{record.name}</h1>
       <ContactDetailAside
         contact={contact}
         record={record}
@@ -46,7 +50,7 @@ export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailL
       />
       <ContactDetailMain contact={contact} record={record} tabs={tabs} activities={activities} />
       <ContactDetailPanels activities={activities} add={record.add} deals={deals} />
-      <RecordLayout.Rail items={rail} />
+      <RecordLayout.Rail items={rail} label={t('contacts.detail.rail')} />
       <ArchiveContactDialog state={archive} />
       <MergeContactsDialog winner={contact} state={mergeDialog} />
       <ContactComposerHost composers={composers} />

@@ -81,7 +81,7 @@ export function NavMain({ groups }: Readonly<NavMainProps>) {
   const { t } = useTranslation()
 
   return (
-    <>
+    <nav aria-label={t('nav.primary')}>
       {groups.map((group, groupIndex) => (
         <motion.div
           key={group.key}
@@ -101,6 +101,6 @@ export function NavMain({ groups }: Readonly<NavMainProps>) {
           </SidebarGroup>
         </motion.div>
       ))}
-    </>
+    </nav>
   )
 }

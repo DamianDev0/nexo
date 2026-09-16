@@ -38,7 +38,7 @@ export function ContactDetailAside({
   const optedOut = contact.optedOutChannels
 
   return (
-    <RecordLayout.Aside>
+    <RecordLayout.Aside label={t('contacts.detail.summary')}>
       <div className="px-2 pt-3">
         <PillButton asChild variant="ghost" size="xs" className="px-2 font-medium">
           <Link href={ROUTES.app.contacts.list}>

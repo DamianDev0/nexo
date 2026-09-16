@@ -12,6 +12,7 @@ interface AddressFieldContainerProps {
   readonly onChange: (value: string) => void
   readonly onPlaceSelect?: (place: AddressPlace) => void
   readonly placeholder?: string
+  readonly inputId?: string
 }
 
 export function AddressFieldContainer({
@@ -19,8 +20,17 @@ export function AddressFieldContainer({
   onChange,
   onPlaceSelect,
   placeholder,
+  inputId,
 }: Readonly<AddressFieldContainerProps>) {
   const { state, actions } = useAddressField({ value, onChange, onPlaceSelect })
 
-  return <AddressField value={value} state={state} actions={actions} placeholder={placeholder} />
+  return (
+    <AddressField
+      value={value}
+      state={state}
+      actions={actions}
+      placeholder={placeholder}
+      inputId={inputId}
+    />
+  )
 }

@@ -70,7 +70,7 @@ export function ContactNameCell({
     <span className="flex min-w-0 flex-1 items-center gap-2.5">
       <Avatar size="sm" variant="soft" className={cn('rounded-full', dense ? 'size-7' : 'size-9')}>
         <Avatar.Image src={contactAvatarUrl(contact)} alt="" className="bg-muted" />
-        <Avatar.Fallback aria-label={name} className="bg-muted" />
+        <Avatar.Fallback aria-hidden className="bg-muted" />
       </Avatar>
       {dense ? (
         <span className="flex min-w-0 flex-1 items-center justify-between gap-1">

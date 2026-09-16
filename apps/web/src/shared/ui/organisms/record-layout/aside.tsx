@@ -8,15 +8,18 @@ type RecordLayoutAsideProps = {
   readonly children: ReactNode
   readonly footer?: ReactNode
   readonly className?: string
+  readonly label?: string
 }
 
 export function RecordLayoutAside({
   children,
   footer,
   className,
+  label,
 }: Readonly<RecordLayoutAsideProps>) {
   return (
     <aside
+      aria-label={label}
       data-slot="record-layout-aside"
       className={cn(
         'flex w-full shrink-0 flex-col border-r border-border bg-background md:w-[var(--record-aside-width)]',

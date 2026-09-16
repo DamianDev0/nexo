@@ -1,3 +1,6 @@
+'use client'
+
+import { useId } from 'react'
 import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
 
 import { FieldLabel } from '@/shared/ui/atoms/field-label'
@@ -33,14 +36,22 @@ export function ControlledField<T extends FieldValues>({
   actions,
   hintFormat,
 }: Readonly<ControlledFieldProps<T>>) {
+  const fieldId = useId()
+  const errorId = `${fieldId}-error`
+
   return (
     <Controller
       control={control}
       name={name}
       render={({ field, fieldState }) => (
         <div>
-          <FieldLabel required={spec.required}>{spec.label}</FieldLabel>
+          <FieldLabel htmlFor={fieldId} required={spec.required}>
+            {spec.label}
+          </FieldLabel>
           <Input
+            id={fieldId}
+            aria-invalid={fieldState.error ? true : undefined}
+            aria-describedby={fieldState.error ? errorId : undefined}
             type={spec.type}
             placeholder={spec.placeholder}
             autoComplete={spec.autoComplete}
@@ -60,7 +71,7 @@ export function ControlledField<T extends FieldValues>({
           {hintFormat && (
             <span className="mt-1 block text-xs text-faint">{hintFormat(field.value ?? '')}</span>
           )}
-          <FieldError message={fieldState.error?.message} />
+          <FieldError id={errorId} message={fieldState.error?.message} />
         </div>
       )}
     />

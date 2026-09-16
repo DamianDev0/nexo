@@ -38,6 +38,7 @@ export function RecordLayoutPanel({
       {activePanel === id ? (
         <motion.aside
           key={id}
+          aria-label={title}
           data-slot="record-layout-panel"
           variants={collapseHorizontal}
           initial="initial"

@@ -9,6 +9,7 @@ import type { RailItem } from './types'
 
 type RecordLayoutRailProps = {
   readonly items: ReadonlyArray<RailItem>
+  readonly label: string
   readonly className?: string
 }
 
@@ -40,11 +41,12 @@ function RailBadge({ count, attention }: Readonly<{ count?: number; attention?: 
   )
 }
 
-export function RecordLayoutRail({ items, className }: Readonly<RecordLayoutRailProps>) {
+export function RecordLayoutRail({ items, label, className }: Readonly<RecordLayoutRailProps>) {
   const { activePanel, togglePanel } = useRecordLayoutContext()
 
   return (
     <nav
+      aria-label={label}
       data-slot="record-layout-rail"
       className={cn(
         'flex w-[var(--record-rail-width)] shrink-0 flex-col items-center gap-1.5 border-l border-border bg-background px-2 py-3',

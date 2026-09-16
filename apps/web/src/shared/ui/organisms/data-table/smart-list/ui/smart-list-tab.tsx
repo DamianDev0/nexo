@@ -73,7 +73,7 @@ function SmartListTabBase({
     isDragging,
   } = useSortable({ id: item.id, disabled: !sortable })
   const underline = useReducedTransition(indicatorSpring)
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const menuActions = actions.itemMenu?.(item) ?? []
   const hasMenu = menuActions.length > 0
@@ -132,7 +132,7 @@ function SmartListTabBase({
       {sortable && (
         <span
           ref={setActivatorNodeRef}
-          aria-label={item.label}
+          aria-label={`${t('common.table.reorder')}: ${item.label}`}
           className={cn(
             'absolute left-0.5 z-10 inline-flex h-8 w-6 touch-none items-center justify-center rounded-sm text-primary outline-none transition-[opacity,transform] duration-200 ease-out focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50',
             isDragging

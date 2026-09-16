@@ -19,7 +19,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const tenantSlug = safeTenantSlug((await cookies()).get(TENANT_COOKIE)?.value)
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link href="https://api.fontshare.com" rel="preconnect" crossOrigin="anonymous" />
         <link href="https://cdn.fontshare.com" rel="preconnect" crossOrigin="anonymous" />
