@@ -1,7 +1,9 @@
 'use client'
 
+import { formatNumber } from '@repo/shared-utils'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { collapseHorizontal, smoothEase, useReducedTransition } from '@/shared/lib/animations'
@@ -23,25 +25,35 @@ export interface NavLabels {
   readonly next: string
 }
 
-interface IconButtonProps {
+export interface IconButtonState {
+  readonly disabled?: boolean
+  readonly expanded?: boolean
+  readonly pressed?: boolean
+}
+
+export interface IconButtonProps {
   readonly label: string
   readonly onClick: () => void
   readonly children: ReactNode
-  readonly disabled?: boolean
-  readonly expanded?: boolean
+  readonly state?: IconButtonState
 }
 
-function IconButton({ label, disabled, expanded, onClick, children }: Readonly<IconButtonProps>) {
+function IconButton({ label, state, onClick, children }: Readonly<IconButtonProps>) {
   return (
     <button
       type="button"
       aria-label={label}
-      aria-expanded={expanded}
-      disabled={disabled}
+      aria-expanded={state?.expanded}
+      aria-pressed={state?.pressed}
+      disabled={state?.disabled}
       onClick={onClick}
       className={cn(
         'inline-flex size-7 shrink-0 items-center justify-center rounded-md transition-colors duration-120',
-        disabled ? 'cursor-default text-disabled-fg' : 'cursor-pointer text-body hover:bg-muted',
+        state?.disabled && 'cursor-default text-disabled-fg',
+        !state?.disabled &&
+          (state?.pressed
+            ? 'cursor-pointer bg-accent text-primary-deep hover:bg-accent dark:text-primary'
+            : 'cursor-pointer text-body hover:bg-muted'),
       )}
     >
       {children}
@@ -86,7 +98,7 @@ function Root({ label, collapseLabel, children, className }: Readonly<RootProps>
       </AnimatePresence>
       <IconButton
         label={collapseLabel}
-        expanded={!collapsed}
+        state={{ expanded: !collapsed }}
         onClick={() => setCollapsed((prev) => !prev)}
       >
         <motion.span
@@ -115,21 +127,26 @@ export interface NavProps {
 
 function Nav({ page, totalPages, onPageChange, onPrefetch, labels }: Readonly<NavProps>) {
   const warm = (target: number) => () => onPrefetch?.(target)
+  const { i18n } = useTranslation()
 
   return (
     <span className="inline-flex items-center gap-1">
       <span className="inline-flex" onPointerEnter={warm(page - 1)} onFocus={warm(page - 1)}>
-        <IconButton label={labels.prev} disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+        <IconButton
+          label={labels.prev}
+          state={{ disabled: page <= 1 }}
+          onClick={() => onPageChange(page - 1)}
+        >
           <CaretLeftIcon className="size-4" />
         </IconButton>
       </span>
       <span aria-current="page" className="text-sm font-medium tabular-nums text-body">
-        {page} / {totalPages}
+        {formatNumber(page, i18n.language)} / {formatNumber(totalPages, i18n.language)}
       </span>
       <span className="inline-flex" onPointerEnter={warm(page + 1)} onFocus={warm(page + 1)}>
         <IconButton
           label={labels.next}
-          disabled={page >= totalPages}
+          state={{ disabled: page >= totalPages }}
           onClick={() => onPageChange(page + 1)}
         >
           <CaretRightIcon className="size-4" />
@@ -168,6 +185,7 @@ function PageSize({ value, options, onChange, label }: Readonly<PageSizeProps>) 
 }
 
 export const PaginationCapsule = Object.assign(Root, {
+  Action: IconButton,
   Nav,
   PageSize,
   ScrollTrack,

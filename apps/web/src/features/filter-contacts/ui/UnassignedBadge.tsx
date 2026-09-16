@@ -1,10 +1,12 @@
 'use client'
 
 import { CONTACT_UNASSIGNED_RECENT_DAYS } from '@repo/shared-types'
+import { formatNumber } from '@repo/shared-utils'
 import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib/cn'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
+import { SwapText } from '@/shared/ui/atoms/swap-text'
 import { Text } from '@/shared/ui/atoms/text'
 import { UserXIcon, XIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
@@ -24,7 +26,7 @@ export function UnassignedBadge({
   onSelect,
   onClear,
 }: Readonly<UnassignedBadgeProps>) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   if (count === 0 && !active) return null
 
   return (
@@ -56,7 +58,7 @@ export function UnassignedBadge({
             variant="fine"
             className="inline-flex items-center justify-center rounded-sm border border-border-strong/40 bg-card px-1.5 py-0.5 font-medium leading-none tabular-nums text-secondary-foreground"
           >
-            {count}
+            <SwapText id={count}>{formatNumber(count, i18n.language)}</SwapText>
           </Text>
         </PillButton>
       </HintTooltip>

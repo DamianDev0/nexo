@@ -2,11 +2,14 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { formatNumber } from '@repo/shared-utils'
 import { motion } from 'motion/react'
 import { memo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/shared/lib'
 import { indicatorSpring, snappySpring, useReducedTransition } from '@/shared/lib/animations'
+import { SwapText } from '@/shared/ui/atoms/swap-text'
 import { DotsSixVerticalIcon } from '@/shared/ui/icons'
 import { HintTooltip } from '@/shared/ui/molecules/hint-tooltip'
 import { Button } from '@/shared/ui/shadcn/button'
@@ -18,6 +21,7 @@ import type { KeyboardEvent } from 'react'
 
 export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
   const lift = useReducedTransition(snappySpring)
+  const { i18n } = useTranslation()
 
   return (
     <motion.span
@@ -30,7 +34,7 @@ export function SmartListTabGhost({ item }: Readonly<{ item: SmartListItem }>) {
       {item.label}
       {item.count !== undefined && (
         <span className="inline-flex h-5.5 min-w-6 items-center justify-center rounded-md bg-muted px-1.5 text-xs font-medium tabular-nums text-muted-foreground">
-          {item.count}
+          {formatNumber(item.count, i18n.language)}
         </span>
       )}
     </motion.span>
@@ -69,7 +73,7 @@ function SmartListTabBase({
     isDragging,
   } = useSortable({ id: item.id, disabled: !sortable })
   const underline = useReducedTransition(indicatorSpring)
-  const pop = useReducedTransition(snappySpring)
+  const { i18n } = useTranslation()
 
   const menuActions = actions.itemMenu?.(item) ?? []
   const hasMenu = menuActions.length > 0
@@ -106,14 +110,7 @@ function SmartListTabBase({
             active ? 'bg-primary-pale text-primary-deep' : 'bg-muted text-muted-foreground',
           )}
         >
-          <motion.span
-            key={item.count}
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={pop}
-          >
-            {item.count}
-          </motion.span>
+          <SwapText id={item.count}>{formatNumber(item.count, i18n.language)}</SwapText>
         </span>
       )}
     </Button>

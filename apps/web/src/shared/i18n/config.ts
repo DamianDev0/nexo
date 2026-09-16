@@ -1,3 +1,4 @@
+import { formatNumber } from '@repo/shared-utils'
 import i18n, { createInstance, type i18n as I18nInstance } from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
@@ -17,7 +18,12 @@ const BASE_OPTIONS = {
   supportedLngs: [...SUPPORTED_LOCALES],
   nonExplicitSupportedLngs: true,
   defaultNS: 'translation',
-  interpolation: { escapeValue: false },
+  interpolation: {
+    escapeValue: false,
+    alwaysFormat: true,
+    format: (value: unknown, _format?: string, lng?: string): string =>
+      typeof value === 'number' ? formatNumber(value, lng) : String(value),
+  },
 } as const
 
 export function createLocaleInstance(locale: Locale): I18nInstance {
