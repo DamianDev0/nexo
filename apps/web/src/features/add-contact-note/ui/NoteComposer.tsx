@@ -30,6 +30,7 @@ export function NoteComposer({ contact, onClose }: Readonly<NoteComposerProps>) 
       />
       <Composer.Body>
         <Composer.Textarea
+          aria-label={t('contacts.composers.note.title', { name })}
           placeholder={t('contacts.composers.note.placeholder')}
           autoFocus
           {...form.register('body')}
