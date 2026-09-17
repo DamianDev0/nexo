@@ -945,6 +945,49 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
         );
     `,
   },
+  {
+    id: '0048_object_views',
+    up: (schema) => `
+      ALTER TABLE "${schema}".contact_views RENAME TO object_views;
+      ALTER TABLE "${schema}".object_views
+        ADD COLUMN object_type VARCHAR(20) NOT NULL DEFAULT 'contact';
+      ALTER TABLE "${schema}".object_views ALTER COLUMN object_type DROP DEFAULT;
+      ALTER TABLE "${schema}".object_views
+        ADD CONSTRAINT object_views_object_type_check
+        CHECK (object_type IN ('contact', 'company', 'deal'));
+      DROP INDEX IF EXISTS "${schema}"."idx_${schema}_contact_views_owner";
+      DROP INDEX IF EXISTS "${schema}"."idx_${schema}_contact_views_visibility";
+      DROP INDEX IF EXISTS "${schema}"."uq_${schema}_contact_views_default";
+      CREATE INDEX "idx_${schema}_object_views_owner"
+        ON "${schema}".object_views (owner_id, object_type, position);
+      CREATE INDEX "idx_${schema}_object_views_shared"
+        ON "${schema}".object_views (object_type) WHERE visibility = 'shared';
+      CREATE UNIQUE INDEX "uq_${schema}_object_views_default"
+        ON "${schema}".object_views (owner_id, object_type) WHERE is_default = true;
+
+      ALTER TABLE "${schema}".contact_workspace_states RENAME TO object_workspace_states;
+      ALTER TABLE "${schema}".object_workspace_states
+        ADD COLUMN object_type VARCHAR(20) NOT NULL DEFAULT 'contact';
+      ALTER TABLE "${schema}".object_workspace_states ALTER COLUMN object_type DROP DEFAULT;
+      ALTER TABLE "${schema}".object_workspace_states
+        ADD CONSTRAINT object_workspace_states_object_type_check
+        CHECK (object_type IN ('contact', 'company', 'deal'));
+      DO $$
+      DECLARE unique_name text;
+      BEGIN
+        FOR unique_name IN
+          SELECT conname FROM pg_constraint
+          WHERE conrelid = '"${schema}".object_workspace_states'::regclass AND contype = 'u'
+        LOOP
+          EXECUTE format(
+            'ALTER TABLE "${schema}".object_workspace_states DROP CONSTRAINT %I', unique_name
+          );
+        END LOOP;
+      END $$;
+      ALTER TABLE "${schema}".object_workspace_states
+        ADD CONSTRAINT object_workspace_states_user_type_key UNIQUE (user_id, object_type);
+    `,
+  },
 ]
 
 const FIRST_MIGRATION_NOT_IN_BASE_SCHEMA = '0044_contacts_hardening'

@@ -1,6 +1,7 @@
 import type { ContactListQuery } from '@repo/shared-types'
-import { advancedFilterClauses, type FilterableColumn } from './advanced-filter-sql'
-import { searchClause, type SearchSource } from './search-sql'
+import type { FilterableColumn } from './advanced-filter-sql'
+import { buildRecordWhereClause, type RecordFilterDefinition } from './record-filter-sql'
+import type { SearchSource } from './search-sql'
 
 export type ContactFilterQuery = Omit<ContactListQuery, 'sortBy' | 'sortDir' | 'page' | 'limit'>
 
@@ -44,35 +45,18 @@ export const CONTACT_LIST_FILTERS: ReadonlyArray<readonly [keyof ContactFilterQu
   ['lastContactedTo', 'last_contacted_at <= ?'],
 ]
 
+export const CONTACT_FILTER_DEFINITION: RecordFilterDefinition<ContactFilterQuery> = {
+  activeCondition: 'is_active = true',
+  archivedCondition: 'is_active = false AND merged_into_id IS NULL',
+  search: CONTACT_SEARCH,
+  valueFilters: CONTACT_LIST_FILTERS,
+  flagFilters: [['unassigned', 'assigned_to_id IS NULL']],
+  filterableColumns: CONTACT_FILTERABLE_COLUMNS,
+}
+
 export function buildContactWhereClause(query: ContactFilterQuery): {
   where: string
   params: unknown[]
 } {
-  const conditions: string[] = []
-  const params: unknown[] = []
-
-  const push = (condition: string, value: unknown) => {
-    params.push(value)
-    conditions.push(condition.replace('?', `$${params.length}`))
-  }
-
-  conditions.push(
-    query.archived === true ? 'is_active = false AND merged_into_id IS NULL' : 'is_active = true',
-  )
-
-  if (query.q) conditions.push(searchClause(query.q, CONTACT_SEARCH, params))
-  if (query.unassigned === true) conditions.push('assigned_to_id IS NULL')
-
-  for (const [key, clause] of CONTACT_LIST_FILTERS) {
-    const value = query[key]
-    if (value === undefined || value === null || value === '') continue
-    if (Array.isArray(value) && value.length === 0) continue
-    push(clause, value)
-  }
-
-  if (query.advanced?.length) {
-    conditions.push(...advancedFilterClauses(query.advanced, CONTACT_FILTERABLE_COLUMNS, params))
-  }
-
-  return { where: conditions.join(' AND '), params }
+  return buildRecordWhereClause(CONTACT_FILTER_DEFINITION, query)
 }

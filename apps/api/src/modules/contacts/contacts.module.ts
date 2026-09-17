@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
 import { SettingsModule } from '@/modules/settings/settings.module'
+import { ObjectEngineModule } from '@/shared/object-engine/object-engine.module'
 import { ContactsController } from './controllers/contacts.controller'
 import { ContactsService } from './services/contacts.service'
 import { ContactMergeService } from './services/contact-merge.service'
 import { ContactViewsController } from './controllers/contact-views.controller'
-import { ContactViewsService } from './services/contact-views.service'
 import { ContactWorkspaceController } from './controllers/contact-workspace.controller'
 import { ContactWorkspaceService } from './services/contact-workspace.service'
 import { ContactDuplicatesService } from './services/contact-duplicates.service'
@@ -15,12 +15,10 @@ import { ContactConsentsService } from './services/contact-consents.service'
 import { ContactConsentsRepository } from './repositories/contact-consents.repository'
 import { ContactImportService } from './services/contact-import.service'
 import { ContactsRepository } from './repositories/contacts.repository'
-import { ContactViewsRepository } from './repositories/contact-views.repository'
-import { ContactWorkspaceRepository } from './repositories/contact-workspace.repository'
 import { ContactDuplicatesRepository } from './repositories/contact-duplicates.repository'
 
 @Module({
-  imports: [SettingsModule],
+  imports: [SettingsModule, ObjectEngineModule],
   controllers: [
     ContactViewsController,
     ContactWorkspaceController,
@@ -30,7 +28,6 @@ import { ContactDuplicatesRepository } from './repositories/contact-duplicates.r
   providers: [
     ContactsService,
     ContactMergeService,
-    ContactViewsService,
     ContactWorkspaceService,
     ContactDuplicatesService,
     ContactTaxonomyService,
@@ -38,8 +35,6 @@ import { ContactDuplicatesRepository } from './repositories/contact-duplicates.r
     ContactConsentsService,
     ContactImportService,
     ContactsRepository,
-    ContactViewsRepository,
-    ContactWorkspaceRepository,
     ContactDuplicatesRepository,
     ContactConsentsRepository,
   ],

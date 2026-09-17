@@ -6,47 +6,44 @@ import {
   IsArray,
   IsBoolean,
   IsIn,
-  IsInt,
   IsNotEmpty,
   IsObject,
   IsOptional,
   IsString,
   IsUUID,
-  Max,
   MaxLength,
-  Min,
   ValidateNested,
 } from 'class-validator'
 
 import {
-  CONTACT_TABLE_MAX_COLUMNS,
-  CONTACT_TABLE_MAX_PINNED,
-  CONTACT_VIEW_DENSITIES,
-  CONTACT_VIEW_SORT_DIRECTIONS,
-  CONTACT_VIEW_VISIBILITIES,
+  OBJECT_TABLE_MAX_COLUMNS,
+  OBJECT_TABLE_MAX_PINNED,
+  OBJECT_VIEW_DENSITIES,
+  OBJECT_VIEW_SORT_DIRECTIONS,
+  OBJECT_VIEW_VISIBILITIES,
 } from '@repo/shared-types'
 
-export class ContactViewSortDto {
+export class ObjectViewSortDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(60)
   field!: string
 
-  @IsIn(CONTACT_VIEW_SORT_DIRECTIONS)
-  direction!: (typeof CONTACT_VIEW_SORT_DIRECTIONS)[number]
+  @IsIn(OBJECT_VIEW_SORT_DIRECTIONS)
+  direction!: (typeof OBJECT_VIEW_SORT_DIRECTIONS)[number]
 }
 
-export class ContactViewColumnsDto {
+export class ObjectViewColumnsDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(CONTACT_TABLE_MAX_COLUMNS)
+  @ArrayMaxSize(OBJECT_TABLE_MAX_COLUMNS)
   order?: string[]
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(CONTACT_TABLE_MAX_COLUMNS)
+  @ArrayMaxSize(OBJECT_TABLE_MAX_COLUMNS)
   hidden?: string[]
 
   @IsOptional()
@@ -56,17 +53,17 @@ export class ContactViewColumnsDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(CONTACT_TABLE_MAX_PINNED)
+  @ArrayMaxSize(OBJECT_TABLE_MAX_PINNED)
   pinnedLeft?: string[]
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ArrayMaxSize(CONTACT_TABLE_MAX_PINNED)
+  @ArrayMaxSize(OBJECT_TABLE_MAX_PINNED)
   pinnedRight?: string[]
 }
 
-export class CreateContactViewDto {
+export class CreateObjectViewDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)
@@ -87,17 +84,17 @@ export class CreateContactViewDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => ContactViewColumnsDto)
-  columns?: ContactViewColumnsDto
+  @Type(() => ObjectViewColumnsDto)
+  columns?: ObjectViewColumnsDto
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => ContactViewSortDto)
-  sort?: ContactViewSortDto | null
+  @Type(() => ObjectViewSortDto)
+  sort?: ObjectViewSortDto | null
 
   @IsOptional()
-  @IsIn(CONTACT_VIEW_DENSITIES)
-  density?: (typeof CONTACT_VIEW_DENSITIES)[number]
+  @IsIn(OBJECT_VIEW_DENSITIES)
+  density?: (typeof OBJECT_VIEW_DENSITIES)[number]
 
   @IsOptional()
   @IsBoolean()
@@ -108,31 +105,23 @@ export class CreateContactViewDto {
   isFavorite?: boolean
 
   @IsOptional()
-  @IsIn(CONTACT_VIEW_VISIBILITIES)
-  visibility?: (typeof CONTACT_VIEW_VISIBILITIES)[number]
+  @IsIn(OBJECT_VIEW_VISIBILITIES)
+  visibility?: (typeof OBJECT_VIEW_VISIBILITIES)[number]
 }
 
-export class UpdateContactViewDto extends PartialType(CreateContactViewDto) {}
+export class UpdateObjectViewDto extends PartialType(CreateObjectViewDto) {}
 
-export class ReorderContactViewsDto {
+export class ReorderObjectViewsDto {
   @IsArray()
   @IsUUID('4', { each: true })
   @ArrayMaxSize(100)
   ids!: string[]
 }
 
-export class DuplicateContactViewDto {
+export class DuplicateObjectViewDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)
   name?: string
-}
-
-export class ContactViewPositionDto {
-  @IsInt()
-  @Type(() => Number)
-  @Min(0)
-  @Max(1000)
-  position!: number
 }
