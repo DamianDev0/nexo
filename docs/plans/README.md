@@ -1,6 +1,8 @@
 # Planes de ejecución — Fase 2 "CRM adaptable"
 
-> 2026-09-16 · Reemplaza la secuencia 2.1–2.4 de [`../plan-phase-2.md`](../plan-phase-2.md).
+> 2026-09-16 · **Plan maestro del núcleo CRM (sin DIAN/pagos/integraciones):** [`core-crm.md`](core-crm.md). Estos planes 2.1–2.5 son parte de su hito H1.
+>
+> Reemplaza la secuencia 2.1–2.4 de [`../plan-phase-2.md`](../plan-phase-2.md).
 > Base de la decisión: [`../research/crm-adaptability-benchmark-2026-09.md`](../research/crm-adaptability-benchmark-2026-09.md).
 > Reglas del repo que aplican a todo: [`../../CLAUDE.md`](../../CLAUDE.md), [ADR-0001](../adr/0001-multitenancy-schema-per-tenant.md), [ADR-0002](../adr/0002-money-as-integer-centavos.md), [ADR-0003](../adr/0003-frontend-fsd-atomic.md), [ADR-0004](../adr/0004-modular-monolith-eventbus.md), [ADR-0005](../adr/0005-api-layered-modules-repositories-mappers.md), [ADR-0006](../adr/0006-frontend-architecture-gates.md), [ADR-0009](../adr/0009-object-engine.md).
 
