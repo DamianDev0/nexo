@@ -11,3 +11,4 @@ export { usePendingRecordPatches, type PendingRecordPatch } from './model/record
 export { fromColumnSort, toColumnSort, type RecordSort } from './lib/column-sort'
 export { isColumnSaving, pendingCellToken } from './lib/record-pending-cells'
 export { useOptimisticRecordListPatch } from './query/useOptimisticRecordListPatch'
+export { readSkeletonHint, writeSkeletonHint, type RecordsSkeletonHint } from './lib/skeleton-hint'

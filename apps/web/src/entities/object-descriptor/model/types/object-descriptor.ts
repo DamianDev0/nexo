@@ -1,3 +1,4 @@
+import type { AppIcon } from '@/shared/ui/icons'
 import type {
   AnalyzeResult,
   DuplicateStrategy,
@@ -39,6 +40,8 @@ export type ObjectImportConfig = {
 
 export type ObjectRoutes = {
   readonly list: string
+  readonly import: string | null
+  readonly listSettings: string | null
   detail(id: string): string
 }
 
@@ -47,6 +50,8 @@ export type ObjectDescriptor<TRecord extends RecordBase = RecordBase> = {
   readonly apiPath: string
   readonly queryRoot: string
   readonly defaultPinnedColumns: ReadonlyArray<string>
+  readonly icon: AppIcon
+  readonly searchPlaceholderKey: string
   readonly api: ObjectRecordApi
   readonly routes: ObjectRoutes
   readonly imports: ObjectImportConfig | null

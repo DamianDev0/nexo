@@ -57,6 +57,5 @@ export {
 export { invalidateContactRecords } from './query/invalidate-contact-records'
 export { columnFields } from './lib/contact-column-saving'
 export { contactDialNumber, contactPhoneLabel } from './lib/contact-links'
-export { readSkeletonHint, writeSkeletonHint, type ContactsSkeletonHint } from './lib/skeleton-hint'
 export { listQueryFilters, type ContactListFilters } from './lib/list-query'
 export { isChannelBlocked } from './lib/contact-consent-block'

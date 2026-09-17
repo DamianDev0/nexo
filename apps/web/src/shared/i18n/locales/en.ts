@@ -524,6 +524,43 @@ const en = {
     descriptionTooLong: 'Max 300 characters',
   },
   records: {
+    lists: {
+      manage: 'Manage lists',
+    },
+    toolbar: {
+      more: 'More actions',
+      create: 'Create',
+    },
+    table: {
+      save: {
+        loading: 'Saving',
+        success: 'Saved',
+        error: 'Not saved',
+      },
+    },
+    pageRange: '{{from}}–{{to}} of {{total}} {{entities}}',
+    unavailable: {
+      title: 'We could not load the view',
+      description: 'The column configuration never arrived. Reload the page and try again.',
+    },
+    loadFailed: {
+      title: 'We could not load your {{entities}}',
+      description: 'The connection failed or the server did not answer. Your data is still there.',
+      retry: 'Try again',
+    },
+    empty: {
+      title: 'No {{entities}} yet',
+      description: 'Create the first record or import your {{entities}} from a CSV.',
+      cta: 'Create {{entity}}',
+    },
+    archivedEmpty: {
+      title: 'The {{entities}} trash is empty',
+      description: 'Whatever you archive from the list shows up here.',
+    },
+    noResults: {
+      title: 'No results',
+      description: 'Nothing matches your search. Adjust the filters and try again.',
+    },
     toasts: {
       fieldUpdated: 'Field updated',
       statusUpdated: 'Status updated',
@@ -771,36 +808,6 @@ const en = {
       edit: 'Edit',
       archive: 'Archive',
     },
-    loadFailed: {
-      title: 'We could not load your {{entities}}',
-      description: 'The connection failed or the server did not answer. Your data is still there.',
-      retry: 'Try again',
-    },
-    empty: {
-      title: 'No {{entities}} yet',
-      description:
-        'Create your first {{entity}} or import them from a CSV — your customer base lives here.',
-      cta: 'Create {{entity}}',
-    },
-    archivedEmpty: {
-      title: 'No archived {{entities}}',
-      description: 'The {{entities}} you archive from the list will show up here.',
-    },
-    noResults: {
-      title: 'No results',
-      description: 'No {{entity}} matches your search. Adjust the filters and try again.',
-    },
-    table: {
-      save: {
-        loading: 'Saving',
-        success: 'Saved',
-        error: 'Not saved',
-      },
-    },
-    unavailable: {
-      title: 'We could not load the view',
-      description: 'The column configuration never arrived. Reload the page and try again.',
-    },
     form: {
       pickDate: 'Pick a date',
       pickTime: 'Time',
@@ -837,7 +844,6 @@ const en = {
       customFields: 'Additional information',
       customFieldSelect: 'Pick an option',
     },
-    pageRange: '{{from}}–{{to}} of {{total}} {{entities}}',
     hints: {
       pending_one: '{{count}} new {{entity}} not worked yet',
       pending_other: '{{count}} new {{entities}} not worked yet',
@@ -965,9 +971,6 @@ const en = {
         undoHint: 'You can revert this action.',
         undoQueued: 'Undoing the bulk action…',
       },
-    },
-    toolbar: {
-      more: 'More actions',
     },
     cells: {
       pick: 'Pick {{field}}',

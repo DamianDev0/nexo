@@ -8,9 +8,9 @@ import { ObjectDescriptorProvider } from '@/entities/object-descriptor'
 import { ArchiveRecordDialog } from '@/features/archive-record'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { useMountedOnce } from '@/shared/lib/hooks/useMountedOnce'
+import { useListMenu } from '@/widgets/records-board'
 
 import { useContactsBoard } from '../../model/useContactsBoard'
-import { useListMenu } from '../../model/useListMenu'
 import { ContactsTable } from '../ContactsTable'
 
 const ContactFormSheet = dynamic(

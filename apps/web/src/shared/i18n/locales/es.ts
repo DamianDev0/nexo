@@ -527,6 +527,43 @@ const es = {
     descriptionTooLong: 'Máximo 300 caracteres',
   },
   records: {
+    lists: {
+      manage: 'Gestionar listas',
+    },
+    toolbar: {
+      more: 'Más acciones',
+      create: 'Crear',
+    },
+    table: {
+      save: {
+        loading: 'Guardando',
+        success: 'Guardado',
+        error: 'No se guardó',
+      },
+    },
+    pageRange: '{{from}}–{{to}} de {{total}} {{entities}}',
+    unavailable: {
+      title: 'No pudimos cargar la vista',
+      description: 'La configuración de columnas no llegó. Recarga la página e intenta de nuevo.',
+    },
+    loadFailed: {
+      title: 'No pudimos cargar tus {{entities}}',
+      description: 'La conexión falló o el servidor no respondió. Tus datos siguen ahí.',
+      retry: 'Volver a intentar',
+    },
+    empty: {
+      title: 'Aún no hay {{entities}}',
+      description: 'Crea el primer registro o importa tus {{entities}} desde un CSV.',
+      cta: 'Crear {{entity}}',
+    },
+    archivedEmpty: {
+      title: 'La papelera de {{entities}} está vacía',
+      description: 'Lo que archives desde la lista aparecerá aquí.',
+    },
+    noResults: {
+      title: 'Sin resultados',
+      description: 'Nada coincide con tu búsqueda. Ajusta los filtros e intenta de nuevo.',
+    },
     toasts: {
       fieldUpdated: 'Campo actualizado',
       statusUpdated: 'Estado actualizado',
@@ -775,37 +812,6 @@ const es = {
       edit: 'Editar',
       archive: 'Archivar',
     },
-    loadFailed: {
-      title: 'No pudimos cargar los {{entities}}',
-      description: 'La conexión falló o el servidor no respondió. Tus datos siguen ahí.',
-      retry: 'Volver a intentar',
-    },
-    empty: {
-      title: 'Aún no hay {{entities}}',
-      description:
-        'Crea tu primer {{entity}} o impórtalos desde un CSV — tu base de clientes vive aquí.',
-      cta: 'Crear {{entity}}',
-    },
-    archivedEmpty: {
-      title: 'No hay {{entities}} archivados',
-      description: 'Los {{entities}} que archives desde la lista aparecerán aquí.',
-    },
-    noResults: {
-      title: 'Sin resultados',
-      description:
-        'Ningún {{entity}} coincide con tu búsqueda. Ajusta los filtros e intenta de nuevo.',
-    },
-    table: {
-      save: {
-        loading: 'Guardando',
-        success: 'Guardado',
-        error: 'No se guardó',
-      },
-    },
-    unavailable: {
-      title: 'No pudimos cargar la vista',
-      description: 'La configuración de columnas no llegó. Recarga la página e intenta de nuevo.',
-    },
     form: {
       pickDate: 'Elige una fecha',
       pickTime: 'Hora',
@@ -842,7 +848,6 @@ const es = {
       customFields: 'Información adicional',
       customFieldSelect: 'Selecciona una opción',
     },
-    pageRange: '{{from}}–{{to}} de {{total}} {{entities}}',
     hints: {
       pending_one: '{{count}} {{entity}} nuevo sin gestionar',
       pending_other: '{{count}} {{entities}} nuevos sin gestionar',
@@ -973,9 +978,6 @@ const es = {
         undoHint: 'Puedes revertir esta acción.',
         undoQueued: 'Deshaciendo la acción masiva…',
       },
-    },
-    toolbar: {
-      more: 'Más acciones',
     },
     cells: {
       pick: 'Elegir {{field}}',
