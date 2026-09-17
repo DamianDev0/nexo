@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import type { CustomFieldEntity } from '@repo/shared-types'
 import { TenantDbService } from '@/shared/database/tenant-db.service'
-import {
-  buildContactWhereClause,
-  type ContactFilterQuery,
-} from '@/shared/database/contact-filter-sql'
 import { sqlRows } from '@/shared/database/sql.util'
-import { BULK_CONTACT_FIELD_SQL, BULK_TABLES } from '../constants/bulk-action.constants'
+import {
+  BULK_CONTACT_FIELD_SQL,
+  BULK_TABLES,
+  type BulkFilterCompiler,
+} from '../constants/bulk-action.constants'
 import {
   SNAPSHOT_COLUMNS,
   type BulkMessageTemplateRow,
@@ -22,16 +22,19 @@ type IdRow = { id: string }
 export class BulkTargetsRepository {
   constructor(private readonly db: TenantDbService) {}
 
-  async resolveContactIds(
+  async resolveIdsByFilter(
     schemaName: string,
-    query: ContactFilterQuery,
+    entity: CustomFieldEntity,
+    compile: BulkFilterCompiler,
+    query: Record<string, unknown>,
     limit: number,
   ): Promise<string[]> {
+    const TABLE = BULK_TABLES[entity]
     return this.db.query(schemaName, async (qr) => {
-      const { where, params } = buildContactWhereClause(query)
+      const { where, params } = compile(query)
       const rows = await sqlRows<IdRow[]>(
         qr,
-        `SELECT id FROM contacts WHERE ${where} ORDER BY created_at ASC, id ASC LIMIT $${params.length + 1}`,
+        `SELECT id FROM ${TABLE} WHERE ${where} ORDER BY created_at ASC, id ASC LIMIT $${params.length + 1}`,
         [...params, limit + 1],
       )
       return rows.map((row) => row.id)

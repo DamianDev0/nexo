@@ -68,7 +68,7 @@ describe('BulkActionsService', () => {
     transition: jest.Mock
     markReverted: jest.Mock
   }
-  let targets: { resolveContactIds: jest.Mock }
+  let targets: { resolveIdsByFilter: jest.Mock }
   let snapshots: { findByAction: jest.Mock }
   let runner: { enqueue: jest.Mock }
   let eventBus: { emit: jest.Mock }
@@ -86,7 +86,7 @@ describe('BulkActionsService', () => {
       transition: jest.fn().mockResolvedValue(row({ status: 'cancelled' })),
       markReverted: jest.fn(),
     }
-    targets = { resolveContactIds: jest.fn().mockResolvedValue([ID_A]) }
+    targets = { resolveIdsByFilter: jest.fn().mockResolvedValue([ID_A]) }
     snapshots = {
       findByAction: jest.fn().mockResolvedValue([{ entity_id: ID_A, before: { tags: [] } }]),
     }
@@ -137,8 +137,10 @@ describe('BulkActionsService', () => {
         selection: { mode: 'filter', query: { status: 'lost' } },
       })
 
-      expect(targets.resolveContactIds).toHaveBeenCalledWith(
+      expect(targets.resolveIdsByFilter).toHaveBeenCalledWith(
         ctx.schemaName,
+        'contacts',
+        expect.any(Function),
         { status: 'lost' },
         100_000,
       )
@@ -152,7 +154,7 @@ describe('BulkActionsService', () => {
       )
     })
 
-    it('rejects filter selections on entities other than contacts', async () => {
+    it('rejects filter selections on entities without a registered filter compiler', async () => {
       await expect(
         service.create(ctx, user(), {
           entity: 'deals',

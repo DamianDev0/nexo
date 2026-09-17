@@ -1,5 +1,10 @@
 import { UserRole } from '@repo/shared-types'
 import type { BulkActionKind, BulkExportFormat, CustomFieldEntity } from '@repo/shared-types'
+import {
+  CONTACT_FILTER_DEFINITION,
+  type ContactFilterQuery,
+} from '@/shared/database/contact-filter-sql'
+import { buildRecordWhereClause } from '@/shared/database/record-filter-sql'
 import type { SnapshotColumn } from '../interfaces/bulk-action-row.interfaces'
 
 export const BULK_BATCH_SIZE = 500
@@ -18,6 +23,18 @@ export const BULK_TABLES: Readonly<Record<CustomFieldEntity, string>> = {
   contacts: 'contacts',
   companies: 'companies',
   deals: 'deals',
+}
+
+export type BulkFilterCompiler = (query: Record<string, unknown>) => {
+  where: string
+  params: unknown[]
+}
+
+export const BULK_FILTER_COMPILERS: Readonly<
+  Partial<Record<CustomFieldEntity, BulkFilterCompiler>>
+> = {
+  contacts: (query) =>
+    buildRecordWhereClause(CONTACT_FILTER_DEFINITION, query as ContactFilterQuery),
 }
 
 const ALL_ENTITIES: ReadonlyArray<CustomFieldEntity> = ['contacts', 'companies', 'deals']
