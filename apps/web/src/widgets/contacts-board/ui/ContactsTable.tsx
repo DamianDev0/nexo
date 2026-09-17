@@ -11,7 +11,7 @@ import {
   LIST_UNASSIGNED,
   UnassignedBadge,
 } from '@/features/filter-contacts'
-import { SaveViewControls } from '@/features/manage-contact-views'
+import { SaveViewControls } from '@/features/manage-views'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { DotsThreeVerticalIcon, PlusIcon } from '@/shared/ui/icons'
 import { ActionMenu } from '@/shared/ui/molecules/action-menu'

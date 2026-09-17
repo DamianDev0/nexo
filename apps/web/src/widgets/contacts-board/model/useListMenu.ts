@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useViewTabMenu } from '@/features/manage-contact-views'
+import { useViewTabMenu } from '@/features/manage-views'
 import { ROUTES } from '@/shared/config/routes'
 import { GearIcon } from '@/shared/ui/icons'
 
-import type { ViewMenuController } from '@/features/manage-contact-views'
+import type { ViewMenuController } from '@/features/manage-views'
 import type { SmartListItem, SmartListMenuAction } from '@/shared/ui/organisms/data-table'
 import type { ContactView } from '@repo/shared-types'
 

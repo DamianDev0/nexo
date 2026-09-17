@@ -13,10 +13,10 @@ type MenuActionLike = { key: string; label: string; icon: unknown; onSelect: unk
 
 const viewActions = vi.fn((): MenuActionLike[] => [])
 
-vi.mock('@/features/manage-contact-views', () => ({
+vi.mock('@/features/manage-views', () => ({
   useViewTabMenu: () => ({
     itemMenu: viewActions,
-    menuLabel: 'contacts.views.menu',
+    menuLabel: 'views.menu',
     target: null,
     openMode: null,
     close: vi.fn(),
@@ -28,7 +28,7 @@ const VIEWS: ContactView[] = []
 describe('useListMenu', () => {
   it('gives precedence to view actions when the item is a saved view with actions', () => {
     const viewSpecificActions = [
-      { key: 'duplicate', label: 'contacts.views.duplicate', icon: vi.fn(), onSelect: vi.fn() },
+      { key: 'duplicate', label: 'views.duplicate', icon: vi.fn(), onSelect: vi.fn() },
     ]
     viewActions.mockReturnValueOnce(viewSpecificActions)
     const { result } = renderHook(() => useListMenu(VIEWS, 'viewer-1'))

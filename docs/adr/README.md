@@ -22,3 +22,4 @@ Any decision that is: costly to reverse, affects multiple modules, defines a con
 | [0003](0003-frontend-fsd-atomic.md)                      | Frontend Feature-Sliced Design + Atomic                        | Accepted |
 | [0004](0004-modular-monolith-eventbus.md)                | Modular monolith with EventBus                                 | Accepted |
 | [0005](0005-api-layered-modules-repositories-mappers.md) | Layered module internals: repositories, mappers, thin services | Accepted |
+| [0009](0009-object-engine.md)                            | One object engine for every CRM record type                    | Proposed |

@@ -2,14 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 
+import { contactSortFrom } from '@/entities/contact'
 import { useAuth } from '@/entities/session'
 import { listIdToStatus, type useContactsTable } from '@/features/filter-contacts'
 import {
   defaultView,
   ownedViewOrder,
-  useContactViewsAdmin,
-  useContactViewsSection,
-} from '@/features/manage-contact-views'
+  useViewsAdmin,
+  useViewsSection,
+} from '@/features/manage-views'
 
 import { EMPTY_TABLE_STATE, EMPTY_VIEWS } from '../config/board-empty.constants'
 
@@ -34,7 +35,7 @@ export function useBoardViews({
   setListOrder,
 }: BoardViewsArgs) {
   const { data: me } = useAuth()
-  const viewsAdmin = useContactViewsAdmin()
+  const viewsAdmin = useViewsAdmin()
   const viewerId = me?.id ?? null
 
   const viewSnapshot = useMemo(
@@ -48,13 +49,13 @@ export function useBoardViews({
   )
 
   const views = workspace.views ?? EMPTY_VIEWS
-  const section = useContactViewsSection(
+  const section = useViewsSection(
     views,
     viewSnapshot,
     {
       onAdvanced: table.handleAdvanced,
       onSearch: table.handleSearch,
-      onSort: table.handleSort,
+      onSort: (sort) => table.handleSort(contactSortFrom(sort)),
       onStatus: table.handleStatus,
       onLayout: (columns, density) => applyTableState({ columns, density }),
     },

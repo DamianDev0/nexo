@@ -1,55 +1,35 @@
 import { Test } from '@nestjs/testing'
-import { TenantDbService } from '@/shared/database/tenant-db.service'
-import { buildDbMock, buildQrMock } from '@/shared/testing/tenant-db.mock'
+import { DEFAULT_CONTACT_TAXONOMY } from '@repo/shared-types'
+import { ObjectWorkspaceService } from '@/shared/object-engine/services/object-workspace.service'
+import { CONTACT_OBJECT } from '../constants/contact-object.definition'
 import { ContactWorkspaceService } from '../services/contact-workspace.service'
-import { ContactWorkspaceRepository } from '../repositories/contact-workspace.repository'
-import { ContactViewsService } from '../services/contact-views.service'
 import { ContactsService } from '../services/contacts.service'
-import type { ContactView } from '@repo/shared-types'
 
 const SCHEMA = 'tenant_acme'
 const USER = 'user-1'
 
-function makeView(overrides: Partial<ContactView> = {}): ContactView {
-  return {
-    id: 'view-1',
-    ownerId: USER,
-    name: 'My leads',
-    description: null,
-    filters: {},
-    advancedFilters: null,
-    columns: {},
-    sort: null,
-    density: 'comfortable',
-    isDefault: false,
-    isFavorite: false,
-    visibility: 'private',
-    position: 0,
-    createdAt: '2026-01-01T00:00:00Z',
-    updatedAt: '2026-01-01T00:00:00Z',
-    ...overrides,
-  }
-}
-
 describe('ContactWorkspaceService', () => {
   let service: ContactWorkspaceService
-  let db: ReturnType<typeof buildDbMock>
-  let qr: ReturnType<typeof buildQrMock>
-  let views: { findAll: jest.Mock }
+  let workspace: { getWorkspace: jest.Mock }
   let contacts: { counts: jest.Mock }
 
   beforeEach(async () => {
-    qr = buildQrMock()
-    db = buildDbMock(qr)
-    views = { findAll: jest.fn() }
-    contacts = { counts: jest.fn() }
+    workspace = {
+      getWorkspace: jest.fn().mockResolvedValue({
+        views: [],
+        activeViewId: null,
+        tableState: {},
+        columns: [],
+      }),
+    }
+    contacts = {
+      counts: jest.fn().mockResolvedValue({ total: 3, archived: 0, byStatus: { new: 3 } }),
+    }
 
     const module = await Test.createTestingModule({
       providers: [
         ContactWorkspaceService,
-        ContactWorkspaceRepository,
-        { provide: TenantDbService, useValue: db },
-        { provide: ContactViewsService, useValue: views },
+        { provide: ObjectWorkspaceService, useValue: workspace },
         { provide: ContactsService, useValue: contacts },
       ],
     }).compile()
@@ -57,173 +37,28 @@ describe('ContactWorkspaceService', () => {
     service = module.get(ContactWorkspaceService)
   })
 
-  describe('getWorkspace', () => {
-    it('composes views, counts, column catalog and quick filters', async () => {
-      views.findAll.mockResolvedValue([makeView()])
-      contacts.counts.mockResolvedValue({ total: 3, archived: 0, byStatus: { new: 3 } })
-      qr.query.mockResolvedValueOnce([])
+  it('builds the generic workspace from the contact definition and custom fields', async () => {
+    const customFields = [{ key: 'eps', label: 'EPS', type: 'text' }] as never[]
 
-      const workspace = await service.getWorkspace(SCHEMA, USER)
+    await service.getWorkspace(SCHEMA, USER, DEFAULT_CONTACT_TAXONOMY, customFields)
 
-      expect(workspace.views).toHaveLength(1)
-      expect(workspace.counts).toEqual({ total: 3, archived: 0, byStatus: { new: 3 } })
-      expect(workspace.columns.length).toBeGreaterThan(0)
-      expect(workspace.quickFilters.statuses.length).toBeGreaterThan(0)
-      expect(workspace.quickFilters.sources.length).toBeGreaterThan(0)
-      expect(workspace.quickFilters.lifecycleStages.length).toBeGreaterThan(0)
-    })
-
-    it('falls back to the default view when there is no saved state', async () => {
-      views.findAll.mockResolvedValue([makeView({ id: 'view-default', isDefault: true })])
-      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
-      qr.query.mockResolvedValueOnce([])
-
-      const workspace = await service.getWorkspace(SCHEMA, USER)
-
-      expect(workspace.activeViewId).toBe('view-default')
-      expect(workspace.tableState).toEqual({})
-    })
-
-    it('uses the saved active view when it still exists', async () => {
-      views.findAll.mockResolvedValue([
-        makeView({ id: 'view-default', isDefault: true }),
-        makeView({ id: 'view-saved' }),
-      ])
-      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
-      qr.query.mockResolvedValueOnce([
-        { active_view_id: 'view-saved', table_state: { density: 'compact' } },
-      ])
-
-      const workspace = await service.getWorkspace(SCHEMA, USER)
-
-      expect(workspace.activeViewId).toBe('view-saved')
-      expect(workspace.tableState).toEqual({ density: 'compact' })
-    })
-
-    it('falls back to the default view when the saved active_view_id no longer exists', async () => {
-      views.findAll.mockResolvedValue([makeView({ id: 'view-default', isDefault: true })])
-      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
-      qr.query.mockResolvedValueOnce([
-        { active_view_id: 'view-deleted', table_state: { density: 'compact' } },
-      ])
-
-      const workspace = await service.getWorkspace(SCHEMA, USER)
-
-      expect(workspace.activeViewId).toBe('view-default')
-    })
-
-    it('falls back to null when the saved view is gone and there is no default', async () => {
-      views.findAll.mockResolvedValue([makeView({ id: 'view-other', ownerId: 'someone-else' })])
-      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
-      qr.query.mockResolvedValueOnce([{ active_view_id: 'view-deleted', table_state: {} }])
-
-      const workspace = await service.getWorkspace(SCHEMA, USER)
-
-      expect(workspace.activeViewId).toBeNull()
-    })
-
-    it('only considers a default view owned by the requesting user', async () => {
-      views.findAll.mockResolvedValue([
-        makeView({ id: 'view-other-default', ownerId: 'someone-else', isDefault: true }),
-      ])
-      contacts.counts.mockResolvedValue({ total: 0, archived: 0, byStatus: {} })
-      qr.query.mockResolvedValueOnce([])
-
-      const workspace = await service.getWorkspace(SCHEMA, USER)
-
-      expect(workspace.activeViewId).toBeNull()
-    })
+    expect(workspace.getWorkspace).toHaveBeenCalledWith(SCHEMA, CONTACT_OBJECT, USER, customFields)
   })
 
-  describe('updateState', () => {
-    function mockState(existing: unknown[]) {
-      qr.query.mockResolvedValueOnce([]).mockResolvedValueOnce(existing).mockResolvedValueOnce([])
+  it('adds counts and the enabled quick filter keys of the tenant taxonomy', async () => {
+    const taxonomy = {
+      ...DEFAULT_CONTACT_TAXONOMY,
+      sources: DEFAULT_CONTACT_TAXONOMY.sources.map((option, index) => ({
+        ...option,
+        enabled: index === 0,
+      })),
     }
 
-    function upsertCall(): [string, unknown[]] {
-      return qr.query.mock.calls[2] as [string, unknown[]]
-    }
+    const result = await service.getWorkspace(SCHEMA, USER, taxonomy)
 
-    it('serializes writers per user inside one transaction before reading the state', async () => {
-      mockState([])
-
-      await service.updateState(SCHEMA, USER, { activeViewId: 'view-1' })
-
-      expect(db.transactional).toHaveBeenCalledTimes(1)
-      const [lockSql, lockParams] = qr.query.mock.calls[0] as [string, unknown[]]
-      expect(lockSql).toContain('pg_advisory_xact_lock')
-      expect(lockParams).toEqual([USER])
-    })
-
-    it('upserts active view and table state with an ON CONFLICT clause', async () => {
-      mockState([])
-
-      await service.updateState(SCHEMA, USER, {
-        activeViewId: 'view-1',
-        tableState: { density: 'compact' },
-      })
-
-      const [sql, params] = upsertCall()
-      expect(sql).toContain('INSERT INTO contact_workspace_states')
-      expect(sql).toContain('ON CONFLICT (user_id) DO UPDATE')
-      expect(params).toEqual([USER, 'view-1', { density: 'compact' }])
-    })
-
-    it('keeps the existing active view and table state when the dto omits them', async () => {
-      mockState([{ active_view_id: 'view-existing', table_state: { density: 'comfortable' } }])
-
-      await service.updateState(SCHEMA, USER, {})
-
-      const [, params] = upsertCall()
-      expect(params).toEqual([USER, 'view-existing', { density: 'comfortable' }])
-    })
-
-    it('falls back to null active view when there is no prior state and none is provided', async () => {
-      mockState([])
-
-      await service.updateState(SCHEMA, USER, { tableState: { density: 'compact' } })
-
-      const [, params] = upsertCall()
-      expect(params).toEqual([USER, null, { density: 'compact' }])
-    })
-
-    it('merges the incoming table state into the stored one instead of replacing it', async () => {
-      mockState([
-        {
-          active_view_id: null,
-          table_state: { density: 'compact', columns: { order: ['name', 'email'] } },
-        },
-      ])
-
-      await service.updateState(SCHEMA, USER, {
-        tableState: { columns: { widths: { name: 200 } } },
-      })
-
-      const [, params] = upsertCall()
-      expect(params[2]).toEqual({
-        density: 'compact',
-        columns: { order: ['name', 'email'], widths: { name: 200 } },
-      })
-    })
-
-    it('clamps persisted widths to the catalog bounds', async () => {
-      mockState([])
-
-      await service.updateState(SCHEMA, USER, {
-        tableState: { columns: { widths: { name: 5, city: 10_000 } } },
-      })
-
-      const [, params] = upsertCall()
-      expect(params[2]).toEqual({ columns: { widths: { name: 180, city: 480 } } })
-    })
-
-    it('clears the active view when the dto sends an explicit null', async () => {
-      mockState([{ active_view_id: 'view-existing', table_state: { density: 'comfortable' } }])
-
-      await service.updateState(SCHEMA, USER, { activeViewId: null })
-
-      const [, params] = upsertCall()
-      expect(params).toEqual([USER, null, { density: 'comfortable' }])
-    })
+    expect(result.counts).toEqual({ total: 3, archived: 0, byStatus: { new: 3 } })
+    expect(result.quickFilters.sources).toEqual([DEFAULT_CONTACT_TAXONOMY.sources[0]?.key])
+    expect(result.quickFilters.statuses.length).toBeGreaterThan(0)
+    expect(result.quickFilters.lifecycleStages.length).toBeGreaterThan(0)
   })
 })

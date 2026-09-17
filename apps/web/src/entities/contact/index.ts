@@ -38,12 +38,12 @@ export {
   missingFieldsHint,
   type ContactRequiredField,
 } from './lib/contact-completeness'
+export { CONTACT_DESCRIPTOR } from './config/contact-descriptor.constants'
 export {
-  fromColumnSort,
   parseSortParam,
   serializeSort,
-  toColumnSort,
   type ContactSort,
+  contactSortFrom,
 } from './lib/contact-sort'
 export { useContactList, usePrefetchContactList } from './query/useContactList'
 export { useContact, type ContactRecordQuery } from './query/useContact'

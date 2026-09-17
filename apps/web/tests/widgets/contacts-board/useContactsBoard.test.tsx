@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CONTACTS_FIXTURE, CONTACT_COLUMNS_FIXTURE } from '../../msw/handlers'
 import { API, createMswServer } from '../../msw/test-server'
 import { resetUrl } from '../../next-navigation-mock'
-import { queryWrapper as wrapper } from '../../query-wrapper'
+import { contactObjectWrapper as wrapper } from '../../object-wrapper'
 
 import { useContactsBoard } from '@/widgets/contacts-board/model/useContactsBoard'
 

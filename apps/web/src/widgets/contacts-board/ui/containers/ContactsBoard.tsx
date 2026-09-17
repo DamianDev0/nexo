@@ -2,7 +2,9 @@
 
 import dynamic from 'next/dynamic'
 
+import { CONTACT_DESCRIPTOR } from '@/entities/contact'
 import { useEntityTerms } from '@/entities/nomenclature'
+import { ObjectDescriptorProvider } from '@/entities/object-descriptor'
 import { ArchiveContactDialog } from '@/features/archive-contact'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { useMountedOnce } from '@/shared/lib/hooks/useMountedOnce'
@@ -22,11 +24,19 @@ const ContactRecordDrawer = dynamic(
 )
 
 const ViewTabDialogs = dynamic(
-  () => import('@/features/manage-contact-views').then((m) => m.ViewTabDialogs),
+  () => import('@/features/manage-views').then((m) => m.ViewTabDialogs),
   { loading: () => null, ssr: false },
 )
 
 export function ContactsBoard() {
+  return (
+    <ObjectDescriptorProvider descriptor={CONTACT_DESCRIPTOR}>
+      <ContactsBoardContent />
+    </ObjectDescriptorProvider>
+  )
+}
+
+function ContactsBoardContent() {
   const { instance, lists, state, actions, bulk, sheet, preview, composers, archive } =
     useContactsBoard()
   const listMenu = useListMenu(state.views, state.viewerId)

@@ -1,56 +1,51 @@
 import type { ContactSortField } from './contacts'
-import type { CustomFieldType, SelectOption } from './settings'
+import {
+  OBJECT_COLUMN_MAX_WIDTH,
+  OBJECT_COLUMN_MIN_WIDTH,
+  OBJECT_TABLE_MAX_COLUMNS,
+  OBJECT_TABLE_MAX_PINNED,
+  OBJECT_VIEW_DENSITIES,
+  OBJECT_VIEW_SORT_DIRECTIONS,
+  OBJECT_VIEW_VISIBILITIES,
+} from './object-views'
+import type {
+  ObjectColumnDef,
+  ObjectTableState,
+  ObjectView,
+  ObjectViewColumns,
+  ObjectViewDensity,
+  ObjectViewInput,
+  ObjectViewSort,
+  ObjectViewSortDirection,
+  ObjectViewVisibility,
+  ObjectWorkspaceBase,
+} from './object-views'
 
-export const CONTACT_VIEW_VISIBILITIES = ['private', 'shared'] as const
+export const CONTACT_VIEW_VISIBILITIES = OBJECT_VIEW_VISIBILITIES
 
-export type ContactViewVisibility = (typeof CONTACT_VIEW_VISIBILITIES)[number]
+export type ContactViewVisibility = ObjectViewVisibility
 
-export const CONTACT_VIEW_DENSITIES = ['compact', 'comfortable'] as const
+export const CONTACT_VIEW_DENSITIES = OBJECT_VIEW_DENSITIES
 
-export type ContactViewDensity = (typeof CONTACT_VIEW_DENSITIES)[number]
+export type ContactViewDensity = ObjectViewDensity
 
-export const CONTACT_VIEW_SORT_DIRECTIONS = ['asc', 'desc'] as const
+export const CONTACT_VIEW_SORT_DIRECTIONS = OBJECT_VIEW_SORT_DIRECTIONS
 
-export type ContactViewSortDirection = (typeof CONTACT_VIEW_SORT_DIRECTIONS)[number]
+export type ContactViewSortDirection = ObjectViewSortDirection
 
-export type ContactViewSort = {
-  field: string
-  direction: ContactViewSortDirection
-}
+export type ContactViewSort = ObjectViewSort
 
-export const CONTACT_COLUMN_MIN_WIDTH = 90
+export const CONTACT_COLUMN_MIN_WIDTH = OBJECT_COLUMN_MIN_WIDTH
 
-export const CONTACT_COLUMN_MAX_WIDTH = 480
+export const CONTACT_COLUMN_MAX_WIDTH = OBJECT_COLUMN_MAX_WIDTH
 
-export const CONTACT_TABLE_MAX_COLUMNS = 60
+export const CONTACT_TABLE_MAX_COLUMNS = OBJECT_TABLE_MAX_COLUMNS
 
-export const CONTACT_TABLE_MAX_PINNED = 10
+export const CONTACT_TABLE_MAX_PINNED = OBJECT_TABLE_MAX_PINNED
 
-export type ContactViewColumns = {
-  order?: string[]
-  hidden?: string[]
-  widths?: Record<string, number>
-  pinnedLeft?: string[]
-  pinnedRight?: string[]
-}
+export type ContactViewColumns = ObjectViewColumns
 
-export type ContactView = {
-  id: string
-  ownerId: string
-  name: string
-  description: string | null
-  filters: Record<string, unknown>
-  advancedFilters: Record<string, unknown> | null
-  columns: ContactViewColumns
-  sort: ContactViewSort | null
-  density: ContactViewDensity
-  isDefault: boolean
-  isFavorite: boolean
-  visibility: ContactViewVisibility
-  position: number
-  createdAt: string
-  updatedAt: string
-}
+export type ContactView = ObjectView
 
 export const CONTACT_UNASSIGNED_RECENT_DAYS = 30
 
@@ -72,21 +67,7 @@ export type ContactTaxonomyUsage = {
 
 export type TaxonomyReassignKind = 'status' | 'source' | 'lifecycle' | 'tag'
 
-export type ContactColumnDef = {
-  key: string
-  labelKey: string
-  hintKey: string
-  sortField: ContactSortField | null
-  defaultVisible: boolean
-  defaultWidth: number
-  minWidth: number
-  custom?: boolean
-  label?: string | null
-  fieldType?: CustomFieldType
-  fieldOptions?: SelectOption[]
-}
-
-export const CUSTOM_COLUMN_PREFIX = 'custom:'
+export type ContactColumnDef = ObjectColumnDef<ContactSortField>
 
 export type ContactQuickFilterOptions = {
   statuses: string[]
@@ -94,17 +75,9 @@ export type ContactQuickFilterOptions = {
   lifecycleStages: string[]
 }
 
-export type ContactTableState = {
-  columns?: ContactViewColumns
-  density?: ContactViewDensity
-  listOrder?: string[]
-}
+export type ContactTableState = ObjectTableState
 
-export type ContactWorkspace = {
-  views: ContactView[]
-  activeViewId: string | null
-  tableState: ContactTableState
-  columns: ContactColumnDef[]
+export type ContactWorkspace = ObjectWorkspaceBase<ContactSortField> & {
   quickFilters: ContactQuickFilterOptions
   counts: ContactCounts
 }
@@ -142,15 +115,4 @@ export type ContactDuplicateProbeResult = {
   duplicate: ContactDuplicatePayload | null
 }
 
-export type ContactViewInput = {
-  name: string
-  description?: string | null
-  filters?: Record<string, unknown>
-  advancedFilters?: Record<string, unknown> | null
-  columns?: ContactViewColumns
-  sort?: ContactViewSort | null
-  density?: ContactViewDensity
-  isDefault?: boolean
-  isFavorite?: boolean
-  visibility?: ContactViewVisibility
-}
+export type ContactViewInput = ObjectViewInput
