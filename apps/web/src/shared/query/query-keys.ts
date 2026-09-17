@@ -2,18 +2,27 @@ import type {
   BulkActionListQuery,
   ContactDuplicateProbeQuery,
   ContactListQuery,
+  ObjectType,
 } from '@repo/shared-types'
 
 const CONTACTS_LIST = ['contacts', 'list'] as const
+
+export const OBJECT_QUERY_ROOTS = {
+  contact: 'contacts',
+  company: 'companies',
+  deal: 'deals',
+} as const satisfies Record<ObjectType, string>
 
 export const QUERY_KEYS = {
   auth: {
     me: ['auth', 'me'] as const,
   },
+  objects: {
+    workspace: (queryRoot: string) => [queryRoot, 'workspace'] as const,
+  },
   contacts: {
     all: ['contacts'] as const,
     counts: ['contacts', 'counts'] as const,
-    workspace: ['contacts', 'workspace'] as const,
     taxonomyUsage: ['contacts', 'taxonomy-usage'] as const,
     lists: CONTACTS_LIST,
     list: (query: ContactListQuery) => [...CONTACTS_LIST, query] as const,

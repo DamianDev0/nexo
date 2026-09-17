@@ -7,7 +7,7 @@ import type { ContactListItem, PaginatedContacts } from '@repo/shared-types'
 import type { ReactNode } from 'react'
 
 import { useOptimisticContactListPatch, usePendingContactPatches } from '@/entities/contact'
-import { QUERY_KEYS } from '@/shared/query/query-keys'
+import { OBJECT_QUERY_ROOTS, QUERY_KEYS } from '@/shared/query/query-keys'
 
 vi.mock('i18next', () => ({ t: (key: string) => key }))
 
@@ -138,7 +138,9 @@ describe('useOptimisticContactListPatch', () => {
       expect(invalidate).toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.lists }),
     )
     expect(invalidate).toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.counts })
-    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.workspace })
+    expect(invalidate).not.toHaveBeenCalledWith({
+      queryKey: QUERY_KEYS.objects.workspace(OBJECT_QUERY_ROOTS.contact),
+    })
     expect(invalidate).not.toHaveBeenCalledWith({ queryKey: QUERY_KEYS.contacts.all })
   })
 })

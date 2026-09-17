@@ -11,9 +11,9 @@ vi.mock('@/entities/session', () => ({ useAuth: () => ({ data: { id: 'viewer-1' 
 
 const reorder = vi.fn()
 
-vi.mock('@/features/manage-contact-views', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/features/manage-contact-views')>()),
-  useContactViewsAdmin: () => ({
+vi.mock('@/features/manage-views', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/manage-views')>()),
+  useViewsAdmin: () => ({
     create: vi.fn(),
     update: vi.fn(),
     duplicate: vi.fn(),

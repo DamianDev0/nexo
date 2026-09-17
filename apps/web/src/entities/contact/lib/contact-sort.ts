@@ -1,12 +1,9 @@
 import { CONTACT_SORT_FIELDS } from '@repo/shared-types'
 
-import type { DataTableSort } from '@/shared/ui/organisms/data-table'
-import type { ContactColumnDef, ContactSortField } from '@repo/shared-types'
+import type { RecordSort } from '@/entities/object-descriptor'
+import type { ContactSortField, ObjectViewSort } from '@repo/shared-types'
 
-export type ContactSort = {
-  readonly field: ContactSortField
-  readonly direction: 'asc' | 'desc'
-}
+export type ContactSort = RecordSort<ContactSortField>
 
 export function parseSortParam(value: string | null): ContactSort | null {
   if (!value) return null
@@ -19,27 +16,12 @@ export function parseSortParam(value: string | null): ContactSort | null {
     : null
 }
 
+export function contactSortFrom(sort: ObjectViewSort | null): ContactSort | null {
+  if (!sort) return null
+  return parseSortParam(sort.direction === 'desc' ? `-${sort.field}` : sort.field)
+}
+
 export function serializeSort(sort: ContactSort | null): string | null {
   if (!sort) return null
   return sort.direction === 'desc' ? `-${sort.field}` : sort.field
-}
-
-export function toColumnSort(
-  sort: ContactSort | null,
-  catalog: ReadonlyArray<ContactColumnDef>,
-): DataTableSort | null {
-  if (!sort) return null
-
-  const column = catalog.find((def) => def.sortField === sort.field)
-  return column ? { field: column.key, direction: sort.direction } : null
-}
-
-export function fromColumnSort(
-  sort: DataTableSort | null,
-  catalog: ReadonlyArray<ContactColumnDef>,
-): ContactSort | null {
-  if (!sort) return null
-
-  const column = catalog.find((def) => def.key === sort.field)
-  return column?.sortField ? { field: column.sortField, direction: sort.direction } : null
 }

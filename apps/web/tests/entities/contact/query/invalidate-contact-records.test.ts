@@ -2,7 +2,7 @@ import { QueryClient } from '@tanstack/react-query'
 import { describe, expect, it, vi } from 'vitest'
 
 import { invalidateContactRecords } from '@/entities/contact'
-import { QUERY_KEYS } from '@/shared/query/query-keys'
+import { OBJECT_QUERY_ROOTS, QUERY_KEYS } from '@/shared/query/query-keys'
 
 function spyOnInvalidate(client: QueryClient) {
   return vi.spyOn(client, 'invalidateQueries').mockResolvedValue(undefined)
@@ -21,7 +21,7 @@ describe('invalidateContactRecords', () => {
       QUERY_KEYS.contacts.counts,
       QUERY_KEYS.contacts.taxonomyUsage,
     ])
-    expect(keys).not.toContain(QUERY_KEYS.contacts.workspace)
+    expect(keys).not.toContain(QUERY_KEYS.objects.workspace(OBJECT_QUERY_ROOTS.contact))
   })
 
   it('also refreshes the record itself when a contact is known', async () => {

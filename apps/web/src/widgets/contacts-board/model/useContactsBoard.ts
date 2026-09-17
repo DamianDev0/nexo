@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useContactTaxonomy, useTaxonomyUsage } from '@/entities/contact-taxonomy'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { filterSelection, useBulkActions } from '@/features/bulk-actions'
-import { useContactsLayout, useContactWorkspace } from '@/features/customize-contacts-table'
+import { useObjectWorkspace, useTableLayout } from '@/features/customize-table'
 import {
   buildContactHints,
   buildQuickFilterDefs,
@@ -30,6 +30,8 @@ import { useBoardSelection } from './useBoardSelection'
 import { useBoardViews } from './useBoardViews'
 import { useSkeletonHintSync } from './useSkeletonHintSync'
 
+import type { ContactWorkspace } from '@repo/shared-types'
+
 export function useContactsBoard() {
   const { t } = useTranslation()
   const table = useContactsTable()
@@ -37,11 +39,11 @@ export function useContactsBoard() {
   const taxonomy = useContactTaxonomy()
   const terms = useEntityTerms('contact')
   const { sheet, preview, composers, archive, rowActions, rowContextMenu } = useBoardEditors()
-  const workspace = useContactWorkspace()
+  const workspace = useObjectWorkspace<ContactWorkspace>()
   const usage = useTaxonomyUsage()
 
   const catalog = workspace.data?.columns ?? EMPTY_COLUMNS
-  const { layout, sort, setListOrder, applyState, saveStatus } = useContactsLayout(
+  const { layout, sort, setListOrder, applyState, saveStatus } = useTableLayout(
     catalog,
     workspace.data?.tableState ?? EMPTY_TABLE_STATE,
     { value: table.sort, onChange: table.handleSort },
