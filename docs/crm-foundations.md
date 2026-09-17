@@ -9,14 +9,14 @@
 
 ## 1. Diagnóstico: por qué reestructurar
 
-Construimos backend antes que producto. Hoy tenemos 20 módulos de API, un motor de theming, presets por industria y campos custom — pero la pregunta "¿qué es un CRM?" nunca se contestó de forma canónica. El resultado: un roadmap ordenado por *módulos técnicos* (contacts, deals, activities) en vez de por *capacidades de negocio* (captar, calificar, cerrar, cobrar, retener).
+Construimos backend antes que producto. Hoy tenemos 20 módulos de API, un motor de theming, presets por industria y campos custom — pero la pregunta "¿qué es un CRM?" nunca se contestó de forma canónica. El resultado: un roadmap ordenado por _módulos técnicos_ (contacts, deals, activities) en vez de por _capacidades de negocio_ (captar, calificar, cerrar, cobrar, retener).
 
 Dos datos que enmarcan todo lo demás:
 
 - Gartner/Forrester documentan tasas de fracaso de implementación de CRM entre **47% y 63%**; en pymes latinoamericanas se estima **~60% de abandono antes del primer año**.
 - La causa dominante **no es el producto, es la implementación**: el CRM no refleja cómo la empresa vende, pide demasiados datos inútiles, no ahorra tiempo, y el equipo termina vendiendo por WhatsApp fuera del sistema.
 
-Traducción para nosotros: **nuestro competidor real no es HubSpot. Es Excel + WhatsApp personal.** Y el riesgo #1 no es que falte una feature, es que el CRM no se use. Todo el diseño debe optimizar *time-to-first-value* y *fidelidad al proceso real del cliente*, no cantidad de módulos.
+Traducción para nosotros: **nuestro competidor real no es HubSpot. Es Excel + WhatsApp personal.** Y el riesgo #1 no es que falte una feature, es que el CRM no se use. Todo el diseño debe optimizar _time-to-first-value_ y _fidelidad al proceso real del cliente_, no cantidad de módulos.
 
 ---
 
@@ -26,12 +26,12 @@ Flowlu (y la literatura clásica de CRM) define cuatro pilares: **Personas → E
 
 Nosotros vendemos tecnología. Por eso nuestro trabajo no es "hacer el pilar 4 muy bueno", sino **absorber los pilares 1–3 dentro del producto**, porque la pyme colombiana no tiene consultor de implementación.
 
-| Pilar | Qué es | Cómo lo absorbe Nexo (no es opcional, es el producto) |
-|---|---|---|
-| **Personas** | Adopción, capacitación, cultura | Onboarding guiado que configura el CRM *por* el usuario. Cero manual. Métrica: usuario crea su primer negocio en < 10 min. UI en español colombiano. |
-| **Estrategia** | Metas medibles | Onboarding pregunta 3 cosas (sector, cómo vendes, qué duele) y de ahí deriva pipeline, campos y dashboard. La estrategia se materializa como *configuración*, no como PDF. |
-| **Proceso** | El método real de venta | **Presets por industria** (9 sectores ya en código) + pipelines y taxonomías editables. El CRM se adapta al proceso; nunca al revés. |
-| **Tecnología** | La herramienta | Motor data-driven: metadata en backend, UI derivada. Ver §4. |
+| Pilar          | Qué es                          | Cómo lo absorbe Nexo (no es opcional, es el producto)                                                                                                                      |
+| -------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Personas**   | Adopción, capacitación, cultura | Onboarding guiado que configura el CRM _por_ el usuario. Cero manual. Métrica: usuario crea su primer negocio en < 10 min. UI en español colombiano.                       |
+| **Estrategia** | Metas medibles                  | Onboarding pregunta 3 cosas (sector, cómo vendes, qué duele) y de ahí deriva pipeline, campos y dashboard. La estrategia se materializa como _configuración_, no como PDF. |
+| **Proceso**    | El método real de venta         | **Presets por industria** (9 sectores ya en código) + pipelines y taxonomías editables. El CRM se adapta al proceso; nunca al revés.                                       |
+| **Tecnología** | La herramienta                  | Motor data-driven: metadata en backend, UI derivada. Ver §4.                                                                                                               |
 
 **Regla de producto derivada:** cualquier feature que exija que el cliente "primero defina su proceso" está mal diseñada. El producto debe traer un proceso por defecto, defendible, y dejarlo cambiar después.
 
@@ -60,16 +60,16 @@ Encima de ese esqueleto van cuatro capas transversales:
 
 Destilado de Salesforce, HubSpot y Flowlu. Esto es lo que un comprador entiende por "CRM". Estado real hoy:
 
-| # | Capacidad | Qué incluye | Estado Nexo |
-|---|---|---|---|
-| 1 | **Gestión de contactos y empresas** | ficha 360, dedup, jerarquía empresa↔contacto, historial | Backend ✅ · UI parcial |
-| 2 | **Pipeline y oportunidades** | etapas, probabilidad, pronóstico, motivos de pérdida | Backend ✅ · UI ❌ |
-| 3 | **Actividades y agenda** | tareas, llamadas, reuniones, recordatorios, calendario | Backend ✅ · UI ❌ |
-| 4 | **Comunicación multicanal** | WhatsApp, email, formularios, inbox unificado | ❌ (0 código) |
-| 5 | **Automatización de flujos** | trigger→condición→acción, secuencias, asignación | ❌ (0 código) |
-| 6 | **Reportes y analítica** | dashboards, embudo, ciclo de venta, cohortes | Dashboard básico ✅ |
-| 7 | **Personalización** | campos custom, objetos, nomenclatura, vistas, theming | ✅ **ventaja actual** |
-| 8 | **Datos e integraciones** | import/export, API, webhooks, dedup, auditoría | Backend ✅ (import, webhooks, api-keys, audit-log) |
+| #   | Capacidad                           | Qué incluye                                              | Estado Nexo                                        |
+| --- | ----------------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
+| 1   | **Gestión de contactos y empresas** | ficha 360, dedup, jerarquía empresa↔contacto, historial | Backend ✅ · UI parcial                            |
+| 2   | **Pipeline y oportunidades**        | etapas, probabilidad, pronóstico, motivos de pérdida     | Backend ✅ · UI ❌                                 |
+| 3   | **Actividades y agenda**            | tareas, llamadas, reuniones, recordatorios, calendario   | Backend ✅ · UI ❌                                 |
+| 4   | **Comunicación multicanal**         | WhatsApp, email, formularios, inbox unificado            | ❌ (0 código)                                      |
+| 5   | **Automatización de flujos**        | trigger→condición→acción, secuencias, asignación         | ❌ (0 código)                                      |
+| 6   | **Reportes y analítica**            | dashboards, embudo, ciclo de venta, cohortes             | Dashboard básico ✅                                |
+| 7   | **Personalización**                 | campos custom, objetos, nomenclatura, vistas, theming    | ✅ **ventaja actual**                              |
+| 8   | **Datos e integraciones**           | import/export, API, webhooks, dedup, auditoría           | Backend ✅ (import, webhooks, api-keys, audit-log) |
 
 Lectura honesta: **somos fuertes donde el mercado no compra (7 y 8) y estamos en cero donde sí compra (4 y 5).** Eso lo corrige el roadmap de §7.
 
@@ -77,9 +77,11 @@ Lectura honesta: **somos fuertes donde el mercado no compra (7 y 8) y estamos en
 
 De las guías de arquitectura de HubSpot/Salesforce, tres reglas que debemos codificar como límites del producto:
 
-1. **Property sprawl degrada el sistema.** Los equipos crean 200+ campos custom cuando 40 bastan. → Nexo debe *sugerir* campos por preset y advertir al pasar umbrales, no dar un lienzo infinito.
+1. **Property sprawl degrada el sistema.** Los equipos crean 200+ campos custom cuando 40 bastan. → Nexo debe _sugerir_ campos por preset y advertir al pasar umbrales, no dar un lienzo infinito.
 2. **Todo campo de texto libre es un problema de calidad de datos futuro.** → Por defecto, `select` sobre `text`. El inferidor de campos del import ya va en esta dirección.
-3. **Objetos custom sin caso de uso documentado son basura.** → Los objetos custom llegan tarde en el roadmap y siempre con plantilla, nunca en blanco.
+3. **Objetos custom sin caso de uso documentado son basura.** → Nexo tiene **objetos propios desde plantilla, con límites**: una clínica instala Citas y una inmobiliaria Inmuebles desde su paquete de industria, sin código ni consultor. Crear un objeto en blanco existe pero no es el camino principal, y cada plan fija un tope de objetos, campos por objeto y registros ([benchmark de adaptabilidad](research/crm-adaptability-benchmark-2026-09.md) §1–§4, [ADR-0010](adr/0010-object-metadata.md), [plan 2.1](plans/2.1-objetos-configurables.md)).
+
+   _Actualizado 2026-09-16._ Antes decía que los objetos custom llegaban tarde en el roadmap. El benchmark mostró que objetos de verdad, no renombres, son lo que separa un CRM adaptable de uno genérico, y que el riesgo real es el sprawl, que se controla con plantillas y límites, no posponiendo la capacidad.
 
 ---
 
@@ -87,19 +89,19 @@ De las guías de arquitectura de HubSpot/Salesforce, tres reglas que debemos cod
 
 Esto es lo que ya nos diferencia y hay que volverlo explícito, nombrado y vendible.
 
-**Tesis:** en Nexo, la aplicación no está *codificada*, está *declarada*. El backend emite metadata por tenant y el frontend se deriva de ella. Un vertical nuevo es **datos, no un fork de código**.
+**Tesis:** en Nexo, la aplicación no está _codificada_, está _declarada_. El backend emite metadata por tenant y el frontend se deriva de ella. Un vertical nuevo es **datos, no un fork de código**.
 
 Piezas que ya existen en `apps/api/src/modules/settings/`:
 
-| Pieza | Archivo/servicio | Qué declara |
-|---|---|---|
-| Presets por industria | `constants/industry-presets.ts` | 9 sectores: salud, educación, inmobiliaria, comercio, servicios, restaurante, tecnología, construcción, otros |
-| Nomenclatura | `constants/default-nomenclature.ts` | "Contacto/Negocio" → "Paciente/Tratamiento", "Inmueble/Visita" |
-| Navegación | `constants/default-sidebar.ts` | qué módulos existen y en qué orden para ese tenant |
-| Taxonomías | `tenant_config.contactTaxonomy` | estados y fuentes de contacto como **datos**, ya no como enums |
-| Campos custom | `custom-fields-validator.service.ts` | contacts, companies, deals |
-| Theming | `ThemeCssService` | tokens de color/tipografía por tenant |
-| Pipelines | `pipeline.controller.ts` | etapas, probabilidad |
+| Pieza                 | Archivo/servicio                     | Qué declara                                                                                                   |
+| --------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Presets por industria | `constants/industry-presets.ts`      | 9 sectores: salud, educación, inmobiliaria, comercio, servicios, restaurante, tecnología, construcción, otros |
+| Nomenclatura          | `constants/default-nomenclature.ts`  | "Contacto/Negocio" → "Paciente/Tratamiento", "Inmueble/Visita"                                                |
+| Navegación            | `constants/default-sidebar.ts`       | qué módulos existen y en qué orden para ese tenant                                                            |
+| Taxonomías            | `tenant_config.contactTaxonomy`      | estados y fuentes de contacto como **datos**, ya no como enums                                                |
+| Campos custom         | `custom-fields-validator.service.ts` | contacts, companies, deals                                                                                    |
+| Theming               | `ThemeCssService`                    | tokens de color/tipografía por tenant                                                                         |
+| Pipelines             | `pipeline.controller.ts`             | etapas, probabilidad                                                                                          |
 
 **Las cuatro capas de personalización** (usarlas como lenguaje interno y comercial):
 
@@ -108,7 +110,7 @@ Piezas que ya existen en `apps/api/src/modules/settings/`:
 3. **Comportamiento** — qué pasa solo (automatizaciones, validaciones, scoring). ← **hueco actual**
 4. **Apariencia** — marca visual (theming, logo, dominio).
 
-Tenemos 1, 2 y 4. **La capa 3 es la que se cobra.** Un CRM que se ve como tu empresa es bonito; uno que *trabaja* como tu empresa es el que no se cancela.
+Tenemos 1, 2 y 4. **La capa 3 es la que se cobra.** Un CRM que se ve como tu empresa es bonito; uno que _trabaja_ como tu empresa es el que no se cancela.
 
 **Trampa a evitar (regla dura):** personalizable ≠ constructor de software. El PRD ya lo dice ("personalizable dentro de estándares"). Concretamente: no construimos objetos arbitrarios en blanco, ni un lenguaje de fórmulas, ni un builder de UI drag&drop. Todo preset debe ser una **opinión**, no un lienzo.
 
@@ -133,11 +135,11 @@ DIAN / Wompi / WhatsApp                Automatizaciones precargadas
 
 Un preset vertical debe contestar cinco preguntas, siempre las mismas:
 
-1. ¿Cómo llamas a tus clientes y a tus ventas? *(léxico)*
-2. ¿Cuáles son tus etapas hasta el cierre? *(pipeline)*
-3. ¿Qué 5–8 datos necesitas de cada cliente que otros no necesitan? *(campos)*
-4. ¿Qué mensaje mandas y cuándo? *(plantillas + automatizaciones)*
-5. ¿Qué número miras cada mañana? *(dashboard)*
+1. ¿Cómo llamas a tus clientes y a tus ventas? _(léxico)_
+2. ¿Cuáles son tus etapas hasta el cierre? _(pipeline)_
+3. ¿Qué 5–8 datos necesitas de cada cliente que otros no necesitan? _(campos)_
+4. ¿Qué mensaje mandas y cuándo? _(plantillas + automatizaciones)_
+5. ¿Qué número miras cada mañana? _(dashboard)_
 
 Los presets actuales cubren 1, 2 y 3. **Faltan 4 y 5 en los nueve sectores** — es trabajo de datos, barato, y multiplica el valor percibido en el minuto uno del onboarding.
 
@@ -147,31 +149,31 @@ Los presets actuales cubren 1, 2 y 3. **Faltan 4 y 5 en los nueve sectores** —
 
 ### 6.1 Quejas documentadas
 
-| # | Queja | Fuente / evidencia |
-|---|---|---|
-| Q1 | "El CRM no refleja cómo vendemos; pide datos inútiles" | causa #1 de abandono en pymes LATAM |
-| Q2 | "Vendemos por WhatsApp y el CRM vive aparte" | WhatsApp es el sistema de ventas de facto de 2.5M de micro/pymes colombianas |
-| Q3 | "Precios en USD que escalan rápido" | crítica recurrente a HubSpot; el costo crece al crecer |
-| Q4 | "Soporte en español limitado fuera de partners locales" | HubSpot; soporte cae en picos de temporada en Siigo/Alegra (esperas > 2 h en cierres de IVA y exógena) |
-| Q5 | "Configurarlo requiere consultor" | Zoho/Bitrix24: alta curva de configuración y adaptación inicial |
-| Q6 | "Los contables no son CRM y los CRM no facturan" | Alegra/Siigo cumplen DIAN pero no gestionan pipeline; errores y rechazos DIAN son fricción documentada |
-| Q7 | "Actualizaciones constantes confunden al usuario" | reseñas de DataCRM (competidor colombiano directo) |
-| Q8 | "Faltan módulos: marketing, servicios" | reseñas de DataCRM |
-| Q9 | "Datos sucios" tras importar de Excel | causa clásica de fracaso de CRM |
+| #   | Queja                                                   | Fuente / evidencia                                                                                     |
+| --- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Q1  | "El CRM no refleja cómo vendemos; pide datos inútiles"  | causa #1 de abandono en pymes LATAM                                                                    |
+| Q2  | "Vendemos por WhatsApp y el CRM vive aparte"            | WhatsApp es el sistema de ventas de facto de 2.5M de micro/pymes colombianas                           |
+| Q3  | "Precios en USD que escalan rápido"                     | crítica recurrente a HubSpot; el costo crece al crecer                                                 |
+| Q4  | "Soporte en español limitado fuera de partners locales" | HubSpot; soporte cae en picos de temporada en Siigo/Alegra (esperas > 2 h en cierres de IVA y exógena) |
+| Q5  | "Configurarlo requiere consultor"                       | Zoho/Bitrix24: alta curva de configuración y adaptación inicial                                        |
+| Q6  | "Los contables no son CRM y los CRM no facturan"        | Alegra/Siigo cumplen DIAN pero no gestionan pipeline; errores y rechazos DIAN son fricción documentada |
+| Q7  | "Actualizaciones constantes confunden al usuario"       | reseñas de DataCRM (competidor colombiano directo)                                                     |
+| Q8  | "Faltan módulos: marketing, servicios"                  | reseñas de DataCRM                                                                                     |
+| Q9  | "Datos sucios" tras importar de Excel                   | causa clásica de fracaso de CRM                                                                        |
 
 ### 6.2 Respuesta de producto (esto es el roadmap, no el marketing)
 
-| Queja | Respuesta Nexo | Estado |
-|---|---|---|
-| Q1 | Presets por industria + nomenclatura + taxonomías editables; onboarding que configura por ti | ✅ base construida |
-| Q2 | WhatsApp como objeto de primera clase: inbox bidireccional, conversación en el timeline del contacto, cobro y factura por WhatsApp | ❌ **prioridad máxima** |
-| Q3 | Precio en COP, por tenant, sin cargo por campo custom ni por objeto | ✅ decidido |
-| Q4 | Producto colombiano, soporte local, español colombiano; documentación y estados de error en español | ✅ por diseño |
-| Q5 | Time-to-value < 10 min; el consultor es el preset | ✅ base construida |
-| Q6 | **El puente**: CRM + DIAN + Wompi en un solo registro. Negocio ganado → factura → link de pago → conciliación → cartera | ❌ Fase 3 |
-| Q7 | Changelog in-app, cambios de UI con opt-in, sin mover la navegación sin avisar | ⬜ política a adoptar |
-| Q8 | Servicio/postventa como pipeline configurable (mismo motor, otro preset), no como módulo nuevo | ⬜ diseño |
-| Q9 | Import con inferencia de tipos, dedup y preview antes de escribir | ✅ parcial (`shared/imports`) |
+| Queja | Respuesta Nexo                                                                                                                     | Estado                        |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Q1    | Presets por industria + nomenclatura + taxonomías editables; onboarding que configura por ti                                       | ✅ base construida            |
+| Q2    | WhatsApp como objeto de primera clase: inbox bidireccional, conversación en el timeline del contacto, cobro y factura por WhatsApp | ❌ **prioridad máxima**       |
+| Q3    | Precio en COP, por tenant, sin cargo por campo custom ni por objeto                                                                | ✅ decidido                   |
+| Q4    | Producto colombiano, soporte local, español colombiano; documentación y estados de error en español                                | ✅ por diseño                 |
+| Q5    | Time-to-value < 10 min; el consultor es el preset                                                                                  | ✅ base construida            |
+| Q6    | **El puente**: CRM + DIAN + Wompi en un solo registro. Negocio ganado → factura → link de pago → conciliación → cartera            | ❌ Fase 3                     |
+| Q7    | Changelog in-app, cambios de UI con opt-in, sin mover la navegación sin avisar                                                     | ⬜ política a adoptar         |
+| Q8    | Servicio/postventa como pipeline configurable (mismo motor, otro preset), no como módulo nuevo                                     | ⬜ diseño                     |
+| Q9    | Import con inferencia de tipos, dedup y preview antes de escribir                                                                  | ✅ parcial (`shared/imports`) |
 
 ### 6.3 El foso regulatorio: lo que ningún CRM global va a construir
 
@@ -180,10 +182,10 @@ Esto es lo defendible. Ninguna de estas cuatro cosas la hace HubSpot, y son obli
 **a) Ley 2300 de 2023 ("Dejen de Fregar") — compliance de contacto por diseño.**
 Regula canales, horario y periodicidad con que se puede contactar a un consumidor en gestiones de cobranza. Horarios permitidos: **lunes a viernes 7:00–19:00, sábados 8:00–15:00; prohibido domingos y festivos** salvo autorización expresa. Solo por los canales que el consumidor autorizó. Sanciona SIC/Superfinanciera.
 
-→ **Feature Nexo:** el motor de automatización de cobranza es *consciente de la Ley 2300*. Calendario de festivos colombianos integrado; encolado que retiene mensajes fuera de ventana y los libera al abrir; registro por contacto de canales autorizados; tope de frecuencia; log auditable de "a quién contactamos, cuándo, por qué canal, con qué autorización".
+→ **Feature Nexo:** el motor de automatización de cobranza es _consciente de la Ley 2300_. Calendario de festivos colombianos integrado; encolado que retiene mensajes fuera de ventana y los libera al abrir; registro por contacto de canales autorizados; tope de frecuencia; log auditable de "a quién contactamos, cuándo, por qué canal, con qué autorización".
 → **Argumento comercial:** "Nexo no te deja incumplir la Ley 2300." Un CRM global te deja mandar el WhatsApp de cobro un domingo a las 9 pm y la multa es tuya. Este es probablemente **el diferenciador más vendible que tenemos** y cuesta poco: es lógica de calendario + política, no IA.
 
-**b) Habeas Data (Ley 1581 de 2012) — el CRM *es* una base de datos personales.**
+**b) Habeas Data (Ley 1581 de 2012) — el CRM _es_ una base de datos personales.**
 Exige autorización previa, expresa e informada; finalidad declarada; canales para ejercer derechos; y el titular puede revocar y pedir supresión.
 
 → **Feature Nexo:** campo de origen y prueba de autorización en cada contacto; finalidad por contacto; export y borrado del titular en un clic (ya está en Fase 5 del roadmap — **debe subir de prioridad**, es requisito legal, no hardening); política de privacidad por tenant generada desde la configuración.
@@ -208,15 +210,15 @@ Desde julio 2025 Meta cobra **por mensaje de plantilla**, no por conversación. 
 CAPTAR → CALIFICAR → CERRAR → COBRAR → RETENER
 ```
 
-| Fase | Nombre | Cierra el ciclo | Criterio de salida (uno solo, medible) |
-|---|---|---|---|
-| **1** | Hardening (en curso) | — | Gate de aislamiento verde en CI, cobertura ≥ 70% |
-| **2** | **Núcleo visible** — contactos, empresas, negocios, actividades con UI | CALIFICAR → CERRAR | Un vendedor gestiona su semana completa sin salir de Nexo |
-| **3** | **Conversación** — WhatsApp bidireccional en el timeline | CAPTAR | Un lead entra por WhatsApp y queda como contacto con conversación, sin digitar |
-| **4** | **Dinero** — DIAN + Wompi + cartera | COBRAR | Negocio ganado → factura DIAN → link de pago → conciliado, en un flujo |
-| **5** | **Automatización con freno legal** — motor de flujos + cobranza Ley 2300 | RETENER | 5 flujos precargados corriendo con log de auditoría y ventana horaria respetada |
-| **6** | **Verticalización profunda** — presets completos (plantillas + dashboards) para 9 sectores | transversal | Onboarding de cualquier sector con valor en < 10 min |
-| **7** | Inteligencia — scoring, resúmenes, siguiente mejor acción | transversal | — |
+| Fase  | Nombre                                                                                     | Cierra el ciclo    | Criterio de salida (uno solo, medible)                                          |
+| ----- | ------------------------------------------------------------------------------------------ | ------------------ | ------------------------------------------------------------------------------- |
+| **1** | Hardening (en curso)                                                                       | —                  | Gate de aislamiento verde en CI, cobertura ≥ 70%                                |
+| **2** | **Núcleo visible** — contactos, empresas, negocios, actividades con UI                     | CALIFICAR → CERRAR | Un vendedor gestiona su semana completa sin salir de Nexo                       |
+| **3** | **Conversación** — WhatsApp bidireccional en el timeline                                   | CAPTAR             | Un lead entra por WhatsApp y queda como contacto con conversación, sin digitar  |
+| **4** | **Dinero** — DIAN + Wompi + cartera                                                        | COBRAR             | Negocio ganado → factura DIAN → link de pago → conciliado, en un flujo          |
+| **5** | **Automatización con freno legal** — motor de flujos + cobranza Ley 2300                   | RETENER            | 5 flujos precargados corriendo con log de auditoría y ventana horaria respetada |
+| **6** | **Verticalización profunda** — presets completos (plantillas + dashboards) para 9 sectores | transversal        | Onboarding de cualquier sector con valor en < 10 min                            |
+| **7** | Inteligencia — scoring, resúmenes, siguiente mejor acción                                  | transversal        | —                                                                               |
 
 **Movimiento clave frente al roadmap actual:** WhatsApp sube de Fase 4 a Fase 3, **antes** que el módulo de dinero. Razón: WhatsApp es donde ya vive el cliente (Q2). Facturar sin capturar la conversación es construir la mitad de abajo del embudo sobre un embudo vacío. Además la conversación genera el dato con el que después se cobra.
 
@@ -228,14 +230,14 @@ CAPTAR → CALIFICAR → CERRAR → COBRAR → RETENER
 
 **Métricas del producto (no de features):**
 
-| Métrica | Meta | Por qué |
-|---|---|---|
-| Time to first value | < 10 min (primer negocio creado) | contra Q5 y el 60% de abandono |
-| Adopción semanal por asiento | > 4 días/semana con actividad | si no lo abren, no importa qué tenga |
-| % de conversaciones dentro del CRM | > 80% | contra Q2 — el indicador de si ganamos a WhatsApp personal |
-| Campos custom por tenant | **< 40** (alerta a los 60) | contra property sprawl |
-| Contactos sin fuente/autorización | 0% | requisito Ley 1581 |
-| Mensajes bloqueados por ventana legal | reportado, no oculto | prueba de valor de Ley 2300 |
+| Métrica                               | Meta                             | Por qué                                                    |
+| ------------------------------------- | -------------------------------- | ---------------------------------------------------------- |
+| Time to first value                   | < 10 min (primer negocio creado) | contra Q5 y el 60% de abandono                             |
+| Adopción semanal por asiento          | > 4 días/semana con actividad    | si no lo abren, no importa qué tenga                       |
+| % de conversaciones dentro del CRM    | > 80%                            | contra Q2 — el indicador de si ganamos a WhatsApp personal |
+| Campos custom por tenant              | **< 40** (alerta a los 60)       | contra property sprawl                                     |
+| Contactos sin fuente/autorización     | 0%                               | requisito Ley 1581                                         |
+| Mensajes bloqueados por ventana legal | reportado, no oculto             | prueba de valor de Ley 2300                                |
 
 **Anti-metas (decir que no):**
 
@@ -260,6 +262,7 @@ CAPTAR → CALIFICAR → CERRAR → COBRAR → RETENER
 ## 10. Fuentes
 
 **Marco conceptual de CRM**
+
 - Flowlu — Los pilares del CRM: https://www.flowlu.com/es/crm-guide/pillars-of-crm/
 - HubSpot Academy — Anatomía de tu CRM: https://academy.hubspot.com/es/lessons/anatomy-of-your-crm
 - HubSpot — Qué es un modelo de datos CRM: https://blog.hubspot.com/marketing/crm-data-model
@@ -271,12 +274,14 @@ CAPTAR → CALIFICAR → CERRAR → COBRAR → RETENER
 - Arquitectura CRM empresarial (best practices): https://www.campaigncreators.com/blog/enterprise-hubspot-crm-architecture-best-practices
 
 **Fracaso de CRM y adopción**
+
 - Forrester — CRM pitfalls: https://www.forrester.com/blogs/dont-let-crm-pitfalls-trip-you-up
 - Gerencia y Negocios — 60% de fracaso en pymes LATAM: https://gerenciaynegocios.com/por-que-el-60-de-las-implementaciones-de-crm-en-pymes-latinoamericanas-fracasan-antes-del-primer-ano/
 - Cloud Solutions LATAM — Por qué fracasan los CRM: https://www.cloudsolutionslatam.com/novedades/por-que-los-crm-fracasan-en-la-implementacion
 - Ropofy — Errores al elegir un CRM para pymes: https://ropofy.com/blog/gestion-comercial/errores-elegir-crm-para-pymes-argentina/
 
 **Mercado y competencia en Colombia**
+
 - DataCRM (competidor colombiano) — opiniones: https://www.getapp.com.co/reviews/2057151/datacrm · https://www.softwareadvice.es/reviews/245324/datacrm
 - Chately — CRM + WhatsApp en Colombia: https://chately.co/blog/crm-whatsapp-colombia
 - ComparaSoftware — CRM para pymes en Colombia: https://www.comparasoftware.co/software-crm-pequenas-empresas
@@ -286,6 +291,7 @@ CAPTAR → CALIFICAR → CERRAR → COBRAR → RETENER
 - Alegra — errores frecuentes documento soporte: https://ayuda.alegra.com/col/errores-frecuentes-del-documentos-soporte-electronicos
 
 **Marco regulatorio colombiano**
+
 - Ley 2300 de 2023 (texto oficial): https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=213990
 - Ley 2300 — análisis "Dejen de Fregar": https://www.tusdatos.co/blog/ley-2300-dejen-de-fregar
 - Ley 1581 de 2012 (habeas data, texto oficial): http://www.secretariasenado.gov.co/senado/basedoc/ley_1581_2012.html
@@ -294,5 +300,6 @@ CAPTAR → CALIFICAR → CERRAR → COBRAR → RETENER
 - DIAN — instructivo RADIAN: https://www.dian.gov.co/impuestos/factura-electronica/Documents/Instructivo-RADIAN.pdf
 
 **Economía de WhatsApp**
+
 - Meta — Pricing WhatsApp Business Platform: https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing
 - Tarifas por país (Colombia): https://www.plivo.com/whatsapp/pricing/co/ · https://formbeep.com/whatsapp-api-pricing/

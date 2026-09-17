@@ -23,3 +23,5 @@ Any decision that is: costly to reverse, affects multiple modules, defines a con
 | [0004](0004-modular-monolith-eventbus.md)                | Modular monolith with EventBus                                 | Accepted |
 | [0005](0005-api-layered-modules-repositories-mappers.md) | Layered module internals: repositories, mappers, thin services | Accepted |
 | [0009](0009-object-engine.md)                            | One object engine for every CRM record type                    | Proposed |
+| [0010](0010-object-metadata.md)                          | Tenant data model declared as object metadata                  | Proposed |
+| [0011](0011-versioned-industry-packages.md)              | Versioned industry packages instead of one-shot presets        | Proposed |
