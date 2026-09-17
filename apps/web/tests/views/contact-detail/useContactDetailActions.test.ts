@@ -1,10 +1,11 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { queryWrapper as wrapper } from '../../query-wrapper'
+import { contactObjectWrapper as wrapper } from '../../object-wrapper'
 
-import type { ArchiveContactDialogState } from '@/features/archive-contact'
+import type { ArchiveRecordDialogState } from '@/features/archive-record'
 import type { ContactComposers } from '@/features/compose-contact-actions'
+import type { ContactListItem } from '@repo/shared-types'
 
 import { useContactDetailActions } from '@/views/contact-detail/model/useContactDetailActions'
 
@@ -24,7 +25,7 @@ function makeComposers(): ContactComposers {
   }
 }
 
-function makeArchive(): ArchiveContactDialogState {
+function makeArchive(): ArchiveRecordDialogState<ContactListItem> {
   return { target: null, isPending: false, ask: vi.fn(), close: vi.fn(), confirm: vi.fn() }
 }
 

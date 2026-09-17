@@ -21,6 +21,7 @@ const ON_DEMAND_ONLY_KEYS = new Set([
   'companies.search',
   'companies.summary',
   'deals.byContact',
+  'deals.linked',
   'bulkActions.list',
   'bulkActions.detail',
   'tags.trash',

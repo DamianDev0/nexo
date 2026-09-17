@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { CONTACTS_FIXTURE } from '../../msw/handlers'
 import { API, createMswServer } from '../../msw/test-server'
-import { queryWrapper as wrapper } from '../../query-wrapper'
+import { contactObjectWrapper as wrapper } from '../../object-wrapper'
 
 import { useArchivedContacts } from '@/features/manage-settings/model/useArchivedContacts'
 

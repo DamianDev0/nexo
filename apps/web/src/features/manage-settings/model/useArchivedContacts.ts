@@ -3,14 +3,15 @@
 import { useState } from 'react'
 
 import { useCreateBulkAction } from '@/entities/bulk-action'
-import { useContactList, useRestoreContact } from '@/entities/contact'
+import { useContactList } from '@/entities/contact'
+import { useRestoreRecord } from '@/features/archive-record'
 import { COMPACT_PAGE_SIZE, FIRST_PAGE } from '@/shared/config/pagination'
 import { pageCount } from '@/shared/lib/pagination'
 
 export function useArchivedContacts() {
   const [page, setPage] = useState(FIRST_PAGE)
   const { data, isPending } = useContactList({ archived: true, page, limit: COMPACT_PAGE_SIZE })
-  const restoreOne = useRestoreContact()
+  const restoreOne = useRestoreRecord()
   const restoreAll = useCreateBulkAction()
 
   const total = data?.total ?? 0

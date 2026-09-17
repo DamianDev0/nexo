@@ -147,7 +147,7 @@ export function buildContactQuickActions(
   if (actions.onArchive && contact.isActive) {
     menu.push({
       id: 'archive',
-      label: t('contacts.archive.action'),
+      label: t('records.archive.action'),
       icon: <ArchiveIcon />,
       tone: 'danger',
       onClick: () => actions.onArchive?.(contact),

@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 
+import { CONTACT_DESCRIPTOR } from '@/entities/contact'
+import { ObjectDescriptorProvider } from '@/entities/object-descriptor'
 import { ROUTES } from '@/shared/config/routes'
 import { PillButton } from '@/shared/ui/atoms/pill-button'
 import { AddressBookIcon, WarningIcon } from '@/shared/ui/icons'
@@ -18,6 +20,14 @@ type ContactDetailViewProps = {
 }
 
 export function ContactDetailView({ contactId }: Readonly<ContactDetailViewProps>) {
+  return (
+    <ObjectDescriptorProvider descriptor={CONTACT_DESCRIPTOR}>
+      <ContactDetailContent contactId={contactId} />
+    </ObjectDescriptorProvider>
+  )
+}
+
+function ContactDetailContent({ contactId }: Readonly<ContactDetailViewProps>) {
   const { t } = useTranslation()
   const detail = useContactDetail(contactId)
 

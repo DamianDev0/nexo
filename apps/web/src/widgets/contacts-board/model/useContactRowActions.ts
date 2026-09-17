@@ -2,15 +2,23 @@
 
 import { useMemo } from 'react'
 
-import { useRestoreContact } from '@/entities/contact'
-import { useAssignContactOwner } from '@/features/assign-contact-owner'
-import { useChangeContactStatus } from '@/features/change-contact-status'
-import { useEditContactCustomFields, useEditContactFields } from '@/features/edit-contact-field'
+import { useRestoreRecord } from '@/features/archive-record'
+import {
+  useAssignRecordOwner,
+  useChangeRecordStatus,
+  useEditRecordCustomFields,
+  useEditRecordFields,
+} from '@/features/edit-record-field'
 import { useToggleContactActivity } from '@/features/log-contact-activity'
 import { useDialNumber } from '@/features/place-call'
 import { copyToClipboard } from '@/shared/lib/copy-to-clipboard'
 
-import type { ContactComposeChannel, ContactLogKind, ContactRowActions } from '@/entities/contact'
+import type {
+  ContactComposeChannel,
+  ContactFieldsPatch,
+  ContactLogKind,
+  ContactRowActions,
+} from '@/entities/contact'
 import type { ContactListItem } from '@repo/shared-types'
 
 type RowActionHandlers = {
@@ -25,12 +33,12 @@ type RowActionHandlers = {
 }
 
 export function useContactRowActions(handlers: RowActionHandlers): ContactRowActions {
-  const changeStatus = useChangeContactStatus()
-  const editCustomFields = useEditContactCustomFields()
-  const editFields = useEditContactFields()
+  const changeStatus = useChangeRecordStatus()
+  const editCustomFields = useEditRecordCustomFields()
+  const editFields = useEditRecordFields<ContactFieldsPatch>()
   const dialNumber = useDialNumber()
-  const restore = useRestoreContact()
-  const assignOwner = useAssignContactOwner()
+  const restore = useRestoreRecord()
+  const assignOwner = useAssignRecordOwner()
   const toggleActivity = useToggleContactActivity()
   const {
     onArchive,

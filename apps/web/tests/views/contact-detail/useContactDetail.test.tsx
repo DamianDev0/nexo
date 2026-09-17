@@ -3,7 +3,7 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { buildContact } from '../../msw/handlers'
-import { queryWrapper as wrapper } from '../../query-wrapper'
+import { contactObjectWrapper as wrapper } from '../../object-wrapper'
 
 import type { ContactActivity, DealListItem } from '@repo/shared-types'
 
@@ -45,9 +45,9 @@ vi.mock('@/entities/tag', async (importOriginal) => ({
 }))
 
 let capturedOnArchived: (() => void) | undefined
-vi.mock('@/features/archive-contact', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/features/archive-contact')>()),
-  useArchiveContactDialog: (onArchived?: () => void) => {
+vi.mock('@/features/archive-record', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/archive-record')>()),
+  useArchiveRecordDialog: (onArchived?: () => void) => {
     capturedOnArchived = onArchived
     return { target: null, isPending: false, ask: vi.fn(), close: vi.fn(), confirm: vi.fn() }
   },

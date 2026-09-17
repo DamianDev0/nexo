@@ -2,7 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from 'react'
 
-import type { ObjectDescriptor } from './types/object-descriptor'
+import type { ObjectDescriptor, RecordBase } from './types/object-descriptor'
 
 const ObjectDescriptorContext = createContext<ObjectDescriptor | null>(null)
 
@@ -22,9 +22,12 @@ export function ObjectDescriptorProvider({
   )
 }
 
-export function useObjectDescriptor(): ObjectDescriptor {
+export function useObjectDescriptor<
+  TRecord extends RecordBase = RecordBase,
+>(): ObjectDescriptor<TRecord> {
   const descriptor = useContext(ObjectDescriptorContext)
-  if (!descriptor)
+  if (!descriptor) {
     throw new Error('useObjectDescriptor must be used inside ObjectDescriptorProvider')
+  }
   return descriptor
 }

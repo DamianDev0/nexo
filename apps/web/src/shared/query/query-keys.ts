@@ -19,6 +19,7 @@ export const QUERY_KEYS = {
   },
   objects: {
     workspace: (queryRoot: string) => [queryRoot, 'workspace'] as const,
+    lists: (queryRoot: string) => [queryRoot, 'list'] as const,
   },
   contacts: {
     all: ['contacts'] as const,
@@ -41,7 +42,9 @@ export const QUERY_KEYS = {
     summary: (id: string) => ['companies', 'summary', id] as const,
   },
   deals: {
-    byContact: (contactId: string) => ['deals', 'by-contact', contactId] as const,
+    linked: (link: { contactId?: string; companyId?: string }) =>
+      ['deals', 'linked', link] as const,
+    byContact: (contactId: string) => ['deals', 'linked', { contactId }] as const,
   },
   team: {
     members: ['team', 'members'] as const,

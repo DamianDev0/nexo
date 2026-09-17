@@ -526,6 +526,37 @@ const es = {
     nameTooLong: 'Máximo 120 caracteres',
     descriptionTooLong: 'Máximo 300 caracteres',
   },
+  records: {
+    toasts: {
+      fieldUpdated: 'Campo actualizado',
+      statusUpdated: 'Estado actualizado',
+      ownerUpdated: 'Responsable actualizado',
+      tagsUpdated: 'Etiquetas actualizadas',
+      restored: '{{name}} volvió a la lista',
+    },
+    archive: {
+      action: 'Archivar',
+      done: '{{name}} pasó a la papelera',
+      confirm: {
+        title: 'Archivar {{entity}}',
+        description:
+          '{{name}} sale de la lista y deja de aparecer en búsquedas. Puedes restaurar desde la papelera.',
+        descriptionWithDeals_one:
+          '{{name}} tiene {{count}} de tus {{deals}} en curso. Sale de la lista, pero ese registro sigue activo.',
+        descriptionWithDeals_other:
+          '{{name}} tiene {{count}} de tus {{deals}} en curso. Sale de la lista, pero esos registros siguen activos.',
+        action: 'Archivar',
+      },
+    },
+    tags: {
+      title: 'Etiquetas de {{name}}',
+      search: 'Buscar etiqueta…',
+      empty: 'Sin etiquetas disponibles',
+      selected_one: '{{count}} seleccionada',
+      selected_other: '{{count}} seleccionadas',
+      save: 'Guardar',
+    },
+  },
   contacts: {
     filters: {
       lifecycleStage: 'Ciclo de vida',
@@ -915,15 +946,6 @@ const es = {
         bodyRequired: 'La nota no puede estar vacía',
         bodyTooLong: 'Máximo {{max}} caracteres',
       },
-      tags: {
-        title: 'Etiquetas de {{name}}',
-        search: 'Buscar etiqueta…',
-        empty: 'Sin etiquetas disponibles',
-        selected_one: '{{count}} seleccionada',
-        selected_other: '{{count}} seleccionadas',
-        save: 'Guardar',
-        saved: 'Etiquetas actualizadas',
-      },
       message: {
         title: {
           email: 'Email para {{name}}',
@@ -1129,20 +1151,6 @@ const es = {
         assignedToId: 'Responsable',
       },
     },
-    archive: {
-      action: 'Archivar',
-      done: '{{entity}} archivado',
-      confirm: {
-        title: 'Archivar {{entity}}',
-        description:
-          '{{name}} sale de la lista y deja de aparecer en búsquedas. Lo puedes restaurar desde la papelera.',
-        descriptionWithDeals_one:
-          '{{name}} tiene {{count}} negocio abierto. Al archivarlo sale de la lista, pero el negocio sigue vivo.',
-        descriptionWithDeals_other:
-          '{{name}} tiene {{count}} negocios abiertos. Al archivarlo sale de la lista, pero los negocios siguen vivos.',
-        action: 'Archivar',
-      },
-    },
     company: {
       empty: 'Sin empresa vinculada',
       link: 'Vincular empresa',
@@ -1291,10 +1299,6 @@ const es = {
     toasts: {
       created: '{{entity}} creado',
       updated: '{{entity}} actualizado',
-      statusUpdated: 'Estado actualizado',
-      ownerUpdated: 'Responsable actualizado',
-      fieldUpdated: 'Campo actualizado',
-      restored: '{{entity}} restaurado',
     },
     errors: {
       firstNameRequired: 'El nombre es obligatorio',

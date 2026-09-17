@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 
+import { contactFullName } from '@/entities/contact'
 import { Composer } from '@/shared/ui/organisms/composer'
 
 import { resolveLogKind, resolveMessageChannel } from '../../lib/message-channel'
@@ -20,7 +21,7 @@ const NoteComposer = dynamic(
   { loading: () => null, ssr: false },
 )
 
-const TagComposer = dynamic(() => import('@/features/tag-contact').then((m) => m.TagComposer), {
+const TagComposer = dynamic(() => import('@/features/tag-record').then((m) => m.TagComposer), {
   loading: () => null,
   ssr: false,
 })
@@ -55,7 +56,12 @@ export function ContactComposerHost({
         <NoteComposer key={active.contact.id} contact={active.contact} onClose={close} />
       )}
       {active?.kind === 'tags' && (
-        <TagComposer key={active.contact.id} contact={active.contact} onClose={close} />
+        <TagComposer
+          key={active.contact.id}
+          record={active.contact}
+          name={contactFullName(active.contact)}
+          onClose={close}
+        />
       )}
       {active?.kind === 'meeting' && (
         <MeetingComposer key={active.contact.id} contact={active.contact} onClose={close} />

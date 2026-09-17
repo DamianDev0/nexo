@@ -523,6 +523,37 @@ const en = {
     nameTooLong: 'Max 120 characters',
     descriptionTooLong: 'Max 300 characters',
   },
+  records: {
+    toasts: {
+      fieldUpdated: 'Field updated',
+      statusUpdated: 'Status updated',
+      ownerUpdated: 'Owner updated',
+      tagsUpdated: 'Tags updated',
+      restored: '{{name}} is back on the list',
+    },
+    archive: {
+      action: 'Archive',
+      done: '{{name}} moved to the trash',
+      confirm: {
+        title: 'Archive {{entity}}',
+        description:
+          '{{name}} leaves the list and stops showing up in search. You can restore it from the trash.',
+        descriptionWithDeals_one:
+          '{{name}} has {{count}} open item in your {{deals}}. It leaves the list, but that record stays active.',
+        descriptionWithDeals_other:
+          '{{name}} has {{count}} open items in your {{deals}}. It leaves the list, but those records stay active.',
+        action: 'Archive',
+      },
+    },
+    tags: {
+      title: 'Tags for {{name}}',
+      search: 'Search tag…',
+      empty: 'No tags available',
+      selected_one: '{{count}} selected',
+      selected_other: '{{count}} selected',
+      save: 'Save',
+    },
+  },
   contacts: {
     filters: {
       lifecycleStage: 'Lifecycle',
@@ -908,15 +939,6 @@ const en = {
         bodyRequired: 'The note cannot be empty',
         bodyTooLong: 'Maximum {{max}} characters',
       },
-      tags: {
-        title: 'Tags for {{name}}',
-        search: 'Search tag…',
-        empty: 'No tags available',
-        selected_one: '{{count}} selected',
-        selected_other: '{{count}} selected',
-        save: 'Save',
-        saved: 'Tags updated',
-      },
       message: {
         title: {
           email: 'Email to {{name}}',
@@ -1122,20 +1144,6 @@ const en = {
         assignedToId: 'Owner',
       },
     },
-    archive: {
-      action: 'Archive',
-      done: '{{entity}} archived',
-      confirm: {
-        title: 'Archive {{entity}}',
-        description:
-          '{{name}} leaves the list and stops showing up in search. You can restore it from the trash.',
-        descriptionWithDeals_one:
-          '{{name}} has {{count}} open deal. Archiving takes the contact off the list, but the deal stays live.',
-        descriptionWithDeals_other:
-          '{{name}} has {{count}} open deals. Archiving takes the contact off the list, but the deals stay live.',
-        action: 'Archive',
-      },
-    },
     company: {
       empty: 'No company linked',
       link: 'Link a company',
@@ -1284,10 +1292,6 @@ const en = {
     toasts: {
       created: '{{entity}} created',
       updated: '{{entity}} updated',
-      statusUpdated: 'Status updated',
-      ownerUpdated: 'Owner updated',
-      fieldUpdated: 'Field updated',
-      restored: '{{entity}} restored',
     },
     errors: {
       firstNameRequired: 'First name is required',

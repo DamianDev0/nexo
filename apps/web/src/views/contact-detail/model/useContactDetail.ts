@@ -8,7 +8,7 @@ import { useContact, useContactTimeline } from '@/entities/contact'
 import { useContactTaxonomy } from '@/entities/contact-taxonomy'
 import { openDealCount, useContactDeals } from '@/entities/deal'
 import { useTagCatalog } from '@/entities/tag'
-import { useArchiveContactDialog } from '@/features/archive-contact'
+import { useArchiveRecordDialog } from '@/features/archive-record'
 import { useContactComposers } from '@/features/compose-contact-actions'
 import { useMergeContactsDialog } from '@/features/merge-contacts'
 import { groupContactActivities } from '@/features/preview-contact'
@@ -21,6 +21,7 @@ import { useContactDetailActions } from './useContactDetailActions'
 import { usePanelRoute } from './usePanelRoute'
 
 import type { DetailTabId } from '../config/detail-panels.constants'
+import type { ContactListItem } from '@repo/shared-types'
 
 export function useContactDetail(contactId: string) {
   const { t } = useTranslation()
@@ -31,7 +32,7 @@ export function useContactDetail(contactId: string) {
   const composers = useContactComposers()
   const router = useRouter()
   const backToList = useCallback(() => router.push(ROUTES.app.contacts.list), [router])
-  const archive = useArchiveContactDialog(backToList)
+  const archive = useArchiveRecordDialog<ContactListItem>(backToList)
   const query = useContact(contactId)
   const mergeDialog = useMergeContactsDialog(query.contact, backToList)
   const actions = useContactDetailActions(composers, archive, mergeDialog.ask)

@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { buildContact } from '../../msw/handlers'
-import { queryWrapper as wrapper } from '../../query-wrapper'
+import { contactObjectWrapper as wrapper } from '../../object-wrapper'
 
 import { useBoardEditors } from '@/widgets/contacts-board/model/useBoardEditors'
 
