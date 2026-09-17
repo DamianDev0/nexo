@@ -8,7 +8,7 @@ export function buildToolbarMenu(t: TFunction): ActionMenuItem[] {
   return [
     {
       id: 'import',
-      label: t('contacts.import.cta'),
+      label: t('imports.cta'),
       icon: <CloudArrowUpIcon />,
       href: ROUTES.app.contacts.import,
     },

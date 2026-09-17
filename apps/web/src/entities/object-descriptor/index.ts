@@ -1,8 +1,10 @@
 export type {
   ObjectDescriptor,
+  ObjectImportConfig,
   ObjectRecordApi,
   RecordBase,
   RecordDealLink,
+  RecordImportRun,
 } from './model/types/object-descriptor'
 export { ObjectDescriptorProvider, useObjectDescriptor } from './model/object-descriptor-context'
 export { usePendingRecordPatches, type PendingRecordPatch } from './model/record-pending.store'

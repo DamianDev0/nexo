@@ -11,7 +11,7 @@ describe('buildToolbarMenu', () => {
     const items = buildToolbarMenu(t)
 
     expect(items.map((item) => [item.id, item.label, item.href])).toEqual([
-      ['import', 'contacts.import.cta', '/contacts/import'],
+      ['import', 'imports.cta', '/contacts/import'],
       ['bulk-actions', 'bulkActions.title', '/bulk-actions'],
     ])
   })
