@@ -5,12 +5,12 @@ import dynamic from 'next/dynamic'
 import { CONTACT_DESCRIPTOR } from '@/entities/contact'
 import { useEntityTerms } from '@/entities/nomenclature'
 import { ObjectDescriptorProvider } from '@/entities/object-descriptor'
-import { ArchiveContactDialog } from '@/features/archive-contact'
+import { ArchiveRecordDialog } from '@/features/archive-record'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { useMountedOnce } from '@/shared/lib/hooks/useMountedOnce'
+import { useListMenu } from '@/widgets/records-board'
 
 import { useContactsBoard } from '../../model/useContactsBoard'
-import { useListMenu } from '../../model/useListMenu'
 import { ContactsTable } from '../ContactsTable'
 
 const ContactFormSheet = dynamic(
@@ -70,7 +70,7 @@ function ContactsBoardContent() {
           taxonomy={preview.taxonomy}
         />
       )}
-      <ArchiveContactDialog state={archive} />
+      <ArchiveRecordDialog state={archive} />
       <ContactComposerHost composers={composers} placement={preview.open ? 'aside' : 'corner'} />
     </div>
   )

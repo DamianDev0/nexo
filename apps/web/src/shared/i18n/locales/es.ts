@@ -526,7 +526,190 @@ const es = {
     nameTooLong: 'Máximo 120 caracteres',
     descriptionTooLong: 'Máximo 300 caracteres',
   },
+  records: {
+    lists: {
+      manage: 'Gestionar listas',
+    },
+    toolbar: {
+      more: 'Más acciones',
+      create: 'Agregar {{entity}}',
+    },
+    table: {
+      save: {
+        loading: 'Guardando',
+        success: 'Guardado',
+        error: 'No se guardó',
+      },
+    },
+    pageRange: '{{from}}–{{to}} de {{total}} {{entities}}',
+    unavailable: {
+      title: 'No pudimos cargar la vista',
+      description: 'La configuración de columnas no llegó. Recarga la página e intenta de nuevo.',
+    },
+    loadFailed: {
+      title: 'No pudimos cargar tus {{entities}}',
+      description: 'La conexión falló o el servidor no respondió. Tus datos siguen ahí.',
+      retry: 'Volver a intentar',
+    },
+    empty: {
+      title: 'Aún no hay {{entities}}',
+      description: 'Crea el primer registro o importa tus {{entities}} desde un CSV.',
+      cta: 'Crear {{entity}}',
+    },
+    archivedEmpty: {
+      title: 'La papelera de {{entities}} está vacía',
+      description: 'Lo que archives desde la lista aparecerá aquí.',
+    },
+    noResults: {
+      title: 'Sin resultados',
+      description: 'Nada coincide con tu búsqueda. Ajusta los filtros e intenta de nuevo.',
+    },
+    toasts: {
+      fieldUpdated: 'Campo actualizado',
+      statusUpdated: 'Estado actualizado',
+      ownerUpdated: 'Responsable actualizado',
+      tagsUpdated: 'Etiquetas actualizadas',
+      restored: '{{name}} volvió a la lista',
+    },
+    archive: {
+      action: 'Archivar',
+      done: '{{name}} pasó a la papelera',
+      confirm: {
+        title: 'Archivar {{entity}}',
+        description:
+          '{{name}} sale de la lista y deja de aparecer en búsquedas. Puedes restaurar desde la papelera.',
+        descriptionWithDeals_one:
+          '{{name}} tiene {{count}} de tus {{deals}} en curso. Sale de la lista, pero ese registro sigue activo.',
+        descriptionWithDeals_other:
+          '{{name}} tiene {{count}} de tus {{deals}} en curso. Sale de la lista, pero esos registros siguen activos.',
+        action: 'Archivar',
+      },
+    },
+    tags: {
+      title: 'Etiquetas de {{name}}',
+      search: 'Buscar etiqueta…',
+      empty: 'Sin etiquetas disponibles',
+      selected_one: '{{count}} seleccionada',
+      selected_other: '{{count}} seleccionadas',
+      save: 'Guardar',
+    },
+  },
+  imports: {
+    cta: 'Importar',
+    title: 'Importar {{entities}}',
+    stepper: {
+      upload: 'Archivo',
+      configure: 'Configurar',
+      map: 'Mapear',
+      review: 'Revisar',
+      done: 'Listo',
+    },
+    steps: {
+      upload: 'Sube un archivo CSV o Excel con tus {{entities}}.',
+      configure: 'Decide qué hacer con lo que ya existe en tus {{entities}}.',
+      map: 'Revisa a qué campo va cada columna.',
+      review: 'Esto es lo que va a pasar cuando importes.',
+      done: 'Importación terminada.',
+    },
+    upload: {
+      cta: 'Haz clic o arrastra tu archivo',
+      reading: 'Leyendo el archivo...',
+      hint: 'CSV o Excel (.xlsx) con encabezados · Máximo {{size}}MB',
+      summary: '{{rows}} filas · {{columns}} columnas',
+      templateHint: '¿No sabes cómo armarlo?',
+      templateCta: 'Descarga la plantilla',
+      templateName: 'plantilla-{{entities}}.csv',
+    },
+    map: {
+      title: 'Columnas del archivo',
+      columnHeader: 'Columna del archivo',
+      sampleHeader: 'Ejemplo',
+      fieldHeader: 'Campo del CRM',
+      ignore: 'No importar',
+      empty: 'Sin datos de ejemplo',
+      missing: 'Falta asignar: {{fields}}',
+      search: 'Buscar campo...',
+    },
+    preview: {
+      title: 'Vista previa',
+      counts: '{{valid}} válidas · {{invalid}} con errores',
+      invalid: 'Fila con errores',
+    },
+    review: {
+      ready: 'Listos para importar',
+      warnings: 'Con avisos',
+      errors: 'No se importarán',
+      row: 'Fila {{row}}',
+      noIssues: 'Nada que revisar',
+      needsAttention: '{{count}} filas necesitan tu atención',
+      truncated: 'Mostrando las primeras {{shown}}',
+      filters: {
+        all: 'Todo',
+        errors: 'Errores',
+        warnings: 'Avisos',
+      },
+      skipSummary:
+        'Se crearán {{ready}} {{entities}}. Los repetidos se omiten y {{errors}} filas con errores no entran.',
+      updateSummary:
+        'Se procesarán {{ready}} {{entities}}: los nuevos se crean y los que ya existan se actualizan. {{errors}} filas con errores no entran.',
+      createSummary:
+        'Se crearán {{ready}} {{entities}}, incluso si ya existe uno igual. {{errors}} filas con errores no entran.',
+    },
+    strategy: {
+      title: 'Si ya existe en tus {{entities}}',
+      skip: 'Omitir',
+      update: 'Actualizar',
+      create: 'Crear otro',
+      skipHint: 'Solo entran los registros nuevos. Los repetidos se dejan como están.',
+      updateHint:
+        'Los registros nuevos se crean y los que ya existan se actualizan con los datos del archivo.',
+      createHint: 'Se crea un registro nuevo aunque ya exista uno igual.',
+    },
+    done: {
+      title: 'Importación completa',
+      subtitle: '{{total}} filas procesadas',
+      downloadReport: 'Descargar reporte',
+      reportName: 'reporte-importacion.csv',
+    },
+    actions: {
+      back: 'Atrás',
+      backToList: 'Volver a {{entities}}',
+      changeFile: 'Cambiar archivo',
+      continue: 'Continuar',
+      checking: 'Revisando...',
+      importCount: 'Importar {{count}} {{entities}}',
+      importing: 'Importando...',
+      viewList: 'Ver {{entities}}',
+    },
+    errors: {
+      analyze: 'No pudimos leer el archivo',
+      validate: 'No pudimos revisar el archivo',
+      execute: 'No se pudo completar la importación',
+    },
+    result: {
+      imported: 'Creados',
+      updated: 'Actualizados',
+      skipped: 'Omitidos',
+    },
+  },
   contacts: {
+    import: {
+      fields: {
+        firstName: 'Nombre',
+        lastName: 'Apellido',
+        email: 'Email',
+        phone: 'Teléfono',
+        whatsapp: 'WhatsApp',
+        documentType: 'Tipo de documento',
+        documentNumber: 'Documento',
+        city: 'Ciudad',
+        status: 'Estado',
+        source: 'Origen',
+        lifecycleStage: 'Ciclo de vida',
+        tags: 'Etiquetas',
+      },
+      matchNote: 'Buscamos coincidencias de {{entities}} por email o número de documento.',
+    },
     filters: {
       lifecycleStage: 'Ciclo de vida',
       source: 'Origen',
@@ -629,37 +812,6 @@ const es = {
       edit: 'Editar',
       archive: 'Archivar',
     },
-    loadFailed: {
-      title: 'No pudimos cargar los {{entities}}',
-      description: 'La conexión falló o el servidor no respondió. Tus datos siguen ahí.',
-      retry: 'Volver a intentar',
-    },
-    empty: {
-      title: 'Aún no hay {{entities}}',
-      description:
-        'Crea tu primer {{entity}} o impórtalos desde un CSV — tu base de clientes vive aquí.',
-      cta: 'Crear {{entity}}',
-    },
-    archivedEmpty: {
-      title: 'No hay {{entities}} archivados',
-      description: 'Los {{entities}} que archives desde la lista aparecerán aquí.',
-    },
-    noResults: {
-      title: 'Sin resultados',
-      description:
-        'Ningún {{entity}} coincide con tu búsqueda. Ajusta los filtros e intenta de nuevo.',
-    },
-    table: {
-      save: {
-        loading: 'Guardando',
-        success: 'Guardado',
-        error: 'No se guardó',
-      },
-    },
-    unavailable: {
-      title: 'No pudimos cargar la vista',
-      description: 'La configuración de columnas no llegó. Recarga la página e intenta de nuevo.',
-    },
     form: {
       pickDate: 'Elige una fecha',
       pickTime: 'Hora',
@@ -696,7 +848,6 @@ const es = {
       customFields: 'Información adicional',
       customFieldSelect: 'Selecciona una opción',
     },
-    pageRange: '{{from}}–{{to}} de {{total}} {{entities}}',
     hints: {
       pending_one: '{{count}} {{entity}} nuevo sin gestionar',
       pending_other: '{{count}} {{entities}} nuevos sin gestionar',
@@ -828,9 +979,6 @@ const es = {
         undoQueued: 'Deshaciendo la acción masiva…',
       },
     },
-    toolbar: {
-      more: 'Más acciones',
-    },
     cells: {
       pick: 'Elegir {{field}}',
       edit: 'Editar {{field}}',
@@ -915,15 +1063,6 @@ const es = {
         bodyRequired: 'La nota no puede estar vacía',
         bodyTooLong: 'Máximo {{max}} caracteres',
       },
-      tags: {
-        title: 'Etiquetas de {{name}}',
-        search: 'Buscar etiqueta…',
-        empty: 'Sin etiquetas disponibles',
-        selected_one: '{{count}} seleccionada',
-        selected_other: '{{count}} seleccionadas',
-        save: 'Guardar',
-        saved: 'Etiquetas actualizadas',
-      },
       message: {
         title: {
           email: 'Email para {{name}}',
@@ -957,119 +1096,6 @@ const es = {
     },
     notesPopover: {
       title: 'Notas',
-    },
-    import: {
-      cta: 'Importar',
-      title: 'Importar {{entities}}',
-      stepper: {
-        upload: 'Archivo',
-        configure: 'Configurar',
-        map: 'Mapear',
-        review: 'Revisar',
-        done: 'Listo',
-      },
-      steps: {
-        upload: 'Sube un archivo CSV o Excel con tus {{entities}}.',
-        configure: 'Decide qué hacer con los {{entities}} que ya existen.',
-        map: 'Revisa a qué campo va cada columna.',
-        review: 'Esto es lo que va a pasar cuando importes.',
-        done: 'Importación terminada.',
-      },
-      upload: {
-        cta: 'Haz clic o arrastra tu archivo',
-        reading: 'Leyendo el archivo...',
-        hint: 'CSV o Excel (.xlsx) con encabezados · Máximo {{size}}MB',
-        summary: '{{rows}} filas · {{columns}} columnas',
-        templateHint: '¿No sabes cómo armarlo?',
-        templateCta: 'Descarga la plantilla',
-        templateName: 'plantilla-{{entities}}.csv',
-      },
-      map: {
-        title: 'Columnas del archivo',
-        columnHeader: 'Columna del archivo',
-        sampleHeader: 'Ejemplo',
-        fieldHeader: 'Campo del CRM',
-        ignore: 'No importar',
-        empty: 'Sin datos de ejemplo',
-        missing: 'Falta asignar: {{fields}}',
-        search: 'Buscar campo...',
-      },
-      fields: {
-        firstName: 'Nombre',
-        lastName: 'Apellido',
-        email: 'Email',
-        phone: 'Teléfono',
-        whatsapp: 'WhatsApp',
-        documentType: 'Tipo de documento',
-        documentNumber: 'Documento',
-        city: 'Ciudad',
-        status: 'Estado',
-        source: 'Origen',
-        lifecycleStage: 'Ciclo de vida',
-        tags: 'Etiquetas',
-      },
-      preview: {
-        title: 'Vista previa',
-        counts: '{{valid}} válidas · {{invalid}} con errores',
-        invalid: 'Fila con errores',
-      },
-      review: {
-        ready: 'Listos para importar',
-        warnings: 'Con avisos',
-        errors: 'No se importarán',
-        row: 'Fila {{row}}',
-        noIssues: 'Nada que revisar',
-        needsAttention: '{{count}} filas necesitan tu atención',
-        truncated: 'Mostrando las primeras {{shown}}',
-        filters: {
-          all: 'Todo',
-          errors: 'Errores',
-          warnings: 'Avisos',
-        },
-        skipSummary:
-          'Se crearán {{ready}} {{entities}}. Los repetidos se omiten y {{errors}} filas con errores no entran.',
-        updateSummary:
-          'Se procesarán {{ready}} {{entities}}: los nuevos se crean y los que ya existan se actualizan. {{errors}} filas con errores no entran.',
-        createSummary:
-          'Se crearán {{ready}} {{entities}}, incluso si ya existe uno igual. {{errors}} filas con errores no entran.',
-      },
-      strategy: {
-        title: 'Si el {{entity}} ya existe',
-        skip: 'Omitir',
-        update: 'Actualizar',
-        create: 'Crear otro',
-        skipHint: 'Solo se crean los {{entities}} nuevos. Los repetidos se dejan como están.',
-        updateHint:
-          'Los {{entities}} nuevos se crean y los que ya existan se actualizan con los datos del archivo.',
-        createHint: 'Se crea un {{entity}} nuevo aunque ya exista uno igual.',
-        matchNote: 'Buscamos coincidencias de {{entities}} por email o número de documento.',
-      },
-      done: {
-        title: 'Importación completa',
-        subtitle: '{{total}} filas procesadas',
-        downloadReport: 'Descargar reporte',
-        reportName: 'reporte-importacion.csv',
-      },
-      actions: {
-        back: 'Atrás',
-        backToContacts: 'Volver a {{entities}}',
-        changeFile: 'Cambiar archivo',
-        continue: 'Continuar',
-        checking: 'Revisando...',
-        importCount: 'Importar {{count}} {{entities}}',
-        importing: 'Importando...',
-        viewContacts: 'Ver {{entities}}',
-      },
-      errors: {
-        analyze: 'No pudimos leer el archivo',
-        validate: 'No pudimos revisar el archivo',
-        execute: 'No se pudo completar la importación',
-      },
-      result: {
-        imported: 'Creados',
-        updated: 'Actualizados',
-        skipped: 'Omitidos',
-      },
     },
     tagCount_one: '{{count}} etiqueta',
     tagCount_other: '{{count}} etiquetas',
@@ -1127,20 +1153,6 @@ const es = {
         source: 'Origen',
         companyId: 'Empresa',
         assignedToId: 'Responsable',
-      },
-    },
-    archive: {
-      action: 'Archivar',
-      done: '{{entity}} archivado',
-      confirm: {
-        title: 'Archivar {{entity}}',
-        description:
-          '{{name}} sale de la lista y deja de aparecer en búsquedas. Lo puedes restaurar desde la papelera.',
-        descriptionWithDeals_one:
-          '{{name}} tiene {{count}} negocio abierto. Al archivarlo sale de la lista, pero el negocio sigue vivo.',
-        descriptionWithDeals_other:
-          '{{name}} tiene {{count}} negocios abiertos. Al archivarlo sale de la lista, pero los negocios siguen vivos.',
-        action: 'Archivar',
       },
     },
     company: {
@@ -1291,10 +1303,6 @@ const es = {
     toasts: {
       created: '{{entity}} creado',
       updated: '{{entity}} actualizado',
-      statusUpdated: 'Estado actualizado',
-      ownerUpdated: 'Responsable actualizado',
-      fieldUpdated: 'Campo actualizado',
-      restored: '{{entity}} restaurado',
     },
     errors: {
       firstNameRequired: 'El nombre es obligatorio',

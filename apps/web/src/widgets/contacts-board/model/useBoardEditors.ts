@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { buildContactCellLabels, buildRowMenuItems } from '@/entities/contact'
-import { useArchiveContactDialog } from '@/features/archive-contact'
+import { useArchiveRecordDialog } from '@/features/archive-record'
 import { useContactComposers } from '@/features/compose-contact-actions'
 import { useCreateFromUrl } from '@/features/create-contact'
 import { ROUTES } from '@/shared/config/routes'
@@ -19,7 +19,7 @@ export function useBoardEditors() {
   const sheet = useEntityEditor<ContactListItem>()
   const preview = useEntityEditor<ContactListItem>()
   const composers = useContactComposers()
-  const archive = useArchiveContactDialog()
+  const archive = useArchiveRecordDialog<ContactListItem>()
   const router = useRouter()
   useCreateFromUrl(sheet.openCreate)
 

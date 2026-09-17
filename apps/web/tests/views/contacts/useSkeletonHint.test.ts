@@ -6,9 +6,9 @@ import { useSkeletonHint } from '@/views/contacts/model/useSkeletonHint'
 
 const readSkeletonHint = vi.fn()
 
-vi.mock('@/entities/contact', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/entities/contact')>()),
-  readSkeletonHint: () => readSkeletonHint(),
+vi.mock('@/entities/object-descriptor', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/entities/object-descriptor')>()),
+  readSkeletonHint: (queryRoot: string) => readSkeletonHint(queryRoot),
 }))
 
 describe('useSkeletonHint', () => {

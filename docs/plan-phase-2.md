@@ -27,6 +27,8 @@ Test para toda feature (RFC 0001 §9): _¿funciona igual para una clínica y par
 
 ## 2. Secuencia
 
+> ⚠️ **Actualizado 2026-09-16:** la secuencia 2.1–2.4 se reemplaza por los planes detallados en [`plans/`](plans/README.md), tras el [benchmark de adaptabilidad](research/crm-adaptability-benchmark-2026-09.md). Esta tabla queda como historial.
+
 | #        | Épica                                                                                                                                      | Por qué en este orden                                              | Tamaño |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ | ------ |
 | **2.0a** | Contactos como referencia: sprints S1–S5 de [`audit/contacts-reference-audit-2026-09-16.md`](audit/contacts-reference-audit-2026-09-16.md) | No se extrae un motor con bugs ni con dos formas de hacer lo mismo | L      |

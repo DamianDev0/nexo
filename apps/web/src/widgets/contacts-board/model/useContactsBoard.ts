@@ -17,18 +17,23 @@ import {
   useAdvancedFilterFields,
 } from '@/features/filter-contacts'
 import { useDataTable } from '@/shared/ui/organisms/data-table'
+import {
+  EMPTY_COLUMNS,
+  EMPTY_TABLE_STATE,
+  EMPTY_VIEWS,
+  orderSmartLists,
+  useBoardKeyboard,
+  useBoardSelection,
+  useSkeletonHintSync,
+} from '@/widgets/records-board'
 
-import { EMPTY_COLUMNS, EMPTY_TABLE_STATE, EMPTY_VIEWS } from '../config/board-empty.constants'
-import { orderSmartLists } from '../lib/order-smart-lists'
+import { isFixedContactList, quickFilterSources } from '../lib/contact-board-lists'
 import { selectionScopeKey } from '../lib/selection-scope'
 
 import { useBoardColumns } from './useBoardColumns'
 import { useBoardEditors } from './useBoardEditors'
-import { useBoardKeyboard } from './useBoardKeyboard'
 import { useBoardPreview } from './useBoardPreview'
-import { useBoardSelection } from './useBoardSelection'
-import { useBoardViews } from './useBoardViews'
-import { useSkeletonHintSync } from './useSkeletonHintSync'
+import { useContactBoardViews } from './useContactBoardViews'
 
 import type { ContactWorkspace } from '@repo/shared-types'
 
@@ -104,6 +109,7 @@ export function useContactsBoard() {
           entities: terms.lowerPlural,
         }),
         listOrder,
+        isFixedContactList,
       ),
     [t, counts, taxonomy.statuses, listOrder, terms],
   )
@@ -126,7 +132,7 @@ export function useContactsBoard() {
 
   useSkeletonHintSync(instance.table, table.rows.length, !isPending && !isUnavailable, saveStatus)
 
-  const boardViews = useBoardViews({
+  const boardViews = useContactBoardViews({
     table,
     workspace: { views: workspace.data?.views, tableState: workspace.data?.tableState },
     items,
@@ -163,11 +169,7 @@ export function useContactsBoard() {
       quickFilters: buildQuickFilterDefs(
         t,
         table.filters,
-        {
-          sources: taxonomy.sources,
-          lifecycleStages: taxonomy.lifecycleStages,
-          usage: { sources: usage.sources, lifecycleStages: usage.lifecycleStages },
-        },
+        quickFilterSources(taxonomy, usage),
         terms.lowerSingular,
       ),
     },

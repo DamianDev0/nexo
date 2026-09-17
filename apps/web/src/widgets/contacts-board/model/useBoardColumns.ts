@@ -3,7 +3,8 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { buildContactColumns, usePendingContactPatches } from '@/entities/contact'
+import { buildContactColumns } from '@/entities/contact'
+import { usePendingRecordPatches } from '@/entities/object-descriptor'
 import { useTagCatalog } from '@/entities/tag'
 import { buildOwnerOptions, useTeamMembers } from '@/entities/team-member'
 
@@ -36,7 +37,7 @@ export function useBoardColumns({
   const tagsByName = useTagCatalog('contact')
   const members = useTeamMembers()
   const owners = useMemo(() => buildOwnerOptions(t, members), [t, members])
-  const pendingCells = usePendingContactPatches((state) => state.cells)
+  const pendingCells = usePendingRecordPatches((state) => state.cells)
 
   return useMemo(
     () =>

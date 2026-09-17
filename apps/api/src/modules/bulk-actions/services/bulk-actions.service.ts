@@ -36,6 +36,7 @@ import {
   BULK_MAX_ACTIVE_PER_TENANT,
   BULK_MAX_FILTER_TARGETS,
   BULK_CONTACT_FIELD_SQL,
+  BULK_FILTER_COMPILERS,
 } from '../constants/bulk-action.constants'
 import type { BulkActionQueryDto, CreateBulkActionDto } from '../dto/bulk-action.dto'
 import type { BulkActionRow } from '../interfaces/bulk-action-row.interfaces'
@@ -228,8 +229,8 @@ export class BulkActionsService {
     if ((ROLE_HIERARCHY[user.role] ?? 0) < ROLE_HIERARCHY[required]) {
       throw new ForbiddenException(`Action "${dto.action}" requires role ${required} or higher`)
     }
-    if (dto.selection.mode === 'filter' && dto.entity !== 'contacts') {
-      throw new BadRequestException('Filter selection is only supported for contacts')
+    if (dto.selection.mode === 'filter' && !BULK_FILTER_COMPILERS[dto.entity]) {
+      throw new BadRequestException(`Filter selection is not available for ${dto.entity}`)
     }
     if (dto.selection.mode === 'ids' && !dto.selection.ids?.length) {
       throw new BadRequestException('selection.ids is required when mode is ids')
@@ -345,9 +346,12 @@ export class BulkActionsService {
   }
 
   private async resolveTargets(ctx: TenantContext, dto: CreateBulkActionDto): Promise<string[]> {
-    if (dto.selection.mode === 'ids') return [...new Set(dto.selection.ids ?? [])]
-    const ids = await this.targets.resolveContactIds(
+    const compile = BULK_FILTER_COMPILERS[dto.entity]
+    if (dto.selection.mode === 'ids' || !compile) return [...new Set(dto.selection.ids ?? [])]
+    const ids = await this.targets.resolveIdsByFilter(
       ctx.schemaName,
+      dto.entity,
+      compile,
       dto.selection.query ?? {},
       BULK_MAX_FILTER_TARGETS,
     )

@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { queryWrapper as wrapper } from '../../query-wrapper'
+import { contactObjectWrapper as wrapper } from '../../object-wrapper'
 
 import { useContactRowActions } from '@/widgets/contacts-board/model/useContactRowActions'
 

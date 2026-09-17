@@ -2,29 +2,33 @@
 
 import { useMemo } from 'react'
 
-import { useRestoreContact } from '@/entities/contact'
-import { useAssignContactOwner } from '@/features/assign-contact-owner'
-import { useChangeContactStatus } from '@/features/change-contact-status'
-import { useEditContactCustomFields, useEditContactFields } from '@/features/edit-contact-field'
+import { useRestoreRecord } from '@/features/archive-record'
+import {
+  useAssignRecordOwner,
+  useChangeRecordStatus,
+  useEditRecordCustomFields,
+  useEditRecordFields,
+} from '@/features/edit-record-field'
 import { useToggleContactActivity } from '@/features/log-contact-activity'
 import { useDialNumber } from '@/features/place-call'
 import { copyToClipboard } from '@/shared/lib/copy-to-clipboard'
 
-import type { ContactRowActions } from '@/entities/contact'
-import type { ArchiveContactDialogState } from '@/features/archive-contact'
+import type { ContactFieldsPatch, ContactRowActions } from '@/entities/contact'
+import type { ArchiveRecordDialogState } from '@/features/archive-record'
 import type { ContactComposers } from '@/features/compose-contact-actions'
+import type { ContactListItem } from '@repo/shared-types'
 
 export function useContactDetailActions(
   composers: ContactComposers,
-  archive: ArchiveContactDialogState,
+  archive: ArchiveRecordDialogState<ContactListItem>,
   onMerge: () => void,
 ): ContactRowActions {
-  const assignOwner = useAssignContactOwner()
-  const changeStatus = useChangeContactStatus()
+  const assignOwner = useAssignRecordOwner()
+  const changeStatus = useChangeRecordStatus()
   const dialNumber = useDialNumber()
-  const editCustomFields = useEditContactCustomFields()
-  const editFields = useEditContactFields()
-  const restore = useRestoreContact()
+  const editCustomFields = useEditRecordCustomFields()
+  const editFields = useEditRecordFields<ContactFieldsPatch>()
+  const restore = useRestoreRecord()
   const toggleActivity = useToggleContactActivity()
   const { openNote, openTags, openMessage, openActivity } = composers
 

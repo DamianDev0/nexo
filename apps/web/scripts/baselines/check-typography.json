@@ -1,6 +1,5 @@
 [
   "src/features/create-contact/ui/CustomFieldsSection.tsx :: {def.required && <span className=\"text-destructive\"> *</span>}",
-  "src/features/import-contacts/ui/FieldSelector.tsx :: {field.required && <span className=\"text-destructive\"> *</span>}",
   "src/features/manage-settings/ui/sections/fields/FieldTypePicker.tsx :: <span className=\"text-xs leading-tight\">{t(`settings.fields.types.${fieldType}`)",
   "src/features/setup-workspace/ui/AppearanceLivePreview/PreviewMain.tsx :: <span className=\"w-2/5 font-medium\" style={{ color: fg.main }}>",
   "src/features/setup-workspace/ui/AppearanceLivePreview/PreviewMain.tsx :: <span className=\"font-bold tabular-nums\" style={{ color: colors.primary }}>",

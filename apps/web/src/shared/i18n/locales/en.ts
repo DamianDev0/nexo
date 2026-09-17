@@ -523,7 +523,189 @@ const en = {
     nameTooLong: 'Max 120 characters',
     descriptionTooLong: 'Max 300 characters',
   },
+  records: {
+    lists: {
+      manage: 'Manage lists',
+    },
+    toolbar: {
+      more: 'More actions',
+      create: 'Add {{entity}}',
+    },
+    table: {
+      save: {
+        loading: 'Saving',
+        success: 'Saved',
+        error: 'Not saved',
+      },
+    },
+    pageRange: '{{from}}–{{to}} of {{total}} {{entities}}',
+    unavailable: {
+      title: 'We could not load the view',
+      description: 'The column configuration never arrived. Reload the page and try again.',
+    },
+    loadFailed: {
+      title: 'We could not load your {{entities}}',
+      description: 'The connection failed or the server did not answer. Your data is still there.',
+      retry: 'Try again',
+    },
+    empty: {
+      title: 'No {{entities}} yet',
+      description: 'Create the first record or import your {{entities}} from a CSV.',
+      cta: 'Create {{entity}}',
+    },
+    archivedEmpty: {
+      title: 'The {{entities}} trash is empty',
+      description: 'Whatever you archive from the list shows up here.',
+    },
+    noResults: {
+      title: 'No results',
+      description: 'Nothing matches your search. Adjust the filters and try again.',
+    },
+    toasts: {
+      fieldUpdated: 'Field updated',
+      statusUpdated: 'Status updated',
+      ownerUpdated: 'Owner updated',
+      tagsUpdated: 'Tags updated',
+      restored: '{{name}} is back on the list',
+    },
+    archive: {
+      action: 'Archive',
+      done: '{{name}} moved to the trash',
+      confirm: {
+        title: 'Archive {{entity}}',
+        description:
+          '{{name}} leaves the list and stops showing up in search. You can restore it from the trash.',
+        descriptionWithDeals_one:
+          '{{name}} has {{count}} open item in your {{deals}}. It leaves the list, but that record stays active.',
+        descriptionWithDeals_other:
+          '{{name}} has {{count}} open items in your {{deals}}. It leaves the list, but those records stay active.',
+        action: 'Archive',
+      },
+    },
+    tags: {
+      title: 'Tags for {{name}}',
+      search: 'Search tag…',
+      empty: 'No tags available',
+      selected_one: '{{count}} selected',
+      selected_other: '{{count}} selected',
+      save: 'Save',
+    },
+  },
+  imports: {
+    cta: 'Import',
+    title: 'Import {{entities}}',
+    stepper: {
+      upload: 'File',
+      configure: 'Configure',
+      map: 'Map',
+      review: 'Review',
+      done: 'Done',
+    },
+    steps: {
+      upload: 'Upload a CSV or Excel file with your {{entities}}.',
+      configure: 'Decide what to do with {{entities}} that already exist.',
+      map: 'Check which field each column goes to.',
+      review: 'This is what will happen when you import.',
+      done: 'Import finished.',
+    },
+    upload: {
+      cta: 'Click or drag your file',
+      reading: 'Reading the file...',
+      hint: 'CSV or Excel (.xlsx) with headers · Max {{size}}MB',
+      summary: '{{rows}} rows · {{columns}} columns',
+      templateHint: 'Not sure how to build it?',
+      templateCta: 'Download the template',
+      templateName: '{{entities}}-template.csv',
+    },
+    map: {
+      title: 'File columns',
+      columnHeader: 'File column',
+      sampleHeader: 'Sample',
+      fieldHeader: 'CRM field',
+      ignore: 'Do not import',
+      empty: 'No sample data',
+      missing: 'Still unmapped: {{fields}}',
+      search: 'Search field...',
+    },
+    preview: {
+      title: 'Preview',
+      counts: '{{valid}} valid · {{invalid}} with errors',
+      invalid: 'Row with errors',
+    },
+    review: {
+      ready: 'Ready to import',
+      warnings: 'With warnings',
+      errors: 'Will be skipped',
+      row: 'Row {{row}}',
+      noIssues: 'Nothing to review',
+      needsAttention: '{{count}} rows need your attention',
+      truncated: 'Showing the first {{shown}}',
+      filters: {
+        all: 'All',
+        errors: 'Errors',
+        warnings: 'Warnings',
+      },
+      skipSummary:
+        '{{ready}} {{entities}} will be created. Duplicates are skipped and {{errors}} rows with errors will not be imported.',
+      updateSummary:
+        '{{ready}} {{entities}} will be processed: new ones are created and existing ones are updated. {{errors}} rows with errors will not be imported.',
+      createSummary:
+        '{{ready}} {{entities}} will be created, even if a match already exists. {{errors}} rows with errors will not be imported.',
+    },
+    strategy: {
+      title: 'If the {{entity}} already exists',
+      skip: 'Skip',
+      update: 'Update',
+      create: 'Create another',
+      skipHint: 'Only new {{entities}} are created. Existing ones are left untouched.',
+      updateHint: 'New {{entities}} are created and existing ones are updated with the file data.',
+      createHint: 'A new {{entity}} is created even if a match already exists.',
+    },
+    done: {
+      title: 'Import complete',
+      subtitle: '{{total}} rows processed',
+      downloadReport: 'Download report',
+      reportName: 'import-report.csv',
+    },
+    actions: {
+      back: 'Back',
+      backToList: 'Back to {{entities}}',
+      changeFile: 'Change file',
+      continue: 'Continue',
+      checking: 'Checking...',
+      importCount: 'Import {{count}} {{entities}}',
+      importing: 'Importing...',
+      viewList: 'View {{entities}}',
+    },
+    errors: {
+      analyze: 'We could not read the file',
+      validate: 'We could not check the file',
+      execute: 'The import could not be completed',
+    },
+    result: {
+      imported: 'Created',
+      updated: 'Updated',
+      skipped: 'Skipped',
+    },
+  },
   contacts: {
+    import: {
+      fields: {
+        firstName: 'First name',
+        lastName: 'Last name',
+        email: 'Email',
+        phone: 'Phone',
+        whatsapp: 'WhatsApp',
+        documentType: 'Document type',
+        documentNumber: 'Document',
+        city: 'City',
+        status: 'Status',
+        source: 'Source',
+        lifecycleStage: 'Lifecycle stage',
+        tags: 'Tags',
+      },
+      matchNote: 'We match {{entities}} by email or document number.',
+    },
     filters: {
       lifecycleStage: 'Lifecycle',
       source: 'Source',
@@ -626,36 +808,6 @@ const en = {
       edit: 'Edit',
       archive: 'Archive',
     },
-    loadFailed: {
-      title: 'We could not load your {{entities}}',
-      description: 'The connection failed or the server did not answer. Your data is still there.',
-      retry: 'Try again',
-    },
-    empty: {
-      title: 'No {{entities}} yet',
-      description:
-        'Create your first {{entity}} or import them from a CSV — your customer base lives here.',
-      cta: 'Create {{entity}}',
-    },
-    archivedEmpty: {
-      title: 'No archived {{entities}}',
-      description: 'The {{entities}} you archive from the list will show up here.',
-    },
-    noResults: {
-      title: 'No results',
-      description: 'No {{entity}} matches your search. Adjust the filters and try again.',
-    },
-    table: {
-      save: {
-        loading: 'Saving',
-        success: 'Saved',
-        error: 'Not saved',
-      },
-    },
-    unavailable: {
-      title: 'We could not load the view',
-      description: 'The column configuration never arrived. Reload the page and try again.',
-    },
     form: {
       pickDate: 'Pick a date',
       pickTime: 'Time',
@@ -692,7 +844,6 @@ const en = {
       customFields: 'Additional information',
       customFieldSelect: 'Pick an option',
     },
-    pageRange: '{{from}}–{{to}} of {{total}} {{entities}}',
     hints: {
       pending_one: '{{count}} new {{entity}} not worked yet',
       pending_other: '{{count}} new {{entities}} not worked yet',
@@ -821,9 +972,6 @@ const en = {
         undoQueued: 'Undoing the bulk action…',
       },
     },
-    toolbar: {
-      more: 'More actions',
-    },
     cells: {
       pick: 'Pick {{field}}',
       edit: 'Edit {{field}}',
@@ -908,15 +1056,6 @@ const en = {
         bodyRequired: 'The note cannot be empty',
         bodyTooLong: 'Maximum {{max}} characters',
       },
-      tags: {
-        title: 'Tags for {{name}}',
-        search: 'Search tag…',
-        empty: 'No tags available',
-        selected_one: '{{count}} selected',
-        selected_other: '{{count}} selected',
-        save: 'Save',
-        saved: 'Tags updated',
-      },
       message: {
         title: {
           email: 'Email to {{name}}',
@@ -950,119 +1089,6 @@ const en = {
     },
     notesPopover: {
       title: 'Notes',
-    },
-    import: {
-      cta: 'Import',
-      title: 'Import {{entities}}',
-      stepper: {
-        upload: 'File',
-        configure: 'Configure',
-        map: 'Map',
-        review: 'Review',
-        done: 'Done',
-      },
-      steps: {
-        upload: 'Upload a CSV or Excel file with your {{entities}}.',
-        configure: 'Decide what to do with {{entities}} that already exist.',
-        map: 'Check which field each column goes to.',
-        review: 'This is what will happen when you import.',
-        done: 'Import finished.',
-      },
-      upload: {
-        cta: 'Click or drag your file',
-        reading: 'Reading the file...',
-        hint: 'CSV or Excel (.xlsx) with headers · Max {{size}}MB',
-        summary: '{{rows}} rows · {{columns}} columns',
-        templateHint: 'Not sure how to build it?',
-        templateCta: 'Download the template',
-        templateName: '{{entities}}-template.csv',
-      },
-      map: {
-        title: 'File columns',
-        columnHeader: 'File column',
-        sampleHeader: 'Sample',
-        fieldHeader: 'CRM field',
-        ignore: 'Do not import',
-        empty: 'No sample data',
-        missing: 'Still unmapped: {{fields}}',
-        search: 'Search field...',
-      },
-      fields: {
-        firstName: 'First name',
-        lastName: 'Last name',
-        email: 'Email',
-        phone: 'Phone',
-        whatsapp: 'WhatsApp',
-        documentType: 'Document type',
-        documentNumber: 'Document',
-        city: 'City',
-        status: 'Status',
-        source: 'Source',
-        lifecycleStage: 'Lifecycle stage',
-        tags: 'Tags',
-      },
-      preview: {
-        title: 'Preview',
-        counts: '{{valid}} valid · {{invalid}} with errors',
-        invalid: 'Row with errors',
-      },
-      review: {
-        ready: 'Ready to import',
-        warnings: 'With warnings',
-        errors: 'Will be skipped',
-        row: 'Row {{row}}',
-        noIssues: 'Nothing to review',
-        needsAttention: '{{count}} rows need your attention',
-        truncated: 'Showing the first {{shown}}',
-        filters: {
-          all: 'All',
-          errors: 'Errors',
-          warnings: 'Warnings',
-        },
-        skipSummary:
-          '{{ready}} {{entities}} will be created. Duplicates are skipped and {{errors}} rows with errors will not be imported.',
-        updateSummary:
-          '{{ready}} {{entities}} will be processed: new ones are created and existing ones are updated. {{errors}} rows with errors will not be imported.',
-        createSummary:
-          '{{ready}} {{entities}} will be created, even if a match already exists. {{errors}} rows with errors will not be imported.',
-      },
-      strategy: {
-        title: 'If the {{entity}} already exists',
-        skip: 'Skip',
-        update: 'Update',
-        create: 'Create another',
-        skipHint: 'Only new {{entities}} are created. Existing ones are left untouched.',
-        updateHint:
-          'New {{entities}} are created and existing ones are updated with the file data.',
-        createHint: 'A new {{entity}} is created even if a match already exists.',
-        matchNote: 'We match {{entities}} by email or document number.',
-      },
-      done: {
-        title: 'Import complete',
-        subtitle: '{{total}} rows processed',
-        downloadReport: 'Download report',
-        reportName: 'import-report.csv',
-      },
-      actions: {
-        back: 'Back',
-        backToContacts: 'Back to {{entities}}',
-        changeFile: 'Change file',
-        continue: 'Continue',
-        checking: 'Checking...',
-        importCount: 'Import {{count}} {{entities}}',
-        importing: 'Importing...',
-        viewContacts: 'View {{entities}}',
-      },
-      errors: {
-        analyze: 'We could not read the file',
-        validate: 'We could not check the file',
-        execute: 'The import could not be completed',
-      },
-      result: {
-        imported: 'Created',
-        updated: 'Updated',
-        skipped: 'Skipped',
-      },
     },
     tagCount_one: '{{count}} tag',
     tagCount_other: '{{count}} tags',
@@ -1120,20 +1146,6 @@ const en = {
         source: 'Source',
         companyId: 'Company',
         assignedToId: 'Owner',
-      },
-    },
-    archive: {
-      action: 'Archive',
-      done: '{{entity}} archived',
-      confirm: {
-        title: 'Archive {{entity}}',
-        description:
-          '{{name}} leaves the list and stops showing up in search. You can restore it from the trash.',
-        descriptionWithDeals_one:
-          '{{name}} has {{count}} open deal. Archiving takes the contact off the list, but the deal stays live.',
-        descriptionWithDeals_other:
-          '{{name}} has {{count}} open deals. Archiving takes the contact off the list, but the deals stay live.',
-        action: 'Archive',
       },
     },
     company: {
@@ -1284,10 +1296,6 @@ const en = {
     toasts: {
       created: '{{entity}} created',
       updated: '{{entity}} updated',
-      statusUpdated: 'Status updated',
-      ownerUpdated: 'Owner updated',
-      fieldUpdated: 'Field updated',
-      restored: '{{entity}} restored',
     },
     errors: {
       firstNameRequired: 'First name is required',

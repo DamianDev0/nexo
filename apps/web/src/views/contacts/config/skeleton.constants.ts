@@ -1,6 +1,6 @@
-import type { ContactsSkeletonHint } from '@/entities/contact'
+import type { RecordsSkeletonHint } from '@/entities/object-descriptor'
 
-export const DEFAULT_SKELETON_HINT: ContactsSkeletonHint = {
+export const DEFAULT_SKELETON_HINT: RecordsSkeletonHint = {
   widths: [40, 240, 150, 210, 130, 160, 150, 130, 150, 120, 130],
   rows: 10,
 }

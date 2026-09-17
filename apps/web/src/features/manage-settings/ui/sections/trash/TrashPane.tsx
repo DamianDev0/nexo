@@ -2,6 +2,8 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { CONTACT_DESCRIPTOR } from '@/entities/contact'
+import { ObjectDescriptorProvider } from '@/entities/object-descriptor'
 import { Text } from '@/shared/ui/atoms/text'
 import { SectionTabs } from '@/shared/ui/molecules/section-tabs'
 
@@ -26,7 +28,11 @@ export function TrashPane() {
         onChange={pane.onTabChange}
         className="mb-4"
       />
-      {pane.tab === 'contacts' && <ArchivedContactsList />}
+      {pane.tab === 'contacts' && (
+        <ObjectDescriptorProvider descriptor={CONTACT_DESCRIPTOR}>
+          <ArchivedContactsList />
+        </ObjectDescriptorProvider>
+      )}
       {pane.tab === 'tags' && <ArchivedTagsList />}
       {pane.tab === 'fields' && <ArchivedFieldsList />}
     </div>

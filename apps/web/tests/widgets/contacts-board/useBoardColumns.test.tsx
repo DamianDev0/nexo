@@ -8,7 +8,7 @@ import type { ContactRowActions, ContactTaxonomyMaps } from '@/entities/contact'
 import type { TaxonomyChoice } from '@/entities/contact-taxonomy'
 import type { ContactColumnDef, ContactListItem } from '@repo/shared-types'
 
-import { usePendingContactPatches } from '@/entities/contact/model/contact-pending.store'
+import { usePendingRecordPatches } from '@/entities/object-descriptor/model/record-pending.store'
 import { useBoardColumns } from '@/widgets/contacts-board/model/useBoardColumns'
 
 vi.mock('@/entities/tag', async (importOriginal) => ({
@@ -60,7 +60,7 @@ function Harness({ contact, columnId }: Readonly<{ contact: ContactListItem; col
 }
 
 beforeEach(() => {
-  usePendingContactPatches.getState().end([...usePendingContactPatches.getState().ids])
+  usePendingRecordPatches.getState().end([...usePendingRecordPatches.getState().ids])
 })
 
 describe('useBoardColumns', () => {
@@ -70,10 +70,10 @@ describe('useBoardColumns', () => {
 
     expect(container.querySelector('[aria-busy="true"]')).toBeNull()
 
-    act(() => usePendingContactPatches.getState().begin([{ id: 'c-1', keys: ['firstName'] }]))
+    act(() => usePendingRecordPatches.getState().begin([{ id: 'c-1', keys: ['firstName'] }]))
     expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
 
-    act(() => usePendingContactPatches.getState().end(['c-1']))
+    act(() => usePendingRecordPatches.getState().end(['c-1']))
     expect(container.querySelector('[aria-busy="true"]')).toBeNull()
   })
 
@@ -81,7 +81,7 @@ describe('useBoardColumns', () => {
     const contact = buildContact({ id: 'c-1' })
     const { container } = render(<Harness contact={contact} columnId="name" />)
 
-    act(() => usePendingContactPatches.getState().begin([{ id: 'c-1', keys: ['assignedToId'] }]))
+    act(() => usePendingRecordPatches.getState().begin([{ id: 'c-1', keys: ['assignedToId'] }]))
 
     expect(container.querySelector('[aria-busy="true"]')).toBeNull()
   })
@@ -91,7 +91,7 @@ describe('useBoardColumns', () => {
     const { container } = render(<Harness contact={contact} columnId="name" />)
 
     act(() =>
-      usePendingContactPatches.getState().begin([{ id: 'someone-else', keys: ['firstName'] }]),
+      usePendingRecordPatches.getState().begin([{ id: 'someone-else', keys: ['firstName'] }]),
     )
 
     expect(container.querySelector('[aria-busy="true"]')).toBeNull()

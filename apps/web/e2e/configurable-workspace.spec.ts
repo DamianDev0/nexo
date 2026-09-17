@@ -109,8 +109,8 @@ test.describe('workspace › configurable CRM', () => {
     await page.goto('/contacts')
     await dismissDevOverlay(page)
     await page.getByRole('button', { name: 'Ciclo de vida' }).click()
-    await expect(page.getByRole('menuitem', { name: 'Lead entrante' })).toBeVisible()
-    await expect(page.getByRole('menuitem', { name: 'En tratamiento' })).toBeVisible()
+    await expect(page.getByRole('option', { name: 'Lead entrante' })).toBeVisible()
+    await expect(page.getByRole('option', { name: 'En tratamiento' })).toBeVisible()
 
     await page.goto('/settings/contacts/lifecycle')
     await dismissDevOverlay(page)
@@ -127,8 +127,10 @@ test.describe('workspace › configurable CRM', () => {
     await page.getByRole('button', { name: 'Agregar' }).click()
     await expect(page.getByRole('heading', { name: 'Nuevo campo' })).toBeVisible()
     await page.getByLabel('Nombre del campo').fill('Metros cuadrados')
-    await page.getByLabel('Tipo de campo').click()
-    await page.getByRole('option', { name: 'Número' }).click()
+    await page
+      .getByRole('radiogroup', { name: 'Tipo de campo' })
+      .getByRole('radio', { name: 'Número' })
+      .click()
 
     const created = page.waitForResponse(
       (res) => res.url().includes('/settings/custom-fields/contacts') && res.status() === 201,
@@ -138,7 +140,7 @@ test.describe('workspace › configurable CRM', () => {
     await expect(page.getByText('Metros cuadrados')).toBeVisible()
 
     await openNewContactSheet(page)
-    await expect(page.getByText('Campos personalizados')).toBeVisible()
+    await expect(page.getByRole('spinbutton', { name: 'Metros cuadrados' })).toBeVisible()
 
     await page.locator('input[name="firstName"]').fill('Julia')
     await page.getByLabel('Metros cuadrados').fill('120')
@@ -146,7 +148,10 @@ test.describe('workspace › configurable CRM', () => {
     const posted = page.waitForRequest(
       (req) => req.url().endsWith('/contacts') && req.method() === 'POST',
     )
-    await page.getByRole('button', { name: /^Crear Paciente/i }).click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /^Crear Paciente/i })
+      .click()
     const body = (await posted).postDataJSON() as { customFields?: Record<string, unknown> }
     expect(body.customFields).toEqual({ metros_cuadrados: 120 })
 

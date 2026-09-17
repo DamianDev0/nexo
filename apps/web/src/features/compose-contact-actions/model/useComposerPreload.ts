@@ -6,7 +6,7 @@ const IDLE_FALLBACK_MS = 1200
 
 function warmComposerChunks(): void {
   void import('@/features/add-contact-note')
-  void import('@/features/tag-contact')
+  void import('@/features/tag-record')
   void import('@/features/compose-message')
   void import('@/features/log-contact-activity')
   void import('@/features/preview-contact')

@@ -2,7 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
-import { ArchiveContactDialog } from '@/features/archive-contact'
+import { ArchiveRecordDialog } from '@/features/archive-record'
 import { ContactComposerHost } from '@/features/compose-contact-actions'
 import { MergeContactsDialog } from '@/features/merge-contacts'
 import { useContactRecord } from '@/features/preview-contact'
@@ -51,7 +51,7 @@ export function ContactDetailLoaded({ contact, detail }: Readonly<ContactDetailL
       <ContactDetailMain contact={contact} record={record} tabs={tabs} activities={activities} />
       <ContactDetailPanels activities={activities} add={record.add} deals={deals} />
       <RecordLayout.Rail items={rail} label={t('contacts.detail.rail')} />
-      <ArchiveContactDialog state={archive} />
+      <ArchiveRecordDialog state={archive} />
       <MergeContactsDialog winner={contact} state={mergeDialog} />
       <ContactComposerHost composers={composers} />
     </RecordLayout>

@@ -45,5 +45,10 @@ Record-type-agnostic capabilities live in an object engine keyed by `ObjectType`
   layout persists for every object.
 - Engine changes affect every object at once. The engine has its own unit suite in
   `shared/object-engine/__tests__` and each module keeps a cross-tenant e2e spec.
-- Still record-specific and pending extraction: inline field editing, archive/restore,
-  bulk filter selection, import and the board widget.
+- Also generic now: inline field edits, status, owner, tags, archive/restore
+  (`edit-record-field`, `tag-record`, `archive-record`), bulk filter selection
+  (`BULK_FILTER_COMPILERS`), the import wizard (`import-records`) and the board
+  shell (`widgets/records-board`). A record board composes `RecordsTable` with its own
+  slots; the descriptor carries api, routes, import config, icon and copy keys.
+- Still record-specific: the list query and smart lists (`filter-contacts`), the
+  create/edit form, the record page and the API import writer.
