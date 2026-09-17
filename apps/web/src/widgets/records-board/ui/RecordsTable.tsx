@@ -88,7 +88,7 @@ export function RecordsTable<TRecord>({
         </ActionMenu>
         <PillButton size="sm" className="gap-1.5 rounded-md" onClick={actions.onCreate}>
           <PlusIcon className="size-4" />
-          {t('records.toolbar.create')}
+          {t('records.toolbar.create', { entity: terms.lowerSingular })}
         </PillButton>
       </DataTable.SmartLists>
 

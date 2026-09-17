@@ -532,7 +532,7 @@ const es = {
     },
     toolbar: {
       more: 'Más acciones',
-      create: 'Crear',
+      create: 'Agregar {{entity}}',
     },
     table: {
       save: {
