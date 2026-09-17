@@ -20,6 +20,28 @@ export const CONTACT_TAG_CATALOG: readonly CatalogTag[] = [
   { name: 'Moroso', color: '#F87171', description: 'Tiene pagos pendientes o vencidos' },
 ]
 
+export interface ScriptTenant {
+  slug: string
+  schemaName: string
+}
+
+export async function findActiveTenants(
+  runner: QueryRunner,
+  slug: string | null,
+): Promise<ScriptTenant[]> {
+  const rows = (await runner.query(
+    `SELECT slug, "schemaName" FROM public.tenants
+     WHERE "isActive" = true AND ($1::text IS NULL OR slug = $1)`,
+    [slug],
+  )) as ScriptTenant[]
+  return rows.filter((tenant) => SCHEMA_PATTERN.test(tenant.schemaName))
+}
+
+export function tenantSlugArgument(argv: readonly string[]): string | null {
+  const index = argv.indexOf('--tenant')
+  return index === -1 ? null : (argv[index + 1] ?? null)
+}
+
 export function createScriptDataSource(): DataSource {
   return new DataSource({
     type: 'postgres',

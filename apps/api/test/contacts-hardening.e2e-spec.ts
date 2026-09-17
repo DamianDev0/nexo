@@ -1,6 +1,11 @@
 import { type INestApplication } from '@nestjs/common'
 import request from 'supertest'
 
+import {
+  findDocumentCollisionRows,
+  groupDocumentCollisions,
+} from '../scripts/lib/document-collisions'
+import { TENANT_MIGRATIONS } from '../src/shared/database/tenant-migrations'
 import { createTestApp, onboardTenant, asTenant, teardownTenants, API_PREFIX } from './helpers/e2e'
 import type { TestApp, OnboardedTenant } from './helpers/e2e'
 
@@ -159,6 +164,12 @@ describe('Contacts hardening: fresh tenants, concurrency, search (E2E, real HTTP
       .send({ firstName: 'Repetida', documentType: 'nit', documentNumber: '900373115' })
       .expect(409)
     expect(clash.body.message).toBeDefined()
+
+    const probe = await asTenant(
+      request(server()).get(`/${API_PREFIX}/contacts/duplicates/probe?documentNumber=900.373.115`),
+      tenant,
+    ).expect(200)
+    expect(probe.body.data.duplicate).toMatchObject({ severity: 'hard', field: 'documentNumber' })
   })
 
   it('refuses to resurrect the loser of a merge and keeps it out of the trash', async () => {
@@ -195,5 +206,118 @@ describe('Contacts hardening: fresh tenants, concurrency, search (E2E, real HTTP
     await asTenant(request(server()).patch(`/${API_PREFIX}/contacts/${id}`), tenant)
       .send({ city: 'Cali' })
       .expect(404)
+  })
+
+  it('reports the documents 0047 could not normalize because a twin already holds them', async () => {
+    const insert = async (name: string, document: string): Promise<string> => {
+      const rows = (await ctx.dataSource.query(
+        `INSERT INTO "${tenant.schemaName}".contacts (first_name, document_type, document_number)
+         VALUES ($1, 'cc', $2) RETURNING id`,
+        [name, document],
+      )) as Array<{ id: string }>
+      return rows[0]!.id
+    }
+    const clean = await insert('Limpia', '1020304050')
+    const dirty = await insert('Sucia', '1.020.304.050')
+    const alone = await insert('Sola', '2.030.405.060')
+
+    const migration = TENANT_MIGRATIONS.find(
+      (m) => m.id === '0047_contacts_document_number_normalized',
+    )
+    await ctx.dataSource.query(migration!.up(tenant.schemaName))
+
+    const runner = ctx.dataSource.createQueryRunner()
+    try {
+      const collisions = groupDocumentCollisions(
+        await findDocumentCollisionRows(runner, tenant.schemaName),
+      )
+      expect(collisions).toEqual([
+        expect.objectContaining({
+          normalized: '1020304050',
+          active: true,
+          contacts: [
+            expect.objectContaining({ id: clean, clean: true }),
+            expect.objectContaining({ id: dirty, clean: false }),
+          ],
+        }),
+      ])
+      expect(JSON.stringify(collisions)).not.toContain(alone)
+    } finally {
+      await runner.release()
+    }
+  })
+
+  describe('lifecycle stage backfill and subscriber remap', () => {
+    const REMAP = '0049_contacts_lifecycle_stage_remap'
+
+    async function setLifecycleStages(stages: unknown): Promise<void> {
+      await ctx.dataSource.query(
+        `UPDATE public.tenants
+         SET config = jsonb_set(COALESCE(config, '{}'::jsonb), '{contactTaxonomy}',
+           COALESCE(config -> 'contactTaxonomy', '{}'::jsonb) || jsonb_build_object('lifecycleStages', $1::jsonb))
+         WHERE "schemaName" = $2`,
+        [JSON.stringify(stages), tenant.schemaName],
+      )
+    }
+
+    async function insertWithStage(stage: string | null): Promise<string> {
+      const rows = (await ctx.dataSource.query(
+        `INSERT INTO "${tenant.schemaName}".contacts (first_name, lifecycle_stage)
+         VALUES ('Remap', $1) RETURNING id`,
+        [stage],
+      )) as Array<{ id: string }>
+      return rows[0]!.id
+    }
+
+    async function stageOf(id: string): Promise<string | null> {
+      const rows = (await ctx.dataSource.query(
+        `SELECT lifecycle_stage FROM "${tenant.schemaName}".contacts WHERE id = $1`,
+        [id],
+      )) as Array<{ lifecycle_stage: string | null }>
+      return rows[0]?.lifecycle_stage ?? null
+    }
+
+    async function runRemap(): Promise<void> {
+      const migration = TENANT_MIGRATIONS.find((m) => m.id === REMAP)
+      await ctx.dataSource.query(migration!.up(tenant.schemaName))
+    }
+
+    afterAll(async () => {
+      await ctx.dataSource.query(
+        `UPDATE public.tenants SET config = config #- '{contactTaxonomy,lifecycleStages}'
+         WHERE "schemaName" = $1`,
+        [tenant.schemaName],
+      )
+    })
+
+    it('picks the enabled stage with the lowest order, not the first one stored', async () => {
+      await setLifecycleStages([
+        { key: 'cliente', order: 3, enabled: true },
+        { key: 'archivado', order: 0, enabled: false },
+        { key: 'prospecto', order: 1, enabled: true },
+      ])
+      const empty = await insertWithStage(null)
+      const legacy = await insertWithStage('subscriber')
+      const kept = await insertWithStage('cliente')
+
+      await runRemap()
+
+      expect(await stageOf(empty)).toBe('prospecto')
+      expect(await stageOf(legacy)).toBe('prospecto')
+      expect(await stageOf(kept)).toBe('cliente')
+    })
+
+    it('leaves subscriber alone for a tenant still on the default catalog', async () => {
+      await ctx.dataSource.query(
+        `UPDATE public.tenants SET config = config #- '{contactTaxonomy,lifecycleStages}'
+         WHERE "schemaName" = $1`,
+        [tenant.schemaName],
+      )
+      const legacy = await insertWithStage('subscriber')
+
+      await runRemap()
+
+      expect(await stageOf(legacy)).toBe('subscriber')
+    })
   })
 })

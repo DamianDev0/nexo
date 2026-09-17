@@ -8,23 +8,9 @@ import { type QueryRunner } from 'typeorm'
 import {
   backfillTagDescriptions,
   createScriptDataSource,
-  SCHEMA_PATTERN,
+  findActiveTenants,
+  tenantSlugArgument,
 } from './lib/tenant-scripts'
-
-interface TenantRow {
-  slug: string
-  schemaName: string
-}
-
-async function findTenants(runner: QueryRunner, slug: string | null): Promise<TenantRow[]> {
-  const where = slug ? 'AND slug = $1' : ''
-  const rows = (await runner.query(
-    `SELECT slug, "schemaName" FROM public.tenants WHERE "isActive" = true ${where}`,
-    slug ? [slug] : [],
-  )) as TenantRow[]
-
-  return rows.filter((tenant) => SCHEMA_PATTERN.test(tenant.schemaName))
-}
 
 async function cleanTenant(runner: QueryRunner, schema: string): Promise<number> {
   await backfillTagDescriptions(runner, schema)
@@ -49,9 +35,7 @@ async function cleanTenant(runner: QueryRunner, schema: string): Promise<number>
 }
 
 async function main(): Promise<void> {
-  const argv = process.argv.slice(2)
-  const tenantIndex = argv.indexOf('--tenant')
-  const slug = tenantIndex === -1 ? null : (argv[tenantIndex + 1] ?? null)
+  const slug = tenantSlugArgument(process.argv.slice(2))
 
   const dataSource = createScriptDataSource()
   await dataSource.initialize()
@@ -59,7 +43,7 @@ async function main(): Promise<void> {
   await runner.connect()
 
   try {
-    const tenants = await findTenants(runner, slug)
+    const tenants = await findActiveTenants(runner, slug)
     if (tenants.length === 0) {
       console.log(slug ? `No active tenant "${slug}"` : 'No active tenants')
       return

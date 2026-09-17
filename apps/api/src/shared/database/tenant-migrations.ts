@@ -4,6 +4,35 @@ export interface TenantMigration {
   up(schema: string): string
 }
 
+const DEFAULT_LIFECYCLE_STAGE_KEY = 'subscriber'
+
+function storedLifecycleStagesSql(schema: string): string {
+  return `
+    SELECT t.config -> 'contactTaxonomy' -> 'lifecycleStages' AS stages
+    FROM public.tenants t
+    WHERE t."schemaName" = '${schema}'
+      AND jsonb_typeof(t.config -> 'contactTaxonomy' -> 'lifecycleStages') = 'array'
+      AND jsonb_array_length(t.config -> 'contactTaxonomy' -> 'lifecycleStages') > 0
+  `
+}
+
+function tenantFirstLifecycleStageSql(schema: string): string {
+  return `
+    COALESCE(
+      (
+        SELECT option.value ->> 'key'
+        FROM (${storedLifecycleStagesSql(schema)}) stored
+        CROSS JOIN LATERAL jsonb_array_elements(stored.stages) WITH ORDINALITY AS option(value, idx)
+        ORDER BY COALESCE((option.value ->> 'enabled')::boolean, true) DESC,
+                 (option.value ->> 'order')::numeric ASC NULLS LAST,
+                 option.idx ASC
+        LIMIT 1
+      ),
+      '${DEFAULT_LIFECYCLE_STAGE_KEY}'
+    )
+  `
+}
+
 export const TENANT_MIGRATIONS: TenantMigration[] = [
   {
     id: '0001_audit_log_description_metadata',
@@ -912,20 +941,9 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
     id: '0046_contacts_lifecycle_tenant_default',
     up: (schema) => `
       ALTER TABLE "${schema}".contacts ALTER COLUMN lifecycle_stage DROP DEFAULT;
-      UPDATE "${schema}".contacts c
-      SET lifecycle_stage = stage.key
-      FROM (
-        SELECT option ->> 'key' AS key
-        FROM public.tenants t
-        CROSS JOIN LATERAL jsonb_array_elements(
-          COALESCE(t.config -> 'contactTaxonomy' -> 'lifecycleStages', '[]'::jsonb)
-        ) AS option
-        WHERE t."schemaName" = '${schema}'
-          AND COALESCE((option ->> 'enabled')::boolean, true)
-        ORDER BY COALESCE((option ->> 'position')::int, 0)
-        LIMIT 1
-      ) stage
-      WHERE c.lifecycle_stage IS NULL;
+      UPDATE "${schema}".contacts
+      SET lifecycle_stage = ${tenantFirstLifecycleStageSql(schema)}
+      WHERE lifecycle_stage IS NULL;
     `,
   },
   {
@@ -986,6 +1004,24 @@ export const TENANT_MIGRATIONS: TenantMigration[] = [
       END $$;
       ALTER TABLE "${schema}".object_workspace_states
         ADD CONSTRAINT object_workspace_states_user_type_key UNIQUE (user_id, object_type);
+    `,
+  },
+  {
+    id: '0049_contacts_lifecycle_stage_remap',
+    up: (schema) => `
+      UPDATE "${schema}".contacts
+      SET lifecycle_stage = ${tenantFirstLifecycleStageSql(schema)}
+      WHERE lifecycle_stage IS NULL;
+      UPDATE "${schema}".contacts
+      SET lifecycle_stage = ${tenantFirstLifecycleStageSql(schema)}, updated_at = NOW()
+      WHERE lifecycle_stage = '${DEFAULT_LIFECYCLE_STAGE_KEY}'
+        AND EXISTS (${storedLifecycleStagesSql(schema)})
+        AND NOT EXISTS (
+          SELECT 1
+          FROM (${storedLifecycleStagesSql(schema)}) stored
+          CROSS JOIN LATERAL jsonb_array_elements(stored.stages) AS option
+          WHERE option ->> 'key' = '${DEFAULT_LIFECYCLE_STAGE_KEY}'
+        );
     `,
   },
 ]

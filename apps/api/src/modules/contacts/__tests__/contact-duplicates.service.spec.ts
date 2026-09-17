@@ -67,6 +67,17 @@ describe('ContactDuplicatesService', () => {
       }
     })
 
+    it('matches a document typed with dots and dashes against the stored digits', async () => {
+      qr.query.mockResolvedValueOnce([makeDuplicateRow()])
+
+      await expect(
+        service.assertNoDuplicates(qr as never, { documentNumber: '900.373.115-1' }),
+      ).rejects.toThrow(ConflictException)
+
+      const [, params] = qr.query.mock.calls[0] as [string, unknown[]]
+      expect(params[0]).toBe('9003731151')
+    })
+
     it('checks email before document number and stops at the first hard match', async () => {
       qr.query.mockResolvedValueOnce([makeDuplicateRow()])
 

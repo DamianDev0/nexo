@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common'
 import type { QueryRunner } from 'typeorm'
 import type { ContactDuplicatePayload } from '@repo/shared-types'
+import { normalizeDocumentNumber } from '@repo/shared-utils'
 import type { DuplicateProbe } from '../interfaces/contact-duplicate-row.interfaces'
 import { ContactDuplicatesRepository } from '../repositories/contact-duplicates.repository'
 import { mapContactDuplicatePayload } from '../mappers/contact-duplicate.mapper'
@@ -42,7 +43,7 @@ export class ContactDuplicatesService {
       if (rows.length > 0) return mapContactDuplicatePayload('hard', 'email', rows)
     }
 
-    const document = probe.documentNumber?.trim()
+    const document = probe.documentNumber ? normalizeDocumentNumber(probe.documentNumber) : ''
     if (document) {
       const rows = await this.repository.findByDocumentNumber(qr, document, excludeId)
       if (rows.length > 0) return mapContactDuplicatePayload('hard', 'documentNumber', rows)
