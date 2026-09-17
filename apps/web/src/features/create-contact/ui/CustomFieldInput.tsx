@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
+import { customFieldFromInput, customFieldToInput } from '@/entities/contact'
 import { DatePicker } from '@/shared/ui/molecules/date-picker'
 import { buildTimePickerLabels, TimePicker } from '@/shared/ui/molecules/time-picker'
 import {
@@ -11,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/shadcn/select'
-import { customFieldFromInput, customFieldToInput } from '@/entities/contact'
 import { Textarea } from '@/shared/ui/shadcn/textarea'
 import { AnimatedToggle } from '@/shared/ui/smoothui/animated-toggle'
 import { SmoothCheckbox } from '@/shared/ui/smoothui/checkbox'
